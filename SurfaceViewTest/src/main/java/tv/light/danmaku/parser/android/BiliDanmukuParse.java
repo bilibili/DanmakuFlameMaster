@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package tv.light.danmaku.parser;
+package tv.light.danmaku.parser.android;
 
 import tv.light.danmaku.model.DanmakuBase;
-import tv.light.danmaku.parser.android.AndroidFileSource;
+import tv.light.danmaku.parser.DanmakuParserBase;
+import tv.light.danmaku.parser.IDataSource;
 
 import java.util.List;
 
