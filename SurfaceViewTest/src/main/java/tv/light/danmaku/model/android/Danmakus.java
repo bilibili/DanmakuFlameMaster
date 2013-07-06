@@ -62,8 +62,8 @@ public class Danmakus implements IDanmakus {
             endItem = createItem("end");
         }
         if (startItem != null && endItem != null) {
-            startItem.setTime(startTime);
-            endItem.setTime(endTime);
+            startItem.time = startTime;
+            endItem.time = endTime;
             subItems.setItems(((SortedSet<DanmakuBase>) items).subSet(startItem, endItem));
             return subItems;
         }

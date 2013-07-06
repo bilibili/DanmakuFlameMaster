@@ -16,22 +16,19 @@
 
 package tv.light.danmaku.parser;
 
-import tv.light.danmaku.model.android.Danmakus;
+import tv.light.danmaku.model.DanmakuBase;
+import tv.light.danmaku.model.R2LDanmaku;
 
-/**
- *
- */
-public abstract class DanmakuParserBase {
-    protected IDataSource mDataSource;
+public class BiliDanmakuFactory {
 
-    public void load(IDataSource source) {
-        mDataSource = source;
+    public static DanmakuBase createDanmaku(int type) {
+        DanmakuBase instance = null;
+        if (type == 1) {
+            instance = new R2LDanmaku();
+        }
+        // TODO: more Danmaku type
+
+        return instance;
     }
-
-    public Danmakus parse() {
-        return parse(mDataSource);
-    }
-
-    public abstract Danmakus parse(IDataSource source);
 
 }

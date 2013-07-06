@@ -41,7 +41,7 @@ public abstract class DanmakuBase {
     /**
      * 字体大小
      */
-    public int textSize;
+    public float textSize;
 
     /**
      * 占位宽度
@@ -63,9 +63,10 @@ public abstract class DanmakuBase {
      */
     protected DanmakuTimer mTimer;
 
-    public void setTime(long time) {
-        this.time = time;
-    }
+    /**
+     * 索引/编号
+     */
+    public int index;
 
     public void setTimer(DanmakuTimer timer) {
         mTimer = timer;
