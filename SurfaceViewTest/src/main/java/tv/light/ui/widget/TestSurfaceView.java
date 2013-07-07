@@ -17,15 +17,13 @@
 package tv.light.ui.widget;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
+import android.graphics.*;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -38,7 +36,8 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     private HandlerThread mDrawThread;
 
-    private Handler handler;
+    private DrawHandler handler;
+    private long startTime;
 
     public TestSurfaceView(Context context) {
         super(context);
@@ -74,7 +73,11 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     void drawCanvas(String text) {
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
+            Log.e("", "cycle:" + (System.currentTimeMillis() - startTime));
+            startTime = System.currentTimeMillis();
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             drawText(canvas, text);
+            Log.e("draw Time", "draw time:" + (System.currentTimeMillis() - startTime));
             mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
 
@@ -87,20 +90,20 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        startDraw();
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            quitDrawThread();
-        }
-        return super.onTouchEvent(event);
+        // startDraw();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // if (event.getAction() == MotionEvent.ACTION_UP) {
+        quitDrawThread();
+        // }
+        return super.onTouchEvent(event);
     }
 
     private void startDraw() {
@@ -112,10 +115,10 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     private void quitDrawThread() {
         if (handler != null) {
-            handler.sendEmptyMessage(DrawHandler.STOP);
+            handler.quit();// .sendEmptyMessage(DrawHandler.STOP);
             handler = null;
         }
-        if (mDrawThread == null) {
+        if (mDrawThread != null) {
             mDrawThread.quit();
             mDrawThread = null;
         }
@@ -130,10 +133,15 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         private static final int START = 1;
 
         private static final int UPDATE = 2;
-        private static final int STOP = 3;
+
+        private boolean quitFlag;
 
         public DrawHandler(Looper looper) {
             super(looper);
+        }
+
+        public void quit() {
+            quitFlag = true;
         }
 
         @Override
@@ -141,14 +149,14 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             int what = msg.what;
             switch (what) {
                 case START:
+                    quitFlag = false;
                     sendEmptyMessage(UPDATE);
                     break;
                 case UPDATE:
-                    drawTime();
-                    sendEmptyMessageDelayed(UPDATE, 100);
-                    break;
-                case STOP:
-                    removeCallbacksAndMessages(null);
+                    if (!quitFlag) {
+                        drawTime();
+                        sendEmptyMessageDelayed(UPDATE, 10);
+                    }
                     break;
             }
         }
