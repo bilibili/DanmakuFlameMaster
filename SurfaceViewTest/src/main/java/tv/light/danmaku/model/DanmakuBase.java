@@ -41,17 +41,17 @@ public abstract class DanmakuBase {
     /**
      * 字体大小
      */
-    public float textSize;
+    public float textSize = -1;
 
     /**
      * 占位宽度
      */
-    public float paintWidth;
+    public float paintWidth = -1;
 
     /**
      * 占位高度
      */
-    public float paintHeight;
+    public float paintHeight = -1;
 
     /**
      * 存活时间(毫秒)
@@ -59,7 +59,7 @@ public abstract class DanmakuBase {
     public long duration;
 
     /**
-     * 计时器
+     * 计时
      */
     protected DanmakuTimer mTimer;
 
@@ -81,7 +81,13 @@ public abstract class DanmakuBase {
     }
 
     public void draw(IDisplayer displayer) {
-        displayer.drawDanmaku(this);
+        displayer.draw(this);
+    }
+
+    public void measure(IDisplayer displayer) {
+        if (paintWidth < 0 && paintHeight < 0) {
+            displayer.measure(this);
+        }
     }
 
     public abstract void layout(IDisplayer displayer, float x, float y);

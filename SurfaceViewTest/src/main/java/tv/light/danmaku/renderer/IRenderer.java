@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package tv.light.danmaku.model;
+package tv.light.danmaku.renderer;
 
-public interface IDisplayer {
+import tv.light.danmaku.model.IDanmakus;
+import tv.light.danmaku.model.IDisplayer;
 
-    public abstract int getWidth();
+public interface IRenderer {
 
-    public abstract int getHeight();
+    public void draw(IDisplayer disp, IDanmakus danmakus);
 
-    public abstract void draw(DanmakuBase danmaku);
-
-    /**
-     * @param danmaku
-     * @return
-     */
-    public abstract void measure(DanmakuBase danmaku);
 }
