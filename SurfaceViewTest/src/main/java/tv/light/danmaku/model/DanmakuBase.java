@@ -84,10 +84,12 @@ public abstract class DanmakuBase {
         displayer.draw(this);
     }
 
+    public boolean isMeasured() {
+        return paintWidth >= 0 && paintHeight >= 0;
+    }
+
     public void measure(IDisplayer displayer) {
-        if (paintWidth < 0 && paintHeight < 0) {
-            displayer.measure(this);
-        }
+        displayer.measure(this);
     }
 
     public abstract void layout(IDisplayer displayer, float x, float y);

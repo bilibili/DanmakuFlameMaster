@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
  *
@@ -34,7 +33,9 @@ public class DanmakuRenderer extends Renderer {
         while (itr.hasNext()) {
             DanmakuBase drawItem = itr.next();
             // measure
-            drawItem.measure(disp);
+            if (!drawItem.isMeasured()) {
+                drawItem.measure(disp);
+            }
             // layout
             drawItem.layout(disp, 0, 0);
         }
