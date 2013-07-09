@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
  *
@@ -17,11 +16,12 @@
 
 package tv.light.danmaku.model.android;
 
+import tv.light.danmaku.model.DanmakuBase;
+import tv.light.danmaku.model.IDisplayer;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import tv.light.danmaku.model.DanmakuBase;
-import tv.light.danmaku.model.IDisplayer;
 
 /**
  * Created by ch on 13-7-5.
@@ -51,9 +51,10 @@ public class AndroidDisplayer implements IDisplayer {
     }
 
     private static Paint getPaint(DanmakuBase danmaku) {
-        PAINT.setTextSize(danmaku.textSize * 2);  //TODO: fixme
-        //PAINT.setColor(danmaku.textColor);
-        PAINT.setColor(danmaku.index % 3 == 0 ? Color.BLUE : Color.WHITE); //TODO: fixme
+        PAINT.setTextSize(danmaku.textSize * 2); // TODO: fixme
+        // PAINT.setColor(danmaku.textColor);
+        PAINT.setColor(danmaku.index % 3 == 0 ? Color.BLUE : Color.WHITE); // TODO:
+                                                                           // fixme
         // TODO: set the text shadow color
         return PAINT;
     }
@@ -82,7 +83,8 @@ public class AndroidDisplayer implements IDisplayer {
     public void draw(DanmakuBase danmaku) {
         if (canvas != null) {
             Paint paint = getPaint(danmaku);
-            canvas.drawText(danmaku.text, danmaku.getLeft(), danmaku.getTop() - paint.ascent(), paint);
+            canvas.drawText(danmaku.text, danmaku.getLeft(), danmaku.getTop() - paint.ascent(),
+                    paint);
         }
     }
 

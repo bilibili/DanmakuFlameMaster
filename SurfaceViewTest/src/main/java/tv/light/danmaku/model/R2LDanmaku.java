@@ -29,11 +29,12 @@ public class R2LDanmaku extends DanmakuBase {
     @Override
     public void layout(IDisplayer displayer, float x, float y) {
         if (mTimer != null) {
-            //if (time <= mTimer.currMillisecond && mTimer.currMillisecond - time <= duration) {
+            // if (time <= mTimer.currMillisecond && mTimer.currMillisecond -
+            // time <= duration) {
             this.x = (1 - (mTimer.currMillisecond - time) / (float) duration)
-                        * (displayer.getWidth() + paintWidth) - paintWidth;
-                this.y = y;
-            //}
+                    * (displayer.getWidth() + paintWidth) - paintWidth;
+            this.y = y;
+            // }
         }
     }
 
