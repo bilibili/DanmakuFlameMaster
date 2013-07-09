@@ -17,6 +17,10 @@
 package tv.light.ui.widget;
 
 import tv.light.controller.DrawHelper;
+import tv.light.controller.DrawTask;
+import tv.light.danmaku.model.DanmakuTimer;
+import tv.light.danmaku.model.android.AndroidDisplayer;
+import tv.light.danmaku.renderer.android.DanmakuRenderer;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -26,12 +30,11 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
     private SurfaceHolder mSurfaceHolder;
 
@@ -47,17 +50,23 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     private long maxDuration;
 
-    public TestSurfaceView(Context context) {
+    private DanmakuTimer timer;
+
+    private DanmakuRenderer renderer;
+
+    private DrawTask drawTask;
+
+    public DanmakuSurfaceView(Context context) {
         super(context);
         init();
     }
 
-    public TestSurfaceView(Context context, AttributeSet attrs) {
+    public DanmakuSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public TestSurfaceView(Context context, AttributeSet attrs, int defStyle) {
+    public DanmakuSurfaceView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -67,6 +76,8 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+        if (timer == null)
+            timer = new DanmakuTimer();
     }
 
     @Override
@@ -76,7 +87,7 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        // startDraw();
+
     }
 
     @Override
@@ -90,9 +101,14 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         // quitDrawThread();
         // }
 
-        updateCxCy(event.getX(), event.getY());
+        // updateCxCy(event.getX(), event.getY());
+        updateTimer();
 
         return true;
+    }
+
+    private void updateTimer() {
+        timer.currMillisecond += 100;
     }
 
     private void updateCxCy(float x, float y) {
@@ -101,10 +117,9 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void startDraw() {
-        // mDrawThread = new HandlerThread("draw thread");
-        // mDrawThread.start();
-        // handler = new DrawHandler(mDrawThread.getLooper());
-        handler = new DrawHandler();
+        mDrawThread = new HandlerThread("draw thread");
+        mDrawThread.start();
+        handler = new DrawHandler(mDrawThread.getLooper());
         handler.sendEmptyMessage(DrawHandler.START);
     }
 
@@ -119,30 +134,18 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
-    private void drawTime() {
-        drawSomeThing(System.currentTimeMillis() + "ms");
-    }
+    void drawSomeThing() {
 
-    void drawSomeThing(String text) {
-        if (startTime <= 0) {
-            startTime = System.currentTimeMillis();
-        }
-        long temp;
-        Log.e("", "cycle:" + (temp = System.currentTimeMillis() - startTime));
-        startTime = System.currentTimeMillis();
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
-
             DrawHelper.clearCanvas(canvas);
-            DrawHelper.drawDuration(
-                    canvas,
-                    String.valueOf(maxDuration = Math.max(temp, maxDuration)) + ":"
-                            + String.valueOf(avgDuration = (temp + avgDuration) / 2) + ":"
-                            + String.valueOf(temp));
-            DrawHelper.drawText(canvas, text);
-            DrawHelper.drawCircle(cx, cy, canvas);
+            canvas.drawText("sssss", 100, 100, AndroidDisplayer.PAINT);
+            if (drawTask == null)
+                drawTask = new DrawTask(timer, getContext());
+            drawTask.draw(canvas);
+
+            DrawHelper.drawCircle(100, 100, canvas);
             mSurfaceHolder.unlockCanvasAndPost(canvas);
-            Log.e("draw Time", "draw time:" + (System.currentTimeMillis() - startTime));
         }
 
     }
@@ -177,8 +180,8 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     break;
                 case UPDATE:
                     if (!quitFlag) {
-                        drawTime();
-                        sendEmptyMessageDelayed(UPDATE, 0);
+                        drawSomeThing();
+                        sendEmptyMessageDelayed(UPDATE, 50);
                     }
                     break;
             }

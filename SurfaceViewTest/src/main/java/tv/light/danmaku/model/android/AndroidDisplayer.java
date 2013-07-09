@@ -18,6 +18,7 @@
 package tv.light.danmaku.model.android;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import tv.light.danmaku.model.DanmakuBase;
 import tv.light.danmaku.model.IDisplayer;
@@ -27,8 +28,12 @@ import tv.light.danmaku.model.IDisplayer;
  */
 public class AndroidDisplayer implements IDisplayer {
 
-    private static Paint PAINT = new Paint();
+    public static Paint PAINT;
+
     static {
+        PAINT = new Paint();
+        PAINT.setColor(Color.RED);
+        PAINT.setTextSize(50);
         PAINT.setAntiAlias(true);
         // TODO: load font from file
     }
@@ -46,8 +51,9 @@ public class AndroidDisplayer implements IDisplayer {
     }
 
     private static Paint getPaint(DanmakuBase danmaku) {
-        PAINT.setTextSize(danmaku.textSize);
-        PAINT.setColor(danmaku.textColor);
+        PAINT.setTextSize(danmaku.textSize * 2);  //TODO: fixme
+        //PAINT.setColor(danmaku.textColor);
+        PAINT.setColor(danmaku.index % 3 == 0 ? Color.BLUE : Color.WHITE); //TODO: fixme
         // TODO: set the text shadow color
         return PAINT;
     }

@@ -20,7 +20,7 @@ import tv.light.controller.DrawHelper;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.PixelFormat;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -28,60 +28,41 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.View;
 
-public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+public class TestView extends View {
 
-    private SurfaceHolder mSurfaceHolder;
+    private long startTime;
+
+    private float cx;
+
+    private float cy;
 
     private HandlerThread mDrawThread;
 
     private DrawHandler handler;
 
-    private long startTime;
-
-    private float cx, cy;
-
     private long avgDuration;
 
     private long maxDuration;
 
-    public TestSurfaceView(Context context) {
+    public TestView(Context context) {
         super(context);
         init();
     }
 
-    public TestSurfaceView(Context context, AttributeSet attrs) {
+    public TestView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public TestSurfaceView(Context context, AttributeSet attrs, int defStyle) {
+    public TestView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
 
     private void init() {
-        setZOrderOnTop(true);
-        mSurfaceHolder = getHolder();
-        mSurfaceHolder.addCallback(this);
-        mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        startDraw();
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        // startDraw();
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
+        setBackgroundColor(Color.TRANSPARENT);
     }
 
     @Override
@@ -95,45 +76,41 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         return true;
     }
 
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        drawTime(canvas);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (changed) {
+            startDraw();
+        }
+    }
+
     private void updateCxCy(float x, float y) {
         cx = x;
         cy = y;
     }
 
-    private void startDraw() {
-        // mDrawThread = new HandlerThread("draw thread");
-        // mDrawThread.start();
-        // handler = new DrawHandler(mDrawThread.getLooper());
-        handler = new DrawHandler();
-        handler.sendEmptyMessage(DrawHandler.START);
+    private void drawTime(Canvas canvas) {
+        drawSomeThing(System.currentTimeMillis() + "ms", canvas);
+
     }
 
-    private void quitDrawThread() {
-        if (handler != null) {
-            handler.quit();// .sendEmptyMessage(DrawHandler.STOP);
-            handler = null;
-        }
-        if (mDrawThread != null) {
-            mDrawThread.quit();
-            mDrawThread = null;
-        }
-    }
-
-    private void drawTime() {
-        drawSomeThing(System.currentTimeMillis() + "ms");
-    }
-
-    void drawSomeThing(String text) {
+    void drawSomeThing(String text, Canvas canvas) {
         if (startTime <= 0) {
             startTime = System.currentTimeMillis();
         }
         long temp;
         Log.e("", "cycle:" + (temp = System.currentTimeMillis() - startTime));
         startTime = System.currentTimeMillis();
-        Canvas canvas = mSurfaceHolder.lockCanvas();
+
         if (canvas != null) {
 
-            DrawHelper.clearCanvas(canvas);
+            // DrawHelper.clearCanvas(canvas);
             DrawHelper.drawDuration(
                     canvas,
                     String.valueOf(maxDuration = Math.max(temp, maxDuration)) + ":"
@@ -141,10 +118,16 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                             + String.valueOf(temp));
             DrawHelper.drawText(canvas, text);
             DrawHelper.drawCircle(cx, cy, canvas);
-            mSurfaceHolder.unlockCanvasAndPost(canvas);
             Log.e("draw Time", "draw time:" + (System.currentTimeMillis() - startTime));
         }
+        this.invalidate();
+    }
 
+    private void startDraw() {
+        mDrawThread = new HandlerThread("draw thread");
+        mDrawThread.start();
+        handler = new DrawHandler(mDrawThread.getLooper());
+        handler.sendEmptyMessage(DrawHandler.START);
     }
 
     public class DrawHandler extends Handler {
@@ -154,10 +137,6 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         private static final int UPDATE = 2;
 
         private boolean quitFlag;
-
-        public DrawHandler() {
-            super();
-        }
 
         public DrawHandler(Looper looper) {
             super(looper);
@@ -177,7 +156,7 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     break;
                 case UPDATE:
                     if (!quitFlag) {
-                        drawTime();
+                        postInvalidate();
                         sendEmptyMessageDelayed(UPDATE, 0);
                     }
                     break;
@@ -185,5 +164,4 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
 
     }
-
 }

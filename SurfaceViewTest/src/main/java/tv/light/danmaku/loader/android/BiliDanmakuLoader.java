@@ -22,9 +22,19 @@ import tv.light.danmaku.parser.android.AndroidFileSource;
 
 import android.net.Uri;
 
+import java.io.InputStream;
+
 public class BiliDanmakuLoader implements ILoader {
 
     private static BiliDanmakuLoader _instance;
+
+    private AndroidFileSource dataSource;
+
+    private Uri uri;
+
+    public BiliDanmakuLoader() {
+
+    }
 
     public static BiliDanmakuLoader instance() {
         if (_instance == null) {
@@ -33,25 +43,25 @@ public class BiliDanmakuLoader implements ILoader {
         return _instance;
     }
 
-    private Uri uri;
-
-    public BiliDanmakuLoader() {
-
-    }
-
     /**
      * @param uri 弹幕文件地址(http:// file://)
      * @return
      */
-    @Override
-    public IDataSource load(String uri) {
+    public void load(String uri) {
         try {
             this.uri = Uri.parse(uri);
-            return new AndroidFileSource(uri);
+            dataSource = new AndroidFileSource(uri);
         } catch (Exception e) {
 
         }
-        return null;
     }
 
+    public void load(InputStream stream) {
+        dataSource = new AndroidFileSource(stream);
+    }
+
+    @Override
+    public IDataSource getDataSource() {
+        return dataSource;
+    }
 }

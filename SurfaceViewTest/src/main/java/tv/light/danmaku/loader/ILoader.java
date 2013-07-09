@@ -20,6 +20,6 @@ import tv.light.danmaku.parser.IDataSource;
 
 public interface ILoader {
 
-    public IDataSource load(String uri);
+    public IDataSource getDataSource();
 
 }

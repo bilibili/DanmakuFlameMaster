@@ -80,9 +80,9 @@ public class Danmakus implements IDanmakus {
         public int compare(DanmakuBase obj1, DanmakuBase obj2) {
             long val = obj1.time - obj2.time;
             if (val > 0) {
-                return -1;
-            } else if (val < 0) {
                 return 1;
+            } else if (val < 0) {
+                return -1;
             }
             if (obj1.text == obj2.text) {
                 return 0;

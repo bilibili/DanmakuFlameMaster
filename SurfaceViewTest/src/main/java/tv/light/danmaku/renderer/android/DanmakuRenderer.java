@@ -37,7 +37,10 @@ public class DanmakuRenderer extends Renderer {
                 drawItem.measure(disp);
             }
             // layout
-            drawItem.layout(disp, 0, 0);
+            drawItem.layout(disp, 0, 100);
+            // draw
+            drawItem.draw(disp);
+            //break;
         }
     }
 }

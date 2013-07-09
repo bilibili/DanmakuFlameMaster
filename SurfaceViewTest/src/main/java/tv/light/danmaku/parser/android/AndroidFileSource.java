@@ -46,6 +46,10 @@ public class AndroidFileSource implements IDataSource {
         fillStreamFromFile(file);
     }
 
+    public AndroidFileSource(InputStream stream) {
+        this.inStream = stream;
+    }
+
     public void fillStreamFromFile(File file) {
         try {
             inStream = new BufferedInputStream(new FileInputStream(file));

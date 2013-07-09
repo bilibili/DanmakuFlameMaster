@@ -32,6 +32,10 @@ import java.io.IOException;
 
 public class BiliDanmukuParse extends DanmakuParserBase {
 
+    static {
+        System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
+    }
+
     @Override
     public Danmakus parse(IDataSource ds) {
 
