@@ -51,7 +51,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     private static Paint getPaint(DanmakuBase danmaku) {
         PAINT.setTextSize(danmaku.textSize * 2); // TODO: fixme
-        PAINT.setColor(Color.rgb(danmaku.textColor >> 16, (danmaku.textColor & 0xFF00) >> 8, danmaku.textColor & 0x0000FF));
+        PAINT.setColor(danmaku.textColor);
         // TODO: set the text shadow color
         return PAINT;
     }
