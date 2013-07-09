@@ -16,12 +16,11 @@
 
 package tv.light.danmaku.model.android;
 
-import tv.light.danmaku.model.DanmakuBase;
-import tv.light.danmaku.model.IDisplayer;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import tv.light.danmaku.model.DanmakuBase;
+import tv.light.danmaku.model.IDisplayer;
 
 /**
  * Created by ch on 13-7-5.
@@ -52,9 +51,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     private static Paint getPaint(DanmakuBase danmaku) {
         PAINT.setTextSize(danmaku.textSize * 2); // TODO: fixme
-        // PAINT.setColor(danmaku.textColor);
-        PAINT.setColor(danmaku.index % 3 == 0 ? Color.BLUE : Color.WHITE); // TODO:
-                                                                           // fixme
+        PAINT.setColor(Color.rgb(danmaku.textColor >> 16, (danmaku.textColor & 0xFF00) >> 8, danmaku.textColor & 0x0000FF));
         // TODO: set the text shadow color
         return PAINT;
     }
