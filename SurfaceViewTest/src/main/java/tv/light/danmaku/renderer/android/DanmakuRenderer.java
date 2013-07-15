@@ -26,18 +26,23 @@ import java.util.Iterator;
 
 public class DanmakuRenderer extends Renderer {
 
+    public int dispWidth, dispHeight;
+
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus) {
         Danmakus drawItems = (Danmakus) danmakus;
         Iterator<DanmakuBase> itr = drawItems.items.iterator();
         while (itr.hasNext()) {
             DanmakuBase drawItem = itr.next();
+
             // measure
             if (!drawItem.isMeasured()) {
                 drawItem.measure(disp);
             }
             // layout
-            drawItem.layout(disp, 0, 100);
+            if (drawItem.isShown()) {
+                drawItem.layout(disp, 0, 100);
+            }
             // draw
             drawItem.draw(disp);
             // break;

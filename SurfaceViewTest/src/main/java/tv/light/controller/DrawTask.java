@@ -16,6 +16,8 @@
 
 package tv.light.controller;
 
+import android.content.Context;
+import android.graphics.Canvas;
 import tv.light.danmaku.loader.android.BiliDanmakuLoader;
 import tv.light.danmaku.loader.android.DanmakuLoaderFactory;
 import tv.light.danmaku.model.DanmakuBase;
@@ -28,9 +30,6 @@ import tv.light.danmaku.parser.android.BiliDanmukuParse;
 import tv.light.danmaku.renderer.IRenderer;
 import tv.light.danmaku.renderer.android.DanmakuRenderer;
 import tv.light.surfaceviewtest.R;
-
-import android.content.Context;
-import android.graphics.Canvas;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -55,19 +54,20 @@ public class DrawTask {
 
     private Danmakus danmakuList;
 
-    public DrawTask(DanmakuTimer timer, Context context) {
+    public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH) {
         this.timer = timer;
-        this.context = context;
-        loadBiliDanmakus(context.getResources().openRawResource(R.raw.comments));
         renderer = new DanmakuRenderer();
         disp = new AndroidDisplayer();
+        disp.width = dispW;
+        disp.height = dispH;
+        loadBiliDanmakus(context.getResources().openRawResource(R.raw.comments));
     }
 
     private void loadBiliDanmakus(InputStream stream) {
         loader = (BiliDanmakuLoader) DanmakuLoaderFactory.create("bili");
         loader.load(stream);
         dataSource = loader.getDataSource();
-        parser = new BiliDanmukuParse();
+        parser = new BiliDanmukuParse(disp.width);
         parser.load(dataSource);
         danmakuList = parser.parse();
 
@@ -81,7 +81,7 @@ public class DrawTask {
         if (danmakuList != null) {
             long currMills = timer.currMillisecond;
             IDanmakus danmakus = danmakuList.sub(currMills - 4000, currMills + 4000);
-            disp.canvas = canvas;
+            disp.init(canvas);
             if (danmakus != null) {
                 renderer.draw(disp, danmakus);
             }

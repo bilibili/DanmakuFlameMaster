@@ -22,8 +22,8 @@ public class R2LDanmaku extends DanmakuBase {
 
     private float y = -1;
 
-    public R2LDanmaku() {
-        duration = 4000;
+    public R2LDanmaku(long duration) {
+        this.duration = duration;
     }
 
     @Override
@@ -56,5 +56,12 @@ public class R2LDanmaku extends DanmakuBase {
     @Override
     public float getBottom() {
         return y + paintHeight;
+    }
+
+    @Override
+    public boolean isShown() {
+        if (mTimer != null)
+            return time <= mTimer.currMillisecond && mTimer.currMillisecond - time <= duration;
+        return false;
     }
 }

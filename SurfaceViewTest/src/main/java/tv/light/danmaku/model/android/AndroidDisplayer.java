@@ -16,11 +16,12 @@
 
 package tv.light.danmaku.model.android;
 
+import tv.light.danmaku.model.DanmakuBase;
+import tv.light.danmaku.model.IDisplayer;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import tv.light.danmaku.model.DanmakuBase;
-import tv.light.danmaku.model.IDisplayer;
 
 /**
  * Created by ch on 13-7-5.
@@ -39,18 +40,12 @@ public class AndroidDisplayer implements IDisplayer {
 
     public Canvas canvas;
 
-    public AndroidDisplayer() {
+    public int width;
 
-        this(null);
-    }
-
-    public AndroidDisplayer(Canvas c) {
-
-        canvas = c;
-    }
+    public int height;
 
     private static Paint getPaint(DanmakuBase danmaku) {
-        PAINT.setTextSize(danmaku.textSize * 2); // TODO: fixme
+        PAINT.setTextSize(danmaku.textSize); // TODO: fixme
         PAINT.setColor(danmaku.textColor);
         // TODO: set the text shadow color
         return PAINT;
@@ -58,22 +53,22 @@ public class AndroidDisplayer implements IDisplayer {
 
     public void init(Canvas c) {
         canvas = c;
+        if (c != null) {
+            width = c.getWidth();
+            height = c.getHeight();
+        }
     }
 
     @Override
     public int getWidth() {
-        if (canvas != null) {
-            return canvas.getWidth();
-        }
-        return 0;
+
+        return width;
     }
 
     @Override
     public int getHeight() {
-        if (canvas != null) {
-            return canvas.getHeight();
-        }
-        return 0;
+
+        return height;
     }
 
     @Override

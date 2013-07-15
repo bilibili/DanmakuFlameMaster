@@ -101,4 +101,7 @@ public abstract class DanmakuBase {
     public abstract float getRight();
 
     public abstract float getBottom();
+
+    public abstract boolean isShown();
+
 }

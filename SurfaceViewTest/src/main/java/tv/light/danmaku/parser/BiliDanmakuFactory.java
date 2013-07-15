@@ -21,14 +21,25 @@ import tv.light.danmaku.model.R2LDanmaku;
 
 public class BiliDanmakuFactory {
 
-    public static DanmakuBase createDanmaku(int type) {
+    public static float BILI_PLAYER_WIDTH = 539;
+
+    public static float BILI_PLAYER_HEIGHT = 385;
+
+    public static long COMMON_DANMAKU_DURATION = 4000;
+
+    public static DanmakuBase createDanmaku(int type, float dispWidth) {
         DanmakuBase instance = null;
         if (type == 1) {
-            instance = new R2LDanmaku();
+            instance = new R2LDanmaku(
+                    (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH)));
         }
         // TODO: more Danmaku type
 
         return instance;
+    }
+
+    public static void updateDanmakuDuration(DanmakuBase danmaku, float dispWidth) {
+        danmaku.duration = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
     }
 
 }
