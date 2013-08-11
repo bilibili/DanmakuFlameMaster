@@ -1,12 +1,15 @@
 # built application files
 *.apk
 *.ap_
+<<<<<<< HEAD
 *.com
 *.class
 *.dll
 *.exe
 *.o
 *.so
+=======
+>>>>>>> 351097be522728d2b272dfb22ddbe4da2e9aaf18
 
 # files for the dex VM
 *.dex
@@ -21,6 +24,7 @@ gen/
 # Local configuration file (sdk path, etc)
 local.properties
 
+<<<<<<< HEAD
 *~
 
 .settings/
@@ -30,3 +34,8 @@ local.properties
 build/
 *.iml
 out/
+=======
+# Eclipse project files
+.classpath
+.project
+>>>>>>> 351097be522728d2b272dfb22ddbe4da2e9aaf18
