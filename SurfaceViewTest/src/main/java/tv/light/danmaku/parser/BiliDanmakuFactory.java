@@ -17,6 +17,8 @@
 package tv.light.danmaku.parser;
 
 import tv.light.danmaku.model.BaseDanmaku;
+import tv.light.danmaku.model.FBDanmaku;
+import tv.light.danmaku.model.FTDanmaku;
 import tv.light.danmaku.model.R2LDanmaku;
 
 public class BiliDanmakuFactory {
@@ -30,14 +32,22 @@ public class BiliDanmakuFactory {
     public static long REAL_DANMAKU_DURATION = -1;
 
     public static BaseDanmaku createDanmaku(int type, float dispWidth) {
-        BaseDanmaku instance = null;
-        if (type == 1) {
-            if (REAL_DANMAKU_DURATION == -1)
-                REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
-            instance = new R2LDanmaku(REAL_DANMAKU_DURATION);
-        }
-        // TODO: more Danmaku type
+        if (REAL_DANMAKU_DURATION == -1)
+            REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
 
+        BaseDanmaku instance = null;
+        switch (type) {
+            case 1: // 从右往左滚动
+                instance = new R2LDanmaku(REAL_DANMAKU_DURATION);
+                break;
+            case 4: // 底端固定
+                instance = new FBDanmaku(REAL_DANMAKU_DURATION);
+                break;
+            case 5: // 顶端固定
+                instance = new FTDanmaku(COMMON_DANMAKU_DURATION);
+                break;
+            // TODO: more Danmaku type
+        }
         return instance;
     }
 

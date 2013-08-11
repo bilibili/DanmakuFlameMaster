@@ -119,6 +119,11 @@ public class Danmakus implements IDanmakus {
         return 0;
     }
 
+    public void clear() {
+        if (items != null)
+            items.clear();
+    }
+
     private class TimeComparator implements Comparator<BaseDanmaku> {
 
         @Override

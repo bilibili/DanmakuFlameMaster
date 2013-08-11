@@ -16,16 +16,15 @@
 
 package tv.light.danmaku.model;
 
-public class DanmakuTimer {
-    public long currMillisecond;
+public class FBDanmaku extends FTDanmaku {
 
-    public void update(long curr) {
-        currMillisecond = curr;
+    public FBDanmaku(long duration) {
+        super(duration);
     }
 
-    public void add(long mills) {
-        update(currMillisecond + mills);
+    @Override
+    public int getType() {
+        return TYPE_FIX_BOTTOM;
     }
-
 
 }

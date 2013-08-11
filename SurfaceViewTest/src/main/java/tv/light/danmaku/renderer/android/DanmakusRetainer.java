@@ -42,39 +42,44 @@ public class DanmakusRetainer {
                 rldrInstance.fix(danmaku, disp);
                 break;
             case BaseDanmaku.TYPE_FIX_TOP:
-
+                if (ftdrInstance == null) {
+                    ftdrInstance = new FTDanmakusRetainer();
+                }
+                ftdrInstance.fix(danmaku, disp);
                 break;
             case BaseDanmaku.TYPE_FIX_BOTTOM:
-
+                if (fbdrInstance == null) {
+                    fbdrInstance = new FBDanmakusRetainer();
+                }
+                fbdrInstance.fix(danmaku, disp);
                 break;
         }
 
     }
 
     public interface IDanmakusRetainer {
-        public void fix(BaseDanmaku danmaku, IDisplayer disp);
+        public void fix(BaseDanmaku drawItem, IDisplayer disp);
     }
 
     private static class RLDanmakusRetainer implements IDanmakusRetainer {
 
-        private Danmakus mLRDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
+        protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
 
         @Override
         public void fix(BaseDanmaku drawItem, IDisplayer disp) {
-
+            if (drawItem.isOutside()) return;
             float topPos = 0;
             boolean shown = drawItem.isShown();
             if (!shown) {
-                //确定弹幕位置
-                Iterator<BaseDanmaku> it = mLRDanmakus.iterator();
+                // 确定弹幕位置
+                Iterator<BaseDanmaku> it = mVisibleDanmakus.iterator();
                 BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null;
                 boolean overwriteInsert = false;
                 while (it.hasNext()) {
                     BaseDanmaku item = it.next();
-                    if (item.getTop() == 0)
+                    if (firstItem == null)
                         firstItem = item;
                     lastItem = item;
-
 
                     if (drawItem.paintHeight + item.getTop() > disp.getHeight()) {
                         overwriteInsert = true;
@@ -88,11 +93,6 @@ public class DanmakusRetainer {
                         }
                     }
 
-//                    if(item.isOutside()){
-//                        insertItem = item;
-//                        break;
-//                    }
-
                     // 检查碰撞
                     boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
                             drawItem.getDuration());
@@ -105,30 +105,57 @@ public class DanmakusRetainer {
 
                 if (insertItem != null) {
                     topPos = insertItem.getTop();
-                    mLRDanmakus.removeItem(insertItem);
+                    mVisibleDanmakus.removeItem(insertItem);
                 } else if (overwriteInsert) {
                     if (minRightRow != null) {
                         topPos = minRightRow.getTop();
-                        mLRDanmakus.removeItem(minRightRow);
+                        mVisibleDanmakus.removeItem(minRightRow);
                     }
                 } else if (lastItem != null && insertItem == null) {
-                    topPos = lastItem.getBottom();
+                    topPos = lastItem.getBottom();// checkVerticalEdge(drawItem,
+                    // disp, topPos, firstItem,
+                    // lastItem);
                 } else if (topPos == 0 && firstItem != null) {
                     topPos = firstItem.getTop();
-                    mLRDanmakus.removeItem(firstItem);
+                    mVisibleDanmakus.removeItem(firstItem);
                 } else if (firstItem == null) {
                     topPos = 0;
                 }
+
+                topPos = checkVerticalEdge(overwriteInsert, drawItem, disp, topPos, firstItem, lastItem);
             }
 
             // layout
-            drawItem.layout(disp, 0, topPos);
+            drawItem.layout(disp, drawItem.getLeft(), topPos);
 
             if (!shown) {
-                mLRDanmakus.addItem(drawItem);
+                mVisibleDanmakus.addItem(drawItem);
             }
 
         }
+
+        protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplayer disp, float topPos,
+                                          BaseDanmaku firstItem, BaseDanmaku lastItem) {
+            return topPos;
+        }
+
+    }
+
+    private static class FTDanmakusRetainer extends RLDanmakusRetainer {
+
+        @Override
+        protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplayer disp, float topPos,
+                                          BaseDanmaku firstItem, BaseDanmaku lastItem) {
+            if (topPos + drawItem.paintHeight > disp.getHeight()) {
+                topPos = 0;
+                mVisibleDanmakus.clear();
+            }
+            return topPos;
+        }
+
+    }
+
+    private static class FBDanmakusRetainer extends RLDanmakusRetainer {
 
     }
 

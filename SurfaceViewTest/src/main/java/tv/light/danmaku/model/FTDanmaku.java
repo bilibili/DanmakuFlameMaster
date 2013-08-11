@@ -16,13 +16,16 @@
 
 package tv.light.danmaku.model;
 
-public class R2LDanmaku extends BaseDanmaku {
+/**
+ * 顶部固定弹幕
+ */
+public class FTDanmaku extends BaseDanmaku {
 
     private float x = 0;
 
     private float y = -1;
 
-    public R2LDanmaku(long duration) {
+    public FTDanmaku(long duration) {
         this.duration = duration;
     }
 
@@ -31,11 +34,8 @@ public class R2LDanmaku extends BaseDanmaku {
         if (mTimer != null) {
             long deltaDuration = mTimer.currMillisecond - time;
             if (deltaDuration >= 0 && deltaDuration <= duration) {
-                // this.x = (1 - (mTimer.currMillisecond - time) / (float)
-                // duration)
-                // * (displayer.getWidth() + paintWidth) - paintWidth;
-                this.x = getLeft(displayer, mTimer.currMillisecond);
                 if (this.visibility == INVISIBLE) {
+                    this.x = getLeft(displayer);
                     this.y = y;
                     this.visibility = VISIBLE;
                 }
@@ -45,18 +45,21 @@ public class R2LDanmaku extends BaseDanmaku {
                 this.visibility = INVISIBLE;
             }
         }
+
     }
 
-    private float getLeft(IDisplayer displayer, long currTime) {
-        return (1 - (currTime - time) / (float) duration) * (displayer.getWidth() + paintWidth)
-                - paintWidth;
+    private float getLeft(IDisplayer displayer) {
+        float left = (displayer.getWidth() - paintWidth) / 2;
+        return left;
     }
 
     @Override
     public float[] getRectAtTime(IDisplayer displayer, long time) {
         if (!isMeasured())
             return null;
-        float left = getLeft(displayer, time);
+        if (isOutside(time))
+            return null;
+        float left = getLeft(displayer);
         float[] rect = new float[] {
                 left, y, left + paintWidth, y + paintHeight
         };
@@ -85,15 +88,6 @@ public class R2LDanmaku extends BaseDanmaku {
 
     @Override
     public int getType() {
-        return TYPE_SCROLL_RL;
+        return TYPE_FIX_TOP;
     }
-
-    // @Override
-    // public boolean isShown() {
-    // // if (mTimer != null)
-    // // return time <= mTimer.currMillisecond && mTimer.currMillisecond - time
-    // <= duration;
-    // // return false;
-    // return this.visibility == VISIBLE;
-    // }
 }

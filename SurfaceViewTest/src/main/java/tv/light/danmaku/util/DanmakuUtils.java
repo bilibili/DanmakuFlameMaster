@@ -16,10 +16,9 @@
 
 package tv.light.danmaku.util;
 
+import android.graphics.RectF;
 import tv.light.danmaku.model.BaseDanmaku;
 import tv.light.danmaku.model.IDisplayer;
-
-import android.graphics.RectF;
 
 public class DanmakuUtils {
 
@@ -50,12 +49,17 @@ public class DanmakuUtils {
             if (rect2.left < rect1.right) {
                 return true;
             }
-        }
-        if (d1.getType() == BaseDanmaku.TYPE_SCROLL_LR
+        } else if (d1.getType() == BaseDanmaku.TYPE_SCROLL_LR
                 && d2.getType() == BaseDanmaku.TYPE_SCROLL_LR) {
             if (rect2.right > rect1.left) {
                 return true;
             }
+        } else if (d1.getType() == BaseDanmaku.TYPE_FIX_TOP
+                && d2.getType() == BaseDanmaku.TYPE_FIX_TOP) {
+            return true;
+        } else if (d1.getType() == BaseDanmaku.TYPE_FIX_BOTTOM
+                && d2.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
+            return true;
         }
 
         // TODO: more type

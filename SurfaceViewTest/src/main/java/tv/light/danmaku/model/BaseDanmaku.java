@@ -19,10 +19,14 @@ package tv.light.danmaku.model;
 public abstract class BaseDanmaku {
 
     public final static int TYPE_SCROLL_RL = 1;
+
     public final static int TYPE_SCROLL_LR = 2;
+
     public final static int TYPE_FIX_TOP = 3;
+
     public final static int TYPE_FIX_BOTTOM = 4;
-    public final static int TYPE_MOVEABLE_XXX = 0;  //TODO: add more type
+
+    public final static int TYPE_MOVEABLE_XXX = 0; // TODO: add more type
 
     public final static int INVISIBLE = 0;
 
@@ -111,9 +115,14 @@ public abstract class BaseDanmaku {
         return this.visibility == VISIBLE;
     }
 
+    public boolean isOutside(long ctime) {
+        return time > ctime || ctime - time > duration;
+    }
+
     public boolean isOutside() {
-        if (mTimer != null)
-            return time > mTimer.currMillisecond || mTimer.currMillisecond - time > duration;
+        if (mTimer != null) {
+            return isOutside(mTimer.currMillisecond);
+        }
         return true;
     }
 
@@ -135,12 +144,9 @@ public abstract class BaseDanmaku {
 
     /**
      * return the type of Danmaku
-     *
-     * @return TYPE_SCROLL_RL = 0
-     * TYPE_SCROLL_RL = 1
-     * TYPE_SCROLL_LR = 2
-     * TYPE_FIX_TOP = 3;
-     * TYPE_FIX_BOTTOM = 4;
+     * 
+     * @return TYPE_SCROLL_RL = 0 TYPE_SCROLL_RL = 1 TYPE_SCROLL_LR = 2
+     *         TYPE_FIX_TOP = 3; TYPE_FIX_BOTTOM = 4;
      */
     public abstract int getType();
 

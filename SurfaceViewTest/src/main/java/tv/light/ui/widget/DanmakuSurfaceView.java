@@ -16,6 +16,12 @@
 
 package tv.light.ui.widget;
 
+import tv.light.controller.DrawHelper;
+import tv.light.controller.DrawTask;
+import tv.light.danmaku.model.DanmakuTimer;
+import tv.light.danmaku.model.android.AndroidDisplayer;
+import tv.light.danmaku.renderer.android.DanmakuRenderer;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
@@ -27,11 +33,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import tv.light.controller.DrawHelper;
-import tv.light.controller.DrawTask;
-import tv.light.danmaku.model.DanmakuTimer;
-import tv.light.danmaku.model.android.AndroidDisplayer;
-import tv.light.danmaku.renderer.android.DanmakuRenderer;
 
 public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -102,12 +103,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         // updateCxCy(event.getX(), event.getY());
         updateTimer();
-
+        drawSomeThing();
         return true;
     }
 
     private void updateTimer() {
-        timer.currMillisecond += 100;
+        timer.add(100);
     }
 
     private void updateCxCy(float x, float y) {
@@ -119,7 +120,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         mDrawThread = new HandlerThread("draw thread");
         mDrawThread.start();
         handler = new DrawHandler(mDrawThread.getLooper());
-        handler.sendEmptyMessage(DrawHandler.START);
+        // handler.sendEmptyMessage(DrawHandler.START);
     }
 
     private void quitDrawThread() {
