@@ -41,12 +41,15 @@ public class DanmakuRenderer extends Renderer {
                 drawItem.measure(disp);
             }
 
+            // layout
             DanmakusRetainer.fix(drawItem, disp);
 
             // draw
-            if (drawItem.isShown()) {
+            if (drawItem.isShown()
+                    && (drawItem.getType() != BaseDanmaku.TYPE_SCROLL_LR && drawItem.getLeft() < disp
+                    .getWidth() && drawItem.getRight() > 0)) {
                 drawItem.draw(disp);
-                //break;
+                // break;
             }
 
         }
