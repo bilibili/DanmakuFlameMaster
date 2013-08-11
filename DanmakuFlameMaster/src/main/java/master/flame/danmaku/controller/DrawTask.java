@@ -18,6 +18,7 @@ package master.flame.danmaku.controller;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import master.flame.danmaku.activity.R;
 import master.flame.danmaku.danmaku.loader.android.BiliDanmakuLoader;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
@@ -29,13 +30,10 @@ import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParse;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
-import master.flame.danmaku.activity.R;
 
 import java.io.InputStream;
 
 public class DrawTask {
-
-    private static final long DURATION = 4000;
 
     private final AndroidDisplayer disp;
 
