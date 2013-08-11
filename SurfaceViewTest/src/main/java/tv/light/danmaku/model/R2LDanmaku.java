@@ -16,7 +16,7 @@
 
 package tv.light.danmaku.model;
 
-public class R2LDanmaku extends DanmakuBase {
+public class R2LDanmaku extends BaseDanmaku {
 
     private float x = 0;
 
@@ -29,13 +29,33 @@ public class R2LDanmaku extends DanmakuBase {
     @Override
     public void layout(IDisplayer displayer, float x, float y) {
         if (mTimer != null) {
-            // if (time <= mTimer.currMillisecond && mTimer.currMillisecond -
-            // time <= duration) {
-            this.x = (1 - (mTimer.currMillisecond - time) / (float) duration)
-                    * (displayer.getWidth() + paintWidth) - paintWidth;
-            this.y = y;
-            // }
+            long deltaDuration = mTimer.currMillisecond - time;
+            if (deltaDuration >= 0 && deltaDuration <= duration) {
+                // this.x = (1 - (mTimer.currMillisecond - time) / (float)
+                // duration)
+                // * (displayer.getWidth() + paintWidth) - paintWidth;
+                this.x = getLeft(displayer, mTimer.currMillisecond);
+                if (this.visibility == INVISIBLE) {
+                    this.y = y;
+                    this.visibility = VISIBLE;
+                }
+            } else if (deltaDuration > duration) {
+                this.visibility = INVISIBLE;
+            } else if (deltaDuration < 0) {
+                this.visibility = INVISIBLE;
+            }
         }
+    }
+
+    @Override
+    public float[] getRectAtTime(IDisplayer displayer, long time) {
+        if (!isMeasured())
+            return null;
+        float left = getLeft(displayer, time);
+        float[] rect = new float[] {
+                left, y, left + paintWidth, y + paintHeight
+        };
+        return rect;
     }
 
     @Override
@@ -59,9 +79,21 @@ public class R2LDanmaku extends DanmakuBase {
     }
 
     @Override
-    public boolean isShown() {
-        if (mTimer != null)
-            return time <= mTimer.currMillisecond && mTimer.currMillisecond - time <= duration;
-        return false;
+    public int getType() {
+        return TYPE_SCROLL_RL;
     }
+
+    private float getLeft(IDisplayer displayer, long currTime) {
+        return (1 - (currTime - time) / (float) duration) * (displayer.getWidth() + paintWidth)
+                - paintWidth;
+    }
+
+    // @Override
+    // public boolean isShown() {
+    // // if (mTimer != null)
+    // // return time <= mTimer.currMillisecond && mTimer.currMillisecond - time
+    // <= duration;
+    // // return false;
+    // return this.visibility == VISIBLE;
+    // }
 }

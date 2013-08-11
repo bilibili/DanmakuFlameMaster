@@ -22,15 +22,16 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-import tv.light.danmaku.model.DanmakuBase;
+
+import tv.light.danmaku.model.BaseDanmaku;
 import tv.light.danmaku.model.android.Danmakus;
+import tv.light.danmaku.parser.BaseDanmakuParser;
 import tv.light.danmaku.parser.BiliDanmakuFactory;
-import tv.light.danmaku.parser.DanmakuParserBase;
 import tv.light.danmaku.parser.IDataSource;
 
 import java.io.IOException;
 
-public class BiliDanmukuParse extends DanmakuParserBase {
+public class BiliDanmukuParse extends BaseDanmakuParser {
 
     static {
         System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
@@ -68,7 +69,7 @@ public class BiliDanmukuParse extends DanmakuParserBase {
 
         public Danmakus result = null;
 
-        public DanmakuBase item = null;
+        public BaseDanmaku item = null;
 
         public boolean completed = false;
 
@@ -122,7 +123,7 @@ public class BiliDanmukuParse extends DanmakuParserBase {
                     item = BiliDanmakuFactory.createDanmaku(type, dispWidth);
                     if (item != null) {
                         item.time = time;
-                        item.textSize = textSize;
+                        item.textSize = textSize * 2;
                         item.textColor = color;
                     }
                 }
@@ -134,6 +135,7 @@ public class BiliDanmukuParse extends DanmakuParserBase {
             if (item != null) {
                 String tagName = localName.length() != 0 ? localName : qName;
                 if (tagName.equalsIgnoreCase("d")) {
+                    item.setTimer(mTimer);
                     result.addItem(item);
                 }
                 item = null;

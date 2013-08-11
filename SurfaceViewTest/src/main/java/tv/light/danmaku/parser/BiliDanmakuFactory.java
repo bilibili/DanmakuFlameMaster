@@ -16,7 +16,7 @@
 
 package tv.light.danmaku.parser;
 
-import tv.light.danmaku.model.DanmakuBase;
+import tv.light.danmaku.model.BaseDanmaku;
 import tv.light.danmaku.model.R2LDanmaku;
 
 public class BiliDanmakuFactory {
@@ -27,18 +27,21 @@ public class BiliDanmakuFactory {
 
     public static long COMMON_DANMAKU_DURATION = 4000;
 
-    public static DanmakuBase createDanmaku(int type, float dispWidth) {
-        DanmakuBase instance = null;
+    public static long REAL_DANMAKU_DURATION = -1;
+
+    public static BaseDanmaku createDanmaku(int type, float dispWidth) {
+        BaseDanmaku instance = null;
         if (type == 1) {
-            instance = new R2LDanmaku(
-                    (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH)));
+            if (REAL_DANMAKU_DURATION == -1)
+                REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
+            instance = new R2LDanmaku(REAL_DANMAKU_DURATION);
         }
         // TODO: more Danmaku type
 
         return instance;
     }
 
-    public static void updateDanmakuDuration(DanmakuBase danmaku, float dispWidth) {
+    public static void updateDanmakuDuration(BaseDanmaku danmaku, float dispWidth) {
         danmaku.duration = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
     }
 

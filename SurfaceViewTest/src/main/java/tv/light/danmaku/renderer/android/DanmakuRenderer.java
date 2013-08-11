@@ -16,36 +16,104 @@
 
 package tv.light.danmaku.renderer.android;
 
-import tv.light.danmaku.model.DanmakuBase;
+import tv.light.danmaku.model.BaseDanmaku;
 import tv.light.danmaku.model.IDanmakus;
 import tv.light.danmaku.model.IDisplayer;
 import tv.light.danmaku.model.android.Danmakus;
 import tv.light.danmaku.renderer.Renderer;
+import tv.light.danmaku.util.DanmakuUtils;
 
 import java.util.Iterator;
 
 public class DanmakuRenderer extends Renderer {
 
-    public int dispWidth, dispHeight;
+    public Danmakus mLRDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
 
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus) {
         Danmakus drawItems = (Danmakus) danmakus;
-        Iterator<DanmakuBase> itr = drawItems.items.iterator();
+        Iterator<BaseDanmaku> itr = drawItems.iterator();
+        int index = 0;
         while (itr.hasNext()) {
-            DanmakuBase drawItem = itr.next();
+            BaseDanmaku drawItem = itr.next();
 
             // measure
             if (!drawItem.isMeasured()) {
                 drawItem.measure(disp);
             }
-            // layout
-            if (drawItem.isShown()) {
-                drawItem.layout(disp, 0, 100);
+
+            float topPos = 0;
+            boolean shown = drawItem.isShown();
+            if (!shown) {
+                //确定弹幕位置
+                Iterator<BaseDanmaku> it = mLRDanmakus.iterator();
+                BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null;
+                boolean overwriteInsert = false;
+                while (it.hasNext()) {
+                    BaseDanmaku item = it.next();
+                    if (item.getTop() == 0)
+                        firstItem = item;
+                    lastItem = item;
+
+
+                    if (drawItem.paintHeight + item.getTop() > disp.getHeight()) {
+                        overwriteInsert = true;
+                        break;
+                    }
+                    if (minRightRow == null) {
+                        minRightRow = item;
+                    } else {
+                        if (minRightRow.getRight() >= item.getRight()) {
+                            minRightRow = item;
+                        }
+                    }
+
+//                    if(item.isOutside()){
+//                        insertItem = item;
+//                        break;
+//                    }
+
+                    // 检查碰撞
+                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
+                            drawItem.getDuration());
+                    if (!willHit) {
+                        insertItem = item;
+                        break;
+                    }
+
+                }
+
+                if (insertItem != null) {
+                    topPos = insertItem.getTop();
+                    mLRDanmakus.removeItem(insertItem);
+                } else if (overwriteInsert) {
+                    if (minRightRow != null) {
+                        topPos = minRightRow.getTop();
+                        mLRDanmakus.removeItem(minRightRow);
+                    }
+                } else if (lastItem != null && insertItem == null) {
+                    topPos = lastItem.getBottom();
+                } else if (topPos == 0 && firstItem != null) {
+                    topPos = firstItem.getTop();
+                    mLRDanmakus.removeItem(firstItem);
+                } else if (firstItem == null) {
+                    topPos = 0;
+                }
             }
+
+            // layout
+            drawItem.layout(disp, 0, topPos);
+
+            if (!shown) {
+                mLRDanmakus.addItem(drawItem);
+            }
+
             // draw
-            drawItem.draw(disp);
-            // break;
+            if (drawItem.isShown()) {
+                drawItem.draw(disp);
+                //break;
+            }
+
         }
     }
 }

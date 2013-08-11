@@ -16,38 +16,78 @@
 
 package tv.light.danmaku.model.android;
 
+import tv.light.danmaku.model.BaseDanmaku;
 import tv.light.danmaku.model.Danmaku;
-import tv.light.danmaku.model.DanmakuBase;
 import tv.light.danmaku.model.IDanmakus;
 
-import java.util.Comparator;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Danmakus implements IDanmakus {
 
-    public Set<DanmakuBase> items;
+    public static final int ST_BY_TIME = 0;
+
+    public static final int ST_BY_YPOS = 1;
+
+    public Set<BaseDanmaku> items;
 
     private Danmakus subItems;
 
-    private DanmakuBase startItem, endItem;
+    private BaseDanmaku startItem, endItem;
 
     public Danmakus() {
-        items = new TreeSet<DanmakuBase>(new DanmakusCompartor());
+        this(ST_BY_TIME);
     }
 
-    public Danmakus(Set<DanmakuBase> items) {
+    public Danmakus(int sortType) {
+        Comparator<BaseDanmaku> comparator = null;
+        if (sortType == ST_BY_TIME) {
+            comparator = new TimeComparator();
+        } else if (sortType == ST_BY_YPOS) {
+            comparator = new YPosComparator();
+        }
+        items = new TreeSet<BaseDanmaku>(comparator);
+    }
+
+    public Danmakus(Set<BaseDanmaku> items) {
         setItems(items);
     }
 
-    public void setItems(Set<DanmakuBase> items) {
+    public void setItems(Set<BaseDanmaku> items) {
+        if (this.items != null) {
+            Iterator<BaseDanmaku> it = this.items.iterator();
+            while (it.hasNext()) {
+                BaseDanmaku item = it.next();
+                if (item.isOutside()) {
+                    item.setVisibility(false);
+                } else {
+                    break;
+                }
+            }
+        }
         this.items = items;
     }
 
+    public Iterator<BaseDanmaku> iterator() {
+        if (items != null) {
+            return items.iterator();
+        }
+        return null;
+    }
+
     @Override
-    public void addItem(DanmakuBase item) {
-        items.add(item);
+    public void addItem(BaseDanmaku item) {
+        if (items != null)
+            items.add(item);
+    }
+
+    @Override
+    public void removeItem(BaseDanmaku item) {
+        if (item.isOutside()) {
+            item.setVisibility(false);
+        }
+        if (items != null) {
+            items.remove(item);
+        }
     }
 
     @Override
@@ -61,23 +101,21 @@ public class Danmakus implements IDanmakus {
         if (endItem == null) {
             endItem = createItem("end");
         }
-        if (startItem != null && endItem != null) {
-            startItem.time = startTime;
-            endItem.time = endTime;
-            subItems.setItems(((SortedSet<DanmakuBase>) items).subSet(startItem, endItem));
-            return subItems;
-        }
-        return null;
+
+        startItem.time = startTime;
+        endItem.time = endTime;
+        subItems.setItems(((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem));
+        return subItems;
     }
 
-    private DanmakuBase createItem(String text) {
+    private BaseDanmaku createItem(String text) {
         return new Danmaku(text);
     }
 
-    private class DanmakusCompartor implements Comparator<DanmakuBase> {
+    private class TimeComparator implements Comparator<BaseDanmaku> {
 
         @Override
-        public int compare(DanmakuBase obj1, DanmakuBase obj2) {
+        public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
             long val = obj1.time - obj2.time;
             if (val > 0) {
                 return 1;
@@ -96,4 +134,23 @@ public class Danmakus implements IDanmakus {
             return obj1.text.compareTo(obj2.text);
         }
     }
+
+    private class YPosComparator implements Comparator<BaseDanmaku> {
+
+        @Override
+        public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
+            int result = Float.compare(obj1.getTop(), obj2.getTop());
+            if (result != 0) {
+                return result;
+            }
+            long val = obj1.time - obj2.time;
+            if (val > 0) {
+                result = 1;
+            } else if (val < 0) {
+                result = -1;
+            }
+            return result;
+        }
+    }
+
 }

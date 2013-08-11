@@ -16,25 +16,27 @@
 
 package tv.light.controller;
 
-import android.content.Context;
-import android.graphics.Canvas;
 import tv.light.danmaku.loader.android.BiliDanmakuLoader;
 import tv.light.danmaku.loader.android.DanmakuLoaderFactory;
-import tv.light.danmaku.model.DanmakuBase;
 import tv.light.danmaku.model.DanmakuTimer;
 import tv.light.danmaku.model.IDanmakus;
 import tv.light.danmaku.model.android.AndroidDisplayer;
 import tv.light.danmaku.model.android.Danmakus;
+import tv.light.danmaku.parser.BiliDanmakuFactory;
 import tv.light.danmaku.parser.IDataSource;
 import tv.light.danmaku.parser.android.BiliDanmukuParse;
 import tv.light.danmaku.renderer.IRenderer;
 import tv.light.danmaku.renderer.android.DanmakuRenderer;
 import tv.light.surfaceviewtest.R;
 
+import android.content.Context;
+import android.graphics.Canvas;
+
 import java.io.InputStream;
-import java.util.Iterator;
 
 public class DrawTask {
+
+    private static final long DURATION = 4000;
 
     private final AndroidDisplayer disp;
 
@@ -54,6 +56,8 @@ public class DrawTask {
 
     private Danmakus danmakuList;
 
+    private IDanmakus danmakus;
+
     public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH) {
         this.timer = timer;
         renderer = new DanmakuRenderer();
@@ -69,20 +73,17 @@ public class DrawTask {
         dataSource = loader.getDataSource();
         parser = new BiliDanmukuParse(disp.width);
         parser.load(dataSource);
-        danmakuList = parser.parse();
-
-        Iterator<DanmakuBase> itr = danmakuList.items.iterator();
-        while (itr.hasNext()) {
-            itr.next().setTimer(timer);
-        }
+        danmakuList = parser.parse(timer);
     }
 
     public void draw(Canvas canvas) {
         if (danmakuList != null) {
             long currMills = timer.currMillisecond;
-            IDanmakus danmakus = danmakuList.sub(currMills - 4000, currMills + 4000);
-            disp.init(canvas);
+            // if(danmakus==null)
+            danmakus = danmakuList.sub(currMills - BiliDanmakuFactory.REAL_DANMAKU_DURATION,
+                    currMills);
             if (danmakus != null) {
+                disp.update(canvas);
                 renderer.draw(disp, danmakus);
             }
         }

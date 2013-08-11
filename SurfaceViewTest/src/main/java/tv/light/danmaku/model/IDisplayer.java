@@ -22,11 +22,11 @@ public interface IDisplayer {
 
     public abstract int getHeight();
 
-    public abstract void draw(DanmakuBase danmaku);
+    public abstract void draw(BaseDanmaku danmaku);
 
     /**
      * @param danmaku
      * @return
      */
-    public abstract void measure(DanmakuBase danmaku);
+    public abstract void measure(BaseDanmaku danmaku);
 }

@@ -16,7 +16,7 @@
 
 package tv.light.danmaku.model.android;
 
-import tv.light.danmaku.model.DanmakuBase;
+import tv.light.danmaku.model.BaseDanmaku;
 import tv.light.danmaku.model.IDisplayer;
 
 import android.graphics.Canvas;
@@ -44,14 +44,14 @@ public class AndroidDisplayer implements IDisplayer {
 
     public int height;
 
-    private static Paint getPaint(DanmakuBase danmaku) {
+    private static Paint getPaint(BaseDanmaku danmaku) {
         PAINT.setTextSize(danmaku.textSize); // TODO: fixme
         PAINT.setColor(danmaku.textColor);
         // TODO: set the text shadow color
         return PAINT;
     }
 
-    public void init(Canvas c) {
+    public void update(Canvas c) {
         canvas = c;
         if (c != null) {
             width = c.getWidth();
@@ -72,7 +72,7 @@ public class AndroidDisplayer implements IDisplayer {
     }
 
     @Override
-    public void draw(DanmakuBase danmaku) {
+    public void draw(BaseDanmaku danmaku) {
         if (canvas != null) {
             Paint paint = getPaint(danmaku);
             canvas.drawText(danmaku.text, danmaku.getLeft(), danmaku.getTop() - paint.ascent(),
@@ -81,7 +81,7 @@ public class AndroidDisplayer implements IDisplayer {
     }
 
     @Override
-    public void measure(DanmakuBase danmaku) {
+    public void measure(BaseDanmaku danmaku) {
         Paint paint = getPaint(danmaku);
         danmaku.paintWidth = paint.measureText(danmaku.text);
         danmaku.paintHeight = paint.getTextSize();

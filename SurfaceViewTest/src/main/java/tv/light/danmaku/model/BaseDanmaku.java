@@ -16,7 +16,17 @@
 
 package tv.light.danmaku.model;
 
-public abstract class DanmakuBase {
+public abstract class BaseDanmaku {
+
+    public final static int TYPE_SCROLL_RL = 1;
+    public final static int TYPE_SCROLL_LR = 2;
+    public final static int TYPE_FIX_TOP = 3;
+    public final static int TYPE_FIX_BOTTOM = 4;
+    public final static int TYPE_MOVEABLE_XXX = 0;  //TODO: add more type
+
+    public final static int INVISIBLE = 0;
+
+    public final static int VISIBLE = 1;
 
     /**
      * 显示时间(毫秒)
@@ -59,14 +69,19 @@ public abstract class DanmakuBase {
     public long duration;
 
     /**
-     * 计时
-     */
-    protected DanmakuTimer mTimer;
-
-    /**
      * 索引/编号
      */
     public int index;
+
+    /**
+     * 是否可见
+     */
+    public int visibility;
+
+    /**
+     * 计时
+     */
+    protected DanmakuTimer mTimer;
 
     public void setTimer(DanmakuTimer timer) {
         mTimer = timer;
@@ -92,7 +107,23 @@ public abstract class DanmakuBase {
         displayer.measure(this);
     }
 
+    public boolean isShown() {
+        return this.visibility == VISIBLE;
+    }
+
+    public boolean isOutside() {
+        if (mTimer != null)
+            return time > mTimer.currMillisecond || mTimer.currMillisecond - time > duration;
+        return true;
+    }
+
+    public void setVisibility(boolean b) {
+        this.visibility = (b ? VISIBLE : INVISIBLE);
+    }
+
     public abstract void layout(IDisplayer displayer, float x, float y);
+
+    public abstract float[] getRectAtTime(IDisplayer displayer, long time);
 
     public abstract float getLeft();
 
@@ -102,6 +133,15 @@ public abstract class DanmakuBase {
 
     public abstract float getBottom();
 
-    public abstract boolean isShown();
+    /**
+     * return the type of Danmaku
+     *
+     * @return TYPE_SCROLL_RL = 0
+     * TYPE_SCROLL_RL = 1
+     * TYPE_SCROLL_LR = 2
+     * TYPE_FIX_TOP = 3;
+     * TYPE_FIX_BOTTOM = 4;
+     */
+    public abstract int getType();
 
 }

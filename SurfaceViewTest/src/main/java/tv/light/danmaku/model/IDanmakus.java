@@ -18,7 +18,9 @@ package tv.light.danmaku.model;
 
 public interface IDanmakus {
 
-    public void addItem(DanmakuBase item);
+    public void addItem(BaseDanmaku item);
+
+    public void removeItem(BaseDanmaku item);
 
     public IDanmakus sub(long startTime, long endTime);
 

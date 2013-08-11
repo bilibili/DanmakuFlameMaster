@@ -16,19 +16,23 @@
 
 package tv.light.danmaku.parser;
 
+import tv.light.danmaku.model.DanmakuTimer;
 import tv.light.danmaku.model.android.Danmakus;
 
 /**
  *
  */
-public abstract class DanmakuParserBase {
+public abstract class BaseDanmakuParser {
     protected IDataSource mDataSource;
+
+    protected DanmakuTimer mTimer;
 
     public void load(IDataSource source) {
         mDataSource = source;
     }
 
-    public Danmakus parse() {
+    public Danmakus parse(DanmakuTimer timer) {
+        mTimer = timer;
         return parse(mDataSource);
     }
 
