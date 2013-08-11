@@ -16,12 +16,11 @@
 
 package tv.light.danmaku.model.android;
 
-import tv.light.danmaku.model.BaseDanmaku;
-import tv.light.danmaku.model.IDisplayer;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import tv.light.danmaku.model.BaseDanmaku;
+import tv.light.danmaku.model.IDisplayer;
 
 /**
  * Created by ch on 13-7-5.
@@ -33,7 +32,7 @@ public class AndroidDisplayer implements IDisplayer {
         PAINT = new Paint();
         PAINT.setColor(Color.RED);
         PAINT.setTextSize(50);
-        PAINT.setAntiAlias(true);
+        //PAINT.setAntiAlias(true);
         // TODO: load font from file
     }
 

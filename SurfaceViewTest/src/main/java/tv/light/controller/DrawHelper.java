@@ -28,12 +28,12 @@ public class DrawHelper {
         paint = new Paint();
         paint.setColor(Color.RED);
         paint.setTextSize(50);
-        paint.setAntiAlias(true);
+        //paint.setAntiAlias(true);
     }
 
     public static void drawText(Canvas canvas, String text) {
 
-        canvas.drawText(text, 50, 50, paint);
+        canvas.drawText(text, 10, canvas.getHeight() - 50, paint);
 
     }
 

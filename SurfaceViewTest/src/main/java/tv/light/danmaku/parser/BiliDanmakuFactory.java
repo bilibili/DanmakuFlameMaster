@@ -27,7 +27,7 @@ public class BiliDanmakuFactory {
 
     public static float BILI_PLAYER_HEIGHT = 385;
 
-    public static long COMMON_DANMAKU_DURATION = 4000;
+    public static long COMMON_DANMAKU_DURATION = 3500; //B站原始分辨率下弹幕存活时间
 
     public static long REAL_DANMAKU_DURATION = -1;
 

@@ -16,12 +16,6 @@
 
 package tv.light.ui.widget;
 
-import tv.light.controller.DrawHelper;
-import tv.light.controller.DrawTask;
-import tv.light.danmaku.model.DanmakuTimer;
-import tv.light.danmaku.model.android.AndroidDisplayer;
-import tv.light.danmaku.renderer.android.DanmakuRenderer;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
@@ -33,6 +27,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import tv.light.controller.DrawHelper;
+import tv.light.controller.DrawTask;
+import tv.light.danmaku.model.DanmakuTimer;
+import tv.light.danmaku.renderer.android.DanmakuRenderer;
 
 public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -56,9 +54,23 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     private DrawTask drawTask;
 
+    private long mBaseTime;
+
+    private boolean isSurfaceCreated;
+
     public DanmakuSurfaceView(Context context) {
         super(context);
         init();
+    }
+
+    private void init() {
+        setZOrderOnTop(true);
+        mSurfaceHolder = getHolder();
+        mSurfaceHolder.addCallback(this);
+        mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+        if (timer == null) {
+            timer = new DanmakuTimer();
+        }
     }
 
     public DanmakuSurfaceView(Context context, AttributeSet attrs) {
@@ -71,23 +83,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         init();
     }
 
-    private void init() {
-        setZOrderOnTop(true);
-        mSurfaceHolder = getHolder();
-        mSurfaceHolder.addCallback(this);
-        mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        if (timer == null)
-            timer = new DanmakuTimer();
-    }
-
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        startDraw();
+
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-
+        isSurfaceCreated = true;
     }
 
     @Override
@@ -97,35 +100,25 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // if (event.getAction() == MotionEvent.ACTION_UP) {
-        // quitDrawThread();
-        // }
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (isSurfaceCreated) {
+                if (handler == null || handler.isStop())
+                    startDraw();
+                else
+                    stopDraw();
+            }
+        }
 
-        // updateCxCy(event.getX(), event.getY());
-        updateTimer();
-        drawSomeThing();
         return true;
     }
 
-    private void updateTimer() {
-        timer.add(100);
-    }
-
-    private void updateCxCy(float x, float y) {
-        cx = x;
-        cy = y;
-    }
-
-    private void startDraw() {
-        mDrawThread = new HandlerThread("draw thread");
-        mDrawThread.start();
-        handler = new DrawHandler(mDrawThread.getLooper());
-        // handler.sendEmptyMessage(DrawHandler.START);
+    private void stopDraw() {
+        quitDrawThread();
     }
 
     private void quitDrawThread() {
         if (handler != null) {
-            handler.quit();// .sendEmptyMessage(DrawHandler.STOP);
+            handler.quit();
             handler = null;
         }
         if (mDrawThread != null) {
@@ -134,17 +127,26 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    void drawSomeThing() {
+    private void startDraw() {
+        mDrawThread = new HandlerThread("draw thread");
+        mDrawThread.start();
+        handler = new DrawHandler(mDrawThread.getLooper());
+        handler.sendEmptyMessage(DrawHandler.START);
+    }
 
+    void drawDanmakus() {
+        long stime = System.currentTimeMillis();
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
+
             DrawHelper.clearCanvas(canvas);
-            canvas.drawText("sssss", 100, 100, AndroidDisplayer.PAINT);
             if (drawTask == null)
                 drawTask = new DrawTask(timer, getContext(), canvas.getWidth(), canvas.getHeight());
             drawTask.draw(canvas);
 
-            DrawHelper.drawCircle(100, 100, canvas);
+            long dtime = System.currentTimeMillis() - stime;
+            String fps = String.format("%.2f fps", 1000 / (float) dtime);
+            DrawHelper.drawText(canvas, fps);
             mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
 
@@ -156,7 +158,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         private static final int UPDATE = 2;
 
-        private boolean quitFlag;
+        private boolean quitFlag = true;
 
         public DrawHandler() {
             super();
@@ -170,23 +172,35 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             quitFlag = true;
         }
 
+        public boolean isStop() {
+            return quitFlag == true;
+        }
+
         @Override
         public void handleMessage(Message msg) {
             int what = msg.what;
             switch (what) {
                 case START:
                     quitFlag = false;
+                    mBaseTime = System.currentTimeMillis();
+                    timer.update(0);
                     sendEmptyMessage(UPDATE);
                     break;
                 case UPDATE:
                     if (!quitFlag) {
-                        drawSomeThing();
-                        sendEmptyMessageDelayed(UPDATE, 50);
+                        long d = timer.update(System.currentTimeMillis() - mBaseTime);
+                        if (d > 5) {
+                            drawDanmakus();
+                            sendEmptyMessage(UPDATE);
+                        } else
+                            sendEmptyMessageDelayed(UPDATE, 1000);
                     }
                     break;
             }
         }
 
     }
+
+
 
 }

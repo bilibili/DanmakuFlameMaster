@@ -19,9 +19,11 @@ package tv.light.danmaku.model;
 public class DanmakuTimer {
     public long currMillisecond;
 
-    public void update(long curr) {
+    public long update(long curr) {
+        long delta = Math.abs(curr - currMillisecond);
         currMillisecond = curr;
-    }
+        return delta;
+   }
 
     public void add(long mills) {
         update(currMillisecond + mills);
