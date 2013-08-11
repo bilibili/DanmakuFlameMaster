@@ -112,6 +112,13 @@ public class Danmakus implements IDanmakus {
         return new Danmaku(text);
     }
 
+    public int size() {
+        if (items != null) {
+            return items.size();
+        }
+        return 0;
+    }
+
     private class TimeComparator implements Comparator<BaseDanmaku> {
 
         @Override

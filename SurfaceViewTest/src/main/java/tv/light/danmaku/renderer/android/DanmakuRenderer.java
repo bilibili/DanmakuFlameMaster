@@ -36,15 +36,14 @@ public class DanmakuRenderer extends Renderer {
         while (itr.hasNext()) {
             BaseDanmaku drawItem = itr.next();
 
-            // 测量弹幕尺寸(measure)
+            // measure
             if (!drawItem.isMeasured()) {
                 drawItem.measure(disp);
             }
 
-            // 确定弹幕位置(layout)
             DanmakusRetainer.fix(drawItem, disp);
 
-            // 绘制弹幕(draw)
+            // draw
             if (drawItem.isShown()) {
                 drawItem.draw(disp);
                 //break;

@@ -57,15 +57,15 @@ public class DanmakusRetainer {
 
     private static class RLDanmakusRetainer implements IDanmakusRetainer {
 
-        private Danmakus mLRDanmakus = new Danmakus();
+        private Danmakus mLRDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
 
         @Override
-        public void fix(BaseDanmaku danmaku, IDisplayer disp) {
+        public void fix(BaseDanmaku drawItem, IDisplayer disp) {
 
             float topPos = 0;
-            boolean shown = danmaku.isShown();
+            boolean shown = drawItem.isShown();
             if (!shown) {
-                // 确定弹幕位置
+                //确定弹幕位置
                 Iterator<BaseDanmaku> it = mLRDanmakus.iterator();
                 BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null;
                 boolean overwriteInsert = false;
@@ -75,7 +75,8 @@ public class DanmakusRetainer {
                         firstItem = item;
                     lastItem = item;
 
-                    if (danmaku.paintHeight + item.getTop() > disp.getHeight()) {
+
+                    if (drawItem.paintHeight + item.getTop() > disp.getHeight()) {
                         overwriteInsert = true;
                         break;
                     }
@@ -87,14 +88,14 @@ public class DanmakusRetainer {
                         }
                     }
 
-                    // if(item.isOutside()){
-                    // insertItem = item;
-                    // break;
-                    // }
+//                    if(item.isOutside()){
+//                        insertItem = item;
+//                        break;
+//                    }
 
                     // 检查碰撞
-                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, danmaku,
-                            danmaku.getDuration());
+                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
+                            drawItem.getDuration());
                     if (!willHit) {
                         insertItem = item;
                         break;
@@ -120,10 +121,11 @@ public class DanmakusRetainer {
                 }
             }
 
-            danmaku.layout(disp, 0, topPos);
+            // layout
+            drawItem.layout(disp, 0, topPos);
 
             if (!shown) {
-                mLRDanmakus.addItem(danmaku);
+                mLRDanmakus.addItem(drawItem);
             }
 
         }
