@@ -22,6 +22,8 @@ public interface IDisplayer {
 
     public abstract int getHeight();
 
+    public abstract float getDensity();
+
     public abstract void draw(BaseDanmaku danmaku);
 
     /**

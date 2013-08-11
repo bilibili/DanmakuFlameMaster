@@ -16,6 +16,8 @@
 
 package tv.light.controller;
 
+import android.content.Context;
+import android.graphics.Canvas;
 import tv.light.danmaku.loader.android.BiliDanmakuLoader;
 import tv.light.danmaku.loader.android.DanmakuLoaderFactory;
 import tv.light.danmaku.model.DanmakuTimer;
@@ -29,9 +31,6 @@ import tv.light.danmaku.renderer.IRenderer;
 import tv.light.danmaku.renderer.android.DanmakuRenderer;
 import tv.light.surfaceviewtest.R;
 
-import android.content.Context;
-import android.graphics.Canvas;
-
 import java.io.InputStream;
 
 public class DrawTask {
@@ -40,51 +39,55 @@ public class DrawTask {
 
     private final AndroidDisplayer disp;
 
-    Context context;
+    Context mContext;
 
-    IRenderer renderer;
+    IRenderer mRenderer;
 
-    DanmakuTimer timer;
+    DanmakuTimer mTimer;
 
     InputStream stream;
 
-    private BiliDanmakuLoader loader;
+    private BiliDanmakuLoader mLoader;
 
     private IDataSource dataSource;
 
-    private BiliDanmukuParse parser;
+    private BiliDanmukuParse mParser;
 
     private Danmakus danmakuList;
 
     private IDanmakus danmakus;
 
     public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH) {
-        this.timer = timer;
-        renderer = new DanmakuRenderer();
+        this.mTimer = timer;
+        mContext = context;
+        mRenderer = new DanmakuRenderer();
         disp = new AndroidDisplayer();
         disp.width = dispW;
         disp.height = dispH;
+        disp.density = context.getResources().getDisplayMetrics().density;
+
         loadBiliDanmakus(context.getResources().openRawResource(R.raw.comments));
     }
 
     private void loadBiliDanmakus(InputStream stream) {
-        loader = (BiliDanmakuLoader) DanmakuLoaderFactory.create("bili");
-        loader.load(stream);
-        dataSource = loader.getDataSource();
-        parser = new BiliDanmukuParse(disp.width);
-        parser.load(dataSource);
-        danmakuList = parser.parse(timer);
+        mLoader = (BiliDanmakuLoader) DanmakuLoaderFactory.create("bili");
+        mLoader.load(stream);
+        dataSource = mLoader.getDataSource();
+        mParser = new BiliDanmukuParse(disp);
+
+        mParser.load(dataSource);
+        danmakuList = mParser.parse(mTimer);
     }
 
     public void draw(Canvas canvas) {
         if (danmakuList != null) {
-            long currMills = timer.currMillisecond;
+            long currMills = mTimer.currMillisecond;
             // if(danmakus==null)
             danmakus = danmakuList.sub(currMills - BiliDanmakuFactory.REAL_DANMAKU_DURATION,
                     currMills);
             if (danmakus != null) {
                 disp.update(canvas);
-                renderer.draw(disp, danmakus);
+                mRenderer.draw(disp, danmakus);
             }
         }
     }

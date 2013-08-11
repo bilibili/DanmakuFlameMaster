@@ -29,7 +29,6 @@ import android.graphics.Paint;
 public class AndroidDisplayer implements IDisplayer {
 
     public static Paint PAINT;
-
     static {
         PAINT = new Paint();
         PAINT.setColor(Color.RED);
@@ -44,12 +43,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     public int height;
 
-    private static Paint getPaint(BaseDanmaku danmaku) {
-        PAINT.setTextSize(danmaku.textSize); // TODO: fixme
-        PAINT.setColor(danmaku.textColor);
-        // TODO: set the text shadow color
-        return PAINT;
-    }
+    public float density = 1;
 
     public void update(Canvas c) {
         canvas = c;
@@ -72,6 +66,11 @@ public class AndroidDisplayer implements IDisplayer {
     }
 
     @Override
+    public float getDensity() {
+        return density;
+    }
+
+    @Override
     public void draw(BaseDanmaku danmaku) {
         if (canvas != null) {
             Paint paint = getPaint(danmaku);
@@ -85,6 +84,13 @@ public class AndroidDisplayer implements IDisplayer {
         Paint paint = getPaint(danmaku);
         danmaku.paintWidth = paint.measureText(danmaku.text);
         danmaku.paintHeight = paint.getTextSize();
+    }
+
+    private static Paint getPaint(BaseDanmaku danmaku) {
+        PAINT.setTextSize(danmaku.textSize); // TODO: fixme
+        PAINT.setColor(danmaku.textColor);
+        // TODO: set the text shadow color
+        return PAINT;
     }
 
 }
