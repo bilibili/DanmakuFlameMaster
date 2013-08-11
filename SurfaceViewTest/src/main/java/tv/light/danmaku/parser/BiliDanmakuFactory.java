@@ -41,7 +41,7 @@ public class BiliDanmakuFactory {
                 instance = new R2LDanmaku(REAL_DANMAKU_DURATION);
                 break;
             case 4: // 底端固定
-                instance = new FBDanmaku(REAL_DANMAKU_DURATION);
+                instance = new FBDanmaku(COMMON_DANMAKU_DURATION);
                 break;
             case 5: // 顶端固定
                 instance = new FTDanmaku(COMMON_DANMAKU_DURATION);

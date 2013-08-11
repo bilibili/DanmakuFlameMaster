@@ -28,7 +28,9 @@ public class Danmakus implements IDanmakus {
 
     public static final int ST_BY_YPOS = 1;
 
-    public Set<BaseDanmaku> items;
+    public static final int ST_BY_YPOS_DESC = 2;
+
+   public Set<BaseDanmaku> items;
 
     private Danmakus subItems;
 
@@ -44,7 +46,9 @@ public class Danmakus implements IDanmakus {
             comparator = new TimeComparator();
         } else if (sortType == ST_BY_YPOS) {
             comparator = new YPosComparator();
-        }
+        } else if (sortType == ST_BY_YPOS_DESC) {
+            comparator = new YposDescComparator();
+      }
         items = new TreeSet<BaseDanmaku>(comparator);
     }
 
@@ -165,4 +169,22 @@ public class Danmakus implements IDanmakus {
         }
     }
 
+
+    private class YposDescComparator implements Comparator<BaseDanmaku> {
+        @Override
+        public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
+
+            int result = Float.compare(obj2.getTop(), obj1.getTop());
+            if (result != 0) {
+                return result;
+            }
+            long val = obj1.time - obj2.time;
+            if (val > 0) {
+                result = 1;
+            } else if (val < 0) {
+                result = -1;
+            }
+            return result;
+        }
+    }
 }

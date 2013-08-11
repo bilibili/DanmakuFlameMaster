@@ -23,7 +23,7 @@ public class FTDanmaku extends BaseDanmaku {
 
     private float x = 0;
 
-    private float y = -1;
+    protected float y = -1;
 
     public FTDanmaku(long duration) {
         this.duration = duration;
@@ -48,7 +48,7 @@ public class FTDanmaku extends BaseDanmaku {
 
     }
 
-    private float getLeft(IDisplayer displayer) {
+    protected float getLeft(IDisplayer displayer) {
         float left = (displayer.getWidth() - paintWidth) / 2;
         return left;
     }
