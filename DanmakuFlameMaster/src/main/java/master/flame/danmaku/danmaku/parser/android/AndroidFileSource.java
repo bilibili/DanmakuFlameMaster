@@ -24,7 +24,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class AndroidFileSource implements IDataSource {
+public class AndroidFileSource implements IDataSource<InputStream> {
 
     private static final String SCHEME_HTTP_TAG = "http";
 
@@ -32,7 +32,7 @@ public class AndroidFileSource implements IDataSource {
 
     private static final String SCHEME_FILE_TAG = "file";
 
-    public InputStream inStream;
+    private InputStream inStream;
 
     public AndroidFileSource(String filepath) {
         fillStreamFromFile(new File(filepath));
@@ -92,5 +92,10 @@ public class AndroidFileSource implements IDataSource {
             inStream = null;
         }
     }
+
+	@Override
+	public InputStream data() {
+		return inStream;
+	}
 
 }

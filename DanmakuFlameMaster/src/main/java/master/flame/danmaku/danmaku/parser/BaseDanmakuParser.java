@@ -23,11 +23,11 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
  *
  */
 public abstract class BaseDanmakuParser {
-    protected IDataSource mDataSource;
+    protected IDataSource<?> mDataSource;
 
     protected DanmakuTimer mTimer;
 
-    public void load(IDataSource source) {
+    public void load(IDataSource<?> source) {
         mDataSource = source;
     }
 
@@ -36,6 +36,6 @@ public abstract class BaseDanmakuParser {
         return parse(mDataSource);
     }
 
-    public abstract Danmakus parse(IDataSource source);
+    public abstract Danmakus parse(IDataSource<?> source);
 
 }

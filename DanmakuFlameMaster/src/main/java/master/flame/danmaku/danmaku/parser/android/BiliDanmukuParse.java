@@ -47,7 +47,7 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
     }
 
     @Override
-    public Danmakus parse(IDataSource ds) {
+    public Danmakus parse(IDataSource<?> ds) {
 
         if (ds != null) {
             AndroidFileSource source = (AndroidFileSource) ds;
@@ -55,7 +55,7 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                 XMLReader xmlReader = XMLReaderFactory.createXMLReader();
                 XmlContentHandler contentHandler = new XmlContentHandler();
                 xmlReader.setContentHandler(contentHandler);
-                xmlReader.parse(new InputSource(source.inStream));
+                xmlReader.parse(new InputSource(source.data()));
                 return contentHandler.getResult();
             } catch (SAXException e) {
                 e.printStackTrace();
