@@ -24,6 +24,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -33,6 +34,8 @@ import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 
 public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+
+    public static final String TAG = "DanmakuSurfaceView";
 
     private SurfaceHolder mSurfaceHolder;
 
@@ -95,28 +98,52 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
+        stopDraw();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (isSurfaceCreated) {
-                if (handler == null || handler.isStop())
+                if (handler == null)
                     startDraw();
+                else if(handler.isStop()){
+                    resume();
+                }
                 else
-                    stopDraw();
+                    pause();
             }
         }
 
         return true;
     }
-
-    private void stopDraw() {
-        quitDrawThread();
+    public void start(){
+        startDraw();
     }
-
-    private void quitDrawThread() {
+    
+    public void pause(){
+        if (handler != null)
+            handler.quit();
+    }
+    
+    public void resume(){
+        if(handler!=null && mDrawThread != null && handler.isStop())
+            handler.sendEmptyMessage(DrawHandler.RESUME);
+        else{
+            restart();   
+        }
+    }
+    
+    public void restart(){
+        stop();
+        start();
+    }
+    
+    public void stop(){
+        stopDraw();
+    }
+    
+    private void stopDraw() {
         if (handler != null) {
             handler.quit();
             handler = null;
@@ -151,14 +178,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
 
     }
-
     public class DrawHandler extends Handler {
-
-        private static final int START = 1;
-
-        private static final int UPDATE = 2;
+        private long pausedPostion = 0;
 
         private boolean quitFlag;
+        private static final int START = 1;
+        private static final int UPDATE = 2;
+        private static final int RESUME = 3;
 
         public DrawHandler(Looper looper) {
             super(looper);
@@ -166,37 +192,44 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         public void quit() {
             quitFlag = true;
+            
         }
 
         public boolean isStop() {
-            return quitFlag == true;
+            return quitFlag;
         }
 
         @Override
         public void handleMessage(Message msg) {
             int what = msg.what;
             switch (what) {
-                case START:
-                    quitFlag = false;
-                    mTimeBase = System.currentTimeMillis();
-                    timer.update(0);
-                    sendEmptyMessage(UPDATE);
-                    break;
-                case UPDATE:
-                    if (!quitFlag) {
-                        long d = timer.update(System.currentTimeMillis() - mTimeBase);
-                        if(d<5){
-                            try {
-                                Thread.sleep(5);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        drawDanmakus();
-                        sendEmptyMessage(UPDATE);
-
+            case START:
+                pausedPostion = 0;
+            case RESUME:
+                quitFlag = false;
+                mTimeBase = System.currentTimeMillis() - pausedPostion ;
+                timer.update(pausedPostion);
+                drawDanmakus();
+                sendEmptyMessage(UPDATE);
+                break;
+            case UPDATE:
+                long d = timer.update(System.currentTimeMillis() - mTimeBase);
+                if (d < 5) {
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    break;
+                }
+                drawDanmakus();
+                if (!quitFlag)
+                    sendEmptyMessage(UPDATE);
+
+                else {
+                    pausedPostion = System.currentTimeMillis()- mTimeBase;
+                    Log.i(TAG, "stop draw: current = " + pausedPostion);
+                }
+                break;
             }
         }
 
