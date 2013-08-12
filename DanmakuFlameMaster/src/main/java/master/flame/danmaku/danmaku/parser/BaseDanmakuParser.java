@@ -29,11 +29,12 @@ public abstract class BaseDanmakuParser {
     protected DanmakuTimer mTimer;
     protected int mDispWidth;
     protected float mDispDensity;
-
+    protected float mScaledDensity;
 
     public BaseDanmakuParser(IDisplayer disp) {
         mDispWidth = disp.getWidth();
         mDispDensity = disp.getDensity();
+        mScaledDensity = disp.getScaledDensity();
     }
     
     public BaseDanmakuParser load(IDataSource<?> source) {

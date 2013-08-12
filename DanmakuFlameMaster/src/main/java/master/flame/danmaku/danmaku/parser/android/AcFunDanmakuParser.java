@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.graphics.BitmapFactory;
+
 public class AcFunDanmakuParser extends BaseDanmakuParser {
 
 	public AcFunDanmakuParser(IDisplayer disp) {
@@ -43,7 +45,7 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                     BaseDanmaku item = BiliDanmakuFactory.createDanmaku(type, mDispWidth);
                     if (item != null) {
                         item.time = time;
-                        item.textSize = textSize/* / mDispDensity + 0.5f*/;
+                        item.textSize = textSize*(mScaledDensity - 0.5f);
                         item.textColor = color;
                         item.text = m ;
                         item.index = i;
