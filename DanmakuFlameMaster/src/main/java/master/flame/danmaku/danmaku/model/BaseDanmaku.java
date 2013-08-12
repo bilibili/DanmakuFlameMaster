@@ -22,9 +22,9 @@ public abstract class BaseDanmaku {
 
     public final static int TYPE_SCROLL_LR = 2;
 
-    public final static int TYPE_FIX_TOP = 3;
-
     public final static int TYPE_FIX_BOTTOM = 4;
+
+    public final static int TYPE_FIX_TOP = 5;
 
     public final static int TYPE_MOVEABLE_XXX = 0; // TODO: add more type
 
@@ -145,8 +145,8 @@ public abstract class BaseDanmaku {
     /**
      * return the type of Danmaku
      * 
-     * @return TYPE_SCROLL_RL = 0 TYPE_SCROLL_RL = 1 TYPE_SCROLL_LR = 2
-     *         TYPE_FIX_TOP = 3; TYPE_FIX_BOTTOM = 4;
+     * @return TYPE_SCROLL_RL = 1 TYPE_SCROLL_LR = 2
+     *         TYPE_FIX_TOP = 5; TYPE_FIX_BOTTOM = 4;
      */
     public abstract int getType();
 

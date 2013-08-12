@@ -28,7 +28,7 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.BiliDanmakuFactory;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.AcFunDanmakuParser;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParse;
@@ -74,7 +74,7 @@ public class DrawTask {
         disp.density = displayMetrics.density;
         disp.scaledDensity = displayMetrics.scaledDensity;
         try {
-			loadAcDanmakus(context.getAssets().open("53264318.json"));
+			loadAcDanmakus(context.getAssets().open("comment.json"));
 		} catch (IOException e) {
 			Log.e(TAG, "open assets error",e);
 		}
@@ -110,7 +110,7 @@ public class DrawTask {
         if (danmakuList != null) {
             long currMills = mTimer.currMillisecond;
             // if(danmakus==null)
-            danmakus = danmakuList.sub(currMills - BiliDanmakuFactory.REAL_DANMAKU_DURATION,
+            danmakus = danmakuList.sub(currMills - DanmakuFactory.REAL_DANMAKU_DURATION,
                     currMills);
             if (danmakus != null) {
                 disp.update(canvas);
