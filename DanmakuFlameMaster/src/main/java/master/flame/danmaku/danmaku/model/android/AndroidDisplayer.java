@@ -18,7 +18,7 @@ package master.flame.danmaku.danmaku.model.android;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
+import android.text.TextPaint;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
@@ -27,12 +27,13 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
  */
 public class AndroidDisplayer implements IDisplayer {
 
-    public static Paint PAINT;
+    public static TextPaint PAINT;
+
     static {
-        PAINT = new Paint();
+        PAINT = new TextPaint();
         PAINT.setColor(Color.RED);
         PAINT.setTextSize(50);
-        //PAINT.setAntiAlias(true);
+        // PAINT.setAntiAlias(true);
         // TODO: load font from file
     }
 
@@ -72,24 +73,80 @@ public class AndroidDisplayer implements IDisplayer {
     @Override
     public void draw(BaseDanmaku danmaku) {
         if (canvas != null) {
-            Paint paint = getPaint(danmaku);
-            canvas.drawText(danmaku.text, danmaku.getLeft(), danmaku.getTop() - paint.ascent(),
-                    paint);
+            TextPaint paint = getPaint(danmaku);
+            if (danmaku.paintHeight > danmaku.textSize) {
+                String[] titleArr = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);
+                if (titleArr.length == 1) {
+                    canvas.drawText(titleArr[0], danmaku.getLeft(),
+                            danmaku.getTop() - paint.ascent(), paint);
+                } else {
+                    for (int t = 0; t < titleArr.length; t++) {
+                        if (titleArr[t].length() > 0) {
+                            canvas.drawText(titleArr[t], danmaku.getLeft(), (t)
+                                    * (danmaku.textSize + 1) + danmaku.getTop() - paint.ascent(),
+                                    paint);
+                        }
+                    }
+                }
+            } else {
+                canvas.drawText(danmaku.text, danmaku.getLeft(), danmaku.getTop() - paint.ascent(),
+                        paint);
+            }
         }
     }
 
-    @Override
-    public void measure(BaseDanmaku danmaku) {
-        Paint paint = getPaint(danmaku);
-        danmaku.paintWidth = paint.measureText(danmaku.text);
-        danmaku.paintHeight = paint.getTextSize();
-    }
-
-    private static Paint getPaint(BaseDanmaku danmaku) {
+    private static TextPaint getPaint(BaseDanmaku danmaku) {
         PAINT.setTextSize(danmaku.textSize); // TODO: fixme
         PAINT.setColor(danmaku.textColor);
         // TODO: set the text shadow color
         return PAINT;
+    }
+
+    @Override
+    public void measure(BaseDanmaku danmaku) {
+        TextPaint paint = getPaint(danmaku);
+        float[] wh = calcPaintWH(danmaku.text, paint);
+        danmaku.paintWidth = wh[0]; // paint.measureText(danmaku.text);
+        danmaku.paintHeight = wh[1]; // paint.getTextSize();
+    }
+
+    private float[] calcPaintWH(String text, TextPaint paint) {
+        float w = 0;
+        float textHeight = paint.getTextSize();
+        if (!text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
+            w = paint.measureText(text);
+            return new float[]{
+                    w, textHeight
+            };
+        }
+
+        int stPos = 0, endPos = -1;
+        String tempStr;
+        int t = 0;
+
+        while ((endPos = text.indexOf(BaseDanmaku.DANMAKU_BR_CHAR, stPos)) != -1) {
+            t++;
+            tempStr = text.substring(stPos, endPos);
+            if (tempStr.length() > 0) {
+                float tr = paint.measureText(tempStr);
+                if (tr > 0) {
+                    w = tr > w ? tr : w;
+                }
+            }
+            stPos = endPos + 2;
+        }
+        if (stPos < text.length() - 1) {
+            t++;
+            tempStr = text.substring(stPos);
+            if (tempStr.equals(BaseDanmaku.DANMAKU_BR_CHAR) == false && tempStr.length() > 0) {
+                float tr = paint.measureText(tempStr);
+                w = Math.max(tr, w);
+            }
+        }
+
+        return new float[]{
+                w, (t + 1) * textHeight
+        };
     }
 
 }

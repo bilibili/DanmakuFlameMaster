@@ -18,6 +18,8 @@ package master.flame.danmaku.danmaku.model;
 
 public abstract class BaseDanmaku {
 
+    public final static String DANMAKU_BR_CHAR = "/n";
+
     public final static int TYPE_SCROLL_RL = 1;
 
     public final static int TYPE_SCROLL_LR = 2;
