@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
-import master.flame.danmaku.danmaku.parser.android.JSONObjectSource;
+import master.flame.danmaku.danmaku.parser.android.JSONSource;
 import android.net.Uri;
 /**
  * Ac danmaku loader
@@ -14,7 +14,7 @@ import android.net.Uri;
 public class AcFunDanmakuLoader implements ILoader{
 	private AcFunDanmakuLoader(){};
 	private static volatile AcFunDanmakuLoader instance;
-	private JSONObjectSource dataSource;
+	private JSONSource dataSource;
 	
 	public static ILoader instance() {
 		if(instance == null){
@@ -27,14 +27,14 @@ public class AcFunDanmakuLoader implements ILoader{
 	}
 	
 	@Override
-	public JSONObjectSource getDataSource() {
+	public JSONSource getDataSource() {
 		return dataSource;
 	}
 	
 	@Override
 	public void load(String uri) throws IllegalDataException {
 		try {
-			dataSource = new JSONObjectSource(Uri.parse(uri));
+			dataSource = new JSONSource(Uri.parse(uri));
 		} catch (Exception e) {
 			throw new IllegalDataException(e);
 		}
@@ -43,7 +43,7 @@ public class AcFunDanmakuLoader implements ILoader{
 	@Override
 	public void load(InputStream in) throws IllegalDataException {
 		try {
-			dataSource = new JSONObjectSource(in);
+			dataSource = new JSONSource(in);
 		} catch (Exception e) {
 			throw new IllegalDataException(e);
 		}
