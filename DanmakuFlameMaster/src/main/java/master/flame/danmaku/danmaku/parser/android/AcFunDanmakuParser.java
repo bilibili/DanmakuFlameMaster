@@ -4,7 +4,7 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.BiliDanmakuFactory;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,10 +40,10 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                     int color = Integer.parseInt(values[1]) | 0xFF000000; // 颜色
                     float textSize = Float.parseFloat(values[3]); // 字体大小
                     int type = Integer.parseInt(values[2]); // 弹幕类型
-                    BaseDanmaku item = BiliDanmakuFactory.createDanmaku(type, mDispWidth);
+                    BaseDanmaku item = DanmakuFactory.createDanmaku(type, mDispWidth);
                     if (item != null) {
                         item.time = time;
-                        item.textSize = textSize/* / mDispDensity + 0.5f*/;
+                        item.textSize = textSize*(mScaledDensity - 0.5f);
                         item.textColor = color;
                         item.text = m ;
                         item.index = i;
