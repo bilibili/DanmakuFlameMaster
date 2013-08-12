@@ -34,6 +34,7 @@ public class AndroidDisplayer implements IDisplayer {
         PAINT.setColor(Color.RED);
         PAINT.setTextSize(50);
         // PAINT.setAntiAlias(true);
+        PAINT.setAntiAlias(true);
         // TODO: load font from file
     }
 
@@ -44,7 +45,8 @@ public class AndroidDisplayer implements IDisplayer {
     public int height;
 
     public float density = 1;
-
+    
+    public float scaledDensity = 1;
     public void update(Canvas c) {
         canvas = c;
         if (c != null) {
@@ -148,5 +150,10 @@ public class AndroidDisplayer implements IDisplayer {
                 w, (t + 1) * textHeight
         };
     }
+
+	@Override
+	public float getScaledDensity() {
+		return scaledDensity;
+	}
 
 }

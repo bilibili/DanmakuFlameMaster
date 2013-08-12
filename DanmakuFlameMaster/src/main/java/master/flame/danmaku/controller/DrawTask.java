@@ -16,26 +16,34 @@
 
 package master.flame.danmaku.controller;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import master.flame.danmaku.activity.R;
+import java.io.IOException;
+import java.io.InputStream;
+
+import master.flame.danmaku.danmaku.loader.ILoader;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.BiliDanmakuLoader;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.BiliDanmakuFactory;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.parser.IDataSource;
+import master.flame.danmaku.danmaku.parser.android.AcFunDanmakuParser;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParse;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
-
-import java.io.InputStream;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.util.DisplayMetrics;
+import android.util.Log;
 
 public class DrawTask {
 
-    private final AndroidDisplayer disp;
+    private static final String TAG = "DrawTask";
+
+	private final AndroidDisplayer disp;
 
     Context mContext;
 
@@ -45,11 +53,11 @@ public class DrawTask {
 
     InputStream stream;
 
-    private BiliDanmakuLoader mLoader;
+    private ILoader mLoader;
 
     private IDataSource dataSource;
 
-    private BiliDanmukuParse mParser;
+    private BaseDanmakuParser mParser;
 
     private Danmakus danmakuList;
 
@@ -62,24 +70,47 @@ public class DrawTask {
         disp = new AndroidDisplayer();
         disp.width = dispW;
         disp.height = dispH;
-        disp.density = context.getResources().getDisplayMetrics().density;
-
-        loadBiliDanmakus(context.getResources().openRawResource(R.raw.comments));
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        disp.density = displayMetrics.density;
+        disp.scaledDensity = displayMetrics.scaledDensity;
+        try {
+            loadAcDanmakus(context.getAssets().open("comment.json"));
+        } catch (IOException e) {
+            Log.e(TAG, "open assets error",e);
+        }
+//        loadBiliDanmakus(context.getResources().openRawResource(R.raw.comments));
     }
 
-    private void loadBiliDanmakus(InputStream stream) {
+    private void loadAcDanmakus(InputStream stream) {
+    	mLoader = DanmakuLoaderFactory.create("acfun");
+        try {
+			mLoader.load(stream);
+			dataSource = mLoader.getDataSource();
+			mParser = new AcFunDanmakuParser(disp);
+			danmakuList = mParser.load(dataSource).setTimer(mTimer).parse();
+		} catch (IllegalDataException e) {
+			Log.e(TAG, "load error",e);
+		}
+	}
+
+	private void loadBiliDanmakus(InputStream stream) {
         mLoader = (BiliDanmakuLoader) DanmakuLoaderFactory.create("bili");
-        mLoader.load(stream);
-        dataSource = mLoader.getDataSource();
-        mParser = new BiliDanmukuParse(disp);
-        danmakuList = mParser.load(dataSource).setTimer(mTimer).parse();
+        try {
+			mLoader.load(stream);
+			dataSource = mLoader.getDataSource();
+			mParser = new BiliDanmukuParse(disp);
+			danmakuList = mParser.load(dataSource).setTimer(mTimer).parse();
+		} catch (IllegalDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public void draw(Canvas canvas) {
         if (danmakuList != null) {
             long currMills = mTimer.currMillisecond;
             // if(danmakus==null)
-            danmakus = danmakuList.sub(currMills - BiliDanmakuFactory.MAX_DANMAKU_DURATION,
+            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION,
                     currMills);
             if (danmakus != null) {
                 disp.update(canvas);
