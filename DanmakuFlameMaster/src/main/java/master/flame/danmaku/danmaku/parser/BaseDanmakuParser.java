@@ -27,15 +27,15 @@ public abstract class BaseDanmakuParser {
 
     protected DanmakuTimer mTimer;
 
-    public void load(IDataSource<?> source) {
+    public BaseDanmakuParser load(IDataSource<?> source) {
         mDataSource = source;
+        return this;
+    }
+    public BaseDanmakuParser setTimer(DanmakuTimer timer){
+    	mTimer = timer;
+    	return this;
     }
 
-    public Danmakus parse(DanmakuTimer timer) {
-        mTimer = timer;
-        return parse(mDataSource);
-    }
-
-    public abstract Danmakus parse(IDataSource<?> source);
+    public abstract Danmakus parse();
 
 }

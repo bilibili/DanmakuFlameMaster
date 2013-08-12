@@ -47,10 +47,10 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
     }
 
     @Override
-    public Danmakus parse(IDataSource<?> ds) {
+    public Danmakus parse() {
 
-        if (ds != null) {
-            AndroidFileSource source = (AndroidFileSource) ds;
+        if (mDataSource != null) {
+            AndroidFileSource source = (AndroidFileSource) mDataSource;
             try {
                 XMLReader xmlReader = XMLReaderFactory.createXMLReader();
                 XmlContentHandler contentHandler = new XmlContentHandler();
