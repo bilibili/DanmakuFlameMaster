@@ -78,6 +78,15 @@ public class DanmakusRetainer {
                 boolean overwriteInsert = false;
                 while (it.hasNext()) {
                     BaseDanmaku item = it.next();
+
+                    // 检查碰撞
+                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
+                            drawItem.getDuration(), drawItem.getTimer().currMillisecond);
+                    if (!willHit) {
+                        insertItem = item;
+                        break;
+                    }
+
                     if (firstItem == null)
                         firstItem = item;
                     lastItem = item;
@@ -94,13 +103,6 @@ public class DanmakusRetainer {
                         }
                     }
 
-                    // 检查碰撞
-                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
-                            drawItem.getDuration(), drawItem.getTimer().currMillisecond);
-                    if (!willHit) {
-                        insertItem = item;
-                        break;
-                    }
 
                 }
 
