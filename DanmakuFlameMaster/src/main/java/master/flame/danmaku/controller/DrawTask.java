@@ -72,9 +72,7 @@ public class DrawTask {
         mLoader.load(stream);
         dataSource = mLoader.getDataSource();
         mParser = new BiliDanmukuParse(disp);
-
-        mParser.load(dataSource);
-        danmakuList = mParser.parse(mTimer);
+        danmakuList = mParser.load(dataSource).setTimer(mTimer).parse();
     }
 
     public void draw(Canvas canvas) {

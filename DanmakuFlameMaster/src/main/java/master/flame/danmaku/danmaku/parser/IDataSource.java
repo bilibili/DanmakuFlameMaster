@@ -16,8 +16,8 @@
 
 package master.flame.danmaku.danmaku.parser;
 
-public interface IDataSource {
-
+public interface IDataSource<T> {
+	public T data();
     public void release();
 
 }
