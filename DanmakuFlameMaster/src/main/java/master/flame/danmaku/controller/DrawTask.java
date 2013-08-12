@@ -79,7 +79,7 @@ public class DrawTask {
         if (danmakuList != null) {
             long currMills = mTimer.currMillisecond;
             // if(danmakus==null)
-            danmakus = danmakuList.sub(currMills - BiliDanmakuFactory.REAL_DANMAKU_DURATION,
+            danmakus = danmakuList.sub(currMills - BiliDanmakuFactory.MAX_DANMAKU_DURATION,
                     currMills);
             if (danmakus != null) {
                 disp.update(canvas);

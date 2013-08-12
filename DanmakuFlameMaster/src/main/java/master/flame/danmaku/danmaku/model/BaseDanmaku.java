@@ -86,6 +86,7 @@ public abstract class BaseDanmaku {
      * 计时
      */
     protected DanmakuTimer mTimer;
+    private long timer;
 
     public void setTimer(DanmakuTimer timer) {
         mTimer = timer;
@@ -150,4 +151,7 @@ public abstract class BaseDanmaku {
      */
     public abstract int getType();
 
+    public DanmakuTimer getTimer() {
+        return mTimer;
+    }
 }

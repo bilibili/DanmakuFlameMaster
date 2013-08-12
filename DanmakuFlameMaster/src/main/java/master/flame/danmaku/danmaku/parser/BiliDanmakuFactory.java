@@ -31,10 +31,14 @@ public class BiliDanmakuFactory {
 
     public static long REAL_DANMAKU_DURATION = -1;
 
+    public static long MAX_DANMAKU_DURATION = -1;
+
     public static BaseDanmaku createDanmaku(int type, float dispWidth) {
         if (REAL_DANMAKU_DURATION == -1)
             REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
-
+        if (MAX_DANMAKU_DURATION == -1) {
+            MAX_DANMAKU_DURATION = Math.max(REAL_DANMAKU_DURATION, COMMON_DANMAKU_DURATION);
+        }
         BaseDanmaku instance = null;
         switch (type) {
             case 1: // 从右往左滚动

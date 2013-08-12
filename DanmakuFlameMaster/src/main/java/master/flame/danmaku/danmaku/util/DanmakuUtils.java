@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.danmaku.util;
 
-import android.graphics.RectF;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
@@ -30,36 +29,31 @@ public class DanmakuUtils {
      * @return
      */
     public static boolean willHitInDuration(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2,
-            long duration) {
+                                            long duration, long currTime) {
         if (d1.getType() != d2.getType())
             return false;
         if (Math.abs(d2.time - d1.time) >= duration)
             return false;
-        float[] rectArr1 = d1.getRectAtTime(disp, d1.time + duration);
-        float[] rectArr2 = d2.getRectAtTime(disp, d2.time + duration);
-        if (rectArr1 == null || rectArr2 == null)
-            return false;
-        RectF rect1 = new RectF(rectArr1[0], rectArr1[1], rectArr1[2], rectArr1[3]);
-        RectF rect2 = new RectF(rectArr2[0], rectArr2[1], rectArr2[2], rectArr2[3]);
-        if (RectF.intersects(rect1, rect2)) {
+
+        if (d1.getType() == BaseDanmaku.TYPE_FIX_TOP || d1.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
             return true;
         }
+
+        long time = currTime + duration;
+        float[] rectArr1 = d1.getRectAtTime(disp, time);
+        float[] rectArr2 = d2.getRectAtTime(disp, time);
+        if (rectArr1 == null || rectArr2 == null)
+            return false;
         if (d1.getType() == BaseDanmaku.TYPE_SCROLL_RL
                 && d2.getType() == BaseDanmaku.TYPE_SCROLL_RL) {
-            if (rect2.left < rect1.right) {
+            if (rectArr2[0] < rectArr1[2]) {
                 return true;
             }
         } else if (d1.getType() == BaseDanmaku.TYPE_SCROLL_LR
                 && d2.getType() == BaseDanmaku.TYPE_SCROLL_LR) {
-            if (rect2.right > rect1.left) {
+            if (rectArr2[2] > rectArr1[0]) {
                 return true;
             }
-        } else if (d1.getType() == BaseDanmaku.TYPE_FIX_TOP
-                && d2.getType() == BaseDanmaku.TYPE_FIX_TOP) {
-            return true;
-        } else if (d1.getType() == BaseDanmaku.TYPE_FIX_BOTTOM
-                && d2.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
-            return true;
         }
 
         // TODO: more type

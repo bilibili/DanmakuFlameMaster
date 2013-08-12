@@ -57,8 +57,6 @@ public class FTDanmaku extends BaseDanmaku {
     public float[] getRectAtTime(IDisplayer displayer, long time) {
         if (!isMeasured())
             return null;
-        if (isOutside(time))
-            return null;
         float left = getLeft(displayer);
         float[] rect = new float[] {
                 left, y, left + paintWidth, y + paintHeight
