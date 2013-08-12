@@ -17,6 +17,7 @@
 package master.flame.danmaku.danmaku.parser.android;
 
 import master.flame.danmaku.danmaku.parser.IDataSource;
+import master.flame.danmaku.danmaku.util.IOUtils;
 
 import android.net.Uri;
 
@@ -25,12 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class AndroidFileSource implements IDataSource<InputStream> {
-
-    private static final String SCHEME_HTTP_TAG = "http";
-
-    private static final String SCHEME_HTTPS_TAG = "https";
-
-    private static final String SCHEME_FILE_TAG = "file";
 
     private InputStream inStream;
 
@@ -83,14 +78,8 @@ public class AndroidFileSource implements IDataSource<InputStream> {
 
     @Override
     public void release() {
-        if (inStream != null) {
-            try {
-                inStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            inStream = null;
-        }
+        IOUtils.closeQuietly(inStream);
+        inStream = null;
     }
 
 	@Override

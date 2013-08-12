@@ -16,34 +16,29 @@
 
 package master.flame.danmaku.danmaku.parser.android;
 
+import java.io.IOException;
+
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.BiliDanmakuFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.BiliDanmakuFactory;
-import master.flame.danmaku.danmaku.parser.IDataSource;
-
-import java.io.IOException;
 
 public class BiliDanmukuParse extends BaseDanmakuParser {
 
-    static {
-        System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
-    }
-
-    private final int mDispWidth;
-    private final float mDispDensity;
-
-
     public BiliDanmukuParse(IDisplayer disp) {
-        mDispWidth = disp.getWidth();
-        mDispDensity = disp.getDensity();
+		super(disp);
+	}
+
+	static {
+        System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
     }
 
     @Override

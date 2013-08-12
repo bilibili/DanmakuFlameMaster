@@ -17,7 +17,7 @@
 package master.flame.danmaku.danmaku.loader.android;
 
 import master.flame.danmaku.danmaku.loader.ILoader;
-import master.flame.danmaku.danmaku.parser.IDataSource;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.parser.android.AndroidFileSource;
 
 import android.net.Uri;
@@ -32,7 +32,7 @@ public class BiliDanmakuLoader implements ILoader {
 
     private Uri uri;
 
-    public BiliDanmakuLoader() {
+    private BiliDanmakuLoader() {
 
     }
 
@@ -43,16 +43,12 @@ public class BiliDanmakuLoader implements ILoader {
         return _instance;
     }
 
-    /**
-     * @param uri 弹幕文件地址(http:// file://)
-     * @return
-     */
-    public void load(String uri) {
+    public void load(String uri) throws IllegalDataException {
         try {
             this.uri = Uri.parse(uri);
             dataSource = new AndroidFileSource(uri);
         } catch (Exception e) {
-
+        	throw new IllegalDataException(e);
         }
     }
 
