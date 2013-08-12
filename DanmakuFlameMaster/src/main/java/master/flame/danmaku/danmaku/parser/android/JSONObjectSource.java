@@ -1,43 +1,56 @@
 package master.flame.danmaku.danmaku.parser.android;
 
-import android.net.Uri;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+import master.flame.danmaku.danmaku.parser.IDataSource;
+import master.flame.danmaku.danmaku.util.IOUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.InputStream;
-
-import master.flame.danmaku.danmaku.util.IOUtils;
+import android.text.TextUtils;
 
 /**
- * Created by Yrom on 13-8-11.
+ * a json file source
+ * @author yrom
  */
-public class JSONObjectSource extends AndroidFileSource{
-
-    public JSONObjectSource(String filepath) {
-        super(filepath);
+public class JSONObjectSource implements IDataSource<JSONObject>{
+	private JSONObject mJSONObject;
+	private InputStream mInput;
+	public JSONObjectSource(String json) throws JSONException{
+		init(json);
+	}
+	public JSONObjectSource(InputStream in) throws JSONException{
+		if(in == null)
+			throw new NullPointerException("input stream cannot be null!");
+		mInput = in;
+		String json = IOUtils.getString(mInput);
+		init(json);
+	}
+	public JSONObjectSource(URL url) throws JSONException, IOException{
+		this(url.openStream());
+	}
+	public JSONObjectSource(File file) throws FileNotFoundException, JSONException{
+		this(new FileInputStream(file));
+	}
+	private void init(String json) throws JSONException {
+		if(!TextUtils.isEmpty(json)){
+			mJSONObject = new JSONObject(json);
+		}
+	}
+    public JSONObject data(){
+    	return mJSONObject;
     }
 
-    public JSONObjectSource(Uri uri) {
-        super(uri);
-    }
-
-    public JSONObjectSource(File file) {
-        super(file);
-    }
-
-    public JSONObjectSource(InputStream stream) {
-        super(stream);
-    }
-
-    public JSONObject getJSONObject(){
-        String json = IOUtils.getString(inStream);
-        try {
-            return new JSONObject(json);
-        } catch (JSONException e) {
-            return null;
-        }
-    }
+	@Override
+	public void release() {
+		IOUtils.closeQuietly(mInput);
+		mInput = null;
+	}
 
 }

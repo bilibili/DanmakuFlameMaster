@@ -1,9 +1,9 @@
 package master.flame.danmaku.danmaku.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by Yrom on 13-8-11.
@@ -11,8 +11,7 @@ import java.io.InputStream;
 public class IOUtils {
     public static String getString(InputStream in){
         byte[] data = getBytes(in);
-        if(data != null) return new String(data);
-        return "";
+        return data == null? null:new String(data);
     }
     public static byte[] getBytes(InputStream in){
 
@@ -27,7 +26,17 @@ public class IOUtils {
         } catch (IOException e) {
             return null;
         }
-
-
+    }
+    public static void closeQuietly(InputStream in){
+    	try {
+    		if(in != null)
+    			in.close();
+		} catch (IOException ignore) {}
+    }
+    public static void closeQuietly(OutputStream out){
+    	try {
+    		if(out != null)
+    			out.close();
+    	} catch (IOException ignore) {}
     }
 }
