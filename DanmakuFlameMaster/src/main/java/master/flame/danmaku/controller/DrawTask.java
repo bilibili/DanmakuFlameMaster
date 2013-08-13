@@ -22,7 +22,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
-import master.flame.danmaku.danmaku.loader.android.BiliDanmakuLoader;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
@@ -43,7 +42,9 @@ public class DrawTask {
 
     private static final String TAG = "DrawTask";
 
-	private final AndroidDisplayer disp;
+    private final AndroidDisplayer disp;
+
+    private final int DEBUG_OPTION = 0;
 
     Context mContext;
 
@@ -64,7 +65,7 @@ public class DrawTask {
     private IDanmakus danmakus;
 
     public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH) {
-        this.mTimer = timer;
+        mTimer = timer;
         mContext = context;
         mRenderer = new DanmakuRenderer();
         disp = new AndroidDisplayer();
@@ -73,46 +74,49 @@ public class DrawTask {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         disp.density = displayMetrics.density;
         disp.scaledDensity = displayMetrics.scaledDensity;
+
         try {
-            loadAcDanmakus(context.getAssets().open("comment.json"));
+            if (DEBUG_OPTION == 0) {
+                loadAcDanmakus(context.getAssets().open("comment.json"));
+            } else {
+                loadBiliDanmakus(context.getResources().openRawResource(
+                        master.flame.danmaku.activity.R.raw.comments));
+            }
         } catch (IOException e) {
-            Log.e(TAG, "open assets error",e);
+            Log.e(TAG, "open assets error", e);
         }
-//        loadBiliDanmakus(context.getResources().openRawResource(R.raw.comments));
+
+    }
+
+    private void loadBiliDanmakus(InputStream stream) {
+        mLoader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
+        try {
+            mLoader.load(stream);
+            dataSource = mLoader.getDataSource();
+            mParser = new BiliDanmukuParse(disp);
+            danmakuList = mParser.load(dataSource).setTimer(mTimer).parse();
+        } catch (IllegalDataException e) {
+            Log.e(TAG, "load error", e);
+        }
     }
 
     private void loadAcDanmakus(InputStream stream) {
-    	mLoader = DanmakuLoaderFactory.create("acfun");
+        mLoader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_ACFUN);
         try {
-			mLoader.load(stream);
-			dataSource = mLoader.getDataSource();
-			mParser = new AcFunDanmakuParser(disp);
-			danmakuList = mParser.load(dataSource).setTimer(mTimer).parse();
-		} catch (IllegalDataException e) {
-			Log.e(TAG, "load error",e);
-		}
-	}
-
-	private void loadBiliDanmakus(InputStream stream) {
-        mLoader = (BiliDanmakuLoader) DanmakuLoaderFactory.create("bili");
-        try {
-			mLoader.load(stream);
-			dataSource = mLoader.getDataSource();
-			mParser = new BiliDanmukuParse(disp);
-			danmakuList = mParser.load(dataSource).setTimer(mTimer).parse();
-		} catch (IllegalDataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            mLoader.load(stream);
+            dataSource = mLoader.getDataSource();
+            mParser = new AcFunDanmakuParser(disp);
+            danmakuList = mParser.load(dataSource).setTimer(mTimer).parse();
+        } catch (IllegalDataException e) {
+            Log.e(TAG, "load error", e);
+        }
     }
 
     public void draw(Canvas canvas) {
         if (danmakuList != null) {
             long currMills = mTimer.currMillisecond;
             // if(danmakus==null)
-
-            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION,
-                    currMills);
+            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
             if (danmakus != null) {
                 disp.update(canvas);
                 mRenderer.draw(disp, danmakus);
