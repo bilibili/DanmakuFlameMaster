@@ -16,9 +16,10 @@
 
 package master.flame.danmaku.controller;
 
-import java.io.IOException;
-import java.io.InputStream;
-
+import android.content.Context;
+import android.graphics.Canvas;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.BiliDanmakuLoader;
@@ -34,10 +35,9 @@ import master.flame.danmaku.danmaku.parser.android.AcFunDanmakuParser;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParse;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
-import android.content.Context;
-import android.graphics.Canvas;
-import android.util.DisplayMetrics;
-import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class DrawTask {
 
@@ -110,6 +110,7 @@ public class DrawTask {
         if (danmakuList != null) {
             long currMills = mTimer.currMillisecond;
             // if(danmakus==null)
+
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION,
                     currMills);
             if (danmakus != null) {

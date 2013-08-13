@@ -29,7 +29,7 @@ public class DanmakuUtils {
      * @return
      */
     public static boolean willHitInDuration(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2,
-                                            long duration, long currTime) {
+            long duration, long currTime) {
         if (d1.getType() != d2.getType())
             return false;
         if (Math.abs(d2.time - d1.time) >= duration)
@@ -37,6 +37,10 @@ public class DanmakuUtils {
 
         if (d1.getType() == BaseDanmaku.TYPE_FIX_TOP || d1.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
             return true;
+        }
+
+        if (d1.isOutside()) {
+            return false;
         }
 
         long time = currTime + duration;
