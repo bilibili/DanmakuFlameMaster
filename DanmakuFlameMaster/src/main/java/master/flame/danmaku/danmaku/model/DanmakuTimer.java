@@ -18,15 +18,20 @@ package master.flame.danmaku.danmaku.model;
 
 public class DanmakuTimer {
     public long currMillisecond;
+    private long lastInterval;
 
     public long update(long curr) {
-        long delta = Math.abs(curr - currMillisecond);
+        lastInterval = Math.abs(curr - currMillisecond);
         currMillisecond = curr;
-        return delta;
-   }
+        return lastInterval;
+    }
 
     public void add(long mills) {
         update(currMillisecond + mills);
+    }
+
+    public long lastInterval() {
+        return lastInterval;
     }
 
 
