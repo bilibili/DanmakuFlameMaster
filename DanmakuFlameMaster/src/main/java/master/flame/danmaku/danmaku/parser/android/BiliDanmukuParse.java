@@ -31,6 +31,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import android.graphics.Color;
+
 public class BiliDanmukuParse extends BaseDanmakuParser {
 
     public BiliDanmukuParse(IDisplayer disp) {
@@ -123,6 +125,7 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                         item.time = time;
                         item.textSize = textSize * mDispDensity;
                         item.textColor = color;
+                        item.textShadowColor = color <= Color.BLACK?Color.WHITE:Color.BLACK;
                     }
                 }
             }
