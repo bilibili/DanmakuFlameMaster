@@ -214,11 +214,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 break;
             case UPDATE:
                 long d = timer.update(System.currentTimeMillis() - mTimeBase);
-                    if (d < 10) {
+                if (d < 15) {
+                    if (d < 12) {
                         try {
-                            Thread.sleep(10 - d);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                            Thread.sleep(15 - d);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 drawDanmakus();
