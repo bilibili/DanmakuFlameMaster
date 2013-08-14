@@ -24,4 +24,6 @@ public interface IDanmakus {
 
     public IDanmakus sub(long startTime, long endTime);
 
+    public int size();
+
 }

@@ -34,6 +34,7 @@ import master.flame.danmaku.danmaku.parser.android.AcFunDanmakuParser;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParse;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
+import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +45,7 @@ public class DrawTask {
 
     private final AndroidDisplayer disp;
 
-    private final int DEBUG_OPTION = 0;
+    private final int DEBUG_OPTION = 1;
 
     Context mContext;
 
@@ -64,7 +65,10 @@ public class DrawTask {
 
     private IDanmakus danmakus;
 
+    AndroidCounter mCounter;
+
     public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH) {
+        mCounter = new AndroidCounter();
         mTimer = timer;
         mContext = context;
         mRenderer = new DanmakuRenderer();
@@ -112,15 +116,22 @@ public class DrawTask {
         }
     }
 
+    int count = 0;
+
     public void draw(Canvas canvas) {
         if (danmakuList != null) {
+            mCounter.begin();
             long currMills = mTimer.currMillisecond;
             // if(danmakus==null)
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
             if (danmakus != null) {
                 disp.update(canvas);
+
                 mRenderer.draw(disp, danmakus);
+
             }
+
+            mCounter.end().log("draw danmakus " + (count++));
         }
     }
 

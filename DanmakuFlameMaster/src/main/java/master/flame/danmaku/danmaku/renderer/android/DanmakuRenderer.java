@@ -19,6 +19,7 @@ package master.flame.danmaku.danmaku.renderer.android;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
@@ -26,15 +27,29 @@ import java.util.Iterator;
 
 public class DanmakuRenderer extends Renderer {
 
+    public static int ANTI_ALIAS_DISABLE_SIZE = 30;
+
+    public static int ANTI_ALIAS_ENABLE_SIZE = 5;
+
     public Danmakus mLRDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
 
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus) {
         Danmakus drawItems = (Danmakus) danmakus;
         Iterator<BaseDanmaku> itr = drawItems.iterator();
-        int index = 0;
+        int index = -1;
+        int size = danmakus.size();
+        int startAntiIndex = 0;
+        if (size < ANTI_ALIAS_DISABLE_SIZE) {
+            AndroidDisplayer.PAINT.setAntiAlias(true);
+        } else {
+            AndroidDisplayer.PAINT.setAntiAlias(false);
+            startAntiIndex = size - ANTI_ALIAS_ENABLE_SIZE - 1;
+        }
         while (itr.hasNext()) {
+
             BaseDanmaku drawItem = itr.next();
+            ++index;
 
             // measure
             if (!drawItem.isMeasured()) {
@@ -48,6 +63,17 @@ public class DanmakuRenderer extends Renderer {
             if (drawItem.isShown()
                     && (drawItem.getType() != BaseDanmaku.TYPE_SCROLL_LR && drawItem.getLeft() < disp
                     .getWidth() && drawItem.getRight() > 0)) {
+
+                if (size >= ANTI_ALIAS_DISABLE_SIZE) {
+                    if (index < startAntiIndex) {
+                        AndroidDisplayer.PAINT.setAntiAlias(false);
+                        //Log.e("anti disabled",index + "anti disabled" + size);
+                    } else {
+                        AndroidDisplayer.PAINT.setAntiAlias(true);
+                        //Log.e("anti enable",index + "anti enabled" + size);
+                    }
+                }
+
                 drawItem.draw(disp);
                 // break;
             }
