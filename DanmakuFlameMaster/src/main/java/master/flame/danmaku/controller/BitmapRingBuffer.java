@@ -1,10 +1,9 @@
 
-package master.flame.danmaku.danmaku.renderer.android;
+package master.flame.danmaku.controller;
 
 import android.graphics.Bitmap;
-
 import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.renderer.RingBuffer;
+import master.flame.danmaku.danmaku.model.RingBuffer;
 
 public class BitmapRingBuffer extends RingBuffer<Bitmap> {
 

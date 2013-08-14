@@ -1,5 +1,5 @@
 
-package master.flame.danmaku.danmaku.renderer;
+package master.flame.danmaku.danmaku.model;
 
 public abstract class RingBuffer<T> {
 
