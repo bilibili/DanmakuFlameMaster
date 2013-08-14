@@ -34,7 +34,7 @@ public class AndroidDisplayer implements IDisplayer {
         PAINT.setColor(Color.RED);
         PAINT.setTextSize(50);
         // PAINT.setAntiAlias(true);
-        PAINT.setAntiAlias(true);
+        //PAINT.setAntiAlias(true);
         // TODO: load font from file
     }
 
