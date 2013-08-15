@@ -146,7 +146,7 @@ public class Danmakus implements IDanmakus {
             Integer t1 = obj1.getType();
             Integer t2 = obj2.getType();
             int result = t1.compareTo(t2);
-            if (val != 0) {
+            if (result != 0) {
                 return result;
             }
 
