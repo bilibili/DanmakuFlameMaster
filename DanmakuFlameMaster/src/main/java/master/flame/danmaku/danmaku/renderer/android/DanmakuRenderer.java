@@ -16,6 +16,8 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
+import java.util.Iterator;
+
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -23,15 +25,11 @@ import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
-import java.util.Iterator;
-
 public class DanmakuRenderer extends Renderer {
 
     public static int ANTI_ALIAS_DISABLE_SIZE = 30;
 
     public static int ANTI_ALIAS_ENABLE_SIZE = 5;
-
-    public Danmakus mLRDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
 
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus) {
@@ -61,16 +59,17 @@ public class DanmakuRenderer extends Renderer {
 
             // draw
             if (drawItem.isShown()
-                    && (drawItem.getType() != BaseDanmaku.TYPE_SCROLL_LR && drawItem.getLeft() < disp
-                    .getWidth() && drawItem.getRight() > 0)) {
+                    && (drawItem.getType() != BaseDanmaku.TYPE_SCROLL_LR
+                            && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0)) {
 
                 if (size >= ANTI_ALIAS_DISABLE_SIZE) {
                     if (index < startAntiIndex) {
                         AndroidDisplayer.PAINT.setAntiAlias(false);
-                        //Log.e("anti disabled",index + "anti disabled" + size);
+                        // Log.e("anti disabled",index + "anti disabled" +
+                        // size);
                     } else {
                         AndroidDisplayer.PAINT.setAntiAlias(true);
-                        //Log.e("anti enable",index + "anti enabled" + size);
+                        // Log.e("anti enable",index + "anti enabled" + size);
                     }
                 }
 

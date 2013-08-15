@@ -142,6 +142,14 @@ public class Danmakus implements IDanmakus {
             } else if (val < 0) {
                 return -1;
             }
+
+            Integer t1 = obj1.getType();
+            Integer t2 = obj2.getType();
+            int result = t1.compareTo(t2);
+            if (val != 0) {
+                return result;
+            }
+
             if (obj1.text == obj2.text) {
                 return 0;
             }
