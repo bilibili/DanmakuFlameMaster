@@ -93,6 +93,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         startDraw();
     }
 
+    private void startDraw() {
+        mDrawThread = new HandlerThread("draw thread");
+        mDrawThread.start();
+        handler = new DrawHandler(mDrawThread.getLooper());
+        handler.sendEmptyMessage(DrawHandler.START);
+    }
+
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
         isSurfaceCreated = true;
@@ -103,48 +110,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         stopDraw();
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (isSurfaceCreated) {
-                if (handler == null)
-                    startDraw();
-                else if(handler.isStop()){
-                    resume();
-                }
-                else
-                    pause();
-            }
-        }
-
-        return true;
-    }
-    public void start(){
-        startDraw();
-    }
-    
-    public void pause(){
-        if (handler != null)
-            handler.quit();
-    }
-    
-    public void resume(){
-        if(handler!=null && mDrawThread != null && handler.isStop())
-            handler.sendEmptyMessage(DrawHandler.RESUME);
-        else{
-            restart();   
-        }
-    }
-    
-    public void restart(){
-        stop();
-        start();
-    }
-    
-    public void stop(){
-        stopDraw();
-    }
-    
     private void stopDraw() {
         if (handler != null) {
             handler.quit();
@@ -156,11 +121,46 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    private void startDraw() {
-        mDrawThread = new HandlerThread("draw thread");
-        mDrawThread.start();
-        handler = new DrawHandler(mDrawThread.getLooper());
-        handler.sendEmptyMessage(DrawHandler.START);
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (isSurfaceCreated) {
+                if (handler == null)
+                    startDraw();
+                else if (handler.isStop()) {
+                    resume();
+                } else
+                    pause();
+            }
+        }
+
+        return true;
+    }
+
+    public void resume() {
+        if (handler != null && mDrawThread != null && handler.isStop())
+            handler.sendEmptyMessage(DrawHandler.RESUME);
+        else {
+            restart();
+        }
+    }
+
+    public void restart() {
+        stop();
+        start();
+    }
+
+    public void stop() {
+        stopDraw();
+    }
+
+    public void start() {
+        startDraw();
+    }
+
+    public void pause() {
+        if (handler != null)
+            handler.quit();
     }
 
     void drawDanmakus() {
@@ -178,13 +178,17 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
 
     }
+
     public class DrawHandler extends Handler {
+        private static final int START = 1;
+
+        private static final int UPDATE = 2;
+
+        private static final int RESUME = 3;
+
         private long pausedPostion = 0;
 
         private boolean quitFlag;
-        private static final int START = 1;
-        private static final int UPDATE = 2;
-        private static final int RESUME = 3;
 
         public DrawHandler(Looper looper) {
             super(looper);
@@ -192,7 +196,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         public void quit() {
             quitFlag = true;
-            
+
         }
 
         public boolean isStop() {
@@ -203,59 +207,58 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         public void handleMessage(Message msg) {
             int what = msg.what;
             switch (what) {
-            case START:
-                pausedPostion = 0;
-            case RESUME:
-                quitFlag = false;
-                mTimeBase = System.currentTimeMillis() - pausedPostion ;
-                timer.update(pausedPostion);
-                startDrawingWhenReady(new Runnable() {
+                case START:
+                    pausedPostion = 0;
+                case RESUME:
+                    quitFlag = false;
+                    mTimeBase = System.currentTimeMillis() - pausedPostion;
+                    timer.update(pausedPostion);
+                    startDrawingWhenReady(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        sendEmptyMessage(UPDATE);
-                    }
-                });
-                break;
-            case UPDATE:
-                long d = timer.update(System.currentTimeMillis() - mTimeBase);
-                if (d < 15) {
-                    if (d < 10) {
-                        try {
-                            Thread.sleep(15 - d);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                        @Override
+                        public void run() {
+                            sendEmptyMessage(UPDATE);
+                        }
+                    });
+                    break;
+                case UPDATE:
+                    long d = timer.update(System.currentTimeMillis() - mTimeBase);
+                    if (d < 15) {
+                        if (d < 10) {
+                            try {
+                                Thread.sleep(15 - d);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                }
-                drawDanmakus();
-                if (!quitFlag)
-                    sendEmptyMessage(UPDATE);
+                    drawDanmakus();
+                    if (!quitFlag)
+                        sendEmptyMessage(UPDATE);
 
-                else {
-                    pausedPostion = System.currentTimeMillis()- mTimeBase;
-                    Log.i(TAG, "stop draw: current = " + pausedPostion);
-                }
-                break;
+                    else {
+                        pausedPostion = System.currentTimeMillis() - mTimeBase;
+                        Log.i(TAG, "stop draw: current = " + pausedPostion);
+                    }
+                    break;
             }
         }
 
         private void startDrawingWhenReady(final Runnable runnable) {
             if (drawTask == null) {
-                drawTask = new CachingDrawTask(timer, getContext(), getWidth(), getHeight(), new IDrawTask.TaskListener() {
-                    @Override
-                    public void ready() {
-                        Log.i(TAG, "start drawing");
-                        runnable.run();
-                    }
-                });
+                drawTask = new CachingDrawTask(timer, getContext(), getWidth(), getHeight(),
+                        new IDrawTask.TaskListener() {
+                            @Override
+                            public void ready() {
+                                Log.i(TAG, "start drawing");
+                                runnable.run();
+                            }
+                        });
             } else {
                 runnable.run();
             }
         }
 
     }
-
-
 
 }
