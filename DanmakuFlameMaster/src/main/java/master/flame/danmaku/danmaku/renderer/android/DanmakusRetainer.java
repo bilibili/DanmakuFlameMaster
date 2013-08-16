@@ -16,12 +16,12 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
-import java.util.Iterator;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
+
+import java.util.Iterator;
 
 public class DanmakusRetainer {
 
@@ -79,14 +79,6 @@ public class DanmakusRetainer {
                 while (it.hasNext()) {
                     BaseDanmaku item = it.next();
 
-                    // 检查碰撞
-                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
-                            drawItem.getDuration(), drawItem.getTimer().currMillisecond);
-                    if (!willHit) {
-                        insertItem = item;
-                        break;
-                    }
-
                     if (firstItem == null)
                         firstItem = item;
                     lastItem = item;
@@ -95,12 +87,21 @@ public class DanmakusRetainer {
                         overwriteInsert = true;
                         break;
                     }
+
                     if (minRightRow == null) {
                         minRightRow = item;
                     } else {
                         if (minRightRow.getRight() >= item.getRight()) {
                             minRightRow = item;
                         }
+                    }
+
+                    // 检查碰撞
+                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
+                            drawItem.getDuration(), drawItem.getTimer().currMillisecond);
+                    if (!willHit) {
+                        insertItem = item;
+                        break;
                     }
 
                 }

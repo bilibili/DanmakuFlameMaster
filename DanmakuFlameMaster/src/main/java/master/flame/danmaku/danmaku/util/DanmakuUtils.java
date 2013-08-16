@@ -58,12 +58,11 @@ public class DanmakuUtils {
             return false;
         checkHit(d1, d2, rectArr1, rectArr2);
 
-        // TODO: more type
-
         return false;
     }
 
-    private static boolean checkHit(BaseDanmaku d1, BaseDanmaku d2, float[] rectArr1, float[] rectArr2) {
+    private static boolean checkHit(BaseDanmaku d1, BaseDanmaku d2, float[] rectArr1,
+            float[] rectArr2) {
 
         if (d1.getType() == BaseDanmaku.TYPE_SCROLL_RL
                 && d2.getType() == BaseDanmaku.TYPE_SCROLL_RL) {
