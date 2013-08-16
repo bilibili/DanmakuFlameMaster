@@ -28,8 +28,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import master.flame.danmaku.controller.CachingDrawTask;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
+import master.flame.danmaku.controller.IDrawTask;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 
@@ -167,8 +169,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         if (canvas != null) {
 
             DrawHelper.clearCanvas(canvas);
-            if (drawTask == null)
-                drawTask = new DrawTask(timer, getContext(), canvas.getWidth(), canvas.getHeight());
             drawTask.draw(canvas);
 
             long dtime = System.currentTimeMillis() - stime;
@@ -209,13 +209,18 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 quitFlag = false;
                 mTimeBase = System.currentTimeMillis() - pausedPostion ;
                 timer.update(pausedPostion);
-                drawDanmakus();
-                sendEmptyMessage(UPDATE);
+                startDrawingWhenReady(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        sendEmptyMessage(UPDATE);
+                    }
+                });
                 break;
             case UPDATE:
                 long d = timer.update(System.currentTimeMillis() - mTimeBase);
                 if (d < 15) {
-                    if (d < 12) {
+                    if (d < 10) {
                         try {
                             Thread.sleep(15 - d);
                         } catch (InterruptedException e) {
@@ -232,6 +237,20 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     Log.i(TAG, "stop draw: current = " + pausedPostion);
                 }
                 break;
+            }
+        }
+
+        private void startDrawingWhenReady(final Runnable runnable) {
+            if (drawTask == null) {
+                drawTask = new CachingDrawTask(timer, getContext(), getWidth(), getHeight(), new IDrawTask.TaskListener() {
+                    @Override
+                    public void ready() {
+                        Log.i(TAG, "start drawing");
+                        runnable.run();
+                    }
+                });
+            } else {
+                runnable.run();
             }
         }
 

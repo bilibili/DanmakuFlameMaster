@@ -3,6 +3,7 @@ package master.flame.danmaku.controller;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.RingBuffer;
 
@@ -11,9 +12,12 @@ import java.util.List;
 
 public abstract class DrawingCache {
 
+    private static final String TAG = "DrawingCache";
     public Object mBufferLock = new Object();
 
     Thread mThread = new Thread() {
+
+        public static final String TAG = "DrawingCache";
 
         @Override
         public void run() {
@@ -25,18 +29,25 @@ public abstract class DrawingCache {
 
                         if (mScrapList.size() > 0) {
                             DrawingCacheHolder holder = mScrapList.get(0);
+                            mScrapList.remove(0);
                             drawCache(holder);
                             mBuffer.put(holder);
                         }
 
-                        if (mBuffer.isFull()) {
+                        if (mScrapList.isEmpty()) {
                             break;
+                        }
+                        try {
+                            Thread.sleep(5);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
 
                 synchronized (this) {
                     try {
+                        Log.e(TAG, "thread wait");
                         wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -71,7 +82,9 @@ public abstract class DrawingCache {
             DrawingCacheHolder holder = mBuffer.get();
             if (holder != null) {
                 bmp = holder.bitmap;
+                mScrapList.add(holder);
             }
+            Log.e(TAG, "buffered:" + mBuffer.size() + ",scrap:" + mScrapList.size());
         }
         return bmp;
     }
@@ -80,12 +93,16 @@ public abstract class DrawingCache {
      * 使用cache之后调用
      */
     public void fillNext() {
-        synchronized (this) {
-            notify();
+        synchronized (mThread) {
+            mThread.notify();
         }
     }
 
     protected abstract void drawCache(DrawingCacheHolder holder);
+
+    public void start() {
+        mThread.start();
+    }
 
     public class DrawingCacheHolder {
 
@@ -93,7 +110,7 @@ public abstract class DrawingCache {
 
         public Bitmap bitmap;
 
-        public int time;
+        public Object extra;
 
         public DrawingCacheHolder(int w, int h) {
             bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
