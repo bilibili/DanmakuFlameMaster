@@ -3,12 +3,11 @@ package master.flame.danmaku.controller;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.RingBuffer;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.RingBuffer;
 
 public abstract class DrawingCache {
 
@@ -26,7 +25,7 @@ public abstract class DrawingCache {
 
                         if (mScrapList.size() > 0) {
                             DrawingCacheHolder holder = mScrapList.get(0);
-                            fillData(holder);
+                            drawCache(holder);
                             mBuffer.put(holder);
                         }
 
@@ -66,7 +65,7 @@ public abstract class DrawingCache {
         }
     }
 
-    public Bitmap get() {
+    public Bitmap getCache() {
         Bitmap bmp = null;
         synchronized (mBufferLock) {
             DrawingCacheHolder holder = mBuffer.get();
@@ -77,13 +76,16 @@ public abstract class DrawingCache {
         return bmp;
     }
 
+    /**
+     * 使用cache之后调用
+     */
     public void fillNext() {
         synchronized (this) {
             notify();
         }
     }
 
-    protected abstract void fillData(DrawingCacheHolder holder);
+    protected abstract void drawCache(DrawingCacheHolder holder);
 
     public class DrawingCacheHolder {
 
