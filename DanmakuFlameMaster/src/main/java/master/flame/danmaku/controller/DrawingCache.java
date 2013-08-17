@@ -104,6 +104,14 @@ public abstract class DrawingCache {
         mThread.start();
     }
 
+    public void clear() {
+        synchronized (mBufferLock) {
+            while (!mBuffer.isEmpty()) {
+                getCache();
+            }
+        }
+    }
+
     public class DrawingCacheHolder {
 
         public Canvas canvas;

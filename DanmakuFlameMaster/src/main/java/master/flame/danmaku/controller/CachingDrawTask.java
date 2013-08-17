@@ -12,19 +12,22 @@ public class CachingDrawTask extends DrawTask {
 
     private DanmakuTimer mPlayerTimer;
 
-    public CachingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH, TaskListener taskListener) {
+    public CachingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
+                           TaskListener taskListener) {
         super(timer, context, dispW, dispH, taskListener);
         initCache();
     }
 
     private void initCache() {
-        mCache = new DrawingCache(5, mDisp) {
+        mCache = new DrawingCache(3, mDisp) {
             @Override
             protected void drawCache(DrawingCacheHolder holder) {
                 DrawHelper.clearCanvas(holder.canvas);
-                drawDanmakus(holder.canvas, mTimer);
-                holder.extra = mTimer.currMillisecond;
-                mTimer.add(30);  //fix magic num
+                synchronized (mCache) {
+                    drawDanmakus(holder.canvas, mTimer);
+                    holder.extra = mTimer.currMillisecond;
+                    mTimer.add(30); // fix magic num
+                }
             }
         };
         mCache.start();
@@ -37,10 +40,9 @@ public class CachingDrawTask extends DrawTask {
         mTimer.update(mPlayerTimer.currMillisecond);
     }
 
-
     @Override
     public void draw(Canvas canvas) {
-mCounter.begin();
+        mCounter.begin();
         Bitmap bmp = mCache.getCache();
         if (bmp != null) {
             canvas.drawBitmap(bmp, 0, 0, null);
@@ -48,7 +50,20 @@ mCounter.begin();
             mCounter.end().log("drawing");
         }
 
-
     }
 
+    @Override
+    public void reset() {
+        synchronized (mCache) {
+            super.reset();
+        }
+        mCache.clear();
+        mTimer.update(mPlayerTimer.currMillisecond);
+        mCache.fillNext();
+    }
+
+    @Override
+    public void seek(long mills) {
+        reset();
+    }
 }

@@ -26,4 +26,6 @@ public interface IDanmakus {
 
     public int size();
 
+    public void clear();
+
 }

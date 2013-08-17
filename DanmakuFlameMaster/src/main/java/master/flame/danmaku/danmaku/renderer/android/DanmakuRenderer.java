@@ -79,4 +79,10 @@ public class DanmakuRenderer extends Renderer {
 
         }
     }
+
+    @Override
+    public void clear() {
+        DanmakusRetainer.clear();
+    }
+
 }

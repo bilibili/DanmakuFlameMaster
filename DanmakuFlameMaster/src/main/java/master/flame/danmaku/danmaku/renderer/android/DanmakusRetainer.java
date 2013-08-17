@@ -16,12 +16,12 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
+import java.util.Iterator;
+
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
-
-import java.util.Iterator;
 
 public class DanmakusRetainer {
 
@@ -57,8 +57,23 @@ public class DanmakusRetainer {
 
     }
 
+    public static void clear() {
+        if (rldrInstance != null) {
+            rldrInstance.clear();
+        }
+        if (ftdrInstance != null) {
+            ftdrInstance.clear();
+        }
+        if (fbdrInstance != null) {
+            fbdrInstance.clear();
+        }
+    }
+
     public interface IDanmakusRetainer {
         public void fix(BaseDanmaku drawItem, IDisplayer disp);
+
+        public void clear();
+
     }
 
     private static class RLDanmakusRetainer implements IDanmakusRetainer {
@@ -143,6 +158,11 @@ public class DanmakusRetainer {
             return topPos;
         }
 
+        @Override
+        public void clear() {
+            mVisibleDanmakus.clear();
+        }
+
     }
 
     private static class FTDanmakusRetainer extends RLDanmakusRetainer {
@@ -219,6 +239,11 @@ public class DanmakusRetainer {
                 mVisibleDanmakus.addItem(drawItem);
             }
 
+        }
+
+        @Override
+        public void clear() {
+            mVisibleDanmakus.clear();
         }
 
         protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,

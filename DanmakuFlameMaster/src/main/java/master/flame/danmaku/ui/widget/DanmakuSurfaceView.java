@@ -25,9 +25,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import master.flame.danmaku.controller.CachingDrawTask;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
@@ -35,7 +35,7 @@ import master.flame.danmaku.controller.IDrawTask;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 
-public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback, View.OnClickListener, View.OnLongClickListener {
 
     public static final String TAG = "DanmakuSurfaceView";
 
@@ -76,6 +76,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         if (timer == null) {
             timer = new DanmakuTimer();
         }
+        setOnClickListener(this);
+        setOnLongClickListener(this);
     }
 
     public DanmakuSurfaceView(Context context, AttributeSet attrs) {
@@ -121,21 +123,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (isSurfaceCreated) {
-                if (handler == null)
-                    startDraw();
-                else if (handler.isStop()) {
-                    resume();
-                } else
-                    pause();
-            }
-        }
 
-        return true;
-    }
 
     public void resume() {
         if (handler != null && mDrawThread != null && handler.isStop())
@@ -163,6 +151,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             handler.quit();
     }
 
+    public void seekBy(Long deltaMs) {
+        if (handler != null) {
+            handler.obtainMessage(DrawHandler.SEEK_POS, deltaMs).sendToTarget();
+        }
+    }
+
     void drawDanmakus() {
         long stime = System.currentTimeMillis();
         Canvas canvas = mSurfaceHolder.lockCanvas();
@@ -179,12 +173,34 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     }
 
+    @Override
+    public void onClick(View view) {
+        if (isSurfaceCreated) {
+            if (handler == null)
+                startDraw();
+            else if (handler.isStop()) {
+                resume();
+            } else
+                pause();
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        if (isSurfaceCreated) {
+            seekBy(3000L);
+        }
+        return true;
+    }
+
     public class DrawHandler extends Handler {
         private static final int START = 1;
 
         private static final int UPDATE = 2;
 
         private static final int RESUME = 3;
+
+        private static final int SEEK_POS = 4;
 
         private long pausedPostion = 0;
 
@@ -221,8 +237,27 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                         }
                     });
                     break;
+                case SEEK_POS:
+                    Long deltaMs = (Long) msg.obj;
+                    mTimeBase -= deltaMs;
+                    long seekPos = System.currentTimeMillis() - mTimeBase;
+                    drawTask.seek(seekPos);
+                    timer.update(seekPos);
+                    startDrawingWhenReady(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            sendEmptyMessage(UPDATE);
+                        }
+                    });
+                    break;
                 case UPDATE:
                     long d = timer.update(System.currentTimeMillis() - mTimeBase);
+                    if (d == 0) {
+                        if (!quitFlag)
+                            sendEmptyMessageDelayed(UPDATE, 15);
+                        return;
+                    }
                     if (d < 15) {
                         if (d < 10) {
                             try {

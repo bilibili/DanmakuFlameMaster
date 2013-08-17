@@ -143,6 +143,18 @@ public class DrawTask implements IDrawTask {
         mCounter.end().log("drawing");
     }
 
+    @Override
+    public void reset() {
+        danmakus.clear();
+        mRenderer.clear();
+    }
+
+    @Override
+    public void seek(long mills) {
+        mTimer.update(mills);
+        reset();
+    }
+
     protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {
         if (danmakuList != null) {
             long currMills = timer.currMillisecond;
