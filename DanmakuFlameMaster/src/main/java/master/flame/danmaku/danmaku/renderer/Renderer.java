@@ -16,14 +16,6 @@
 
 package master.flame.danmaku.danmaku.renderer;
 
-import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-
 public abstract class Renderer implements IRenderer {
-
-    @Override
-    public void draw(IDisplayer disp, IDanmakus danmakus) {
-
-    }
 
 }
