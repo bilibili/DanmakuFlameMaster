@@ -26,7 +26,8 @@ public class CachingDrawTask extends DrawTask {
                 synchronized (mCache) {
                     drawDanmakus(holder.canvas, mTimer);
                     holder.extra = mTimer.currMillisecond;
-                    mTimer.add(30); // fix magic num
+                    long lastInterval = mPlayerTimer.lastInterval();
+                    mTimer.add(lastInterval == 0 ? 15 : lastInterval); // test
                 }
             }
         };
