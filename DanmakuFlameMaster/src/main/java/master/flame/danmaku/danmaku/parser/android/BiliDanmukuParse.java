@@ -16,14 +16,6 @@
 
 package master.flame.danmaku.danmaku.parser.android;
 
-import java.io.IOException;
-
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -33,13 +25,21 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import android.graphics.Color;
 
+import java.io.IOException;
+
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+
 public class BiliDanmukuParse extends BaseDanmakuParser {
 
     public BiliDanmukuParse(IDisplayer disp) {
-		super(disp);
-	}
+        super(disp);
+    }
 
-	static {
+    static {
         System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
     }
 
@@ -125,7 +125,7 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                         item.time = time;
                         item.textSize = textSize * mDispDensity;
                         item.textColor = color;
-                        item.textShadowColor = color <= Color.BLACK?Color.WHITE:Color.BLACK;
+                        item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
                     }
                 }
             }

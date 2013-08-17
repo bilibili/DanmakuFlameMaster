@@ -16,14 +16,14 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
-import java.util.Iterator;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.renderer.Renderer;
+
+import java.util.Iterator;
 
 public class DanmakuRenderer extends Renderer {
 
@@ -65,11 +65,8 @@ public class DanmakuRenderer extends Renderer {
                 if (size >= ANTI_ALIAS_DISABLE_SIZE) {
                     if (index < startAntiIndex) {
                         AndroidDisplayer.PAINT.setAntiAlias(false);
-                        // Log.e("anti disabled",index + "anti disabled" +
-                        // size);
                     } else {
                         AndroidDisplayer.PAINT.setAntiAlias(true);
-                        // Log.e("anti enable",index + "anti enabled" + size);
                     }
                 }
 
