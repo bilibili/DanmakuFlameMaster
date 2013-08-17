@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.graphics.Color;
+
 public class AcFunDanmakuParser extends BaseDanmakuParser {
 
 	public AcFunDanmakuParser(IDisplayer disp) {
@@ -33,19 +35,23 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
 			try {
 				JSONObject obj =  jsonArray.getJSONObject(i);
 				String c = obj.getString("c");
-				String m = obj.getString("m");
 				String[] values = c.split(",");
 				if (values.length > 0) {
+                    int type = Integer.parseInt(values[2]); // 弹幕类型
+                    if(type == 7)
+                        // FIXME : hard code
+                        // TODO : parse advance danmaku json
+                        continue;
                     long time = (long) (Float.parseFloat(values[0]) * 1000); // 出现时间
                     int color = Integer.parseInt(values[1]) | 0xFF000000; // 颜色
                     float textSize = Float.parseFloat(values[3]); // 字体大小
-                    int type = Integer.parseInt(values[2]); // 弹幕类型
                     BaseDanmaku item = DanmakuFactory.createDanmaku(type, mDispWidth);
                     if (item != null) {
                         item.time = time;
-                        item.textSize = textSize*(mScaledDensity - 0.5f);
+                        item.textSize = textSize*(mScaledDensity - 0.2f);
                         item.textColor = color;
-                        item.text = m ;
+                        item.textShadowColor = color <= Color.BLACK?Color.WHITE:Color.BLACK;
+                        item.text = obj.optString("m","....");
                         item.index = i;
                         item.setTimer(mTimer);
                         danmakus.addItem(item);
