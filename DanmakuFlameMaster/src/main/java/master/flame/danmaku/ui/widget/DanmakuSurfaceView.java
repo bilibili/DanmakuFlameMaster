@@ -104,7 +104,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        stopDraw();
+        release();
     }
 
     private void stopDraw() {
@@ -127,7 +127,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public void release() {
         stop();
-        drawTask.quit();
+        if (drawTask != null) {
+            drawTask.quit();
+            drawTask = null;
+        }
     }
 
     public void stop() {

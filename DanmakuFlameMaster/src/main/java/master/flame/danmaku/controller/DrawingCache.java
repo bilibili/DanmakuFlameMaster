@@ -3,7 +3,6 @@ package master.flame.danmaku.controller;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.util.Log;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.RingBuffer;
 
@@ -18,14 +17,14 @@ public abstract class DrawingCache {
 
     Thread mThread = new Thread(TAG) {
 
-        public static final String TAG = "DrawingCache";
-
         @Override
         public void run() {
 
             while (!quitFlag) {
 
                 while (true) {
+
+
                     synchronized (mBufferLock) {
 
                         if (mScrapList.size() > 0) {
@@ -38,11 +37,12 @@ public abstract class DrawingCache {
                         if (mScrapList.isEmpty()) {
                             break;
                         }
-                        try {
-                            Thread.sleep(5);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    }
+
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
 
@@ -84,7 +84,6 @@ public abstract class DrawingCache {
                 bmp = holder.bitmap;
                 mScrapList.add(holder);
             }
-            Log.e(TAG, "buffered:" + mBuffer.size() + ",scrap:" + mScrapList.size());
         }
         return bmp;
     }
