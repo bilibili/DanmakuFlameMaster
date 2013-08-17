@@ -80,8 +80,6 @@ public class DrawTask implements IDrawTask {
         mDisp.scaledDensity = displayMetrics.scaledDensity;
         initTimer(timer);
         loadDanmakus(context, mTimer);
-
-
     }
 
     protected void loadDanmakus(Context context, DanmakuTimer timer) {
@@ -152,6 +150,11 @@ public class DrawTask implements IDrawTask {
     @Override
     public void seek(long mills) {
         mTimer.update(mills);
+        reset();
+    }
+
+    @Override
+    public void quit() {
         reset();
     }
 

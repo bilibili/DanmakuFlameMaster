@@ -8,6 +8,7 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.RingBuffer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class DrawingCache {
@@ -15,7 +16,7 @@ public abstract class DrawingCache {
     private static final String TAG = "DrawingCache";
     public Object mBufferLock = new Object();
 
-    Thread mThread = new Thread() {
+    Thread mThread = new Thread(TAG) {
 
         public static final String TAG = "DrawingCache";
 
@@ -47,7 +48,6 @@ public abstract class DrawingCache {
 
                 synchronized (this) {
                     try {
-                        Log.e(TAG, "thread wait");
                         wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -104,6 +104,26 @@ public abstract class DrawingCache {
         mThread.start();
     }
 
+    public void quit() {
+        quitFlag = true;
+        fillNext();
+        recyle();
+    }
+
+    public void recyle() {
+        clear();
+        synchronized (mBufferLock) {
+            if (mScrapList != null) {
+                Iterator<DrawingCacheHolder> it = mScrapList.iterator();
+                while (it.hasNext()) {
+                    DrawingCacheHolder holder = it.next();
+                    holder.recycle();
+                    it.remove();
+                }
+            }
+        }
+    }
+
     public void clear() {
         synchronized (mBufferLock) {
             while (!mBuffer.isEmpty()) {
@@ -123,6 +143,13 @@ public abstract class DrawingCache {
         public DrawingCacheHolder(int w, int h) {
             bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             canvas = new Canvas(bitmap);
+        }
+
+        public void recycle() {
+            bitmap.recycle();
+            bitmap = null;
+            canvas = null;
+            extra = null;
         }
 
     }

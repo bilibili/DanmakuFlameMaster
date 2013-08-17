@@ -66,4 +66,9 @@ public class CachingDrawTask extends DrawTask {
     public void seek(long mills) {
         reset();
     }
+
+    @Override
+    public void quit() {
+        mCache.quit();
+    }
 }

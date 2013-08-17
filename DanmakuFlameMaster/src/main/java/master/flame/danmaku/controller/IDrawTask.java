@@ -11,6 +11,8 @@ public interface IDrawTask {
 
     public void seek(long mills);
 
+    public void quit();
+
     public interface TaskListener {
         public void ready();
     }
