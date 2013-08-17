@@ -43,11 +43,27 @@ public class DanmakuUtils {
             return false;
         }
 
-        long time = currTime + duration;
-        float[] rectArr1 = d1.getRectAtTime(disp, time);
-        float[] rectArr2 = d2.getRectAtTime(disp, time);
+        float[] rectArr1 = d1.getRectAtTime(disp, currTime);
+        float[] rectArr2 = d2.getRectAtTime(disp, currTime);
         if (rectArr1 == null || rectArr2 == null)
             return false;
+        if (checkHit(d1, d2, rectArr1, rectArr2)) {
+            return true;
+        }
+
+        long time = currTime + duration;
+        rectArr1 = d1.getRectAtTime(disp, time);
+        rectArr2 = d2.getRectAtTime(disp, time);
+        if (rectArr1 == null || rectArr2 == null)
+            return false;
+        checkHit(d1, d2, rectArr1, rectArr2);
+
+        return false;
+    }
+
+    private static boolean checkHit(BaseDanmaku d1, BaseDanmaku d2, float[] rectArr1,
+            float[] rectArr2) {
+
         if (d1.getType() == BaseDanmaku.TYPE_SCROLL_RL
                 && d2.getType() == BaseDanmaku.TYPE_SCROLL_RL) {
             if (rectArr2[0] < rectArr1[2]) {
@@ -59,9 +75,7 @@ public class DanmakuUtils {
                 return true;
             }
         }
-
-        // TODO: more type
-
         return false;
+
     }
 }

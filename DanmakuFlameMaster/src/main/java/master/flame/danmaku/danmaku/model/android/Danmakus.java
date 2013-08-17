@@ -127,9 +127,18 @@ public class Danmakus implements IDanmakus {
         return 0;
     }
 
+    @Override
     public void clear() {
         if (items != null)
             items.clear();
+        if (subItems != null) {
+            Iterator<BaseDanmaku> it = subItems.iterator();
+            while (it.hasNext()) {
+                BaseDanmaku item = it.next();
+                item.setVisibility(false);
+            }
+            subItems.clear();
+        }
     }
 
     private class TimeComparator implements Comparator<BaseDanmaku> {
@@ -142,6 +151,14 @@ public class Danmakus implements IDanmakus {
             } else if (val < 0) {
                 return -1;
             }
+
+            Integer t1 = obj1.getType();
+            Integer t2 = obj2.getType();
+            int result = t1.compareTo(t2);
+            if (result != 0) {
+                return result;
+            }
+
             if (obj1.text == obj2.text) {
                 return 0;
             }

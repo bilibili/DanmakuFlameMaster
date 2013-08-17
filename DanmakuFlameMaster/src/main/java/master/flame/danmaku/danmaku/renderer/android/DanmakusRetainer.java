@@ -57,8 +57,23 @@ public class DanmakusRetainer {
 
     }
 
+    public static void clear() {
+        if (rldrInstance != null) {
+            rldrInstance.clear();
+        }
+        if (ftdrInstance != null) {
+            ftdrInstance.clear();
+        }
+        if (fbdrInstance != null) {
+            fbdrInstance.clear();
+        }
+    }
+
     public interface IDanmakusRetainer {
         public void fix(BaseDanmaku drawItem, IDisplayer disp);
+
+        public void clear();
+
     }
 
     private static class RLDanmakusRetainer implements IDanmakusRetainer {
@@ -79,14 +94,6 @@ public class DanmakusRetainer {
                 while (it.hasNext()) {
                     BaseDanmaku item = it.next();
 
-                    // 检查碰撞
-                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
-                            drawItem.getDuration(), drawItem.getTimer().currMillisecond);
-                    if (!willHit) {
-                        insertItem = item;
-                        break;
-                    }
-
                     if (firstItem == null)
                         firstItem = item;
                     lastItem = item;
@@ -95,12 +102,21 @@ public class DanmakusRetainer {
                         overwriteInsert = true;
                         break;
                     }
+
                     if (minRightRow == null) {
                         minRightRow = item;
                     } else {
                         if (minRightRow.getRight() >= item.getRight()) {
                             minRightRow = item;
                         }
+                    }
+
+                    // 检查碰撞
+                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
+                            drawItem.getDuration(), drawItem.getTimer().currMillisecond);
+                    if (!willHit) {
+                        insertItem = item;
+                        break;
                     }
 
                 }
@@ -140,6 +156,11 @@ public class DanmakusRetainer {
         protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
                 IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
             return topPos;
+        }
+
+        @Override
+        public void clear() {
+            mVisibleDanmakus.clear();
         }
 
     }
@@ -218,6 +239,11 @@ public class DanmakusRetainer {
                 mVisibleDanmakus.addItem(drawItem);
             }
 
+        }
+
+        @Override
+        public void clear() {
+            mVisibleDanmakus.clear();
         }
 
         protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
