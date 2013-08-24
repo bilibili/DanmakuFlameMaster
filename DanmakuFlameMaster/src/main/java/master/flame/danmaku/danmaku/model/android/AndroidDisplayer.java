@@ -46,7 +46,7 @@ public class AndroidDisplayer implements IDisplayer {
     /**
      * 开启阴影，可动态改变
      */
-    public static boolean HAS_SHADOW = false;
+    public static boolean HAS_SHADOW = true;
     /**
      * 开启描边，可动态改变
      */
@@ -54,7 +54,7 @@ public class AndroidDisplayer implements IDisplayer {
     /**
      * 开启抗锯齿，可动态改变
      */
-    //public static boolean ANTI_ALIAS = false;
+    public static boolean ANTI_ALIAS = true;
 
     public Canvas canvas;
 
@@ -63,7 +63,9 @@ public class AndroidDisplayer implements IDisplayer {
     public int height;
 
     public float density = 1;
-    
+
+    public int densityDpi = 160;
+
     public float scaledDensity = 1;
     public void update(Canvas c) {
         canvas = c;
@@ -91,48 +93,72 @@ public class AndroidDisplayer implements IDisplayer {
     }
 
     @Override
+    public int getDensityDpi() {
+        return densityDpi;
+    }
+
+    @Override
     public void draw(BaseDanmaku danmaku) {
         if (canvas != null) {
-            TextPaint paint = getPaint(danmaku);
-            if (danmaku.paintHeight > danmaku.textSize) {
-                String[] titleArr = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);
-                if (titleArr.length == 1) {
 
-                    if (HAS_STROKE)
-                        canvas.drawText(titleArr[0], danmaku.getLeft(),
-                                danmaku.getTop() - STROKE.ascent(), STROKE);
-                    canvas.drawText(titleArr[0], danmaku.getLeft(),
-                            danmaku.getTop() - paint.ascent(), paint);
-                } else {
-                    for (int t = 0; t < titleArr.length; t++) {
-                        if (titleArr[t].length() > 0) {
-                            canvas.drawText(titleArr[t], danmaku.getLeft(), (t)
-                                    * (danmaku.textSize + 1) + danmaku.getTop() - paint.ascent(),
-                                    paint);
-                        }
-                    }
+            //drawing cache
+            if (danmaku.hasDrawingCache()) {
+                DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
+                if (holder != null) {
+                    canvas.save();
+                    canvas.translate(danmaku.getLeft(), danmaku.getTop());
+                    canvas.drawBitmap(holder.bitmap, 0, 0, null);
+                    canvas.restore();
+                    return;
                 }
-            } else {
-                if (HAS_STROKE)
-                    canvas.drawText(danmaku.text, danmaku.getLeft(), danmaku.getTop() - STROKE.ascent(),
-                            STROKE);
-                canvas.drawText(danmaku.text, danmaku.getLeft(), danmaku.getTop() - paint.ascent(),
-                        paint);
             }
+
+            drawDanmaku(danmaku, canvas, danmaku.getLeft(), danmaku.getTop());
         }
     }
 
-    private static TextPaint getPaint(BaseDanmaku danmaku) {
+    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
+        TextPaint paint = getPaint(danmaku);
+        if (danmaku.paintHeight > danmaku.textSize) {
+            String[] titleArr = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);
+            if (titleArr.length == 1) {
+                if (HAS_STROKE)
+                    canvas.drawText(titleArr[0], left,
+                            top - STROKE.ascent(), STROKE);
+                canvas.drawText(titleArr[0], left,
+                        top - paint.ascent(), paint);
+            } else {
+                for (int t = 0; t < titleArr.length; t++) {
+                    if (titleArr[t].length() > 0) {
+                        canvas.drawText(titleArr[t], left, t
+                                * danmaku.textSize + top - paint.ascent(),
+                                paint);
+                    }
+                }
+            }
+        } else {
+            if (HAS_STROKE)
+                canvas.drawText(danmaku.text, left, top - STROKE.ascent(),
+                        STROKE);
+            canvas.drawText(danmaku.text, left, top - paint.ascent(),
+                    paint);
+        }
+    }
+
+    public static TextPaint getPaint(BaseDanmaku danmaku) {
         PAINT.setTextSize(danmaku.textSize);
         PAINT.setColor(danmaku.textColor);
-        //PAINT.setAntiAlias(ANTI_ALIAS);
+        PAINT.setAntiAlias(ANTI_ALIAS);
         if (HAS_STROKE) {
             //STROKE.setAntiAlias(ANTI_ALIAS);
             STROKE.setTextSize(danmaku.textSize);
             STROKE.setColor(danmaku.textShadowColor);
         }
-        if (HAS_SHADOW)
-            PAINT.setShadowLayer(2.0f, 2, 2, Color.GRAY);
+        if (HAS_SHADOW) {
+            PAINT.setShadowLayer(2.0f, 2, 2, danmaku.textShadowColor);
+        } else {
+            PAINT.clearShadowLayer();
+        }
         return PAINT;
     }
 

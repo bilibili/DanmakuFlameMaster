@@ -85,9 +85,15 @@ public abstract class BaseDanmaku {
     public int visibility;
 
     /**
+     * 绘制用缓存
+     */
+    public IDrawingCache cache;
+
+    /**
      * 计时
      */
     protected DanmakuTimer mTimer;
+
     private long timer;
 
     public void setTimer(DanmakuTimer timer) {
@@ -112,6 +118,10 @@ public abstract class BaseDanmaku {
 
     public void measure(IDisplayer displayer) {
         displayer.measure(this);
+    }
+
+    public boolean hasDrawingCache() {
+        return cache != null && cache.get() != null;
     }
 
     public boolean isShown() {

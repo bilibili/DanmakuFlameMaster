@@ -19,7 +19,6 @@ package master.flame.danmaku.danmaku.renderer.android;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
@@ -35,19 +34,10 @@ public class DanmakuRenderer extends Renderer {
     public void draw(IDisplayer disp, IDanmakus danmakus) {
         Danmakus drawItems = (Danmakus) danmakus;
         Iterator<BaseDanmaku> itr = drawItems.iterator();
-        int index = -1;
-        int size = danmakus.size();
-        int startAntiIndex = 0;
-        if (size < ANTI_ALIAS_DISABLE_SIZE) {
-            AndroidDisplayer.PAINT.setAntiAlias(true);
-        } else {
-            AndroidDisplayer.PAINT.setAntiAlias(false);
-            startAntiIndex = size - ANTI_ALIAS_ENABLE_SIZE - 1;
-        }
+
         while (itr.hasNext()) {
 
             BaseDanmaku drawItem = itr.next();
-            ++index;
 
             // measure
             if (!drawItem.isMeasured()) {
@@ -62,16 +52,8 @@ public class DanmakuRenderer extends Renderer {
                     && (drawItem.getType() != BaseDanmaku.TYPE_SCROLL_LR
                             && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0)) {
 
-                if (size >= ANTI_ALIAS_DISABLE_SIZE) {
-                    if (index < startAntiIndex) {
-                        AndroidDisplayer.PAINT.setAntiAlias(false);
-                    } else {
-                        AndroidDisplayer.PAINT.setAntiAlias(true);
-                    }
-                }
-
                 drawItem.draw(disp);
-                // break;
+
             }
 
         }

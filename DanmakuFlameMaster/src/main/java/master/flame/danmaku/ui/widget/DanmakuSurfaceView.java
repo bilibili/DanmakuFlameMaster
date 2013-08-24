@@ -28,7 +28,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import master.flame.danmaku.controller.CachingDrawTask;
+import master.flame.danmaku.controller.CacheManagerDrawTask;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
 import master.flame.danmaku.controller.IDrawTask;
@@ -129,7 +129,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         stop();
         if (drawTask != null) {
             drawTask.quit();
-            drawTask = null;
         }
     }
 
@@ -150,7 +149,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             DrawHelper.drawText(canvas, fps);
             mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
-
     }
 
     @Override
@@ -266,7 +264,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     long d = timer.update(System.currentTimeMillis() - mTimeBase);
                     if (d == 0) {
                         if (!quitFlag)
-                            sendEmptyMessageDelayed(UPDATE, 15);
+                            sendEmptyMessageDelayed(UPDATE, 10);
                         return;
                     }
                     if (d < 15) {
@@ -308,7 +306,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     private IDrawTask createTask(boolean useMultiThread, DanmakuTimer timer, Context context, int width, int height, IDrawTask.TaskListener taskListener) {
-        return useMultiThread ? new CachingDrawTask(timer, context, width, height, taskListener) : new DrawTask(timer, context, width, height, taskListener);
+        return useMultiThread ? new CacheManagerDrawTask(timer, context, width, height, taskListener) : new DrawTask(timer, context, width, height, taskListener);
     }
 
 }

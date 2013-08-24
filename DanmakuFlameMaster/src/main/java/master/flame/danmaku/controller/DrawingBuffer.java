@@ -2,17 +2,19 @@
 package master.flame.danmaku.controller;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.RingBuffer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class DrawingCache {
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.RingBuffer;
+import master.flame.danmaku.danmaku.model.android.DrawingCacheHolder;
 
-    private static final String TAG = "DrawingCache";
+public abstract class DrawingBuffer {
+
+    private static final String TAG = "DrawingBuffer";
+
     public Object mBufferLock = new Object();
 
     Thread mThread = new Thread(TAG) {
@@ -23,7 +25,6 @@ public abstract class DrawingCache {
             while (!quitFlag) {
 
                 while (true) {
-
 
                     synchronized (mBufferLock) {
 
@@ -68,7 +69,7 @@ public abstract class DrawingCache {
 
     private boolean quitFlag;
 
-    public DrawingCache(int capacity, IDisplayer disp) {
+    public DrawingBuffer(int capacity, IDisplayer disp) {
         mBuffer = new HolderRingBuffer(capacity);
         mDisp = disp;
         for (int i = 0; i < capacity; i++) {
@@ -129,28 +130,6 @@ public abstract class DrawingCache {
                 getCache();
             }
         }
-    }
-
-    public class DrawingCacheHolder {
-
-        public Canvas canvas;
-
-        public Bitmap bitmap;
-
-        public Object extra;
-
-        public DrawingCacheHolder(int w, int h) {
-            bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            canvas = new Canvas(bitmap);
-        }
-
-        public void recycle() {
-            bitmap.recycle();
-            bitmap = null;
-            canvas = null;
-            extra = null;
-        }
-
     }
 
     public class HolderRingBuffer extends RingBuffer<DrawingCacheHolder> {

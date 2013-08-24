@@ -4,22 +4,24 @@ package master.flame.danmaku.controller;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.android.DrawingCacheHolder;
 
 public class CachingDrawTask extends DrawTask {
 
-    DrawingCache mCache;
+    DrawingBuffer mCache;
 
     private DanmakuTimer mPlayerTimer;
 
     public CachingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
-                           TaskListener taskListener) {
+            TaskListener taskListener) {
         super(timer, context, dispW, dispH, taskListener);
         initCache();
     }
 
     private void initCache() {
-        mCache = new DrawingCache(3, mDisp) {
+        mCache = new DrawingBuffer(3, mDisp) {
             @Override
             protected void drawCache(DrawingCacheHolder holder) {
                 DrawHelper.clearCanvas(holder.canvas);
@@ -43,12 +45,10 @@ public class CachingDrawTask extends DrawTask {
 
     @Override
     public void draw(Canvas canvas) {
-        mCounter.begin();
         Bitmap bmp = mCache.getCache();
         if (bmp != null) {
             canvas.drawBitmap(bmp, 0, 0, null);
             mCache.fillNext();
-            mCounter.end().log("drawing");
         }
 
     }

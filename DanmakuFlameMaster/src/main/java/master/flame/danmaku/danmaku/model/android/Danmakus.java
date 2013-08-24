@@ -63,6 +63,7 @@ public class Danmakus implements IDanmakus {
                 BaseDanmaku item = it.next();
                 if (item.isOutside()) {
                     item.setVisibility(false);
+                    if (item.hasDrawingCache()) item.cache.destroy();
                 } else {
                     break;
                 }

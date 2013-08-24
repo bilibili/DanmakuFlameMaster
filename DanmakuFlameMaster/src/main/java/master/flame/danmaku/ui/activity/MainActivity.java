@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
     private void findViews() {
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
-            mDanmakuView.enableMultiThread(PROCESSOR_NUM > 1);
+            mDanmakuView.enableMultiThread(true);
         }
     }
 
