@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.danmaku.util;
 
-import android.text.TextPaint;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
@@ -83,15 +82,13 @@ public class DanmakuUtils {
 
     }
 
-    public static void buildDanmakuDrawingCache(BaseDanmaku danmaku, IDisplayer disp) {
-        DrawingCache cache;
-        danmaku.cache = cache = new DrawingCache();
-        danmaku.cache.build((int) danmaku.paintWidth, (int) danmaku.paintHeight, disp.getDensityDpi());
-        TextPaint paint = AndroidDisplayer.getPaint(danmaku);
+    public static DrawingCache buildDanmakuDrawingCache(BaseDanmaku danmaku, IDisplayer disp) {
+        DrawingCache cache = new DrawingCache();
+        cache.build((int) danmaku.paintWidth, (int) danmaku.paintHeight, disp.getDensityDpi());
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
-            //holder.canvas.drawText(danmaku.text,0,-paint.ascent(),paint);
             AndroidDisplayer.drawDanmaku(danmaku, holder.canvas, 0, 0);
         }
+        return cache;
     }
 }

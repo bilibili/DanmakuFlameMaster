@@ -4,11 +4,10 @@ package master.flame.danmaku.controller;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.android.DrawingCacheHolder;
 
-public class CachingDrawTask extends DrawTask {
+public class CachingDrawTask extends CacheManagerDrawTask {
 
     DrawingBuffer mCache;
 

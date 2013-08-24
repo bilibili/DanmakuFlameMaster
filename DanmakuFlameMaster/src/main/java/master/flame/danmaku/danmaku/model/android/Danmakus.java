@@ -16,11 +16,11 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import java.util.*;
+
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-
-import java.util.*;
 
 public class Danmakus implements IDanmakus {
 
@@ -30,7 +30,7 @@ public class Danmakus implements IDanmakus {
 
     public static final int ST_BY_YPOS_DESC = 2;
 
-   public Set<BaseDanmaku> items;
+    public Set<BaseDanmaku> items;
 
     private Danmakus subItems;
 
@@ -48,7 +48,7 @@ public class Danmakus implements IDanmakus {
             comparator = new YPosComparator();
         } else if (sortType == ST_BY_YPOS_DESC) {
             comparator = new YposDescComparator();
-      }
+        }
         items = new TreeSet<BaseDanmaku>(comparator);
     }
 
@@ -57,19 +57,20 @@ public class Danmakus implements IDanmakus {
     }
 
     public void setItems(Set<BaseDanmaku> items) {
-        if (this.items != null) {
-            Iterator<BaseDanmaku> it = this.items.iterator();
+        Set<BaseDanmaku> oldItems = this.items;
+        this.items = items;
+        if (oldItems != null) {
+            Iterator<BaseDanmaku> it = oldItems.iterator();
             while (it.hasNext()) {
                 BaseDanmaku item = it.next();
                 if (item.isOutside()) {
                     item.setVisibility(false);
-                    if (item.hasDrawingCache()) item.cache.destroy();
                 } else {
                     break;
                 }
             }
         }
-        this.items = items;
+
     }
 
     public Iterator<BaseDanmaku> iterator() {
@@ -190,7 +191,6 @@ public class Danmakus implements IDanmakus {
             return result;
         }
     }
-
 
     private class YposDescComparator implements Comparator<BaseDanmaku> {
         @Override

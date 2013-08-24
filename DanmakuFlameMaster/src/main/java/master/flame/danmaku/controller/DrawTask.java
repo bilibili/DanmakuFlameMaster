@@ -20,6 +20,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.DisplayMetrics;
 import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
@@ -35,9 +39,6 @@ import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParse;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class DrawTask implements IDrawTask {
 
@@ -67,7 +68,8 @@ public class DrawTask implements IDrawTask {
 
     private IDanmakus danmakus;
 
-    public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH, TaskListener taskListener) {
+    public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
+            TaskListener taskListener) {
         mTaskListener = taskListener;
         mCounter = new AndroidCounter();
         mContext = context;
@@ -127,10 +129,6 @@ public class DrawTask implements IDrawTask {
 
     protected void initTimer(DanmakuTimer timer) {
         mTimer = timer;
-    }
-
-    public void setTaskListener(TaskListener taskListener) {
-        mTaskListener = taskListener;
     }
 
     @Override
