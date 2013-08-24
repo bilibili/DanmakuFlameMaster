@@ -17,14 +17,14 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 import java.util.Iterator;
 
-public class CacheManagerDrawTask extends DrawTask {
+public class CacheManagingDrawTask extends DrawTask {
 
     private CacheManager mCacheManager;
 
     private DanmakuTimer mCacheTimer;
 
-    public CacheManagerDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
-            TaskListener taskListener) {
+    public CacheManagingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
+                                 TaskListener taskListener) {
         super(timer, context, dispW, dispH, null);
         mTaskListener = taskListener;
         mCacheManager = new CacheManager(1024 * 1024 * 34, 2); // fixme:set by user config

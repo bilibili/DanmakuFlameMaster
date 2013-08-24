@@ -28,7 +28,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import master.flame.danmaku.controller.CacheManagerDrawTask;
+import master.flame.danmaku.controller.CacheManagingDrawTask;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
 import master.flame.danmaku.controller.IDrawTask;
@@ -306,7 +306,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     private IDrawTask createTask(boolean useDrwaingCache, DanmakuTimer timer, Context context, int width, int height, IDrawTask.TaskListener taskListener) {
-        return useDrwaingCache ? new CacheManagerDrawTask(timer, context, width, height, taskListener) : new DrawTask(timer, context, width, height, taskListener);
+        return useDrwaingCache ? new CacheManagingDrawTask(timer, context, width, height, taskListener) : new DrawTask(timer, context, width, height, taskListener);
     }
 
 }
