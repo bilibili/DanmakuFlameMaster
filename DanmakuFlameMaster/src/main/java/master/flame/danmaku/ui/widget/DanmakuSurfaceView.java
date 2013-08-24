@@ -63,7 +63,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     private long mTimeBase;
 
     private boolean isSurfaceCreated;
-    private boolean mEnableMultiThread;
+    private boolean mEnableDanmakuDrwaingCache;
 
     public DanmakuSurfaceView(Context context) {
         super(context);
@@ -199,8 +199,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    public void enableMultiThread(boolean enableMultiThread) {
-        mEnableMultiThread = enableMultiThread;
+    public void enableDanmakuDrawingCache(boolean enable) {
+        mEnableDanmakuDrwaingCache = enable;
     }
 
     public class DrawHandler extends Handler {
@@ -289,11 +289,11 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         private void startDrawingWhenReady(final Runnable runnable) {
             if (drawTask == null) {
-                drawTask = createTask(mEnableMultiThread, timer, getContext(), getWidth(), getHeight(),
+                drawTask = createTask(mEnableDanmakuDrwaingCache, timer, getContext(), getWidth(), getHeight(),
                         new IDrawTask.TaskListener() {
                             @Override
                             public void ready() {
-                                Log.i(TAG, "start drawing multiThread enabled:" + mEnableMultiThread);
+                                Log.i(TAG, "start drawing multiThread enabled:" + mEnableDanmakuDrwaingCache);
                                 runnable.run();
                             }
                         });
@@ -305,8 +305,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     }
 
-    private IDrawTask createTask(boolean useMultiThread, DanmakuTimer timer, Context context, int width, int height, IDrawTask.TaskListener taskListener) {
-        return useMultiThread ? new CacheManagerDrawTask(timer, context, width, height, taskListener) : new DrawTask(timer, context, width, height, taskListener);
+    private IDrawTask createTask(boolean useDrwaingCache, DanmakuTimer timer, Context context, int width, int height, IDrawTask.TaskListener taskListener) {
+        return useDrwaingCache ? new CacheManagerDrawTask(timer, context, width, height, taskListener) : new DrawTask(timer, context, width, height, taskListener);
     }
 
 }

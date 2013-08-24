@@ -4,7 +4,6 @@ package master.flame.danmaku.ui.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
-
 import master.flame.danmaku.activity.R;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 
@@ -24,7 +23,7 @@ public class MainActivity extends Activity {
     private void findViews() {
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
-            mDanmakuView.enableMultiThread(true);
+            mDanmakuView.enableDanmakuDrawingCache(true);
         }
     }
 
