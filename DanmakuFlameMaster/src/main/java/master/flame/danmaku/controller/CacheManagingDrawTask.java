@@ -108,11 +108,17 @@ public class CacheManagingDrawTask extends DrawTask {
         public void end() {
             if (mHandler != null) {
                 mHandler.pause();
+                mHandler = null;
             }
-            if (mThread != null)
+            if (mThread != null) {
                 mThread.quit();
-            mThread = null;
-            mHandler = null;
+                try {
+                    mThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mThread = null;
+            }
         }
 
         public void resume() {

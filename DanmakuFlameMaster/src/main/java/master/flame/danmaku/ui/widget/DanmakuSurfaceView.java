@@ -114,6 +114,11 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
         if (mDrawThread != null) {
             mDrawThread.quit();
+            try {
+                mDrawThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             mDrawThread = null;
         }
     }
