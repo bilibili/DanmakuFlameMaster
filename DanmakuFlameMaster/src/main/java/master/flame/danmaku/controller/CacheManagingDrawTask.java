@@ -47,13 +47,15 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void reset() {
-        mCacheTimer.update(mTimer.currMillisecond);
+        //mCacheTimer.update(mTimer.currMillisecond);
         super.reset();
     }
 
     @Override
     public void seek(long mills) {
         super.seek(mills);
+        mTimer.update(mills);
+        mCacheTimer.update(mills);
     }
 
     @Override
@@ -104,10 +106,21 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         public void end() {
-            mHandler.pause();
-            mThread.quit();
+            if (mHandler != null) {
+                mHandler.pause();
+            }
+            if (mThread != null)
+                mThread.quit();
             mThread = null;
             mHandler = null;
+        }
+
+        public void resume() {
+            mHandler.sendEmptyMessage(CacheHandler.RESUME);
+        }
+
+        public void pause() {
+            mHandler.sendEmptyMessage(CacheHandler.PAUSE);
         }
 
         public class CacheHandler extends Handler {
@@ -132,7 +145,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         if (!mPause) {
                             long waitTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                             if (waitTime > 1000) {
-                                sendEmptyMessageDelayed(BUILD_CACHES, waitTime);
+                                sendEmptyMessageDelayed(BUILD_CACHES, waitTime-1000);
                                 return;
                             }
                             mCacheTimer.update(mTimer.currMillisecond);
@@ -149,6 +162,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                     case RESUME:
                         mPause = false;
+                        sendEmptyMessage(BUILD_CACHES);
                         break;
                 }
             }
@@ -190,7 +204,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             }
                             put(item.hashCode(), item);
                         } catch (OutOfMemoryError e) {
-                            continue;
+                            break;
                         }
                     }
 

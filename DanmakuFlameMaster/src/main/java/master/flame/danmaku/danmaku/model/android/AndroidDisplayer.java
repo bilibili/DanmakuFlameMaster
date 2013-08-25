@@ -21,7 +21,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.text.TextPaint;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
@@ -117,6 +116,7 @@ public class AndroidDisplayer implements IDisplayer {
                     canvas.translate(danmaku.getLeft(), danmaku.getTop());
                     canvas.drawBitmap(holder.bitmap, 0, 0, null);
                     canvas.restore();
+//                    canvas.drawBitmap(holder.bitmap,danmaku.getLeft(),danmaku.getTop(),null);
                     return;
                 }
             }

@@ -249,17 +249,9 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 case SEEK_POS:
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
-                    long seekPos = System.currentTimeMillis() - mTimeBase;
-                    drawTask.seek(seekPos);
-                    timer.update(seekPos);
-                    startDrawingWhenReady(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            sendEmptyMessage(UPDATE);
-                        }
-                    });
-                    break;
+                    //long seekPos = System.currentTimeMillis() - mTimeBase;
+                    //drawTask.seek(seekPos);
+                    //break;
                 case UPDATE:
                     long d = timer.update(System.currentTimeMillis() - mTimeBase);
                     if (d == 0) {
