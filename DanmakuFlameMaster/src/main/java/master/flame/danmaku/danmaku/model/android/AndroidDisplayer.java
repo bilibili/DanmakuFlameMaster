@@ -111,7 +111,7 @@ public class AndroidDisplayer implements IDisplayer {
             // drawing cache
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
-                if (holder != null) {
+                if (holder != null && holder.bitmap != null) {
                     canvas.save();
                     canvas.translate(danmaku.getLeft(), danmaku.getTop());
                     canvas.drawBitmap(holder.bitmap, 0, 0, null);

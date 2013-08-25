@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.ui.widget;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
@@ -302,8 +303,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     }
 
+    public static int getMemoryClass(final Context context) {
+        return ((ActivityManager) context.getSystemService(
+                Context.ACTIVITY_SERVICE)).getMemoryClass();
+    }
+
     private IDrawTask createTask(boolean useDrwaingCache, DanmakuTimer timer, Context context, int width, int height, IDrawTask.TaskListener taskListener) {
-        return useDrwaingCache ? new CacheManagingDrawTask(timer, context, width, height, taskListener) : new DrawTask(timer, context, width, height, taskListener);
+        return useDrwaingCache ? new CacheManagingDrawTask(timer, context, width, height, taskListener, 1024 * 1024 * getMemoryClass(getContext()) / 3) : new DrawTask(timer, context, width, height, taskListener);
     }
 
 }
