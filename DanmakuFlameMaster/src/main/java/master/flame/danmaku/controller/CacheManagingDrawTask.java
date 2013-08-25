@@ -170,7 +170,7 @@ public class CacheManagingDrawTask extends DrawTask {
                                 return;
                             }
                             mCacheTimer.update(mTimer.currMillisecond);
-                            prepareCaches();
+                            prepareCaches(mTaskListener == null);
                             sendEmptyMessage(BUILD_CACHES);
                             if (mTaskListener != null) {
                                 mTaskListener.ready();
@@ -188,7 +188,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
             }
 
-            private long prepareCaches() {
+            private long prepareCaches(boolean useTimeCounter) {
 
                 long curr = mCacheTimer.currMillisecond;
                 long startTime = System.currentTimeMillis();
@@ -213,6 +213,11 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
                     }
 
+                    if (mCacheManager.size() >= mCacheManager.maxSize()) {
+                        mCacheManager.trimToSize(mCacheManager.maxSize() / 2);
+                        break;
+                    }
+
                     // build cache
                     if (!item.hasDrawingCache()) {
                         try {
@@ -222,19 +227,23 @@ public class CacheManagingDrawTask extends DrawTask {
                                         mDisp, cache);
                                 item.cache = newCache;
                             }
+
                             put(item.hashCode(), item);
 
+
                         } catch (OutOfMemoryError e) {
-                            mCacheManager.trimToSize(mCacheManager.maxSize()/2);
+                            mCacheManager.evictAll();
                             break;
                         } catch (Exception e) {
                             break;
                         }
                     }
 
-                    consumingTime = System.currentTimeMillis() - startTime;
-                    if (consumingTime >= DanmakuFactory.MAX_DANMAKU_DURATION) {
-                        break;
+                    if (useTimeCounter) {
+                        consumingTime = System.currentTimeMillis() - startTime;
+                        if (consumingTime >= DanmakuFactory.MAX_DANMAKU_DURATION) {
+                            break;
+                        }
                     }
 
                 }

@@ -40,8 +40,9 @@ public class DrawingCacheHolder {
         width = w;
         height = h;
         bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        if (mDensity > 0) {
-            bitmap.setDensity(mDensity);
+        if (density > 0) {
+            mDensity = density;
+            bitmap.setDensity(density);
         }
         if (canvas == null)
             canvas = new Canvas(bitmap);
