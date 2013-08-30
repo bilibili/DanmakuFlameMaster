@@ -43,7 +43,7 @@ public class DrawTask implements IDrawTask {
 
     private static final String TAG = "DrawTask";
 
-    private final int DEBUG_OPTION = 1;
+    private final int DEBUG_OPTION = 0;
 
     protected AndroidDisplayer mDisp;
 
@@ -63,12 +63,13 @@ public class DrawTask implements IDrawTask {
 
     private BaseDanmakuParser mParser;
 
-    private Danmakus danmakuList;
+    protected Danmakus danmakuList;
 
     private IDanmakus danmakus;
 
-    public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH, TaskListener taskListener) {
-        setTaskListener(taskListener);
+    public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
+            TaskListener taskListener) {
+        mTaskListener = taskListener;
         mCounter = new AndroidCounter();
         mContext = context;
         mRenderer = new DanmakuRenderer();
@@ -77,9 +78,13 @@ public class DrawTask implements IDrawTask {
         mDisp.height = dispH;
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         mDisp.density = displayMetrics.density;
+        mDisp.densityDpi = displayMetrics.densityDpi;
         mDisp.scaledDensity = displayMetrics.scaledDensity;
         initTimer(timer);
         loadDanmakus(context, mTimer);
+        if (mTaskListener != null) {
+            mTaskListener.ready();
+        }
     }
 
     protected void loadDanmakus(Context context, DanmakuTimer timer) {
@@ -91,14 +96,9 @@ public class DrawTask implements IDrawTask {
                         context.getResources().openRawResource(
                                 master.flame.danmaku.activity.R.raw.comments), timer);
             }
-            Thread.sleep(2000);
-            if (mTaskListener != null) {
-                mTaskListener.ready();
-            }
+
         } catch (IOException e) {
             Log.e(TAG, "open assets error", e);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -130,15 +130,9 @@ public class DrawTask implements IDrawTask {
         mTimer = timer;
     }
 
-    public void setTaskListener(TaskListener taskListener) {
-        mTaskListener = taskListener;
-    }
-
     @Override
     public void draw(Canvas canvas) {
-        mCounter.begin();
         drawDanmakus(canvas, mTimer);
-        mCounter.end().log("drawing");
     }
 
     @Override
@@ -149,13 +143,13 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void seek(long mills) {
-        mTimer.update(mills);
         reset();
+        mTimer.update(mills);
     }
 
     @Override
     public void quit() {
-        reset();
+        mRenderer.clear();
     }
 
     protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {

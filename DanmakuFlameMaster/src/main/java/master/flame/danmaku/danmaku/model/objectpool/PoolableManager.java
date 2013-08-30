@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
+ * Copyright (C) 2009 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package master.flame.danmaku.danmaku.model;
+package master.flame.danmaku.danmaku.model.objectpool;
 
-public interface IDisplayer {
+public interface PoolableManager<T extends Poolable<T>> {
+    T newInstance();
 
-    public abstract int getWidth();
+    void onAcquired(T element);
 
-    public abstract int getHeight();
-
-    public abstract float getDensity();
-
-    public abstract int getDensityDpi();
-
-    public abstract void draw(BaseDanmaku danmaku);
-
-    public abstract float getScaledDensity();
-
-    /**
-     * @param danmaku
-     * @return
-     */
-    public abstract void measure(BaseDanmaku danmaku);
+    void onReleased(T element);
 }

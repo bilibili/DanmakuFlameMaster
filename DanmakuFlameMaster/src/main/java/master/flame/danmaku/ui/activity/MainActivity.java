@@ -12,8 +12,6 @@ public class MainActivity extends Activity {
 
     private DanmakuSurfaceView mDanmakuView;
 
-    public final static int PROCESSOR_NUM = Runtime.getRuntime().availableProcessors();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,7 +22,7 @@ public class MainActivity extends Activity {
     private void findViews() {
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
-            mDanmakuView.enableMultiThread(PROCESSOR_NUM > 1);
+            mDanmakuView.enableDanmakuDrawingCache(true);
         }
     }
 
