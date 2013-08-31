@@ -123,11 +123,20 @@ public class AndroidDisplayer implements IDisplayer {
             }
 //            Log.e("CACHE", "no cache:" + (++NO_CACHE_COUNT));
 
-            drawDanmaku(danmaku, canvas, danmaku.getLeft(), danmaku.getTop());
+            drawDanmaku(danmaku, canvas, danmaku.getLeft(), danmaku.getTop(), true);
         }
     }
 
-    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
+    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean quick) {
+        if (quick) {
+            HAS_STROKE = false;
+            HAS_SHADOW = false;
+            ANTI_ALIAS = false;
+        } else {
+            HAS_STROKE = false;
+            HAS_SHADOW = true;
+            ANTI_ALIAS = true;
+        }
         TextPaint paint = getPaint(danmaku);
         if (danmaku.paintHeight > danmaku.textSize) {
             String[] titleArr = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);

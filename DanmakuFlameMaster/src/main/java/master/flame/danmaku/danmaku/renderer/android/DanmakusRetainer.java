@@ -220,16 +220,13 @@ public class DanmakusRetainer {
                 }
 
                 if (insertItem != null) {
-                    topPos = insertItem.getBottom() - insertItem.paintHeight;
+                    topPos = insertItem.getBottom() - drawItem.paintHeight;
                     mVisibleDanmakus.removeItem(insertItem);
                 } else if (overwriteInsert) {
                     topPos = disp.getHeight() - drawItem.paintHeight;
                     mVisibleDanmakus.clear();
-                } else if (lastItem != null && insertItem == null) {
-                    topPos = lastItem.getBottom() - lastItem.paintHeight - drawItem.paintHeight;
-                } else if (lastItem != null
-                        && topPos <= lastItem.getBottom() - drawItem.paintHeight) {
-                    mVisibleDanmakus.removeItem(lastItem);
+                } else if (lastItem != null) {
+                    topPos = lastItem.getTop() - drawItem.paintHeight;
                 }
 
                 topPos = checkVerticalEdge(overwriteInsert, drawItem, disp, topPos, firstItem,
