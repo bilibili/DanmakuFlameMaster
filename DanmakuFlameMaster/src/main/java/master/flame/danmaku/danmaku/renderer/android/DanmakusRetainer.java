@@ -16,12 +16,12 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
-import java.util.Iterator;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
+
+import java.util.Iterator;
 
 public class DanmakusRetainer {
 
@@ -155,6 +155,10 @@ public class DanmakusRetainer {
 
         protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
                 IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
+            if (topPos < 0 || topPos + drawItem.paintHeight > disp.getHeight()) {
+                topPos = 0;
+                mVisibleDanmakus.clear();
+            }
             return topPos;
         }
 
@@ -216,16 +220,13 @@ public class DanmakusRetainer {
                 }
 
                 if (insertItem != null) {
-                    topPos = insertItem.getBottom() - insertItem.paintHeight;
+                    topPos = insertItem.getBottom() - drawItem.paintHeight;
                     mVisibleDanmakus.removeItem(insertItem);
                 } else if (overwriteInsert) {
                     topPos = disp.getHeight() - drawItem.paintHeight;
                     mVisibleDanmakus.clear();
-                } else if (lastItem != null && insertItem == null) {
-                    topPos = lastItem.getBottom() - lastItem.paintHeight - drawItem.paintHeight;
-                } else if (lastItem != null
-                        && topPos <= lastItem.getBottom() - drawItem.paintHeight) {
-                    mVisibleDanmakus.removeItem(lastItem);
+                } else if (lastItem != null) {
+                    topPos = lastItem.getTop() - drawItem.paintHeight;
                 }
 
                 topPos = checkVerticalEdge(overwriteInsert, drawItem, disp, topPos, firstItem,
