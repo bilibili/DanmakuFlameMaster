@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -60,6 +61,7 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                 }
 
             } catch (JSONException e) {
+                Log.e("Parser","error",e);
             }
         }
 

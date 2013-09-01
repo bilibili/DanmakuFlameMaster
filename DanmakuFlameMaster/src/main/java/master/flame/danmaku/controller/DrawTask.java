@@ -16,10 +16,9 @@
 
 package master.flame.danmaku.controller;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.util.DisplayMetrics;
-import android.util.Log;
+import java.io.IOException;
+import java.io.InputStream;
+
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
@@ -35,9 +34,10 @@ import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParse;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
-
-import java.io.IOException;
-import java.io.InputStream;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.util.DisplayMetrics;
+import android.util.Log;
 
 public class DrawTask implements IDrawTask {
 
@@ -86,16 +86,29 @@ public class DrawTask implements IDrawTask {
             mTaskListener.ready();
         }
     }
-
+    
+    public DrawTask(DanmakuTimer timer, AndroidDisplayer disp, TaskListener taskListener){
+        mTaskListener = taskListener;
+        mCounter = new AndroidCounter();
+        mDisp = disp;
+        mRenderer = new DanmakuRenderer();
+        initTimer(timer);
+        if (mTaskListener != null) {
+            mTaskListener.ready();
+        }
+    }
+    public void setDanmakus(Danmakus danmakus){
+        danmakuList = danmakus;
+    }
     protected void loadDanmakus(Context context, DanmakuTimer timer) {
         try {
             if (DEBUG_OPTION == 0) {
                 loadAcDanmakus(context.getAssets().open("comment.json"), timer);
-            } else {
+            }/* else {
                 loadBiliDanmakus(
                         context.getResources().openRawResource(
                                 master.flame.danmaku.activity.R.raw.comments), timer);
-            }
+            }*/
 
         } catch (IOException e) {
             Log.e(TAG, "open assets error", e);
