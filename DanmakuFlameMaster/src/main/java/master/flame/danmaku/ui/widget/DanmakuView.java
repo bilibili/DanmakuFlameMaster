@@ -33,6 +33,7 @@ public class DanmakuView extends SurfaceView implements Callback {
 
     private void init(Context context) {
         mSurfaceHolder = getHolder();
+        setZOrderOnTop(true);
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         mTimer = new DanmakuTimer();
@@ -68,7 +69,7 @@ public class DanmakuView extends SurfaceView implements Callback {
             mPlayer.setOnErrorListener(mOnErrorListener);
             mPlayer.setDisplay(getDisplayer());
             mPlayer.setSurfaceHolder(mSurfaceHolder);
-            mPlayer.setEnableDrawingCache(false);
+            mPlayer.setEnableDrawingCache(true);
             mPlayer.setTimer(mTimer);
             mPlayer.setDataSource(mUri);
             mPlayer.prepareAsync();
