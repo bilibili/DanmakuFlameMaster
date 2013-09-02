@@ -26,13 +26,12 @@
              android:background="#000"
         >
 
-    <ImageView android:layout_width="match_parent" android:layout_height="match_parent"
-               android:src="@drawable/test"
-               android:scaleType="center"
+
+    <VideoView android:id="@+id/videoview"
+               android:layout_width="fill_parent"
+               android:layout_height="fill_parent"
             />
 
-    <ProgressBar android:layout_width="wrap_content" android:layout_height="wrap_content"
-                 android:layout_gravity="center_horizontal"/>
 
     <master.flame.danmaku.ui.widget.DanmakuSurfaceView android:id="@+id/sv_danmaku"
                                                        android:layout_width="match_parent"

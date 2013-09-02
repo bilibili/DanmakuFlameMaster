@@ -16,12 +16,12 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
+import java.util.Iterator;
+
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
-
-import java.util.Iterator;
 
 public class DanmakusRetainer {
 
@@ -96,7 +96,6 @@ public class DanmakusRetainer {
 
                     if (firstItem == null)
                         firstItem = item;
-                    lastItem = item;
 
                     if (drawItem.paintHeight + item.getTop() > disp.getHeight()) {
                         overwriteInsert = true;
@@ -119,10 +118,15 @@ public class DanmakusRetainer {
                         break;
                     }
 
+                    lastItem = item;
+
                 }
 
                 if (insertItem != null) {
-                    topPos = insertItem.getTop();
+                    if (lastItem != null)
+                        topPos = lastItem.getBottom();
+                    else
+                        topPos = insertItem.getTop();
                     mVisibleDanmakus.removeItem(insertItem);
                 } else if (overwriteInsert) {
                     if (minRightRow != null) {
@@ -130,9 +134,7 @@ public class DanmakusRetainer {
                         mVisibleDanmakus.removeItem(minRightRow);
                     }
                 } else if (lastItem != null && insertItem == null) {
-                    topPos = lastItem.getBottom();// checkVerticalEdge(drawItem,
-                    // disp, topPos, firstItem,
-                    // lastItem);
+                    topPos = lastItem.getBottom();
                 } else if (topPos == 0 && firstItem != null) {
                     topPos = firstItem.getTop();
                     mVisibleDanmakus.removeItem(firstItem);
