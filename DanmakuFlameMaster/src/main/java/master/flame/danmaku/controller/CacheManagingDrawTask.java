@@ -170,6 +170,8 @@ public class CacheManagingDrawTask extends DrawTask {
             while (it.hasNext()) {
                 if (it.next().isTimeOut()) {
                     it.remove();
+                } else {
+                    break;
                 }
             }
         }
