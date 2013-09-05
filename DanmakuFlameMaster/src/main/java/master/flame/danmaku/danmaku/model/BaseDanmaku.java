@@ -132,6 +132,17 @@ public abstract class BaseDanmaku {
         return time > ctime || ctime - time > duration;
     }
 
+    public boolean isTimeOut(long ctime) {
+        return ctime - time > duration;
+    }
+
+    public boolean isTimeOut() {
+        if (mTimer != null) {
+            return isTimeOut(mTimer.currMillisecond);
+        }
+        return true;
+    }
+
     public boolean isOutside() {
         if (mTimer != null) {
             return isOutside(mTimer.currMillisecond);

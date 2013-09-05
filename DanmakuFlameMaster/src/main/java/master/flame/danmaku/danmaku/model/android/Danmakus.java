@@ -16,11 +16,11 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import java.util.*;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
+
+import java.util.*;
 
 public class Danmakus implements IDanmakus {
 
@@ -64,6 +64,10 @@ public class Danmakus implements IDanmakus {
             while (it.hasNext()) {
                 BaseDanmaku item = it.next();
                 if (item.isOutside()) {
+                    if (item.hasDrawingCache()) {
+                        item.cache.destroy();
+                        item.cache = null;
+                    }
                     item.setVisibility(false);
                 } else {
                     break;
