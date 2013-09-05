@@ -16,12 +16,12 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
-import java.util.Iterator;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
+
+import java.util.Iterator;
 
 public class DanmakusRetainer {
 
@@ -185,78 +185,8 @@ public class DanmakusRetainer {
 
     }
 
-    private static class FBDanmakusRetainer implements IDanmakusRetainer {
+    private static class FBDanmakusRetainer extends FTDanmakusRetainer {
 
-        private Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS_DESC);
-
-        @Override
-        public void fix(BaseDanmaku drawItem, IDisplayer disp) {
-            if (drawItem.isOutside())
-                return;
-            float topPos = disp.getHeight() - drawItem.paintHeight;
-            boolean shown = drawItem.isShown();
-            if (!shown) {
-                // 确定弹幕位置
-                Iterator<BaseDanmaku> it = mVisibleDanmakus.iterator();
-                BaseDanmaku insertItem = null, firstItem = null, lastItem = null;
-                boolean overwriteInsert = false;
-                while (it.hasNext()) {
-                    BaseDanmaku item = it.next();
-                    if (firstItem == null)
-                        firstItem = item;
-                    lastItem = item;
-
-                    if (item.getBottom() - drawItem.paintHeight < 0) {
-                        overwriteInsert = true;
-                        break;
-                    }
-
-                    // 检查碰撞
-                    boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
-                            drawItem.getDuration(), drawItem.getTimer().currMillisecond);
-                    if (!willHit) {
-                        insertItem = item;
-                        break;
-                    }
-
-                }
-
-                if (insertItem != null) {
-                    topPos = insertItem.getBottom() - drawItem.paintHeight;
-                    mVisibleDanmakus.removeItem(insertItem);
-                } else if (overwriteInsert) {
-                    topPos = disp.getHeight() - drawItem.paintHeight;
-                    mVisibleDanmakus.clear();
-                } else if (lastItem != null) {
-                    topPos = lastItem.getTop() - drawItem.paintHeight;
-                }
-
-                topPos = checkVerticalEdge(overwriteInsert, drawItem, disp, topPos, firstItem,
-                        lastItem);
-            }
-
-            // layout
-            drawItem.layout(disp, drawItem.getLeft(), topPos);
-
-            if (!shown) {
-                mVisibleDanmakus.addItem(drawItem);
-            }
-
-        }
-
-        @Override
-        public void clear() {
-            mVisibleDanmakus.clear();
-        }
-
-        protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
-                IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
-            if (topPos < 0 || topPos + drawItem.paintHeight > disp.getHeight()) {
-                topPos = disp.getHeight() - drawItem.paintHeight;
-                mVisibleDanmakus.clear();
-            }
-            return topPos;
-        }
     }
 
 }

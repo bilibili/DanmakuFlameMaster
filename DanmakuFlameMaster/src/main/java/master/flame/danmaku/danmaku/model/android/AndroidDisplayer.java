@@ -106,6 +106,11 @@ public class AndroidDisplayer implements IDisplayer {
 
     @Override
     public void draw(BaseDanmaku danmaku) {
+        float top = danmaku.getTop();
+        float left = danmaku.getLeft();
+        if (danmaku.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
+            top = height - top - danmaku.paintHeight;
+        }
         if (canvas != null) {
 
             // drawing cache
@@ -113,7 +118,7 @@ public class AndroidDisplayer implements IDisplayer {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null) {
                     canvas.save();
-                    canvas.translate(danmaku.getLeft(), danmaku.getTop());
+                    canvas.translate(left, top);
                     canvas.drawBitmap(holder.bitmap, 0, 0, null);
                     canvas.restore();
 //                    canvas.drawBitmap(holder.bitmap, danmaku.getLeft(), danmaku.getTop(), null);
@@ -123,7 +128,7 @@ public class AndroidDisplayer implements IDisplayer {
             }
 //            Log.e("CACHE", "no cache:" + (++NO_CACHE_COUNT));
 
-            drawDanmaku(danmaku, canvas, danmaku.getLeft(), danmaku.getTop(), true);
+            drawDanmaku(danmaku, canvas, left, top, true);
         }
     }
 
