@@ -43,7 +43,7 @@ public class DrawTask implements IDrawTask {
 
     private static final String TAG = "DrawTask";
 
-    private final int DEBUG_OPTION = 0;
+    private final int DEBUG_OPTION = 1;
 
     protected AndroidDisplayer mDisp;
 

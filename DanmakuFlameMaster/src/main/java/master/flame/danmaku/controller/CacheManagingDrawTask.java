@@ -167,7 +167,9 @@ public class CacheManagingDrawTask extends DrawTask {
         private void clearTimeOutCaches() {
             Iterator<BaseDanmaku> it = mCaches.iterator();
             while (it.hasNext()) {
-                if (it.next().isTimeOut()) {
+                BaseDanmaku val = it.next();
+                if (val.isTimeOut()) {
+                    entryRemoved(false, val, null);
                     it.remove();
                 } else {
                     break;
