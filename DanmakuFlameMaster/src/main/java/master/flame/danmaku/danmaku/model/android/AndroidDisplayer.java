@@ -121,7 +121,7 @@ public class AndroidDisplayer implements IDisplayer {
 //                    canvas.translate(left, top);
 //                    canvas.drawBitmap(holder.bitmap, 0, 0, null);
 //                    canvas.restore();
-                    canvas.drawBitmap(holder.bitmap, danmaku.getLeft(), danmaku.getTop(), null);
+                    canvas.drawBitmap(holder.bitmap, left, top, null);
 //                    Log.e("CACHE", "cache hit:" + (++HIT_CACHE_COUNT));
                     return;
                 }
