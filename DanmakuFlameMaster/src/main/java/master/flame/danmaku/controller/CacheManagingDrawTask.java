@@ -207,6 +207,7 @@ public class CacheManagingDrawTask extends DrawTask {
                                 return;
                             }
                             mCacheTimer.update(mTimer.currMillisecond);
+                            clearTimeOutCaches();
                             prepareCaches(mTaskListener == null);
                             sendEmptyMessage(BUILD_CACHES);
                             if (mTaskListener != null) {
@@ -245,7 +246,6 @@ public class CacheManagingDrawTask extends DrawTask {
                     item = itr.next();
 
                     if (item.isTimeOut()) {
-
                         continue;
                     }
 
@@ -267,7 +267,6 @@ public class CacheManagingDrawTask extends DrawTask {
                                 item.cache = newCache;
                                 boolean quitLoop = false;
                                 if (mRealSize + newCache.size() > mMaxSize) {
-                                    clearTimeOutCaches();
                                     quitLoop = true;
                                 }
                                 mCacheManager.put(item);
