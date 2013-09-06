@@ -21,7 +21,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.text.TextPaint;
-import android.util.Log;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
@@ -123,11 +122,11 @@ public class AndroidDisplayer implements IDisplayer {
 //                    canvas.drawBitmap(holder.bitmap, 0, 0, null);
 //                    canvas.restore();
                     canvas.drawBitmap(holder.bitmap, danmaku.getLeft(), danmaku.getTop(), null);
-                    Log.e("CACHE", "cache hit:" + (++HIT_CACHE_COUNT));
+//                    Log.e("CACHE", "cache hit:" + (++HIT_CACHE_COUNT));
                     return;
                 }
             }
-            Log.e("CACHE", "no cache:" + (++NO_CACHE_COUNT));
+//            Log.e("CACHE", "no cache:" + (++NO_CACHE_COUNT));
 
             drawDanmaku(danmaku, canvas, left, top, true);
         }
