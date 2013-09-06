@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -245,6 +244,11 @@ public class CacheManagingDrawTask extends DrawTask {
                 while (itr.hasNext()) {
                     item = itr.next();
 
+                    if (item.isTimeOut()) {
+
+                        continue;
+                    }
+
                     // measure
                     if (!item.isMeasured()) {
                         synchronized (danmakuList) {
@@ -257,6 +261,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         try {
                             synchronized (danmakuList) {
                                 DrawingCache cache = mCachePool.acquire();
+
                                 DrawingCache newCache = DanmakuUtils.buildDanmakuDrawingCache(item,
                                         mDisp, cache);
                                 item.cache = newCache;
@@ -294,7 +299,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 } else
                     mCacheTimer.add(DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
 
-                Log.e("cache consumingTime", consumingTime + "ms");
                 return consumingTime;
             }
 
