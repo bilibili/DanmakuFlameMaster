@@ -25,9 +25,9 @@ public class SpecialDanmaku extends BaseDanmaku {
 
     public float pivotX, pivotY;
 
-    private float[] currStateValues = new float[5]; // currX,currY,currAlpha;
+    private float[] currStateValues = new float[4]; // currX,currY,currAlpha;
 
-    @Override
+   @Override
     public void layout(IDisplayer displayer, float x, float y) {
         getRectAtTime(displayer, mTimer.currMillisecond);
     }
@@ -41,11 +41,11 @@ public class SpecialDanmaku extends BaseDanmaku {
         long deltaTime = currTime - time;
 
         // caculate alpha
-        float alphaProgress = deltaTime / (float) alphaDuration;
-        int currAlpha = 255;
-        if (deltaAlpha != 0) {
-            int vectorAlpha = (int) (deltaAlpha * alphaProgress);
-            currAlpha = beginAlpha + vectorAlpha;
+        alpha = beginAlpha;
+      if (deltaAlpha != 0) {
+            float alphaProgress = deltaTime / (float) alphaDuration;
+        int vectorAlpha = (int) (deltaAlpha * alphaProgress);
+            alpha = beginAlpha + vectorAlpha;
         }
 
         // caculate x y
@@ -65,7 +65,6 @@ public class SpecialDanmaku extends BaseDanmaku {
         currStateValues[1] = currY;
         currStateValues[2] = currX + paintWidth;
         currStateValues[3] = currY + paintHeight;
-        currStateValues[4] = currAlpha;
 
 
         this.visibility = isOutside() ? INVISIBLE : VISIBLE;
@@ -114,6 +113,7 @@ public class SpecialDanmaku extends BaseDanmaku {
     public void setAlphaData(int beginAlpha, int endAlpha, long alphaDuration) {
         this.beginAlpha = beginAlpha;
         this.endAlpha = endAlpha;
+        this.deltaAlpha = endAlpha - beginAlpha;
         this.alphaDuration = alphaDuration;
     }
 

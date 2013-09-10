@@ -146,10 +146,10 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                     float endX = beginX;
                     float endY = beginY;
                     String[] alphaArr = textArr[2].split("-");
-                    int beginAlpha = (int) (AlphaValue.MAX_VALUE * Float.parseFloat(alphaArr[0]));
+                    int beginAlpha = (int) (AlphaValue.MAX * Float.parseFloat(alphaArr[0]));
                     int endAlpha = beginAlpha;
                     if (alphaArr.length > 1) {
-                        endAlpha = (int) (AlphaValue.MAX_VALUE * Float.parseFloat(alphaArr[1]));
+                        endAlpha = (int) (AlphaValue.MAX * Float.parseFloat(alphaArr[1]));
                     }
                     long alphaDuraion = (long) (Float.parseFloat(textArr[3]) * 1000);
                     long translationDuration = alphaDuraion;
@@ -165,7 +165,7 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                         translationDuration = Integer.parseInt(textArr[9]);
                         translationStartDelay = (long) (Float.parseFloat(textArr[10]) * 1000);
                     }
-                    item.duration = Math.max(alphaDuraion, translationDuration);
+                    item.duration = alphaDuraion;
                     item.rotateZ = rotateZ;
                     item.rotateY = rotateY;
                     DanmakuFactory.fillTranslationData(item, mDispWidth, mDispHeight, beginX, beginY, endX,

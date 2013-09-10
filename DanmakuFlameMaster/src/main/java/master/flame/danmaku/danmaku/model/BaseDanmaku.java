@@ -52,11 +52,6 @@ public abstract class BaseDanmaku {
     public int textColor;
 
     /**
-     * 透明度
-     */
-    public int alpha = AlphaValue.MAX_VALUE;
-
-    /**
      * Z轴角度
      */
     public float rotateZ;
@@ -111,11 +106,12 @@ public abstract class BaseDanmaku {
      */
     protected DanmakuTimer mTimer;
 
-    private long timer;
+    /**
+     * 透明度
+     */
+    protected int alpha = AlphaValue.MAX;
 
-    public void setTimer(DanmakuTimer timer) {
-        mTimer = timer;
-    }
+    private long timer;
 
     public long getDuration() {
         return duration;
@@ -145,14 +141,6 @@ public abstract class BaseDanmaku {
         return this.visibility == VISIBLE;
     }
 
-    public boolean isOutside(long ctime) {
-        return time > ctime || ctime - time > duration;
-    }
-
-    public boolean isTimeOut(long ctime) {
-        return ctime - time > duration;
-    }
-
     public boolean isTimeOut() {
         if (mTimer != null) {
             return isTimeOut(mTimer.currMillisecond);
@@ -160,11 +148,19 @@ public abstract class BaseDanmaku {
         return true;
     }
 
+    public boolean isTimeOut(long ctime) {
+        return ctime - time > duration;
+    }
+
     public boolean isOutside() {
         if (mTimer != null) {
             return isOutside(mTimer.currMillisecond);
         }
         return true;
+    }
+
+    public boolean isOutside(long ctime) {
+        return time > ctime || ctime - time > duration;
     }
 
     public void setVisibility(boolean b) {
@@ -193,5 +189,13 @@ public abstract class BaseDanmaku {
 
     public DanmakuTimer getTimer() {
         return mTimer;
+    }
+
+    public void setTimer(DanmakuTimer timer) {
+        mTimer = timer;
+    }
+
+    public int getAlpha() {
+        return alpha;
     }
 }
