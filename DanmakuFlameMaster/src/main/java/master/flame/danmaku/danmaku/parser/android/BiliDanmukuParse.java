@@ -16,6 +16,13 @@
 
 package master.flame.danmaku.danmaku.parser.android;
 
+import android.graphics.Color;
+import master.flame.danmaku.danmaku.model.AlphaValue;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -23,15 +30,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import android.graphics.Color;
-
 import java.io.IOException;
-
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class BiliDanmukuParse extends BaseDanmakuParser {
 
@@ -74,22 +73,6 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
         public boolean completed = false;
 
         public int index = 0;
-
-        private String decodeXmlString(String title) {
-            if (title.indexOf("&amp;") > -1) {
-                title = title.replace("&amp;", "&");
-            }
-            if (title.indexOf("&quot;") > -1) {
-                title = title.replace("&quot;", "\"");
-            }
-            if (title.contains("&gt;")) {
-                title = title.replace("&gt;", ">");
-            }
-            if (title.contains("&lt;")) {
-                title = title.replace("&lt;", "<");
-            }
-            return title;
-        }
 
         public Danmakus getResult() {
             return result;
@@ -148,7 +131,62 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
             if (item != null) {
                 item.text = decodeXmlString(new String(ch, start, length));
                 item.index = index++;
+
+                // initial specail danmaku data
+                if (item.getTop() == BaseDanmaku.TYPE_SPECIAL && item.text.startsWith("[")
+                        && item.text.endsWith("]")) {
+                    String text = item.text;
+                    text = text.substring(2, text.length() - 2);
+                    String[] textArr = text.split("\",\"");
+                    if (textArr == null || textArr.length < 5)
+                        return;
+                    item.text = textArr[4];
+                    float beginX = Float.parseFloat(textArr[0]);
+                    float beginY = Float.parseFloat(textArr[1]);
+                    float endX = beginX;
+                    float endY = beginY;
+                    String[] alphaArr = textArr[2].split("-");
+                    int beginAlpha = (int) (AlphaValue.MAX_VALUE * Float.parseFloat(alphaArr[0]));
+                    int endAlpha = beginAlpha;
+                    if (alphaArr.length > 1) {
+                        endAlpha = (int) (AlphaValue.MAX_VALUE * Float.parseFloat(alphaArr[1]));
+                    }
+                    long alphaDuraion = (long) (Float.parseFloat(textArr[3]) * 1000);
+                    long translationDuration = alphaDuraion;
+                    long translationStartDelay = 0;
+                    float rotateX = 0, rotateY = 0;
+                    if (textArr.length > 5) {
+                        rotateX = Float.parseFloat(textArr[5]);
+                        rotateY = Float.parseFloat(textArr[6]);
+                    }
+                    if (textArr.length > 7) {
+                        endX = Float.parseFloat(textArr[7]);
+                        endY = Float.parseFloat(textArr[8]);
+                        translationDuration = Integer.parseInt(textArr[9]);
+                        translationStartDelay = (long) (Float.parseFloat(textArr[10]) * 1000);
+                    }
+                    DanmakuFactory.fillTranslationData(item, mDispWidth, beginX, beginY, endX,
+                            endY, translationDuration, translationStartDelay);
+                    DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
+                }
+
             }
+        }
+
+        private String decodeXmlString(String title) {
+            if (title.indexOf("&amp;") > -1) {
+                title = title.replace("&amp;", "&");
+            }
+            if (title.indexOf("&quot;") > -1) {
+                title = title.replace("&quot;", "\"");
+            }
+            if (title.contains("&gt;")) {
+                title = title.replace("&gt;", ">");
+            }
+            if (title.contains("&lt;")) {
+                title = title.replace("&lt;", "<");
+            }
+            return title;
         }
 
     }

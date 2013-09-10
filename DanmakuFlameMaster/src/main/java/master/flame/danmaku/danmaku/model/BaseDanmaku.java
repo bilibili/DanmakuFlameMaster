@@ -28,6 +28,8 @@ public abstract class BaseDanmaku {
 
     public final static int TYPE_FIX_BOTTOM = 4;
 
+    public final static int TYPE_SPECIAL = 7;
+
     public final static int TYPE_MOVEABLE_XXX = 0; // TODO: add more type
 
     public final static int INVISIBLE = 0;
@@ -48,6 +50,11 @@ public abstract class BaseDanmaku {
      * 文本颜色
      */
     public int textColor;
+
+    /**
+     * 透明度
+     */
+    public int alpha;
 
     /**
      * 阴影/描边颜色
@@ -156,7 +163,7 @@ public abstract class BaseDanmaku {
 
     public abstract void layout(IDisplayer displayer, float x, float y);
 
-    public abstract float[] getRectAtTime(IDisplayer displayer, long time);
+    public abstract float[] getRectAtTime(IDisplayer displayer, long currTime);
 
     public abstract float getLeft();
 
