@@ -21,6 +21,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.text.TextPaint;
+import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
@@ -37,9 +38,12 @@ public class AndroidDisplayer implements IDisplayer {
 
     public static Paint STROKE;
 
+    private static Paint ALPHA_PAINT;
+
     static {
         PAINT = new TextPaint();
         STROKE = new Paint();
+        ALPHA_PAINT = new Paint();
         PAINT.setColor(Color.RED);
         PAINT.setTextSize(50);
         STROKE.setStrokeWidth(1.5f);
@@ -121,7 +125,17 @@ public class AndroidDisplayer implements IDisplayer {
 //                    canvas.translate(left, top);
 //                    canvas.drawBitmap(holder.bitmap, 0, 0, null);
 //                    canvas.restore();
-                    canvas.drawBitmap(holder.bitmap, left, top, null);
+
+                    if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
+                        Paint paint = null;
+                        if (danmaku.alpha != AlphaValue.MAX_VALUE) {
+                            paint = ALPHA_PAINT;
+                            paint.setAlpha(danmaku.alpha);
+                        }
+                        canvas.drawBitmap(holder.bitmap, left, top, paint);
+                    } else
+                        canvas.drawBitmap(holder.bitmap, left, top, null);
+
 //                    Log.e("CACHE", "cache hit:" + (++HIT_CACHE_COUNT));
                     return;
                 }

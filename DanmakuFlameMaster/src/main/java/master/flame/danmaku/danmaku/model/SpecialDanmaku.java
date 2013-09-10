@@ -67,6 +67,10 @@ public class SpecialDanmaku extends BaseDanmaku {
         currStateValues[3] = currY + paintHeight;
         currStateValues[4] = currAlpha;
 
+
+        this.visibility = isOutside() ? INVISIBLE : VISIBLE;
+
+
         return currStateValues;
     }
 

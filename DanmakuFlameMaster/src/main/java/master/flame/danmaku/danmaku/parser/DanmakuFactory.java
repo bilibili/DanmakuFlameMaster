@@ -16,7 +16,8 @@
 
 package master.flame.danmaku.danmaku.parser;
 
-import master.flame.danmaku.danmaku.model.*;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.SpecialDanmaku;
 
 public class DanmakuFactory {
 
@@ -38,15 +39,15 @@ public class DanmakuFactory {
         }
         BaseDanmaku instance = null;
         switch (type) {
-            case 1: // 从右往左滚动
-                instance = new R2LDanmaku(REAL_DANMAKU_DURATION);
-                break;
-            case 4: // 底端固定
-                instance = new FBDanmaku(COMMON_DANMAKU_DURATION);
-                break;
-            case 5: // 顶端固定
-                instance = new FTDanmaku(COMMON_DANMAKU_DURATION);
-                break;
+//            case 1: // 从右往左滚动
+//                instance = new R2LDanmaku(REAL_DANMAKU_DURATION);
+//                break;
+//            case 4: // 底端固定
+//                instance = new FBDanmaku(COMMON_DANMAKU_DURATION);
+//                break;
+//            case 5: // 顶端固定
+//                instance = new FTDanmaku(COMMON_DANMAKU_DURATION);
+//                break;
             case 7:
                 instance = new SpecialDanmaku();
                 break;
@@ -61,9 +62,9 @@ public class DanmakuFactory {
 
     /**
      * Initial translation data of the special danmaku
-     *
      * @param item
      * @param dispWidth
+     * @param dispHeight
      * @param beginX
      * @param beginY
      * @param endX
@@ -71,14 +72,15 @@ public class DanmakuFactory {
      * @param translationDuration
      * @param translationStartDelay
      */
-    public static void fillTranslationData(BaseDanmaku item, int dispWidth, float beginX,
+    public static void fillTranslationData(BaseDanmaku item, int dispWidth, int dispHeight, float beginX,
                                            float beginY, float endX, float endY, long translationDuration,
                                            long translationStartDelay) {
         if (item.getType() != BaseDanmaku.TYPE_SPECIAL)
             return;
-        float scale = dispWidth / BILI_PLAYER_WIDTH;
-        ((SpecialDanmaku) item).setTranslationData(beginX * scale, beginY * scale, endX * scale,
-                endY * scale, translationDuration, translationStartDelay);
+        float scaleX = dispWidth / BILI_PLAYER_WIDTH;
+        float scaleY = dispHeight / BILI_PLAYER_HEIGHT;
+        ((SpecialDanmaku) item).setTranslationData(beginX * scaleX, beginY * scaleY, endX * scaleX,
+                endY * scaleY, translationDuration, translationStartDelay);
     }
 
     /**

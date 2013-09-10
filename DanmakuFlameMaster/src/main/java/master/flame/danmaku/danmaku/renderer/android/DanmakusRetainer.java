@@ -53,6 +53,9 @@ public class DanmakusRetainer {
                 }
                 fbdrInstance.fix(danmaku, disp);
                 break;
+            case BaseDanmaku.TYPE_SPECIAL:
+                danmaku.layout(disp, 0, 0);
+                break;
         }
 
     }

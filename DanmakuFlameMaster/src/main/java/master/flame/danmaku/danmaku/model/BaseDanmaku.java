@@ -54,7 +54,17 @@ public abstract class BaseDanmaku {
     /**
      * 透明度
      */
-    public int alpha;
+    public int alpha = AlphaValue.MAX_VALUE;
+
+    /**
+     * Z轴角度
+     */
+    public float rotateZ;
+
+    /**
+     * Y轴角度
+     */
+    public float rotateY;
 
     /**
      * 阴影/描边颜色

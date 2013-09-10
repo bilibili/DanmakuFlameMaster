@@ -133,7 +133,7 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                 item.index = index++;
 
                 // initial specail danmaku data
-                if (item.getTop() == BaseDanmaku.TYPE_SPECIAL && item.text.startsWith("[")
+                if (item.getType() == BaseDanmaku.TYPE_SPECIAL && item.text.startsWith("[")
                         && item.text.endsWith("]")) {
                     String text = item.text;
                     text = text.substring(2, text.length() - 2);
@@ -154,9 +154,9 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                     long alphaDuraion = (long) (Float.parseFloat(textArr[3]) * 1000);
                     long translationDuration = alphaDuraion;
                     long translationStartDelay = 0;
-                    float rotateX = 0, rotateY = 0;
+                    float rotateY = 0, rotateZ = 0;
                     if (textArr.length > 5) {
-                        rotateX = Float.parseFloat(textArr[5]);
+                        rotateZ = Float.parseFloat(textArr[5]);
                         rotateY = Float.parseFloat(textArr[6]);
                     }
                     if (textArr.length > 7) {
@@ -165,7 +165,10 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                         translationDuration = Integer.parseInt(textArr[9]);
                         translationStartDelay = (long) (Float.parseFloat(textArr[10]) * 1000);
                     }
-                    DanmakuFactory.fillTranslationData(item, mDispWidth, beginX, beginY, endX,
+                    item.duration = Math.max(alphaDuraion, translationDuration);
+                    item.rotateZ = rotateZ;
+                    item.rotateY = rotateY;
+                    DanmakuFactory.fillTranslationData(item, mDispWidth, mDispHeight, beginX, beginY, endX,
                             endY, translationDuration, translationStartDelay);
                     DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
                 }
