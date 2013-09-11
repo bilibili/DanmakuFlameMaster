@@ -130,12 +130,23 @@ public class AndroidDisplayer implements IDisplayer {
                         if (danmaku.getAlpha() == AlphaValue.TRANSPARENT) {
                             return;
                         }
+
+                        boolean restore = false;
+                        if (danmaku.rotationZ != 0) {
+                            restore = true;
+                            canvas.save();
+                            canvas.rotate(danmaku.rotationZ, left, top);
+                        }
+
                         Paint paint = null;
                         if (danmaku.getAlpha() != AlphaValue.MAX) {
                             paint = ALPHA_PAINT;
                             paint.setAlpha(danmaku.getAlpha());
                         }
+
                         canvas.drawBitmap(holder.bitmap, left, top, paint);
+                        if (restore)
+                            canvas.restore();
                     } else
                         canvas.drawBitmap(holder.bitmap, left, top, null);
 
