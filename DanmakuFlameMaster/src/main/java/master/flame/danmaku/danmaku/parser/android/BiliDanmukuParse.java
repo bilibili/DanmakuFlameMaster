@@ -133,9 +133,9 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                 item.index = index++;
 
                 // initial specail danmaku data
-                if (item.getType() == BaseDanmaku.TYPE_SPECIAL && item.text.startsWith("[")
-                        && item.text.endsWith("]")) {
-                    String text = item.text;
+                String text = item.text.trim();
+                if (item.getType() == BaseDanmaku.TYPE_SPECIAL && text.startsWith("[")
+                        && text.endsWith("]")) {
                     text = text.substring(2, text.length() - 2);
                     String[] textArr = text.split("\",\"");
                     if (textArr == null || textArr.length < 5)
