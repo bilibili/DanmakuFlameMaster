@@ -27,7 +27,7 @@ public class SpecialDanmaku extends BaseDanmaku {
 
     private float[] currStateValues = new float[4]; // currX,currY,currAlpha;
 
-   @Override
+    @Override
     public void layout(IDisplayer displayer, float x, float y) {
         getRectAtTime(displayer, mTimer.currMillisecond);
     }
@@ -42,23 +42,26 @@ public class SpecialDanmaku extends BaseDanmaku {
 
         // caculate alpha
         alpha = beginAlpha;
-      if (deltaAlpha != 0) {
+        if (alphaDuration > 0 && deltaAlpha != 0) {
             float alphaProgress = deltaTime / (float) alphaDuration;
-        int vectorAlpha = (int) (deltaAlpha * alphaProgress);
+            int vectorAlpha = (int) (deltaAlpha * alphaProgress);
             alpha = beginAlpha + vectorAlpha;
         }
 
         // caculate x y
         float currX = beginX;
         float currY = beginY;
-        float tranalationProgress = deltaTime / (float) translationDuration;
-        if (deltaX != 0) {
-            float vectorX = deltaX * tranalationProgress;
-            currX = beginX + vectorX;
-        }
-        if (deltaY != 0) {
-            float vectorY = deltaY * tranalationProgress;
-            currY = beginY + vectorY;
+        long dtime = deltaTime - translationStartDelay;
+        if (translationDuration > 0 && dtime >= 0 && dtime <= translationDuration) {
+            float tranalationProgress = dtime / (float) translationDuration;
+            if (deltaX != 0) {
+                float vectorX = deltaX * tranalationProgress;
+                currX = beginX + vectorX;
+            }
+            if (deltaY != 0) {
+                float vectorY = deltaY * tranalationProgress;
+                currY = beginY + vectorY;
+            }
         }
 
         currStateValues[0] = currX;
@@ -66,9 +69,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         currStateValues[2] = currX + paintWidth;
         currStateValues[3] = currY + paintHeight;
 
-
         this.visibility = isOutside() ? INVISIBLE : VISIBLE;
-
 
         return currStateValues;
     }

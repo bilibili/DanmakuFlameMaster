@@ -166,8 +166,8 @@ public class BiliDanmukuParse extends BaseDanmakuParser {
                         translationStartDelay = (long) (Float.parseFloat(textArr[10]) * 1000);
                     }
                     item.duration = alphaDuraion;
-                    item.rotateZ = rotateZ;
-                    item.rotateY = rotateY;
+                    item.rotationZ = rotateZ;
+                    item.rotationY = rotateY;
                     DanmakuFactory.fillTranslationData(item, mDispWidth, mDispHeight, beginX, beginY, endX,
                             endY, translationDuration, translationStartDelay);
                     DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);

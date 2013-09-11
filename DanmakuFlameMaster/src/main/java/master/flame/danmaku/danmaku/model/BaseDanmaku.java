@@ -54,12 +54,12 @@ public abstract class BaseDanmaku {
     /**
      * Z轴角度
      */
-    public float rotateZ;
+    public float rotationZ;
 
     /**
      * Y轴角度
      */
-    public float rotateY;
+    public float rotationY;
 
     /**
      * 阴影/描边颜色

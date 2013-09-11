@@ -127,10 +127,10 @@ public class AndroidDisplayer implements IDisplayer {
 //                    canvas.restore();
 
                     if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
-                        Paint paint = null;
                         if (danmaku.getAlpha() == AlphaValue.TRANSPARENT) {
                             return;
                         }
+                        Paint paint = null;
                         if (danmaku.getAlpha() != AlphaValue.MAX) {
                             paint = ALPHA_PAINT;
                             paint.setAlpha(danmaku.getAlpha());
