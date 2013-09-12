@@ -16,8 +16,7 @@
 
 package master.flame.danmaku.danmaku.parser;
 
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.SpecialDanmaku;
+import master.flame.danmaku.danmaku.model.*;
 
 public class DanmakuFactory {
 
@@ -39,15 +38,15 @@ public class DanmakuFactory {
         }
         BaseDanmaku instance = null;
         switch (type) {
-//            case 1: // 从右往左滚动
-//                instance = new R2LDanmaku(REAL_DANMAKU_DURATION);
-//                break;
-//            case 4: // 底端固定
-//                instance = new FBDanmaku(COMMON_DANMAKU_DURATION);
-//                break;
-//            case 5: // 顶端固定
-//                instance = new FTDanmaku(COMMON_DANMAKU_DURATION);
-//                break;
+            case 1: // 从右往左滚动
+                instance = new R2LDanmaku(REAL_DANMAKU_DURATION);
+                break;
+            case 4: // 底端固定
+                instance = new FBDanmaku(COMMON_DANMAKU_DURATION);
+                break;
+            case 5: // 顶端固定
+                instance = new FTDanmaku(COMMON_DANMAKU_DURATION);
+                break;
             case 7:
                 instance = new SpecialDanmaku();
                 break;
