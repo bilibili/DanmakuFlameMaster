@@ -22,7 +22,7 @@ public abstract class BaseDanmaku {
 
     public final static int TYPE_SCROLL_RL = 1;
 
-    public final static int TYPE_SCROLL_LR = 2;
+    public final static int TYPE_SCROLL_LR = 6;
 
     public final static int TYPE_FIX_TOP = 5;
 

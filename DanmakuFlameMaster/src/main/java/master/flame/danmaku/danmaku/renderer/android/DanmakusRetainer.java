@@ -27,6 +27,8 @@ public class DanmakusRetainer {
 
     private static IDanmakusRetainer rldrInstance = null;
 
+    private static IDanmakusRetainer lrdrInstance = null;
+
     private static IDanmakusRetainer ftdrInstance = null;
 
     private static IDanmakusRetainer fbdrInstance = null;
@@ -40,6 +42,12 @@ public class DanmakusRetainer {
                     rldrInstance = new RLDanmakusRetainer();
                 }
                 rldrInstance.fix(danmaku, disp);
+                break;
+            case BaseDanmaku.TYPE_SCROLL_LR:
+                if (lrdrInstance == null) {
+                    lrdrInstance = new RLDanmakusRetainer();
+                }
+                lrdrInstance.fix(danmaku, disp);
                 break;
             case BaseDanmaku.TYPE_FIX_TOP:
                 if (ftdrInstance == null) {

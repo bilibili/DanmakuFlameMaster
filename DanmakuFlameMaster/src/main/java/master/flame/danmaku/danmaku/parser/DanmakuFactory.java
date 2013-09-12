@@ -47,6 +47,9 @@ public class DanmakuFactory {
             case 5: // 顶端固定
                 instance = new FTDanmaku(COMMON_DANMAKU_DURATION);
                 break;
+            case 6:
+                instance = new L2RDanmaku(REAL_DANMAKU_DURATION);
+                break;
             case 7:
                 instance = new SpecialDanmaku();
                 break;
