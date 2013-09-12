@@ -47,10 +47,10 @@ public class DanmakuFactory {
             case 5: // 顶端固定
                 instance = new FTDanmaku(COMMON_DANMAKU_DURATION);
                 break;
-            case 6:
+            case 6: // 从左往右滚动
                 instance = new L2RDanmaku(REAL_DANMAKU_DURATION);
                 break;
-            case 7:
+            case 7: // 特殊弹幕
                 instance = new SpecialDanmaku();
                 break;
             // TODO: more Danmaku type

@@ -85,12 +85,4 @@ public class R2LDanmaku extends BaseDanmaku {
         return TYPE_SCROLL_RL;
     }
 
-    // @Override
-    // public boolean isShown() {
-    // // if (mTimer != null)
-    // // return time <= mTimer.currMillisecond && mTimer.currMillisecond - time
-    // <= duration;
-    // // return false;
-    // return this.visibility == VISIBLE;
-    // }
 }
