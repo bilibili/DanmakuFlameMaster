@@ -8,6 +8,7 @@ import android.view.*;
 import android.widget.PopupWindow;
 import android.widget.VideoView;
 import master.flame.danmaku.activity.R;
+import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 
 public class MainActivity extends Activity {
@@ -42,8 +43,26 @@ public class MainActivity extends Activity {
             }
         });
 
+        // VideoView
+        mVideoView = (VideoView) findViewById(R.id.videoview);
+        if (mVideoView != null) {
+            mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
+        }
+
+        // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
+            mDanmakuView.setCallback(new DanmakuSurfaceView.Callback() {
+                @Override
+                public void prepared() {
+                    mVideoView.start();
+                }
+
+                @Override
+                public void updateTimer(DanmakuTimer timer) {
+                    //timer.update(mVideoView.getCurrentPosition());
+                }
+            });
             mDanmakuView.enableDanmakuDrawingCache(true);
             mDanmakuView.setOnClickListener(new View.OnClickListener() {
 
@@ -61,14 +80,9 @@ public class MainActivity extends Activity {
                         mPopupWindow.showAtLocation(mDanmakuView, Gravity.NO_GRAVITY, 0, 0);
                 }
             });
+            mDanmakuView.toggleDrawing();
         }
 
-        mVideoView = (VideoView) findViewById(R.id.videoview);
-        if (mVideoView != null) {
-            mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
-            mVideoView.requestFocus();
-            mVideoView.start();
-        }
 
     }
 
