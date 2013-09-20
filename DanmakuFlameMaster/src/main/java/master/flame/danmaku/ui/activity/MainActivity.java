@@ -37,8 +37,9 @@ public class MainActivity extends Activity {
                 if (mPopupWindow != null) {
                     mPopupWindow.dismiss();
                 }
-                if (mDanmakuView != null) {
-                    mDanmakuView.resume();
+
+                if (mVideoView != null) {
+                    mVideoView.start();
                 }
             }
         });
@@ -60,7 +61,10 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
-                    //timer.update(mVideoView.getCurrentPosition());
+                    if (!mVideoView.isPlaying()) return;
+                    int ms = mVideoView.getCurrentPosition();
+                    timer.update(ms);
+//                    Log.e("play time:","play:"+ms+"ms");
                 }
             });
             mDanmakuView.enableDanmakuDrawingCache(true);
@@ -76,11 +80,16 @@ public class MainActivity extends Activity {
 
                     if (mPopupWindow.isShowing()) {
                         mPopupWindow.dismiss();
-                    } else
+                    } else{
                         mPopupWindow.showAtLocation(mDanmakuView, Gravity.NO_GRAVITY, 0, 0);
+                    }
+
+                    if (mVideoView != null) {
+                        mVideoView.pause();
+                    }
                 }
             });
-            mDanmakuView.toggleDrawing();
+            //mDanmakuView.start();
         }
 
 

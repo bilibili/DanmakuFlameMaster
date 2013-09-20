@@ -44,7 +44,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public interface Callback {
         public void prepared();
-
         public void updateTimer(DanmakuTimer timer);
     }
 
@@ -107,7 +106,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        //startDraw();
+        startDraw();
     }
 
     private void startDraw() {
@@ -171,14 +170,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     public void toggleDrawing() {
-        //if (isSurfaceCreated) {
+        if (isSurfaceCreated) {
             if (handler == null)
                 startDraw();
             else if (handler.isStop()) {
                 resume();
             } else
                 pause();
-        //}
+        }
     }
 
     @Override
@@ -273,15 +272,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     pausedPostion = 0;
                 case RESUME:
                     quitFlag = false;
-                    //mTimeBase = timer.currMillisecond - pausedPostion;
-                    mTimeBase = System.currentTimeMillis() - pausedPostion;
+                    mTimeBase = timer.currMillisecond - pausedPostion;
                     timer.update(pausedPostion);
                     startDrawingWhenReady(new Runnable() {
 
                         @Override
                         public void run() {
                             sendEmptyMessage(UPDATE);
-                            if (mCallback != null) {
+                            if (mCallback != null){
                                 mCallback.prepared();
                             }
                         }
@@ -291,30 +289,30 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                 case UPDATE:
-                    long d = timer.update(System.currentTimeMillis() - mTimeBase);
-                    if (mCallback != null) {
+                    //long d = timer.update(System.currentTimeMillis() - mTimeBase);
+                    if (mCallback !=null){
                         mCallback.updateTimer(timer);
                     }
-                    //long d = timer.lastInterval();
-                    if (d == 0) {
-                        if (!quitFlag)
-                            sendEmptyMessageDelayed(UPDATE, 10);
-                        return;
-                    }
-                    if (d < 15) {
-                        if (d < 10) {
-                            try {
-                                Thread.sleep(15 - d);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
+                    long d = timer.lastInterval();
+//                    if (d == 0) {
+//                        if (!quitFlag)
+//                            sendEmptyMessageDelayed(UPDATE, 10);
+//                        return;
+//                    }
+//                    if (d < 15) {
+//                        if (d < 10) {
+//                            try {
+//                                Thread.sleep(15 - d);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }
                     drawDanmakus();
                     if (!quitFlag)
                         sendEmptyMessage(UPDATE);
                     else {
-                        pausedPostion = System.currentTimeMillis() - mTimeBase;
+                        pausedPostion = timer.currMillisecond;//System.currentTimeMillis() - mTimeBase;
                         Log.i(TAG, "stop draw: current = " + pausedPostion);
                     }
                     break;
