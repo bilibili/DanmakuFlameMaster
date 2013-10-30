@@ -2,6 +2,7 @@
 package master.flame.danmaku.ui.activity;
 
 import android.app.Activity;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.*;
@@ -51,6 +52,8 @@ public class MainActivity extends Activity {
             //mVideoView.setVideoPath("http://edge.v.iask.com/44027740.hlv?KID=sina,viask&Expires=1380384000&ssig=d3Xzxbv1fI");
         }
 
+
+
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
@@ -62,10 +65,9 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
-                    //if (!mVideoView.isPlaying()) return;
-                    //int ms = mVideoView.getCurrentPosition();
-                    //timer.update(ms);
-//                    Log.e("play time:","play:"+ms+"ms");
+                    if(mVideoView.isPlaying()){
+
+                    }
                 }
             });
             mDanmakuView.enableDanmakuDrawingCache(true);
@@ -90,7 +92,6 @@ public class MainActivity extends Activity {
                     }
                 }
             });
-            //mDanmakuView.start();
         }
 
 
