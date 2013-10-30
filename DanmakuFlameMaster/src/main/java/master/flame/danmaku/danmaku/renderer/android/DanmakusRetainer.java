@@ -89,6 +89,7 @@ public class DanmakusRetainer {
 
     private static class RLDanmakusRetainer implements IDanmakusRetainer {
 
+        private static int LINE_SPACING = 6;
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
 
         @Override
@@ -108,7 +109,7 @@ public class DanmakusRetainer {
                     if (firstItem == null)
                         firstItem = item;
 
-                    if (drawItem.paintHeight + item.getTop() > disp.getHeight()) {
+                    if (drawItem.paintHeight + item.getTop() + LINE_SPACING > disp.getHeight()) {
                         overwriteInsert = true;
                         break;
                     }
@@ -158,6 +159,9 @@ public class DanmakusRetainer {
             }
 
             // layout
+            if(topPos>0){
+                topPos += LINE_SPACING;
+            }
             drawItem.layout(disp, drawItem.getLeft(), topPos);
 
             if (!shown) {
@@ -168,7 +172,7 @@ public class DanmakusRetainer {
 
         protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
                 IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
-            if (topPos < 0 || topPos + drawItem.paintHeight > disp.getHeight()) {
+            if (topPos < 0 || topPos + drawItem.paintHeight + LINE_SPACING > disp.getHeight()) {
                 topPos = 0;
                 mVisibleDanmakus.clear();
             }
