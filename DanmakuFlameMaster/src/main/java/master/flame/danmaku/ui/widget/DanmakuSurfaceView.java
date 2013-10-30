@@ -272,12 +272,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     pausedPostion = 0;
                 case RESUME:
                     quitFlag = false;
-                    mTimeBase = timer.currMillisecond - pausedPostion;
-                    timer.update(pausedPostion);
                     startDrawingWhenReady(new Runnable() {
 
                         @Override
                         public void run() {
+                            mTimeBase = System.currentTimeMillis() - pausedPostion;//timer.currMillisecond - pausedPostion;
+                            timer.update(pausedPostion);
                             sendEmptyMessage(UPDATE);
                             if (mCallback != null){
                                 mCallback.prepared();
@@ -289,25 +289,25 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                 case UPDATE:
-                    //long d = timer.update(System.currentTimeMillis() - mTimeBase);
+                    long d = timer.update(System.currentTimeMillis() - mTimeBase);
                     if (mCallback !=null){
                         mCallback.updateTimer(timer);
                     }
-                    long d = timer.lastInterval();
-//                    if (d == 0) {
-//                        if (!quitFlag)
-//                            sendEmptyMessageDelayed(UPDATE, 10);
-//                        return;
-//                    }
-//                    if (d < 15) {
-//                        if (d < 10) {
-//                            try {
-//                                Thread.sleep(15 - d);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                    }
+                    //long d = timer.lastInterval();
+                    if (d == 0) {
+                        if (!quitFlag)
+                            sendEmptyMessageDelayed(UPDATE, 10);
+                        return;
+                    }
+                    if (d < 15) {
+                        if (d < 10) {
+                            try {
+                                Thread.sleep(15 - d);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                     drawDanmakus();
                     if (!quitFlag)
                         sendEmptyMessage(UPDATE);

@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
         mVideoView = (VideoView) findViewById(R.id.videoview);
         if (mVideoView != null) {
             mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
+            //mVideoView.setVideoPath("http://edge.v.iask.com/44027740.hlv?KID=sina,viask&Expires=1380384000&ssig=d3Xzxbv1fI");
         }
 
         // DanmakuView
@@ -61,9 +62,9 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
-                    if (!mVideoView.isPlaying()) return;
-                    int ms = mVideoView.getCurrentPosition();
-                    timer.update(ms);
+                    //if (!mVideoView.isPlaying()) return;
+                    //int ms = mVideoView.getCurrentPosition();
+                    //timer.update(ms);
 //                    Log.e("play time:","play:"+ms+"ms");
                 }
             });
