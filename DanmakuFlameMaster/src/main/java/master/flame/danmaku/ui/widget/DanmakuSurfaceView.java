@@ -349,10 +349,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             }
         }
 
-        private void startDrawingWhenReady(final Runnable runnable) {
-
-        }
-
     }
 
 }
