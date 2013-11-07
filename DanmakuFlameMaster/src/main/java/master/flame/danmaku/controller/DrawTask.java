@@ -31,7 +31,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.AcFunDanmakuParser;
-import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParse;
+import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
@@ -119,7 +119,7 @@ public class DrawTask implements IDrawTask {
         try {
             mLoader.load(stream);
             dataSource = mLoader.getDataSource();
-            mParser = new BiliDanmukuParse(mDisp);
+            mParser = new BiliDanmukuParser(mDisp);
             danmakuList = mParser.load(dataSource).setTimer(timer).parse();
         } catch (IllegalDataException e) {
             Log.e(TAG, "load error", e);
