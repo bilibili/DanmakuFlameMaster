@@ -37,7 +37,7 @@ import master.flame.danmaku.controller.IDrawTask;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 
 public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback,
-        View.OnClickListener, View.OnLongClickListener {
+        View.OnClickListener {
 
     public static final String TAG = "DanmakuSurfaceView";
 
