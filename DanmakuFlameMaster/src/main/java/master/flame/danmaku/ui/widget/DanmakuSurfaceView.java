@@ -75,7 +75,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             timer = new DanmakuTimer();
         }
         setOnClickListener(this);
-        setOnLongClickListener(this);
     }
 
     @Override
@@ -102,7 +101,16 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        startDraw();
+        prepare();
+    }
+
+    public void prepare() {
+        if (mDrawThread == null) {
+            mDrawThread = new HandlerThread("draw thread");
+            mDrawThread.start();
+            handler = new DrawHandler(mDrawThread.getLooper());
+            handler.sendEmptyMessage(DrawHandler.PREPARE);
+        }
     }
 
     @Override
@@ -142,13 +150,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    private void startDraw() {
-        mDrawThread = new HandlerThread("draw thread");
-        mDrawThread.start();
-        handler = new DrawHandler(mDrawThread.getLooper());
-        handler.sendEmptyMessage(DrawHandler.START);
-    }
-
     void drawDanmakus() {
         if (!isSurfaceCreated)
             return;
@@ -166,10 +167,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    public void toggleDrawing() {
+    public void toggle() {
         if (isSurfaceCreated) {
             if (handler == null)
-                startDraw();
+                start();
             else if (handler.isStop()) {
                 resume();
             } else
@@ -177,9 +178,11 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    public void pause() {
-        if (handler != null)
-            handler.quit();
+    public void start() {
+        if (handler == null) {
+            prepare();
+        }
+        handler.sendEmptyMessage(DrawHandler.START);
     }
 
     public void resume() {
@@ -195,8 +198,9 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         start();
     }
 
-    public void start() {
-        startDraw();
+    public void pause() {
+        if (handler != null)
+            handler.quit();
     }
 
     @Override
@@ -206,18 +210,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    @Override
-    public boolean onLongClick(View view) {
-        if (isSurfaceCreated) {
-            seekBy(3000L);
-        }
-        return true;
-    }
-
     public void seekBy(Long deltaMs) {
         if (handler != null) {
             handler.obtainMessage(DrawHandler.SEEK_POS, deltaMs).sendToTarget();
         }
+    }
+
+    public void seekTo(Long ms){
+        seekBy(ms - timer.currMillisecond);
     }
 
     public void enableDanmakuDrawingCache(boolean enable) {
@@ -251,9 +251,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         private static final int SEEK_POS = 4;
 
+        private static final int PREPARE = 5;
+
         private long pausedPostion = 0;
 
         private boolean quitFlag;
+
+        private boolean mReady;
 
         public DrawHandler(Looper looper) {
             super(looper);
@@ -271,24 +275,28 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         public void handleMessage(Message msg) {
             int what = msg.what;
             switch (what) {
-                case START:
-                    pausedPostion = 0;
-                case RESUME:
-                    quitFlag = false;
-                    startDrawingWhenReady(new Runnable() {
-
+                case PREPARE:
+                    prepare(new Runnable() {
                         @Override
                         public void run() {
-                            mTimeBase = System.currentTimeMillis() - pausedPostion;// timer.currMillisecond
-                                                                                   // -
-                                                                                   // pausedPostion;
-                            timer.update(pausedPostion);
-                            sendEmptyMessage(UPDATE);
+                            mReady = true;
                             if (mCallback != null) {
                                 mCallback.prepared();
                             }
                         }
                     });
+                    break;
+                case START:
+                    pausedPostion = 0;
+                case RESUME:
+                    quitFlag = false;
+                    if (mReady) {
+                        mTimeBase = System.currentTimeMillis() - pausedPostion;
+                        timer.update(pausedPostion);
+                        sendEmptyMessage(UPDATE);
+                    } else {
+                        sendEmptyMessageDelayed(RESUME, 100);
+                    }
                     break;
                 case SEEK_POS:
                     Long deltaMs = (Long) msg.obj;
@@ -317,15 +325,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     if (!quitFlag)
                         sendEmptyMessage(UPDATE);
                     else {
-                        pausedPostion = timer.currMillisecond;// System.currentTimeMillis()
-                                                              // - mTimeBase;
+                        pausedPostion = timer.currMillisecond;
                         Log.i(TAG, "stop draw: current = " + pausedPostion);
                     }
                     break;
             }
         }
 
-        private void startDrawingWhenReady(final Runnable runnable) {
+        private void prepare(final Runnable runnable) {
             if (drawTask == null) {
                 drawTask = createTask(mEnableDanmakuDrwaingCache, timer, getContext(), getWidth(),
                         getHeight(), new IDrawTask.TaskListener() {
@@ -340,6 +347,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             } else {
                 runnable.run();
             }
+        }
+
+        private void startDrawingWhenReady(final Runnable runnable) {
+
         }
 
     }

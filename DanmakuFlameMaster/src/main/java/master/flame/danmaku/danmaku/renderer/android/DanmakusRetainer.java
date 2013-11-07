@@ -89,7 +89,7 @@ public class DanmakusRetainer {
 
     private static class RLDanmakusRetainer implements IDanmakusRetainer {
 
-        private static int LINE_SPACING = 6;
+        private static int LINE_SPACING = 8;
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
 
         @Override
