@@ -20,6 +20,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.DisplayMetrics;
 import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
@@ -36,9 +40,6 @@ import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 public class DrawTask implements IDrawTask {
 
     private static final String TAG = "DrawTask";
@@ -46,6 +47,8 @@ public class DrawTask implements IDrawTask {
     private final int DEBUG_OPTION = 1;
 
     protected AndroidDisplayer mDisp;
+
+    protected Danmakus danmakuList;
 
     TaskListener mTaskListener;
 
@@ -61,14 +64,12 @@ public class DrawTask implements IDrawTask {
 
     private IDataSource dataSource;
 
-    private BaseDanmakuParser mParser;
-
-    protected Danmakus danmakuList;
+    protected BaseDanmakuParser mParser;
 
     private IDanmakus danmakus;
 
     public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
-            TaskListener taskListener) {
+             TaskListener taskListener) {
         mTaskListener = taskListener;
         mCounter = new AndroidCounter();
         mContext = context;
@@ -81,10 +82,30 @@ public class DrawTask implements IDrawTask {
         mDisp.densityDpi = displayMetrics.densityDpi;
         mDisp.scaledDensity = displayMetrics.scaledDensity;
         initTimer(timer);
-        loadDanmakus(context, mTimer);
+    }
+
+    public void setParser(BaseDanmakuParser parser){
+        mParser = parser;
+    }
+
+    public void prepare(){
+        if (mParser == null) {
+            // load from testing danmaku file
+            loadDanmakus(mContext, mTimer);
+        } else {
+            loadDanmakus(mParser);
+        }
         if (mTaskListener != null) {
             mTaskListener.ready();
         }
+    }
+
+    protected void initTimer(DanmakuTimer timer) {
+        mTimer = timer;
+    }
+
+    protected void loadDanmakus(BaseDanmakuParser parser) {
+        danmakuList = parser.setTimer(mTimer).parse();
     }
 
     protected void loadDanmakus(Context context, DanmakuTimer timer) {
@@ -102,18 +123,6 @@ public class DrawTask implements IDrawTask {
         }
     }
 
-    private void loadAcDanmakus(InputStream stream, DanmakuTimer timer) {
-        mLoader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_ACFUN);
-        try {
-            mLoader.load(stream);
-            dataSource = mLoader.getDataSource();
-            mParser = new AcFunDanmakuParser(mDisp);
-            danmakuList = mParser.load(dataSource).setTimer(timer).parse();
-        } catch (IllegalDataException e) {
-            Log.e(TAG, "load error", e);
-        }
-    }
-
     private void loadBiliDanmakus(InputStream stream, DanmakuTimer timer) {
         mLoader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
         try {
@@ -126,13 +135,32 @@ public class DrawTask implements IDrawTask {
         }
     }
 
-    protected void initTimer(DanmakuTimer timer) {
-        mTimer = timer;
+    private void loadAcDanmakus(InputStream stream, DanmakuTimer timer) {
+        mLoader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_ACFUN);
+        try {
+            mLoader.load(stream);
+            dataSource = mLoader.getDataSource();
+            mParser = new AcFunDanmakuParser(mDisp);
+            danmakuList = mParser.load(dataSource).setTimer(timer).parse();
+        } catch (IllegalDataException e) {
+            Log.e(TAG, "load error", e);
+        }
     }
 
     @Override
     public void draw(Canvas canvas) {
         drawDanmakus(canvas, mTimer);
+    }
+
+    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {
+        if (danmakuList != null) {
+            long currMills = timer.currMillisecond;
+            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
+            if (danmakus != null) {
+                mDisp.update(canvas);
+                mRenderer.draw(mDisp, danmakus);
+            }
+        }
     }
 
     @Override
@@ -150,17 +178,6 @@ public class DrawTask implements IDrawTask {
     @Override
     public void quit() {
         mRenderer.clear();
-    }
-
-    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {
-        if (danmakuList != null) {
-            long currMills = timer.currMillisecond;
-            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
-            if (danmakus != null) {
-                mDisp.update(canvas);
-                mRenderer.draw(mDisp, danmakus);
-            }
-        }
     }
 
 }

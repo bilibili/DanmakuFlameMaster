@@ -6,6 +6,11 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -13,12 +18,9 @@ import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCachePoolManager;
 import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Pools;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class CacheManagingDrawTask extends DrawTask {
 
@@ -28,9 +30,18 @@ public class CacheManagingDrawTask extends DrawTask {
 
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
             TaskListener taskListener, int maxCacheSize) {
-        super(timer, context, dispW, dispH, null);
-        mTaskListener = taskListener;
+        super(timer, context, dispW, dispH, taskListener);
         mCacheManager = new CacheManager(maxCacheSize, 2);
+    }
+
+    @Override
+    public void prepare() {
+        if (mParser == null) {
+            // load from testing danmaku file
+            loadDanmakus(mContext, mTimer);
+        } else {
+            loadDanmakus(mParser);
+        }
         mCacheManager.begin();
     }
 
