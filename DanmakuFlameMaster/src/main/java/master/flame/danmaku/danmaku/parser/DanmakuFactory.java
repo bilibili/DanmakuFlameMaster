@@ -16,10 +16,7 @@
 
 package master.flame.danmaku.danmaku.parser;
 
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.FBDanmaku;
-import master.flame.danmaku.danmaku.model.FTDanmaku;
-import master.flame.danmaku.danmaku.model.R2LDanmaku;
+import master.flame.danmaku.danmaku.model.*;
 
 public class DanmakuFactory {
 
@@ -27,7 +24,7 @@ public class DanmakuFactory {
 
     public static float BILI_PLAYER_HEIGHT = 385;
 
-    public static long COMMON_DANMAKU_DURATION = 3500; //B站原始分辨率下弹幕存活时间
+    public static long COMMON_DANMAKU_DURATION = 3500; // B站原始分辨率下弹幕存活时间
 
     public static long REAL_DANMAKU_DURATION = -1;
 
@@ -50,6 +47,12 @@ public class DanmakuFactory {
             case 5: // 顶端固定
                 instance = new FTDanmaku(COMMON_DANMAKU_DURATION);
                 break;
+            case 6: // 从左往右滚动
+                instance = new L2RDanmaku(REAL_DANMAKU_DURATION);
+                break;
+            case 7: // 特殊弹幕
+                instance = new SpecialDanmaku();
+                break;
             // TODO: more Danmaku type
         }
         return instance;
@@ -59,4 +62,41 @@ public class DanmakuFactory {
         danmaku.duration = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
     }
 
+    /**
+     * Initial translation data of the special danmaku
+     * @param item
+     * @param dispWidth
+     * @param dispHeight
+     * @param beginX
+     * @param beginY
+     * @param endX
+     * @param endY
+     * @param translationDuration
+     * @param translationStartDelay
+     */
+    public static void fillTranslationData(BaseDanmaku item, int dispWidth, int dispHeight, float beginX,
+                                           float beginY, float endX, float endY, long translationDuration,
+                                           long translationStartDelay) {
+        if (item.getType() != BaseDanmaku.TYPE_SPECIAL)
+            return;
+        float scaleX = dispWidth / BILI_PLAYER_WIDTH;
+        float scaleY = dispHeight / BILI_PLAYER_HEIGHT;
+        ((SpecialDanmaku) item).setTranslationData(beginX * scaleX, beginY * scaleY, endX * scaleX,
+                endY * scaleY, translationDuration, translationStartDelay);
+    }
+
+    /**
+     * Initial alpha data of the special danmaku
+     *
+     * @param item
+     * @param beginAlpha
+     * @param endAlpha
+     * @param alphaDuraion
+     */
+    public static void fillAlphaData(BaseDanmaku item, int beginAlpha, int endAlpha,
+                                     long alphaDuraion) {
+        if (item.getType() != BaseDanmaku.TYPE_SPECIAL)
+            return;
+        ((SpecialDanmaku) item).setAlphaData(beginAlpha, endAlpha, alphaDuraion);
+    }
 }

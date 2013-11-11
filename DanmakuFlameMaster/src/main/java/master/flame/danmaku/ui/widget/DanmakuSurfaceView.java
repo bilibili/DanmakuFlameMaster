@@ -34,12 +34,14 @@ import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
 import master.flame.danmaku.controller.IDrawTask;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback,
-        View.OnClickListener, View.OnLongClickListener {
+        View.OnClickListener {
 
     public static final String TAG = "DanmakuSurfaceView";
+
+    private Callback mCallback;
 
     private SurfaceHolder mSurfaceHolder;
 
@@ -47,24 +49,18 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     private DrawHandler handler;
 
-    private long startTime;
-
-    private float cx, cy;
-
-    private long avgDuration;
-
-    private long maxDuration;
-
     private DanmakuTimer timer;
-
-    private DanmakuRenderer renderer;
 
     private IDrawTask drawTask;
 
     private long mTimeBase;
 
     private boolean isSurfaceCreated;
+
     private boolean mEnableDanmakuDrwaingCache;
+
+    private OnClickListener mOnClickListener;
+    private BaseDanmakuParser mParser;
 
     public DanmakuSurfaceView(Context context) {
         super(context);
@@ -80,7 +76,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             timer = new DanmakuTimer();
         }
         setOnClickListener(this);
-        setOnLongClickListener(this);
+    }
+
+    @Override
+    public void setOnClickListener(OnClickListener l) {
+        if (l != this) {
+            mOnClickListener = l;
+        } else
+            super.setOnClickListener(l);
     }
 
     public DanmakuSurfaceView(Context context, AttributeSet attrs) {
@@ -93,9 +96,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         init();
     }
 
+    public void setCallback(Callback callback) {
+        mCallback = callback;
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        startDraw();
+        prepare();
     }
 
     @Override
@@ -106,6 +113,17 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         release();
+    }
+
+    public void release() {
+        stop();
+        if (drawTask != null) {
+            drawTask.quit();
+        }
+    }
+
+    public void stop() {
+        stopDraw();
     }
 
     private void stopDraw() {
@@ -124,25 +142,23 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    private void startDraw() {
-        mDrawThread = new HandlerThread("draw thread");
-        mDrawThread.start();
-        handler = new DrawHandler(mDrawThread.getLooper());
-        handler.sendEmptyMessage(DrawHandler.START);
-    }
-
-    public void release() {
-        stop();
-        if (drawTask != null) {
-            drawTask.quit();
+    public void prepare() {
+        if (mDrawThread == null) {
+            mDrawThread = new HandlerThread("draw thread");
+            mDrawThread.start();
+            handler = new DrawHandler(mDrawThread.getLooper());
+            handler.sendEmptyMessage(DrawHandler.PREPARE);
         }
     }
 
-    public void stop() {
-        stopDraw();
+    public void prepare(BaseDanmakuParser parser) {
+        mParser = parser;
+        prepare();
     }
 
     void drawDanmakus() {
+        if (!isSurfaceCreated)
+            return;
         long stime = System.currentTimeMillis();
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
@@ -157,11 +173,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    @Override
-    public void onClick(View view) {
+    public void toggle() {
         if (isSurfaceCreated) {
             if (handler == null)
-                startDraw();
+                start();
             else if (handler.isStop()) {
                 resume();
             } else
@@ -188,15 +203,21 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     public void start() {
-        startDraw();
+        if (handler == null) {
+            prepare();
+        }
+        handler.sendEmptyMessage(DrawHandler.START);
     }
 
     @Override
-    public boolean onLongClick(View view) {
-        if (isSurfaceCreated) {
-            seekBy(3000L);
+    public void onClick(View view) {
+        if (mOnClickListener != null) {
+            mOnClickListener.onClick(view);
         }
-        return true;
+    }
+
+    public void seekTo(Long ms) {
+        seekBy(ms - timer.currMillisecond);
     }
 
     public void seekBy(Long deltaMs) {
@@ -209,6 +230,27 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         mEnableDanmakuDrwaingCache = enable;
     }
 
+    private IDrawTask createTask(boolean useDrwaingCache, DanmakuTimer timer, Context context,
+            int width, int height, IDrawTask.TaskListener taskListener) {
+        IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, width, height,
+                taskListener, 1024 * 1024 * getMemoryClass(getContext()) / 3) : new DrawTask(timer,
+                context, width, height, taskListener);
+        task.setParser(mParser);
+        task.prepare();
+        return task;
+    }
+
+    public static int getMemoryClass(final Context context) {
+        return ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE))
+                .getMemoryClass();
+    }
+
+    public interface Callback {
+        public void prepared();
+
+        public void updateTimer(DanmakuTimer timer);
+    }
+
     public class DrawHandler extends Handler {
         private static final int START = 1;
 
@@ -218,9 +260,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         private static final int SEEK_POS = 4;
 
+        private static final int PREPARE = 5;
+
         private long pausedPostion = 0;
 
         private boolean quitFlag;
+
+        private boolean mReady;
 
         public DrawHandler(Looper looper) {
             super(looper);
@@ -238,28 +284,38 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         public void handleMessage(Message msg) {
             int what = msg.what;
             switch (what) {
+                case PREPARE:
+                    prepare(new Runnable() {
+                        @Override
+                        public void run() {
+                            mReady = true;
+                            if (mCallback != null) {
+                                mCallback.prepared();
+                            }
+                        }
+                    });
+                    break;
                 case START:
                     pausedPostion = 0;
                 case RESUME:
                     quitFlag = false;
-                    mTimeBase = System.currentTimeMillis() - pausedPostion;
-                    timer.update(pausedPostion);
-                    startDrawingWhenReady(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            sendEmptyMessage(UPDATE);
-                        }
-                    });
+                    if (mReady) {
+                        mTimeBase = System.currentTimeMillis() - pausedPostion;
+                        timer.update(pausedPostion);
+                        sendEmptyMessage(UPDATE);
+                    } else {
+                        sendEmptyMessageDelayed(RESUME, 100);
+                    }
                     break;
                 case SEEK_POS:
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
-                    //long seekPos = System.currentTimeMillis() - mTimeBase;
-                    //drawTask.seek(seekPos);
-                    //break;
                 case UPDATE:
                     long d = timer.update(System.currentTimeMillis() - mTimeBase);
+                    if (mCallback != null) {
+                        mCallback.updateTimer(timer);
+                    }
+                    // long d = timer.lastInterval();
                     if (d == 0) {
                         if (!quitFlag)
                             sendEmptyMessageDelayed(UPDATE, 10);
@@ -278,20 +334,21 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     if (!quitFlag)
                         sendEmptyMessage(UPDATE);
                     else {
-                        pausedPostion = System.currentTimeMillis() - mTimeBase;
+                        pausedPostion = timer.currMillisecond;
                         Log.i(TAG, "stop draw: current = " + pausedPostion);
                     }
                     break;
             }
         }
 
-        private void startDrawingWhenReady(final Runnable runnable) {
+        private void prepare(final Runnable runnable) {
             if (drawTask == null) {
-                drawTask = createTask(mEnableDanmakuDrwaingCache, timer, getContext(), getWidth(), getHeight(),
-                        new IDrawTask.TaskListener() {
+                drawTask = createTask(mEnableDanmakuDrwaingCache, timer, getContext(), getWidth(),
+                        getHeight(), new IDrawTask.TaskListener() {
                             @Override
                             public void ready() {
-                                Log.i(TAG, "start drawing multiThread enabled:" + mEnableDanmakuDrwaingCache);
+                                Log.i(TAG, "start drawing multiThread enabled:"
+                                        + mEnableDanmakuDrwaingCache);
                                 runnable.run();
                             }
                         });
@@ -301,15 +358,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             }
         }
 
-    }
-
-    public static int getMemoryClass(final Context context) {
-        return ((ActivityManager) context.getSystemService(
-                Context.ACTIVITY_SERVICE)).getMemoryClass();
-    }
-
-    private IDrawTask createTask(boolean useDrwaingCache, DanmakuTimer timer, Context context, int width, int height, IDrawTask.TaskListener taskListener) {
-        return useDrwaingCache ? new CacheManagingDrawTask(timer, context, width, height, taskListener, 1024 * 1024 * getMemoryClass(getContext()) / 3) : new DrawTask(timer, context, width, height, taskListener);
     }
 
 }

@@ -16,11 +16,10 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.*;
 import android.graphics.Paint.Style;
 import android.text.TextPaint;
+import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
@@ -28,6 +27,10 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
  * Created by ch on 13-7-5.
  */
 public class AndroidDisplayer implements IDisplayer {
+
+    private Camera camera = new Camera();
+
+    private Matrix matrix = new Matrix();
 
     private int HIT_CACHE_COUNT = 0;
 
@@ -37,9 +40,12 @@ public class AndroidDisplayer implements IDisplayer {
 
     public static Paint STROKE;
 
+    private static Paint ALPHA_PAINT;
+
     static {
         PAINT = new TextPaint();
         STROKE = new Paint();
+        ALPHA_PAINT = new Paint();
         PAINT.setColor(Color.RED);
         PAINT.setTextSize(50);
         STROKE.setStrokeWidth(1.5f);
@@ -106,28 +112,85 @@ public class AndroidDisplayer implements IDisplayer {
 
     @Override
     public void draw(BaseDanmaku danmaku) {
+        float top = danmaku.getTop();
+        float left = danmaku.getLeft();
+        if (danmaku.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
+            top = height - top - danmaku.paintHeight;
+        }
         if (canvas != null) {
 
+            Paint alphaPaint = null;
+            boolean restore = false;
+            if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
+                if (danmaku.getAlpha() == AlphaValue.TRANSPARENT) {
+                    return;
+                }
+                if (danmaku.rotationZ != 0 || danmaku.rotationY != 0) {
+                    saveCanvas(danmaku, canvas, left, top);
+                    restore = true;
+                }
+
+                if (danmaku.getAlpha() != AlphaValue.MAX) {
+                    alphaPaint = ALPHA_PAINT;
+                    alphaPaint.setAlpha(danmaku.getAlpha());
+                }
+            }
             // drawing cache
+            boolean cacheDrawn = false;
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null) {
-//                    canvas.save();
-//                    canvas.translate(danmaku.getLeft(), danmaku.getTop());
-//                    canvas.drawBitmap(holder.bitmap, 0, 0, null);
-//                    canvas.restore();
-                    canvas.drawBitmap(holder.bitmap, danmaku.getLeft(), danmaku.getTop(), null);
-//                    Log.e("CACHE", "cache hit:" + (++HIT_CACHE_COUNT));
-                    return;
+                    // canvas.save();
+                    // canvas.translate(left, top);
+                    // canvas.drawBitmap(holder.bitmap, 0, 0, null);
+                    // canvas.restore();
+                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);
+                    cacheDrawn = true;
                 }
             }
-//            Log.e("CACHE", "no cache:" + (++NO_CACHE_COUNT));
+            if (!cacheDrawn) {
+                if (alphaPaint != null) {
+                    PAINT.setAlpha(alphaPaint.getAlpha());
+                    STROKE.setAlpha(alphaPaint.getAlpha());
+                } else {
+                    resetPaintAlpha(PAINT);
+                    resetPaintAlpha(STROKE);
+                }
+                drawDanmaku(danmaku, canvas, left, top, true);
+            }
 
-            drawDanmaku(danmaku, canvas, danmaku.getLeft(), danmaku.getTop(), true);
+            if (restore) {
+                // need to restore canvas
+                restoreCanvas(canvas);
+            }
         }
     }
 
-    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean quick) {
+    private void resetPaintAlpha(Paint paint) {
+        if (paint.getAlpha() != AlphaValue.MAX) {
+            paint.setAlpha(AlphaValue.MAX);
+        }
+    }
+
+    private void restoreCanvas(Canvas canvas) {
+        canvas.restore();
+    }
+
+    private int saveCanvas(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
+        camera.save();
+        camera.rotateY(-danmaku.rotationY);
+        camera.rotateZ(-danmaku.rotationZ);
+        camera.getMatrix(matrix);
+        matrix.preTranslate(-left, -top);
+        matrix.postTranslate(left, top);
+        camera.restore();
+        int count = canvas.save();
+        canvas.concat(matrix);
+        return count;
+    }
+
+    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
+                                   boolean quick) {
         if (quick) {
             HAS_STROKE = false;
             HAS_SHADOW = false;

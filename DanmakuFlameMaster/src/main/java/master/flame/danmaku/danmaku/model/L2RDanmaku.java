@@ -16,13 +16,13 @@
 
 package master.flame.danmaku.danmaku.model;
 
-public class R2LDanmaku extends BaseDanmaku {
+public class L2RDanmaku extends BaseDanmaku {
 
     private float x = 0;
 
     private float y = -1;
 
-    public R2LDanmaku(long duration) {
+    public L2RDanmaku(long duration) {
         this.duration = duration;
     }
 
@@ -45,7 +45,7 @@ public class R2LDanmaku extends BaseDanmaku {
     }
 
     private float getLeft(IDisplayer displayer, long currTime) {
-        return (1 - (currTime - time) / (float) duration) * (displayer.getWidth() + paintWidth)
+        return (currTime - time) / (float) duration * (displayer.getWidth() + paintWidth)
                 - paintWidth;
     }
 
@@ -82,7 +82,7 @@ public class R2LDanmaku extends BaseDanmaku {
 
     @Override
     public int getType() {
-        return TYPE_SCROLL_RL;
+        return TYPE_SCROLL_LR;
     }
 
 }

@@ -48,9 +48,7 @@ public class DanmakuRenderer extends Renderer {
             DanmakusRetainer.fix(drawItem, disp);
 
             // draw
-            if (drawItem.isShown()
-                    && (drawItem.getType() != BaseDanmaku.TYPE_SCROLL_LR
-                            && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0)) {
+            if (drawItem.isShown() && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0) {
 
                 drawItem.draw(disp);
 

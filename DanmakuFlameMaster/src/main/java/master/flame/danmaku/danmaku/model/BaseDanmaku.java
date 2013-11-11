@@ -22,11 +22,13 @@ public abstract class BaseDanmaku {
 
     public final static int TYPE_SCROLL_RL = 1;
 
-    public final static int TYPE_SCROLL_LR = 2;
+    public final static int TYPE_SCROLL_LR = 6;
 
     public final static int TYPE_FIX_TOP = 5;
 
     public final static int TYPE_FIX_BOTTOM = 4;
+
+    public final static int TYPE_SPECIAL = 7;
 
     public final static int TYPE_MOVEABLE_XXX = 0; // TODO: add more type
 
@@ -48,6 +50,16 @@ public abstract class BaseDanmaku {
      * 文本颜色
      */
     public int textColor;
+
+    /**
+     * Z轴角度
+     */
+    public float rotationZ;
+
+    /**
+     * Y轴角度
+     */
+    public float rotationY;
 
     /**
      * 阴影/描边颜色
@@ -94,11 +106,12 @@ public abstract class BaseDanmaku {
      */
     protected DanmakuTimer mTimer;
 
-    private long timer;
+    /**
+     * 透明度
+     */
+    protected int alpha = AlphaValue.MAX;
 
-    public void setTimer(DanmakuTimer timer) {
-        mTimer = timer;
-    }
+    private long timer;
 
     public long getDuration() {
         return duration;
@@ -128,8 +141,15 @@ public abstract class BaseDanmaku {
         return this.visibility == VISIBLE;
     }
 
-    public boolean isOutside(long ctime) {
-        return time > ctime || ctime - time > duration;
+    public boolean isTimeOut() {
+        if (mTimer != null) {
+            return isTimeOut(mTimer.currMillisecond);
+        }
+        return true;
+    }
+
+    public boolean isTimeOut(long ctime) {
+        return ctime - time > duration;
     }
 
     public boolean isOutside() {
@@ -139,13 +159,17 @@ public abstract class BaseDanmaku {
         return true;
     }
 
+    public boolean isOutside(long ctime) {
+        return time > ctime || ctime - time > duration;
+    }
+
     public void setVisibility(boolean b) {
         this.visibility = (b ? VISIBLE : INVISIBLE);
     }
 
     public abstract void layout(IDisplayer displayer, float x, float y);
 
-    public abstract float[] getRectAtTime(IDisplayer displayer, long time);
+    public abstract float[] getRectAtTime(IDisplayer displayer, long currTime);
 
     public abstract float getLeft();
 
@@ -165,5 +189,13 @@ public abstract class BaseDanmaku {
 
     public DanmakuTimer getTimer() {
         return mTimer;
+    }
+
+    public void setTimer(DanmakuTimer timer) {
+        mTimer = timer;
+    }
+
+    public int getAlpha() {
+        return alpha;
     }
 }
