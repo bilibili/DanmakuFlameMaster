@@ -34,6 +34,7 @@ import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
 import master.flame.danmaku.controller.IDrawTask;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Callback,
         View.OnClickListener {
@@ -59,6 +60,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     private boolean mEnableDanmakuDrwaingCache;
 
     private OnClickListener mOnClickListener;
+    private BaseDanmakuParser mParser;
 
     public DanmakuSurfaceView(Context context) {
         super(context);
@@ -149,6 +151,11 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
+    public void prepare(BaseDanmakuParser parser) {
+        mParser = parser;
+        prepare();
+    }
+
     void drawDanmakus() {
         if (!isSurfaceCreated)
             return;
@@ -228,6 +235,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, width, height,
                 taskListener, 1024 * 1024 * getMemoryClass(getContext()) / 3) : new DrawTask(timer,
                 context, width, height, taskListener);
+        task.setParser(mParser);
         task.prepare();
         return task;
     }
