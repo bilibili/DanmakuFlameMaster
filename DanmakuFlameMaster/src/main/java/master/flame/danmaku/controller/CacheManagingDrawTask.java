@@ -36,12 +36,8 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void prepare() {
-        if (mParser == null) {
-            // load from testing danmaku file
-            loadDanmakus(mContext, mTimer);
-        } else {
-            loadDanmakus(mParser);
-        }
+		assert (mParser != null);
+        loadDanmakus(mParser);
         mCacheManager.begin();
     }
 

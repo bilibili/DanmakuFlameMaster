@@ -60,9 +60,9 @@ public class DrawTask implements IDrawTask {
 
     AndroidCounter mCounter;
 
-    private ILoader mLoader;
+//    private ILoader mLoader;
 
-    private IDataSource dataSource;
+//    private IDataSource dataSource;
 
     protected BaseDanmakuParser mParser;
 
@@ -89,12 +89,8 @@ public class DrawTask implements IDrawTask {
     }
 
     public void prepare(){
-        if (mParser == null) {
-            // load from testing danmaku file
-            loadDanmakus(mContext, mTimer);
-        } else {
-            loadDanmakus(mParser);
-        }
+		assert (mParser != null);
+        loadDanmakus(mParser);
         if (mTaskListener != null) {
             mTaskListener.ready();
         }
@@ -105,10 +101,10 @@ public class DrawTask implements IDrawTask {
     }
 
     protected void loadDanmakus(BaseDanmakuParser parser) {
-        danmakuList = parser.setTimer(mTimer).parse();
+        danmakuList = parser.setDisp(mDisp).setTimer(mTimer).parse();
     }
 
-    protected void loadDanmakus(Context context, DanmakuTimer timer) {
+/*    protected void loadDanmakus(Context context, DanmakuTimer timer) {
         try {
             if (DEBUG_OPTION == 0) {
                 loadAcDanmakus(context.getAssets().open("comment.json"), timer);
@@ -145,7 +141,7 @@ public class DrawTask implements IDrawTask {
         } catch (IllegalDataException e) {
             Log.e(TAG, "load error", e);
         }
-    }
+    }*/
 
     @Override
     public void draw(Canvas canvas) {

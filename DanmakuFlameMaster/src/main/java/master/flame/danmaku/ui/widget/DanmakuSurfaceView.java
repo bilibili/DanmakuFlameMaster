@@ -102,12 +102,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        prepare();
+    	isSurfaceCreated = true;
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        isSurfaceCreated = true;
+        
     }
 
     @Override
@@ -149,11 +149,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             handler = new DrawHandler(mDrawThread.getLooper());
             handler.sendEmptyMessage(DrawHandler.PREPARE);
         }
+        
     }
 
     public void prepare(BaseDanmakuParser parser) {
+    	prepare();
         mParser = parser;
-        prepare();
     }
 
     void drawDanmakus() {
@@ -285,15 +286,19 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             int what = msg.what;
             switch (what) {
                 case PREPARE:
-                    prepare(new Runnable() {
-                        @Override
-                        public void run() {
-                            mReady = true;
-                            if (mCallback != null) {
-                                mCallback.prepared();
-                            }
-                        }
-                    });
+                	if(mParser==null || !isSurfaceCreated){
+                		sendEmptyMessageDelayed(PREPARE,100);
+                	}else{
+	                    prepare(new Runnable() {
+	                        @Override
+	                        public void run() {
+	                            mReady = true;
+	                            if (mCallback != null) {
+	                                mCallback.prepared();
+	                            }
+	                        }
+	                    });
+                	}
                     break;
                 case START:
                     pausedPostion = 0;

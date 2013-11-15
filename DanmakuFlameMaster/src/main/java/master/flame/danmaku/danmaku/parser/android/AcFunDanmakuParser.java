@@ -15,10 +15,6 @@ import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class AcFunDanmakuParser extends BaseDanmakuParser {
 
-    public AcFunDanmakuParser(IDisplayer disp) {
-        super(disp);
-    }
-
     @Override
     public Danmakus parse() {
         if (mDataSource != null && mDataSource instanceof JSONSource) {
