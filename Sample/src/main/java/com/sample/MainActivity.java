@@ -73,7 +73,6 @@ public class MainActivity extends Activity {
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
-
 			BaseDanmakuParser parser = createParser(this.getResources()
 					.openRawResource(R.raw.comments));
 			mDanmakuView.prepare(parser);
@@ -100,23 +99,19 @@ public class MainActivity extends Activity {
                     }
                 }
             });
-            
-
         }
 
 
         if (mVideoView != null) {
+        	 mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                 @Override
+                 public void onPrepared(MediaPlayer mediaPlayer) {
+                     mediaPlayer.start();
+                     mDanmakuView.start();
+                 }
+             });
             mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
-            //mVideoView.setVideoPath("http://edge.v.iask.com/44027740.hlv?KID=sina,viask&Expires=1380384000&ssig=d3Xzxbv1fI");
         }
-
-        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.start();
-                mDanmakuView.start();
-            }
-        });
 
 
     }
