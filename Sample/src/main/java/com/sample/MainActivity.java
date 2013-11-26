@@ -117,6 +117,14 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        if(mDanmakuView!=null){
+            mDanmakuView.release();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
