@@ -61,6 +61,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     private OnClickListener mOnClickListener;
     private BaseDanmakuParser mParser;
+    private boolean mFpsShown;
 
     public DanmakuSurfaceView(Context context) {
         super(context);
@@ -157,6 +158,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         mParser = parser;
     }
 
+    public void showFPS(boolean show){
+        mFpsShown = show;
+    }
+
     void drawDanmakus() {
         if (!isSurfaceCreated)
             return;
@@ -165,13 +170,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         long stime = System.currentTimeMillis();
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
-
             DrawHelper.clearCanvas(canvas);
             drawTask.draw(canvas);
-
-            long dtime = System.currentTimeMillis() - stime;
-            String fps = String.format("fps %.2f", 1000 / (float) dtime);
-            DrawHelper.drawText(canvas, fps);
+            if(mFpsShown){
+                long dtime = System.currentTimeMillis() - stime;
+                String fps = String.format("fps %.2f", 1000 / (float) dtime);
+                DrawHelper.drawText(canvas, fps);
+            }
             mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
