@@ -42,7 +42,7 @@ public class DanmakuUtils {
             return true;
         }
 
-        if (d1.isTimeOut() || d2.isTimeOut()) {
+        if (d1.isOutside() || d1.isTimeOut() || d2.isTimeOut()) {
             return false;
         }
 
@@ -59,7 +59,9 @@ public class DanmakuUtils {
         rectArr2 = d2.getRectAtTime(disp, time);
         if (rectArr1 == null || rectArr2 == null)
             return false;
-        checkHit(d1, d2, rectArr1, rectArr2);
+        if (checkHit(d1, d2, rectArr1, rectArr2)){
+            return true;
+        }
 
         return false;
     }
