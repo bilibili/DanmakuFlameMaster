@@ -160,6 +160,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     void drawDanmakus() {
         if (!isSurfaceCreated)
             return;
+        if(!isShown())
+            return;
         long stime = System.currentTimeMillis();
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
