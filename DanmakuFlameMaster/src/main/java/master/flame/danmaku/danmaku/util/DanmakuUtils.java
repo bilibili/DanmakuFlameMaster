@@ -42,7 +42,7 @@ public class DanmakuUtils {
             return true;
         }
 
-        if (d1.isTimeOut()) {
+        if (d1.isTimeOut() || d2.isTimeOut()) {
             return false;
         }
 
