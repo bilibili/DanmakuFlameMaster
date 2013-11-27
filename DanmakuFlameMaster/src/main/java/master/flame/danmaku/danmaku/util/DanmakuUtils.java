@@ -42,7 +42,7 @@ public class DanmakuUtils {
             return true;
         }
 
-        if (d1.isOutside()) {
+        if (d1.isTimeOut()) {
             return false;
         }
 
