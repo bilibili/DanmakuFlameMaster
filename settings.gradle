@@ -1,1 +1,1 @@
-include ':DanmakuFlameMaster'
+include ':DanmakuFlameMaster', ':Sample'

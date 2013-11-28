@@ -16,9 +16,6 @@ import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class AcFunDanmakuParser extends BaseDanmakuParser {
 
-    public AcFunDanmakuParser(IDisplayer disp) {
-        super(disp);
-    }
 
     @Override
     public Danmakus parse() {
@@ -61,7 +58,6 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                 }
 
             } catch (JSONException e) {
-                Log.e("Parser","error",e);
             }
         }
 

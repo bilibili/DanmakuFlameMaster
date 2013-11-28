@@ -59,6 +59,11 @@ public class AndroidDisplayer implements IDisplayer {
     public static boolean HAS_SHADOW = true;
 
     /**
+     * 阴影高度
+     */
+    public static int SHADOW_HEIGHT = 0;
+
+    /**
      * 开启描边，可动态改变
      */
     public static boolean HAS_STROKE = false;
@@ -206,19 +211,19 @@ public class AndroidDisplayer implements IDisplayer {
             if (titleArr.length == 1) {
                 if (HAS_STROKE)
                     canvas.drawText(titleArr[0], left, top - STROKE.ascent(), STROKE);
-                canvas.drawText(titleArr[0], left, top - paint.ascent(), paint);
+                canvas.drawText(titleArr[0], left, top - paint.ascent() - SHADOW_HEIGHT, paint);
             } else {
                 for (int t = 0; t < titleArr.length; t++) {
                     if (titleArr[t].length() > 0) {
                         canvas.drawText(titleArr[t], left,
-                                t * danmaku.textSize + top - paint.ascent(), paint);
+                                t * danmaku.textSize + top - paint.ascent() - SHADOW_HEIGHT, paint);
                     }
                 }
             }
         } else {
             if (HAS_STROKE)
                 canvas.drawText(danmaku.text, left, top - STROKE.ascent(), STROKE);
-            canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
+            canvas.drawText(danmaku.text, left, top - paint.ascent() - SHADOW_HEIGHT, paint);
         }
     }
 
@@ -233,8 +238,10 @@ public class AndroidDisplayer implements IDisplayer {
         }
         if (HAS_SHADOW) {
             PAINT.setShadowLayer(2.0f, 2, 2, danmaku.textShadowColor);
+            SHADOW_HEIGHT = 4;
         } else {
             PAINT.clearShadowLayer();
+            SHADOW_HEIGHT = 0;
         }
         return PAINT;
     }

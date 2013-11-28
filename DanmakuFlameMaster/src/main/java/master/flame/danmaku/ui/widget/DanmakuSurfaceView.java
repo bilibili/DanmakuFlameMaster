@@ -61,6 +61,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     private OnClickListener mOnClickListener;
     private BaseDanmakuParser mParser;
+    private boolean mShowFps;
 
     public DanmakuSurfaceView(Context context) {
         super(context);
@@ -102,17 +103,17 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        prepare();
+    	isSurfaceCreated = true;
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        isSurfaceCreated = true;
+        
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        release();
+
     }
 
     public void release() {
@@ -149,26 +150,33 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             handler = new DrawHandler(mDrawThread.getLooper());
             handler.sendEmptyMessage(DrawHandler.PREPARE);
         }
+        
     }
 
     public void prepare(BaseDanmakuParser parser) {
+    	prepare();
         mParser = parser;
-        prepare();
+    }
+
+    public void showFPS(boolean show){
+        mShowFps = show;
     }
 
     void drawDanmakus() {
         if (!isSurfaceCreated)
             return;
+        if(!isShown())
+            return;
         long stime = System.currentTimeMillis();
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
-
             DrawHelper.clearCanvas(canvas);
             drawTask.draw(canvas);
-
-            long dtime = System.currentTimeMillis() - stime;
-            String fps = String.format("fps %.2f", 1000 / (float) dtime);
-            DrawHelper.drawText(canvas, fps);
+            if(mShowFps){
+                long dtime = System.currentTimeMillis() - stime;
+                String fps = String.format("fps %.2f", 1000 / (float) dtime);
+                DrawHelper.drawText(canvas, fps);
+            }
             mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
@@ -285,15 +293,19 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             int what = msg.what;
             switch (what) {
                 case PREPARE:
-                    prepare(new Runnable() {
-                        @Override
-                        public void run() {
-                            mReady = true;
-                            if (mCallback != null) {
-                                mCallback.prepared();
-                            }
-                        }
-                    });
+                	if(mParser==null || !isSurfaceCreated){
+                		sendEmptyMessageDelayed(PREPARE,100);
+                	}else{
+	                    prepare(new Runnable() {
+	                        @Override
+	                        public void run() {
+	                            mReady = true;
+	                            if (mCallback != null) {
+	                                mCallback.prepared();
+	                            }
+	                        }
+	                    });
+                	}
                     break;
                 case START:
                     pausedPostion = 0;

@@ -34,10 +34,6 @@ import java.io.IOException;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
 
-    public BiliDanmukuParser(IDisplayer disp) {
-        super(disp);
-    }
-
     static {
         System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
     }
