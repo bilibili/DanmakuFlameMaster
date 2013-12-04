@@ -80,6 +80,7 @@ public class CacheManagingDrawTask extends DrawTask {
         super.seek(mills);
         mTimer.update(mills);
         mCacheTimer.update(mills);
+        mCacheManager.evictAll();
     }
 
     @Override
