@@ -26,7 +26,7 @@ public class DanmakuUtils {
 
     /**
      * 检测两个弹幕是否会碰撞
-     * 
+     *
      * @param d1
      * @param d2
      * @return
