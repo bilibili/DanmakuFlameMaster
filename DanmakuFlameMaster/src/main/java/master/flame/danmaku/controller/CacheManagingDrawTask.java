@@ -271,7 +271,6 @@ public class CacheManagingDrawTask extends DrawTask {
                     item = itr.next();
 
                     if (item.isTimeOut()) {
-                        entryRemoved(false, item, null);
                         continue;
                     }
 
