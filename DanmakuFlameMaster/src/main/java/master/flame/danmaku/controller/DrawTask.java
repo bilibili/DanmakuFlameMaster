@@ -161,8 +161,10 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void reset() {
-        danmakus.clear();
-        mRenderer.clear();
+        if(danmakus != null)
+            danmakus.clear();
+        if(mRenderer != null)
+            mRenderer.clear();
     }
 
     @Override

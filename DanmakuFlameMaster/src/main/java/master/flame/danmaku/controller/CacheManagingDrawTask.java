@@ -72,15 +72,16 @@ public class CacheManagingDrawTask extends DrawTask {
     @Override
     public void reset() {
         // mCacheTimer.update(mTimer.currMillisecond);
-        super.reset();
+        if(mRenderer != null)
+            mRenderer.clear();
+        mCacheManager.evictAll();
     }
 
     @Override
     public void seek(long mills) {
-        super.seek(mills);
         mTimer.update(mills);
         mCacheTimer.update(mills);
-        mCacheManager.evictAll();
+        reset();
     }
 
     @Override

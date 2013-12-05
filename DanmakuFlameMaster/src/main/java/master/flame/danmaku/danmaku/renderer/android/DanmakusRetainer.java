@@ -72,6 +72,9 @@ public class DanmakusRetainer {
         if (rldrInstance != null) {
             rldrInstance.clear();
         }
+        if (lrdrInstance != null) {
+            lrdrInstance.clear();
+        }
         if (ftdrInstance != null) {
             ftdrInstance.clear();
         }
