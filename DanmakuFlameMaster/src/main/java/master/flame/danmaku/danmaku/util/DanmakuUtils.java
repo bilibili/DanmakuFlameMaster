@@ -37,13 +37,12 @@ public class DanmakuUtils {
             return false;
         if (Math.abs(d2.time - d1.time) >= duration)
             return false;
+        if (d1.isOutside() || d1.isTimeOut() || d2.isTimeOut()) {
+            return false;
+        }
 
         if (d1.getType() == BaseDanmaku.TYPE_FIX_TOP || d1.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
             return true;
-        }
-
-        if (d1.isOutside() || d1.isTimeOut() || d2.isTimeOut()) {
-            return false;
         }
 
         float[] rectArr1 = d1.getRectAtTime(disp, currTime);
