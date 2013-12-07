@@ -211,10 +211,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     public void start() {
+        start(0);
+    }
+
+    public void start(long postion) {
         if (handler == null) {
             prepare();
         }
-        handler.sendEmptyMessage(DrawHandler.START);
+        handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
     }
 
     @Override
@@ -308,7 +312,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 	}
                     break;
                 case START:
-                    pausedPostion = 0;
+                    pausedPostion = (Long) msg.obj;
                 case RESUME:
                     quitFlag = false;
                     if (mReady) {
