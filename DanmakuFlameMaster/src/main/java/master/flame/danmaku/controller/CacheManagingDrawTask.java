@@ -178,15 +178,20 @@ public class CacheManagingDrawTask extends DrawTask {
             mHandler.sendEmptyMessage(CacheHandler.PAUSE);
         }
 
-        private synchronized void put(BaseDanmaku item) {
+        private synchronized boolean push(BaseDanmaku item) {
             int size = sizeOf(item);
             while (mRealSize + size > mMaxSize && mCaches.size() > 0) {
                 BaseDanmaku oldValue = mCaches.get(0);
-                entryRemoved(false, oldValue, item);
-                mCaches.remove(oldValue);
+                if(oldValue.isTimeOut()){
+                    entryRemoved(false, oldValue, item);
+                    mCaches.remove(oldValue);
+                }else{
+                    return false;
+                }
             }
             this.mCaches.add(item);
             mRealSize += size;
+            return true;
         }
 
         private synchronized void clearTimeOutCaches() {
@@ -296,12 +301,15 @@ public class CacheManagingDrawTask extends DrawTask {
                                 if (mRealSize + newCache.size() > mMaxSize) {
                                     quitLoop = true;
                                 }
-                                mCacheManager.put(item);
+                                boolean pushed = mCacheManager.push(item);
+                                if (!pushed) {
+                                    mCachePool.release(newCache);
+                                    newCache.destroy();
+                                    break;
+                                }
                                 if (quitLoop)
                                     break;
                             }
-
-                            // put(item.hashCode(), item);
 
                         } catch (OutOfMemoryError e) {
                             break;
