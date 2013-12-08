@@ -109,6 +109,11 @@ public class DanmakusRetainer {
                 while (it.hasNext()) {
                     BaseDanmaku item = it.next();
 
+                    if(item == drawItem){
+                        insertItem = item;
+                        break;
+                    }
+
                     if (firstItem == null)
                         firstItem = item;
 
