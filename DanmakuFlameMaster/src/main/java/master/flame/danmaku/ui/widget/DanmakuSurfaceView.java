@@ -286,6 +286,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         public void quit() {
             quitFlag = true;
+            removeCallbacksAndMessages(null);
         }
 
         public boolean isStop() {

@@ -129,6 +129,7 @@ public class CacheManagingDrawTask extends DrawTask {
         public void end() {
             if (mHandler != null) {
                 mHandler.pause();
+                mHandler.removeCallbacksAndMessages(null);
                 mHandler = null;
             }
             if (mThread != null) {
