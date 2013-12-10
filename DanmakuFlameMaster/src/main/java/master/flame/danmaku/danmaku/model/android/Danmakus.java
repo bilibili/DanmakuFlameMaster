@@ -161,16 +161,22 @@ public class Danmakus implements IDanmakus {
                 return result;
             }
 
-            if (obj1.text == obj2.text) {
-                return 0;
-            }
             if (obj1.text == null) {
                 return -1;
             }
             if (obj2.text == null) {
                 return 1;
             }
-            return obj1.text.compareTo(obj2.text);
+            int r = obj1.text.compareTo(obj2.text);
+            if(r != 0){
+                return r;
+            }
+
+            r = (obj1.textColor - obj2.textColor);
+            if (r != 0) {
+                return r < 0 ? -1 : 1;
+            }
+            return (obj1.hashCode() - obj1.hashCode()) < 0 ? -1 : 1;
         }
     }
 
