@@ -167,6 +167,7 @@ public class Danmakus implements IDanmakus {
             if (obj2.text == null) {
                 return 1;
             }
+
             int r = obj1.text.compareTo(obj2.text);
             if(r != 0){
                 return r;
@@ -176,7 +177,10 @@ public class Danmakus implements IDanmakus {
             if (r != 0) {
                 return r < 0 ? -1 : 1;
             }
-            return (obj1.hashCode() - obj1.hashCode()) < 0 ? -1 : 1;
+            r = obj1.hashCode() - obj1.hashCode();
+            if(r != 0)
+                return r < 0 ? -1 : 1;
+            return r;
         }
     }
 
