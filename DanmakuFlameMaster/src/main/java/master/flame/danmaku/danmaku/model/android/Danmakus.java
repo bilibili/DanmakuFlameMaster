@@ -179,10 +179,14 @@ public class Danmakus implements IDanmakus {
             }
 
             r = (obj1.textColor - obj2.textColor);
-            if (r != 0) {
+            if (r != 0)
                 return r < 0 ? -1 : 1;
-            }
+
             r = obj1.index - obj2.index;
+            if(r != 0)
+                return r < 0 ? -1 : 1;
+
+            r = obj1.hashCode() - obj1.hashCode();
             if(r != 0)
                 return r < 0 ? -1 : 1;
             return r;
