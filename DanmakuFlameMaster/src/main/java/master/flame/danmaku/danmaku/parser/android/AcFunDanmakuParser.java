@@ -42,10 +42,10 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                     long time = (long) (Float.parseFloat(values[0]) * 1000); // 出现时间
                     int color = Integer.parseInt(values[1]) | 0xFF000000; // 颜色
                     float textSize = Float.parseFloat(values[3]); // 字体大小
-                    BaseDanmaku item = DanmakuFactory.createDanmaku(type, mDispWidth);
+                    BaseDanmaku item = DanmakuFactory.createDanmaku(type, mDispWidth/(mDispDensity - 0.6f));
                     if (item != null) {
                         item.time = time;
-                        item.textSize = textSize * (mScaledDensity - 0.2f);
+                        item.textSize = textSize * (mDispDensity - 0.6f);
                         item.textColor = color;
                         item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
                         item.text = obj.optString("m", "....");

@@ -99,10 +99,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     float textSize = Float.parseFloat(values[2]); // 字体大小
                     int color = Integer.parseInt(values[3]) | 0xFF000000; // 颜色
                     // int poolType = Integer.parseInt(values[5]); // 弹幕池类型（忽略
-                    item = DanmakuFactory.createDanmaku(type, mDispWidth);
+                    item = DanmakuFactory.createDanmaku(type, mDispWidth/(mDispDensity - 0.6f));
                     if (item != null) {
                         item.time = time;
-                        item.textSize = textSize * mDispDensity;
+                        item.textSize = textSize * (mDispDensity - 0.6f);
                         item.textColor = color;
                         item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
                     }
