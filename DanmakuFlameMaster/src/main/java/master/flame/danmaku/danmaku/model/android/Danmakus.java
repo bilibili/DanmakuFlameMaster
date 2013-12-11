@@ -16,12 +16,12 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import java.util.*;
+
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
-
-import java.util.*;
 
 public class Danmakus implements IDanmakus {
 
@@ -119,6 +119,10 @@ public class Danmakus implements IDanmakus {
         return subItems;
     }
 
+    private BaseDanmaku createItem(String text) {
+        return new Danmaku(text);
+    }
+
     public int size() {
         if (items != null) {
             return items.size();
@@ -140,12 +144,7 @@ public class Danmakus implements IDanmakus {
         }
     }
 
-    private BaseDanmaku createItem(String text) {
-        return new Danmaku(text);
-    }
-
     private class TimeComparator implements Comparator<BaseDanmaku> {
-
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
 
@@ -154,7 +153,6 @@ public class Danmakus implements IDanmakus {
     }
 
     private class YPosComparator implements Comparator<BaseDanmaku> {
-
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
             int result = Float.compare(obj1.getTop(), obj2.getTop());
@@ -176,4 +174,5 @@ public class Danmakus implements IDanmakus {
             return DanmakuUtils.compare(obj1, obj2);
         }
     }
+
 }
