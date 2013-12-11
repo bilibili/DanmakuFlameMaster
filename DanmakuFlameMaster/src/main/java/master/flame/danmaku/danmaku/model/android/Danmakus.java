@@ -47,7 +47,7 @@ public class Danmakus implements IDanmakus {
         } else if (sortType == ST_BY_YPOS) {
             comparator = new YPosComparator();
         } else if (sortType == ST_BY_YPOS_DESC) {
-            comparator = new YposDescComparator();
+            comparator = new YPosDescComparator();
         }
         items = new TreeSet<BaseDanmaku>(comparator);
     }
@@ -211,7 +211,7 @@ public class Danmakus implements IDanmakus {
         }
     }
 
-    private class YposDescComparator implements Comparator<BaseDanmaku> {
+    private class YPosDescComparator implements Comparator<BaseDanmaku> {
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
 
