@@ -16,11 +16,12 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import java.util.*;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.util.DanmakuUtils;
+
+import java.util.*;
 
 public class Danmakus implements IDanmakus {
 
@@ -118,10 +119,6 @@ public class Danmakus implements IDanmakus {
         return subItems;
     }
 
-    private BaseDanmaku createItem(String text) {
-        return new Danmaku(text);
-    }
-
     public int size() {
         if (items != null) {
             return items.size();
@@ -143,53 +140,16 @@ public class Danmakus implements IDanmakus {
         }
     }
 
+    private BaseDanmaku createItem(String text) {
+        return new Danmaku(text);
+    }
+
     private class TimeComparator implements Comparator<BaseDanmaku> {
 
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
 
-            if(obj1 == obj2){
-                return 0;
-            }
-
-            long val = obj1.time - obj2.time;
-            if (val > 0) {
-                return 1;
-            } else if (val < 0) {
-                return -1;
-            }
-
-            Integer t1 = obj1.getType();
-            Integer t2 = obj2.getType();
-            int result = t1.compareTo(t2);
-            if (result != 0) {
-                return result;
-            }
-
-            if (obj1.text == null) {
-                return -1;
-            }
-            if (obj2.text == null) {
-                return 1;
-            }
-
-            int r = obj1.text.compareTo(obj2.text);
-            if(r != 0){
-                return r;
-            }
-
-            r = (obj1.textColor - obj2.textColor);
-            if (r != 0)
-                return r < 0 ? -1 : 1;
-
-            r = obj1.index - obj2.index;
-            if(r != 0)
-                return r < 0 ? -1 : 1;
-
-            r = obj1.hashCode() - obj1.hashCode();
-            if(r != 0)
-                return r < 0 ? -1 : 1;
-            return r;
+            return DanmakuUtils.compare(obj1, obj2);
         }
     }
 
@@ -201,13 +161,7 @@ public class Danmakus implements IDanmakus {
             if (result != 0) {
                 return result;
             }
-            long val = obj1.time - obj2.time;
-            if (val > 0) {
-                result = 1;
-            } else if (val < 0) {
-                result = -1;
-            }
-            return result;
+            return DanmakuUtils.compare(obj1, obj2);
         }
     }
 
@@ -219,13 +173,7 @@ public class Danmakus implements IDanmakus {
             if (result != 0) {
                 return result;
             }
-            long val = obj1.time - obj2.time;
-            if (val > 0) {
-                result = 1;
-            } else if (val < 0) {
-                result = -1;
-            }
-            return result;
+            return DanmakuUtils.compare(obj1, obj2);
         }
     }
 }
