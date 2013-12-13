@@ -159,7 +159,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         endX = Float.parseFloat(textArr[7]);
                         endY = Float.parseFloat(textArr[8]);
                         translationDuration = Integer.parseInt(textArr[9]);
-                        translationStartDelay = (long) (Float.parseFloat(textArr[10]) * 1000);
+                        translationStartDelay = (long) (Float.parseFloat(textArr[10]));
                     }
                     item.duration = alphaDuraion;
                     item.rotationZ = rotateZ;
