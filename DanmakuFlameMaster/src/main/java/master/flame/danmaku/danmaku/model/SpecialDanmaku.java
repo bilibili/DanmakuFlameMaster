@@ -41,9 +41,6 @@ public class SpecialDanmaku extends BaseDanmaku {
         long deltaTime = currTime - time;
 
         // caculate alpha
-        if(deltaAlpha != 0){
-            alpha = beginAlpha;
-        }
         if (alphaDuration > 0 && deltaAlpha != 0) {
             float alphaProgress = deltaTime / (float) alphaDuration;
             int vectorAlpha = (int) (deltaAlpha * alphaProgress);
@@ -118,6 +115,9 @@ public class SpecialDanmaku extends BaseDanmaku {
         this.endAlpha = endAlpha;
         this.deltaAlpha = endAlpha - beginAlpha;
         this.alphaDuration = alphaDuration;
+        if(deltaAlpha != 0 && beginAlpha != AlphaValue.MAX){
+            alpha = beginAlpha;
+        }
     }
 
 }
