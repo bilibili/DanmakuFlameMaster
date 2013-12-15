@@ -118,18 +118,18 @@ public class Danmakus implements IDanmakus {
                 return subItems;
             }
 
-            if (dtime >= 0 && ((endItem.time - startTime) > dtime)) {
-                startItem.time = startTime;
-                Set<BaseDanmaku> retItems = ((SortedSet<BaseDanmaku>) subItems.items).subSet(
-                        startItem, endItem);
-                subItems.setItems(retItems);
-                startItem.time = endItem.time + 1;
-                endItem.time = endTime;
-                retItems = ((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem);
-                subItems.items.addAll(retItems);
-                startItem.time = startTime;
-                return subItems;
-            }
+//            if (dtime >= 0 && ((endItem.time - startTime) > dtime)) {
+//                startItem.time = startTime;
+//                Set<BaseDanmaku> retItems = ((SortedSet<BaseDanmaku>) subItems.items).subSet(
+//                        startItem, endItem);
+//                subItems.setItems(retItems);
+//                startItem.time = endItem.time + 1;
+//                endItem.time = endTime;
+//                retItems = ((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem);
+//                subItems.items.addAll(retItems);
+//                startItem.time = startTime;
+//                return subItems;
+//            }
         }
 
         startItem.time = startTime;
