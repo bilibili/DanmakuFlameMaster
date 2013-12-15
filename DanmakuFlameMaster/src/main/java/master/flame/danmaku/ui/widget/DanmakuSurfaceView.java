@@ -33,6 +33,7 @@ import master.flame.danmaku.controller.CacheManagingDrawTask;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
 import master.flame.danmaku.controller.IDrawTask;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
@@ -95,6 +96,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     public DanmakuSurfaceView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
+    }
+
+    public void addDanmaku(BaseDanmaku item) {
+        if(drawTask != null){
+            drawTask.addDanmaku(item);
+        }
     }
 
     public void setCallback(Callback callback) {

@@ -99,6 +99,9 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public IDanmakus sub(long startTime, long endTime) {
+        if(items==null || items.size()==0){
+            return null;
+        }
         if (subItems == null) {
             subItems = new Danmakus();
         }
