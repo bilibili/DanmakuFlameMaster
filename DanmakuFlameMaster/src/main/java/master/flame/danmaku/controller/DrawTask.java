@@ -84,7 +84,11 @@ public class DrawTask implements IDrawTask {
             item.index = danmakuList.size();
             item.underlineColor = Color.RED;
             danmakuList.addItem(item);
+            if (danmakus == null)
+                return;
+            danmakus.addItem(item);
         }
+
     }
 
     @Override
