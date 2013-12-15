@@ -85,7 +85,6 @@ public class DrawTask implements IDrawTask {
             item.underlineColor = Color.RED;
             danmakuList.addItem(item);
         }
-
     }
 
     @Override
