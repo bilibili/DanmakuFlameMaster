@@ -273,7 +273,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                     case ADD_DANMAKKU:
                         synchronized (danmakuList) {
-                            danmakuList.addItem((BaseDanmaku) msg.obj);
+                            CacheManagingDrawTask.super.addDanmaku((BaseDanmaku) msg.obj);
                         }
                         break;
                 }
