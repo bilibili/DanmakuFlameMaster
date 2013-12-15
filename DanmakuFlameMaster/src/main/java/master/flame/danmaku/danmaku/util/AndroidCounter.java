@@ -17,19 +17,20 @@ public class AndroidCounter {
         return this;
     }
 
+    /**
+     * log output
+     * 
+     * @param tag
+     */
+    public void end(String tag) {
+        end();
+        Log.e(tag, Long.toString(counter) + " ms");
+    }
+
     public AndroidCounter end() {
 
         counter = System.currentTimeMillis() - counter;
 
         return this;
-    }
-
-    public long getDuration() {
-        return counter;
-    }
-
-    public void log(String title) {
-
-        Log.e(title, Long.toString(counter) + " ms");
     }
 }
