@@ -165,6 +165,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         mParser = parser;
     }
 
+    public boolean isPrepared(){
+        return handler!=null && handler.isPrepared();
+    }
+
     public void showFPS(boolean show){
         mShowFps = show;
     }
@@ -381,6 +385,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             } else {
                 runnable.run();
             }
+        }
+
+        public boolean isPrepared(){
+            return mReady;
         }
 
     }
