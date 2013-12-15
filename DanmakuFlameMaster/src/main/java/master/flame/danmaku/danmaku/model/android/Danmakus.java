@@ -16,12 +16,12 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import java.util.*;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
+
+import java.util.*;
 
 public class Danmakus implements IDanmakus {
 
@@ -99,6 +99,9 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public IDanmakus sub(long startTime, long endTime) {
+        if(items==null || items.size()==0){
+            return null;
+        }
         if (subItems == null) {
             subItems = new Danmakus();
         }
@@ -109,8 +112,24 @@ public class Danmakus implements IDanmakus {
             endItem = createItem("end");
         }
 
-        if (startTime >= startItem.time && endTime <= endItem.time && subItems != null) {
-            return subItems;
+        if (subItems != null) {
+            long dtime = startTime - startItem.time;
+            if (dtime >= 0 && endTime <= endItem.time) {
+                return subItems;
+            }
+
+            if (dtime >= 0 && ((endItem.time - startTime) > dtime)) {
+                startItem.time = startTime;
+                Set<BaseDanmaku> retItems = ((SortedSet<BaseDanmaku>) subItems.items).subSet(
+                        startItem, endItem);
+                subItems.setItems(retItems);
+                startItem.time = endItem.time + 1;
+                endItem.time = endTime;
+                retItems = ((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem);
+                subItems.items.addAll(retItems);
+                startItem.time = startTime;
+                return subItems;
+            }
         }
 
         startItem.time = startTime;
