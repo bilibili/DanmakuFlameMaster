@@ -237,7 +237,7 @@ public class AndroidDisplayer implements IDisplayer {
             STROKE.setColor(danmaku.textShadowColor);
         }
         if (HAS_SHADOW) {
-            PAINT.setShadowLayer(2.0f, 2, 2, danmaku.textShadowColor);
+            PAINT.setShadowLayer(2.0f, 0, 0, danmaku.textShadowColor);
             SHADOW_HEIGHT = 4;
         } else {
             PAINT.clearShadowLayer();
