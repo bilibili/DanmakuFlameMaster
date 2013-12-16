@@ -67,6 +67,11 @@ public abstract class BaseDanmaku {
     public int textShadowColor;
 
     /**
+     * 下划线颜色,0表示无下划线
+     */
+    public int underlineColor = 0;
+
+    /**
      * 字体大小
      */
     public float textSize = -1;

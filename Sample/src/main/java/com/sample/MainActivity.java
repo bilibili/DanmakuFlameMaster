@@ -76,6 +76,7 @@ public class MainActivity extends Activity {
 					.openRawResource(R.raw.comments));
 			mDanmakuView.prepare(parser);
 
+            mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
             mDanmakuView.setOnClickListener(new View.OnClickListener() {
 
