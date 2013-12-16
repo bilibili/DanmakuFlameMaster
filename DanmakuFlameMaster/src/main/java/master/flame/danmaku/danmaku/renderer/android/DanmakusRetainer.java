@@ -72,6 +72,9 @@ public class DanmakusRetainer {
         if (rldrInstance != null) {
             rldrInstance.clear();
         }
+        if (lrdrInstance != null) {
+            lrdrInstance.clear();
+        }
         if (ftdrInstance != null) {
             ftdrInstance.clear();
         }
@@ -105,6 +108,11 @@ public class DanmakusRetainer {
                 boolean overwriteInsert = false;
                 while (it.hasNext()) {
                     BaseDanmaku item = it.next();
+
+                    if(item == drawItem){
+                        insertItem = item;
+                        break;
+                    }
 
                     if (firstItem == null)
                         firstItem = item;

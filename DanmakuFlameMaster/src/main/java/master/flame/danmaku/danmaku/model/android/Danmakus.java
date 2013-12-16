@@ -16,11 +16,12 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import java.util.*;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.util.DanmakuUtils;
+
+import java.util.*;
 
 public class Danmakus implements IDanmakus {
 
@@ -47,7 +48,7 @@ public class Danmakus implements IDanmakus {
         } else if (sortType == ST_BY_YPOS) {
             comparator = new YPosComparator();
         } else if (sortType == ST_BY_YPOS_DESC) {
-            comparator = new YposDescComparator();
+            comparator = new YPosDescComparator();
         }
         items = new TreeSet<BaseDanmaku>(comparator);
     }
@@ -98,6 +99,9 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public IDanmakus sub(long startTime, long endTime) {
+        if(items==null || items.size()==0){
+            return null;
+        }
         if (subItems == null) {
             subItems = new Danmakus();
         }
@@ -108,8 +112,24 @@ public class Danmakus implements IDanmakus {
             endItem = createItem("end");
         }
 
-        if (startTime >= startItem.time && endTime <= endItem.time && subItems != null) {
-            return subItems;
+        if (subItems != null) {
+            long dtime = startTime - startItem.time;
+            if (dtime >= 0 && endTime <= endItem.time) {
+                return subItems;
+            }
+
+//            if (dtime >= 0 && ((endItem.time - startTime) > dtime)) {
+//                startItem.time = startTime;
+//                Set<BaseDanmaku> retItems = ((SortedSet<BaseDanmaku>) subItems.items).subSet(
+//                        startItem, endItem);
+//                subItems.setItems(retItems);
+//                startItem.time = endItem.time + 1;
+//                endItem.time = endTime;
+//                retItems = ((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem);
+//                subItems.items.addAll(retItems);
+//                startItem.time = startTime;
+//                return subItems;
+//            }
         }
 
         startItem.time = startTime;
@@ -144,55 +164,25 @@ public class Danmakus implements IDanmakus {
     }
 
     private class TimeComparator implements Comparator<BaseDanmaku> {
-
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-            long val = obj1.time - obj2.time;
-            if (val > 0) {
-                return 1;
-            } else if (val < 0) {
-                return -1;
-            }
 
-            Integer t1 = obj1.getType();
-            Integer t2 = obj2.getType();
-            int result = t1.compareTo(t2);
-            if (result != 0) {
-                return result;
-            }
-
-            if (obj1.text == obj2.text) {
-                return 0;
-            }
-            if (obj1.text == null) {
-                return -1;
-            }
-            if (obj2.text == null) {
-                return 1;
-            }
-            return obj1.text.compareTo(obj2.text);
+            return DanmakuUtils.compare(obj1, obj2);
         }
     }
 
     private class YPosComparator implements Comparator<BaseDanmaku> {
-
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
             int result = Float.compare(obj1.getTop(), obj2.getTop());
             if (result != 0) {
                 return result;
             }
-            long val = obj1.time - obj2.time;
-            if (val > 0) {
-                result = 1;
-            } else if (val < 0) {
-                result = -1;
-            }
-            return result;
+            return DanmakuUtils.compare(obj1, obj2);
         }
     }
 
-    private class YposDescComparator implements Comparator<BaseDanmaku> {
+    private class YPosDescComparator implements Comparator<BaseDanmaku> {
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
 
@@ -200,13 +190,8 @@ public class Danmakus implements IDanmakus {
             if (result != 0) {
                 return result;
             }
-            long val = obj1.time - obj2.time;
-            if (val > 0) {
-                result = 1;
-            } else if (val < 0) {
-                result = -1;
-            }
-            return result;
+            return DanmakuUtils.compare(obj1, obj2);
         }
     }
+
 }

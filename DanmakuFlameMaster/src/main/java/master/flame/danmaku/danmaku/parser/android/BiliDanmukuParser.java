@@ -19,7 +19,6 @@ package master.flame.danmaku.danmaku.parser.android;
 import android.graphics.Color;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
@@ -91,7 +90,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
             tagName = tagName.toLowerCase().trim();
             if (tagName.equals("d")) {
                 String pValue = attributes.getValue("p");
-                // TODO: parse p value to danmaku
+                // parse p value to danmaku
                 String[] values = pValue.split(",");
                 if (values.length > 0) {
                     long time = (long) (Float.parseFloat(values[0]) * 1000); // 出现时间
@@ -99,10 +98,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     float textSize = Float.parseFloat(values[2]); // 字体大小
                     int color = Integer.parseInt(values[3]) | 0xFF000000; // 颜色
                     // int poolType = Integer.parseInt(values[5]); // 弹幕池类型（忽略
-                    item = DanmakuFactory.createDanmaku(type, mDispWidth);
+                    item = DanmakuFactory.createDanmaku(type, mDispWidth / (mDispDensity - 0.6f));
                     if (item != null) {
                         item.time = time;
-                        item.textSize = textSize * mDispDensity;
+                        item.textSize = textSize * (mDispDensity - 0.6f);
                         item.textColor = color;
                         item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
                     }
@@ -159,13 +158,13 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         endX = Float.parseFloat(textArr[7]);
                         endY = Float.parseFloat(textArr[8]);
                         translationDuration = Integer.parseInt(textArr[9]);
-                        translationStartDelay = (long) (Float.parseFloat(textArr[10]) * 1000);
+                        translationStartDelay = (long) (Float.parseFloat(textArr[10]));
                     }
                     item.duration = alphaDuraion;
                     item.rotationZ = rotateZ;
                     item.rotationY = rotateY;
-                    DanmakuFactory.fillTranslationData(item, mDispWidth, mDispHeight, beginX, beginY, endX,
-                            endY, translationDuration, translationStartDelay);
+                    DanmakuFactory.fillTranslationData(item, mDispWidth, mDispHeight, beginX,
+                            beginY, endX, endY, translationDuration, translationStartDelay);
                     DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
                 }
 

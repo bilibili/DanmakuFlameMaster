@@ -21,6 +21,7 @@ import android.graphics.Paint.Style;
 import android.text.TextPaint;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.Danmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
 /**
@@ -42,16 +43,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     private static Paint ALPHA_PAINT;
 
-    static {
-        PAINT = new TextPaint();
-        STROKE = new Paint();
-        ALPHA_PAINT = new Paint();
-        PAINT.setColor(Color.RED);
-        PAINT.setTextSize(50);
-        STROKE.setStrokeWidth(1.5f);
-        STROKE.setStyle(Style.FILL_AND_STROKE);
-        // TODO: load font from file
-    }
+    private static Paint UNDERLINE_PAINT;
 
     /**
      * 开启阴影，可动态改变
@@ -64,6 +56,11 @@ public class AndroidDisplayer implements IDisplayer {
     public static int SHADOW_HEIGHT = 0;
 
     /**
+     * 下划线高度
+     */
+    public static int UNDERLINE_HEIGHT = 4;
+
+    /**
      * 开启描边，可动态改变
      */
     public static boolean HAS_STROKE = false;
@@ -72,6 +69,19 @@ public class AndroidDisplayer implements IDisplayer {
      * 开启抗锯齿，可动态改变
      */
     public static boolean ANTI_ALIAS = true;
+
+    static {
+        PAINT = new TextPaint();
+        STROKE = new Paint();
+        ALPHA_PAINT = new Paint();
+        UNDERLINE_PAINT = new Paint();
+        UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
+        PAINT.setColor(Color.RED);
+        PAINT.setTextSize(50);
+        STROKE.setStrokeWidth(1.5f);
+        STROKE.setStyle(Style.FILL_AND_STROKE);
+        // TODO: load font from file
+    }
 
     public Canvas canvas;
 
@@ -225,6 +235,19 @@ public class AndroidDisplayer implements IDisplayer {
                 canvas.drawText(danmaku.text, left, top - STROKE.ascent(), STROKE);
             canvas.drawText(danmaku.text, left, top - paint.ascent() - SHADOW_HEIGHT, paint);
         }
+
+        // draw underline
+        if (danmaku.underlineColor != 0) {
+            Paint linePaint = getUnderlinePaint(danmaku);
+            float bottom = top + danmaku.paintHeight;
+            canvas.drawLine(left, bottom - UNDERLINE_HEIGHT, left + danmaku.paintWidth, bottom, linePaint);
+        }
+
+    }
+
+    public static Paint getUnderlinePaint(BaseDanmaku danmaku){
+        UNDERLINE_PAINT.setColor(danmaku.underlineColor);
+        return UNDERLINE_PAINT;
     }
 
     public static TextPaint getPaint(BaseDanmaku danmaku) {

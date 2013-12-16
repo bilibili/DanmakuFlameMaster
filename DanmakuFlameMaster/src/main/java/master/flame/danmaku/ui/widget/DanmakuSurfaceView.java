@@ -33,6 +33,7 @@ import master.flame.danmaku.controller.CacheManagingDrawTask;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
 import master.flame.danmaku.controller.IDrawTask;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
@@ -97,6 +98,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         init();
     }
 
+    public void addDanmaku(BaseDanmaku item) {
+        if(drawTask != null){
+            drawTask.addDanmaku(item);
+        }
+    }
+
     public void setCallback(Callback callback) {
         mCallback = callback;
     }
@@ -158,6 +165,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         mParser = parser;
     }
 
+    public boolean isPrepared(){
+        return handler!=null && handler.isPrepared();
+    }
+
     public void showFPS(boolean show){
         mShowFps = show;
     }
@@ -211,10 +222,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     public void start() {
+        start(0);
+    }
+
+    public void start(long postion) {
         if (handler == null) {
             prepare();
         }
-        handler.sendEmptyMessage(DrawHandler.START);
+        handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
     }
 
     @Override
@@ -282,6 +297,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         public void quit() {
             quitFlag = true;
+            removeCallbacksAndMessages(null);
         }
 
         public boolean isStop() {
@@ -308,7 +324,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 	}
                     break;
                 case START:
-                    pausedPostion = 0;
+                    pausedPostion = (Long) msg.obj;
                 case RESUME:
                     quitFlag = false;
                     if (mReady) {
@@ -322,6 +338,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 case SEEK_POS:
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
+                    drawTask.seek(System.currentTimeMillis() - mTimeBase);
                 case UPDATE:
                     long d = timer.update(System.currentTimeMillis() - mTimeBase);
                     if (mCallback != null) {
@@ -368,6 +385,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             } else {
                 runnable.run();
             }
+        }
+
+        public boolean isPrepared(){
+            return mReady;
         }
 
     }
