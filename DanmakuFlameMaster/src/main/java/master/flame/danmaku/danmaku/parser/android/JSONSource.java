@@ -50,7 +50,7 @@ public class JSONSource implements IDataSource<JSONArray>{
 	public JSONSource(Uri uri) throws IOException, JSONException {
 		String scheme = uri.getScheme();
         if (SCHEME_HTTP_TAG.equalsIgnoreCase(scheme) || SCHEME_HTTPS_TAG.equalsIgnoreCase(scheme)) {
-            init(new URL(uri.getPath()).openStream());
+            init(new URL(uri.toString()).openStream());
         } else if (SCHEME_FILE_TAG.equalsIgnoreCase(scheme)) {
             init(new FileInputStream(uri.getPath()));
         }
