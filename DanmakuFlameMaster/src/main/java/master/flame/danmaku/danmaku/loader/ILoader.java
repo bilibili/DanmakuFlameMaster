@@ -18,6 +18,8 @@ package master.flame.danmaku.danmaku.loader;
 
 import java.io.InputStream;
 
+import android.net.Uri;
+
 import master.flame.danmaku.danmaku.parser.IDataSource;
 
 public interface ILoader {
@@ -34,4 +36,6 @@ public interface ILoader {
      * @param in stream from Internet or local file
      */
     void load(InputStream in) throws IllegalDataException;
+
+    void loadData(String data) throws IllegalDataException;
 }

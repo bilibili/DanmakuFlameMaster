@@ -48,6 +48,15 @@ public class AcFunDanmakuLoader implements ILoader{
 			throw new IllegalDataException(e);
 		}
 	}
+
+    @Override
+    public void loadData(String data) throws IllegalDataException {
+        try {
+            dataSource = new JSONSource(data);
+        }catch(Exception e){
+            throw new IllegalDataException(e);
+        }
+    }
 	
 
 }

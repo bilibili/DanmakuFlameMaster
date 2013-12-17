@@ -22,7 +22,9 @@ import master.flame.danmaku.danmaku.parser.android.AndroidFileSource;
 
 import android.net.Uri;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 
 public class BiliDanmakuLoader implements ILoader {
 
@@ -59,5 +61,11 @@ public class BiliDanmakuLoader implements ILoader {
     @Override
     public AndroidFileSource getDataSource() {
         return dataSource;
+    }
+
+    @Override
+    public void loadData(String data) throws IllegalDataException {
+        ByteArrayInputStream stream = new ByteArrayInputStream(data.getBytes());
+        load(stream);
     }
 }
