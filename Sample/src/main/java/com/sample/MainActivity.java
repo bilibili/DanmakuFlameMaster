@@ -1,22 +1,24 @@
 package com.sample;
 
 import java.io.InputStream;
+
+import master.flame.danmaku.controller.DMSiteType;
+import master.flame.danmaku.danmaku.loader.ILoader;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.IDataSource;
+import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
-import android.view.*;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 import android.widget.VideoView;
-import master.flame.danmaku.danmaku.loader.ILoader;
-import master.flame.danmaku.danmaku.loader.IllegalDataException;
-import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.IDataSource;
-import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
-import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
-
-import com.sample.R;
 
 public class MainActivity extends Activity {
 
@@ -27,24 +29,32 @@ public class MainActivity extends Activity {
     private View mMediaController;
 
     public PopupWindow mPopupWindow;
+    
+    DMSiteType mType = DMSiteType.BILI;
+    
+    String mVideoPath = "/sdcard/0.mp4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (mVideoPath == null) {
+            Toast.makeText(this, "Please edit MainActivity sample, and set mVideoPath variable to your media file URL/path", Toast.LENGTH_LONG).show();
+            return;
+        }
         findViews();
+        
     }
-    
 	private BaseDanmakuParser createParser(InputStream stream) {
-		ILoader loader = DanmakuLoaderFactory
-				.create(DanmakuLoaderFactory.TAG_BILI);
+	    
+		ILoader loader = mType.getLoader();
 
 		try {
 			loader.load(stream);
 		} catch (IllegalDataException e) {
 			e.printStackTrace();
 		}
-		BaseDanmakuParser parser = new BiliDanmukuParser();
+		BaseDanmakuParser parser = mType.getParser();
 		IDataSource<?> dataSource = loader.getDataSource();
 		parser.load(dataSource);
 		return parser;
@@ -110,7 +120,7 @@ public class MainActivity extends Activity {
                      mDanmakuView.start();
                  }
              });
-            mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
+            mVideoView.setVideoPath(mVideoPath);
         }
 
 
