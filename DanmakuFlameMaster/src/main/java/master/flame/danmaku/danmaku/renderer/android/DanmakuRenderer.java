@@ -39,6 +39,10 @@ public class DanmakuRenderer extends Renderer {
 
             BaseDanmaku drawItem = itr.next();
 
+            if (drawItem.isTimeOut()) {
+                continue;
+            }
+
             // measure
             if (!drawItem.isMeasured()) {
                 drawItem.measure(disp);
@@ -48,7 +52,7 @@ public class DanmakuRenderer extends Renderer {
             DanmakusRetainer.fix(drawItem, disp);
 
             // draw
-            if (drawItem.isShown() && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0) {
+            if (drawItem.isOutside()==false && drawItem.isShown() && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0) {
 
                 drawItem.draw(disp);
 
