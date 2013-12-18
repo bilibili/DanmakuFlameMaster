@@ -31,8 +31,10 @@ public class MainActivity extends Activity {
     public PopupWindow mPopupWindow;
     
     DMSiteType mType = DMSiteType.BILI;
+    String mVideoPath = "http://f.youku.com/player/getFlvPath/sid/1387355677398_00/st/mp4/fileid/030008010052AF8EC8DF6B13A1F5D931F954B8-E615-896C-F13C-ADC840C07D71?K=302bf9e26b1554a02411a421,k2:1bc34fddf78cbd103";
+
+//    String mVideoPath = "/sdcard/Download/0.mp4";
     
-    String mVideoPath = "/sdcard/0.mp4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,22 +45,29 @@ public class MainActivity extends Activity {
             return;
         }
         findViews();
-        
+        loadDanmakus("http://comment.bilibili.tv/1269904.xml");
     }
-	private BaseDanmakuParser createParser(InputStream stream) {
+	private void loadDanmakus(final String url) {
 	    
-		ILoader loader = mType.getLoader();
-
-		try {
-			loader.load(stream);
-		} catch (IllegalDataException e) {
-			e.printStackTrace();
-		}
-		BaseDanmakuParser parser = mType.getParser();
-		IDataSource<?> dataSource = loader.getDataSource();
-		parser.load(dataSource);
-		return parser;
-
+		final ILoader loader = mType.getLoader();
+		new Thread(){
+		    public void run() {
+		        try {
+		            loader.load(url);
+		            runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            BaseDanmakuParser parser = mType.getParser();
+                            IDataSource<?> dataSource = loader.getDataSource();
+                            parser.load(dataSource);
+                            mDanmakuView.prepare(parser);
+                        }
+                    });
+		        } catch (IllegalDataException e) {
+		            e.printStackTrace();
+		        }
+		    }
+		}.start();
 	}
 
     private void findViews() {
@@ -82,10 +91,6 @@ public class MainActivity extends Activity {
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
-			BaseDanmakuParser parser = createParser(this.getResources()
-					.openRawResource(R.raw.comments));
-			mDanmakuView.prepare(parser);
-
             mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
             mDanmakuView.setOnClickListener(new View.OnClickListener() {

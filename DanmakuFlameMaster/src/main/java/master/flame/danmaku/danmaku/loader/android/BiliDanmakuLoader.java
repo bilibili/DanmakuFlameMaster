@@ -16,15 +16,13 @@
 
 package master.flame.danmaku.danmaku.loader.android;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.parser.android.AndroidFileSource;
-
 import android.net.Uri;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.StringReader;
 
 public class BiliDanmakuLoader implements ILoader {
 
@@ -48,7 +46,7 @@ public class BiliDanmakuLoader implements ILoader {
     public void load(String uri) throws IllegalDataException {
         try {
             this.uri = Uri.parse(uri);
-            dataSource = new AndroidFileSource(uri);
+            dataSource = new AndroidFileSource(this.uri);
         } catch (Exception e) {
         	throw new IllegalDataException(e);
         }
@@ -65,7 +63,7 @@ public class BiliDanmakuLoader implements ILoader {
 
     @Override
     public void loadData(String data) throws IllegalDataException {
-        ByteArrayInputStream stream = new ByteArrayInputStream(data.getBytes());
+        InputStream stream = new ByteArrayInputStream(data.getBytes());
         load(stream);
     }
 }
