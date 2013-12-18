@@ -87,6 +87,7 @@ public class CacheManagingDrawTask extends DrawTask {
     public void quit() {
         mCacheManager.end();
         super.quit();
+        reset();
     }
 
     @Override

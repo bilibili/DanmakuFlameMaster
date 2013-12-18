@@ -297,6 +297,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         public void quit() {
             quitFlag = true;
+            pausedPostion = timer.currMillisecond;
             removeCallbacksAndMessages(null);
         }
 
@@ -330,6 +331,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     if (mReady) {
                         mTimeBase = System.currentTimeMillis() - pausedPostion;
                         timer.update(pausedPostion);
+                        removeMessages(RESUME);
                         sendEmptyMessage(UPDATE);
                     } else {
                         sendEmptyMessageDelayed(RESUME, 100);
@@ -344,28 +346,16 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     if (mCallback != null) {
                         mCallback.updateTimer(timer);
                     }
-                    // long d = timer.lastInterval();
-                    if (d == 0) {
-                        if (!quitFlag)
-                            sendEmptyMessageDelayed(UPDATE, 10);
-                        return;
-                    }
-                    if (d < 15) {
-                        if (d < 10) {
-                            try {
-                                Thread.sleep(15 - d);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                    if (d < 10) {
+                        try {
+                            Thread.sleep(15 - d);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                     drawDanmakus();
                     if (!quitFlag)
                         sendEmptyMessage(UPDATE);
-                    else {
-                        pausedPostion = timer.currMillisecond;
-                        Log.i(TAG, "stop draw: current = " + pausedPostion);
-                    }
                     break;
             }
         }
