@@ -1,17 +1,16 @@
 
 package master.flame.danmaku.danmaku.parser.android;
 
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.graphics.Color;
-
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class AcFunDanmakuParser extends BaseDanmakuParser {
 
@@ -42,10 +41,10 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                     long time = (long) (Float.parseFloat(values[0]) * 1000); // 出现时间
                     int color = Integer.parseInt(values[1]) | 0xFF000000; // 颜色
                     float textSize = Float.parseFloat(values[3]); // 字体大小
-                    BaseDanmaku item = DanmakuFactory.createDanmaku(type, mDispWidth);
+                    BaseDanmaku item = DanmakuFactory.createDanmaku(type, mDispWidth/ (mDispDensity - 0.5f));
                     if (item != null) {
                         item.time = time;
-                        item.textSize = textSize * (mScaledDensity - 0.2f);
+                        item.textSize = textSize * (mScaledDensity - 0.5f);
                         item.textColor = color;
                         item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
                         item.text = obj.optString("m", "....");
