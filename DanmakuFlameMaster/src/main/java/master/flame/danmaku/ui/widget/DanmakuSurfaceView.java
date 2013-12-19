@@ -334,6 +334,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                                 Log.e(TAG, "something wrong..",e);
                                 Toast.makeText(getContext(), "Error: Please check logcat output for more details ", Toast.LENGTH_SHORT).show();
                             }
+                            /*
+                             * stop thread.
+                             */
+                            quit();
                         }
                 	}
                     break;
@@ -351,6 +355,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     break;
                 case SEEK_POS:
+                    if(quitFlag) break;
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                     drawTask.seek(System.currentTimeMillis() - mTimeBase);
