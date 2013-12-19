@@ -320,6 +320,12 @@ public class CacheManagingDrawTask extends DrawTask {
                     if (!item.hasDrawingCache()) {
                         try {
                             synchronized (danmakuList) {
+                                //guess cache size
+                                int cacheSize = DanmakuUtils.getCacheSize((int)item.paintWidth,(int)item.paintHeight);
+                                if (mRealSize + cacheSize > mMaxSize) {
+                                    break;
+                                }
+
                                 DrawingCache cache = mCachePool.acquire();
 
                                 DrawingCache newCache = DanmakuUtils.buildDanmakuDrawingCache(item,
