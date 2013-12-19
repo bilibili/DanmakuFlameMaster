@@ -260,6 +260,8 @@ public class CacheManagingDrawTask extends DrawTask {
                                 return;
                             } else if (waitTime > maxCacheDuration) {
                                 clearTimeOutCaches(mTimer.currMillisecond + maxCacheDuration);
+                            } else if(waitTime <0 ){
+                                evictAll();
                             }
                             mCacheTimer.update(mTimer.currMillisecond);
                             clearTimeOutCaches();
