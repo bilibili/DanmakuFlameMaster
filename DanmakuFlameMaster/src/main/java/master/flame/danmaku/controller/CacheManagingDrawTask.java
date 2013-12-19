@@ -208,10 +208,14 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         private synchronized void clearTimeOutCaches() {
+            clearTimeOutCaches(mTimer.currMillisecond);
+        }
+
+        private synchronized void clearTimeOutCaches(long time) {
             Iterator<BaseDanmaku> it = mCaches.iterator();
             while (it.hasNext()) {
                 BaseDanmaku val = it.next();
-                if (val.isTimeOut()) {
+                if (val.isTimeOut(time)) {
                     entryRemoved(false, val, null);
                     it.remove();
                 } else {
@@ -249,11 +253,13 @@ public class CacheManagingDrawTask extends DrawTask {
                     case BUILD_CACHES:
                         if (!mPause) {
                             long waitTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
+                            long maxCacheDuration =  DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
                             if (waitTime > 1000
-                                    && waitTime <= DanmakuFactory.MAX_DANMAKU_DURATION
-                                            * mScreenSize) {
+                                    && waitTime <= maxCacheDuration) {
                                 sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
                                 return;
+                            } else if (waitTime > maxCacheDuration) {
+                                clearTimeOutCaches(mTimer.currMillisecond + maxCacheDuration);
                             }
                             mCacheTimer.update(mTimer.currMillisecond);
                             clearTimeOutCaches();
@@ -350,7 +356,9 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
 
                 consumingTime = System.currentTimeMillis() - startTime;
-                mCacheTimer.add(consumingTime);
+                //mCacheTimer.add(consumingTime); it's wrong
+                if(item!=null)
+                    mCacheTimer.update(item.time);
 
                 return consumingTime;
             }
