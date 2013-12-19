@@ -94,8 +94,8 @@ public class CacheManagingDrawTask extends DrawTask {
         if (mCacheManager == null) {
             mCacheManager = new CacheManager(mMaxCacheSize, MAX_CACHE_SCREEN_SIZE);
             mCacheManager.begin();
-        } else if (mCacheManager.isPause()) {
-            mCacheManager.begin();
+        } else {
+            mCacheManager.resume();
         }
     }
 
@@ -174,6 +174,14 @@ public class CacheManagingDrawTask extends DrawTask {
             clearCachePool();
         }
 
+        public void resume() {
+            if (mHandler != null) {
+                mHandler.resume();
+            } else {
+                begin();
+            }
+        }
+
         private synchronized void evictAll() {
             if (mCaches != null) {
                 for (BaseDanmaku danmaku : mCaches) {
@@ -205,10 +213,6 @@ public class CacheManagingDrawTask extends DrawTask {
             while ((item = mCachePool.acquire()) != null) {
                 item.destroy();
             }
-        }
-
-        public boolean isPause() {
-            return mHandler.isPause();
         }
 
         private synchronized boolean push(BaseDanmaku item) {
