@@ -93,8 +93,8 @@ public class CacheManagingDrawTask extends DrawTask {
     public void start() {
         if (mCacheManager == null) {
             mCacheManager = new CacheManager(mMaxCacheSize, MAX_CACHE_SCREEN_SIZE);
-        }
-        if (mCacheManager.isPause()) {
+            mCacheManager.begin();
+        } else if (mCacheManager.isPause()) {
             mCacheManager.begin();
         }
     }
