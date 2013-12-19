@@ -333,6 +333,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                         timer.update(pausedPostion);
                         removeMessages(RESUME);
                         sendEmptyMessage(UPDATE);
+                        drawTask.start();
                     } else {
                         sendEmptyMessageDelayed(RESUME, 100);
                     }
