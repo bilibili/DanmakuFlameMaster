@@ -52,9 +52,9 @@ public class DrawingCacheHolder {
 
     public void recycle() {
         width = height = 0;
-        if (canvas != null) {
-            canvas = null;
-        }
+//        if (canvas != null) {
+//            canvas = null;
+//        }
         if (bitmap != null) {
             bitmap.recycle();
             bitmap = null;

@@ -38,6 +38,10 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class CacheManagingDrawTask extends DrawTask {
 
+    private static final int MAX_CACHE_SCREEN_SIZE = 2;
+
+    private int mMaxCacheSize = 2;
+
     private CacheManager mCacheManager;
 
     private DanmakuTimer mCacheTimer;
@@ -45,7 +49,8 @@ public class CacheManagingDrawTask extends DrawTask {
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
             TaskListener taskListener, int maxCacheSize) {
         super(timer, context, dispW, dispH, taskListener);
-        mCacheManager = new CacheManager(maxCacheSize, 2);
+        mMaxCacheSize = maxCacheSize;
+        mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
     }
 
     @Override
@@ -82,6 +87,16 @@ public class CacheManagingDrawTask extends DrawTask {
         mTimer.update(mills);
         mCacheTimer.update(mills);
         reset();
+    }
+
+    @Override
+    public void start() {
+        if (mCacheManager == null) {
+            mCacheManager = new CacheManager(mMaxCacheSize, MAX_CACHE_SCREEN_SIZE);
+        }
+        if (mCacheManager.isPause()) {
+            mCacheManager.begin();
+        }
     }
 
     @Override
@@ -156,6 +171,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 mThread = null;
             }
             evictAll();
+            clearCachePool();
         }
 
         private synchronized void evictAll() {
@@ -184,12 +200,15 @@ public class CacheManagingDrawTask extends DrawTask {
             return 0;
         }
 
-        public void resume() {
-            mHandler.sendEmptyMessage(CacheHandler.RESUME);
+        private void clearCachePool() {
+            DrawingCache item;
+            while ((item = mCachePool.acquire()) != null) {
+                item.destroy();
+            }
         }
 
-        public void pause() {
-            mHandler.sendEmptyMessage(CacheHandler.PAUSE);
+        public boolean isPause() {
+            return mHandler.isPause();
         }
 
         private synchronized boolean push(BaseDanmaku item) {
@@ -233,10 +252,6 @@ public class CacheManagingDrawTask extends DrawTask {
 
             public static final int BUILD_CACHES = 1;
 
-            public static final int PAUSE = 2;
-
-            public static final int RESUME = 3;
-
             private boolean mPause;
 
             public CacheHandler(android.os.Looper looper) {
@@ -273,13 +288,6 @@ public class CacheManagingDrawTask extends DrawTask {
                                 mTaskListener = null;
                             }
                         }
-                        break;
-                    case PAUSE:
-                        mPause = true;
-                        break;
-                    case RESUME:
-                        mPause = false;
-                        sendEmptyMessage(BUILD_CACHES);
                         break;
                     case ADD_DANMAKKU:
                         synchronized (danmakuList) {
@@ -379,11 +387,16 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             public void pause() {
-                sendEmptyMessage(PAUSE);
+                mPause = true;
             }
 
             public void resume() {
-                sendEmptyMessage(RESUME);
+                mPause = false;
+                sendEmptyMessage(BUILD_CACHES);
+            }
+
+            public boolean isPause() {
+                return mPause;
             }
         }
 

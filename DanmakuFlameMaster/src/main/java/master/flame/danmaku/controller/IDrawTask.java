@@ -31,6 +31,8 @@ public interface IDrawTask {
 
     public void seek(long mills);
 
+    public void start();
+
     public void quit();
 
     public void prepare();
