@@ -97,6 +97,10 @@ public class DanmakuUtils {
         return cache;
     }
 
+    public static int getCacheSize(int w,int h){
+        return w * h * 4;
+    }
+
     public static int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
         if (obj1 == obj2) {
             return 0;
