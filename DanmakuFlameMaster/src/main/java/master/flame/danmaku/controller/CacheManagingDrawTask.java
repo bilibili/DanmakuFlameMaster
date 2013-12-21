@@ -39,7 +39,7 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class CacheManagingDrawTask extends DrawTask {
 
-    private static final int MAX_CACHE_SCREEN_SIZE = 5;
+    private static final int MAX_CACHE_SCREEN_SIZE = 3;
 
     private int mMaxCacheSize = 2;
 
