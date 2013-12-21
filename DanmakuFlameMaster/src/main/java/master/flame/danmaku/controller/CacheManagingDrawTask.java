@@ -21,6 +21,7 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,7 +39,7 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class CacheManagingDrawTask extends DrawTask {
 
-    private static final int MAX_CACHE_SCREEN_SIZE = 2;
+    private static final int MAX_CACHE_SCREEN_SIZE = 5;
 
     private int mMaxCacheSize = 2;
 
@@ -47,7 +48,7 @@ public class CacheManagingDrawTask extends DrawTask {
     private DanmakuTimer mCacheTimer;
 
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
-            TaskListener taskListener, int maxCacheSize) {
+                                 TaskListener taskListener, int maxCacheSize) {
         super(timer, context, dispW, dispH, taskListener);
         mMaxCacheSize = maxCacheSize;
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
@@ -123,7 +124,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         DrawingCachePoolManager mCachePoolManager = new DrawingCachePoolManager();
 
-        Pool<DrawingCache> mCachePool = Pools.finitePool(mCachePoolManager, 300);
+        Pool<DrawingCache> mCachePool = Pools.finitePool(mCachePoolManager, 500);
 
         private int mMaxSize;
 
@@ -192,6 +193,18 @@ public class CacheManagingDrawTask extends DrawTask {
             mRealSize = 0;
         }
 
+        private synchronized void evictAllNotInScreen() {
+            if (mCaches != null) {
+                for (BaseDanmaku danmaku : mCaches) {
+                    if(danmaku.isOutside()){
+                        entryRemoved(true, danmaku, null);
+                    }
+                }
+                mCaches.clear();
+            }
+            mRealSize = 0;
+        }
+
         protected void entryRemoved(boolean evicted, BaseDanmaku oldValue, BaseDanmaku newValue) {
             mRealSize -= sizeOf(oldValue);
             if (oldValue.cache != null) {
@@ -242,8 +255,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 if (val.isTimeOut(time)) {
                     entryRemoved(false, val, null);
                     it.remove();
-                } else {
-                    break;
                 }
             }
         }
@@ -267,24 +278,28 @@ public class CacheManagingDrawTask extends DrawTask {
                 int what = msg.what;
                 switch (what) {
                     case PREPARE:
+                        evictAllNotInScreen();
                         for (int i = 0; i < 200; i++) {
                             mCachePool.release(new DrawingCache());
                         }
                     case BUILD_CACHES:
                         if (!mPause) {
+                            clearTimeOutCaches();
                             long waitTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                             long maxCacheDuration = DanmakuFactory.MAX_DANMAKU_DURATION
                                     * mScreenSize;
+//                            Log.e("cache remain", waitTime+"ms");
                             if (waitTime > 1000 && waitTime <= maxCacheDuration) {
                                 sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
                                 return;
                             } else if (waitTime > maxCacheDuration) {
                                 clearTimeOutCaches(mTimer.currMillisecond + maxCacheDuration);
-                            } else if (waitTime < -maxCacheDuration) {
+                            } else if (waitTime < -maxCacheDuration){
                                 evictAll();
                             }
-                            mCacheTimer.update(mTimer.currMillisecond);
-                            clearTimeOutCaches();
+                            if(waitTime < 0 || waitTime > maxCacheDuration){
+                                mCacheTimer.update(mTimer.currMillisecond + 1000);
+                            }
                             prepareCaches(mTaskListener == null);
                             sendEmptyMessage(BUILD_CACHES);
                             if (mTaskListener != null) {
@@ -317,9 +332,10 @@ public class CacheManagingDrawTask extends DrawTask {
 
                 BaseDanmaku item = null;
                 long consumingTime = 0;
+                int count = 0;
                 while (itr.hasNext()) {
                     item = itr.next();
-
+                    count++;
                     if (item.isTimeOut() || !item.isOutside()) {
                         continue;
                     }
@@ -347,18 +363,12 @@ public class CacheManagingDrawTask extends DrawTask {
                                 DrawingCache newCache = DanmakuUtils.buildDanmakuDrawingCache(item,
                                         mDisp, cache);
                                 item.cache = newCache;
-                                boolean quitLoop = false;
-                                if (mRealSize + newCache.size() > mMaxSize) {
-                                    quitLoop = true;
-                                }
                                 boolean pushed = mCacheManager.push(item);
                                 if (!pushed) {
                                     mCachePool.release(newCache);
                                     newCache.destroy();
                                     break;
                                 }
-                                if (quitLoop)
-                                    break;
                             }
 
                         } catch (OutOfMemoryError e) {
@@ -370,7 +380,8 @@ public class CacheManagingDrawTask extends DrawTask {
 
                     if (useTimeCounter) {
                         consumingTime = System.currentTimeMillis() - startTime;
-                        if (consumingTime >= DanmakuFactory.MAX_DANMAKU_DURATION) {
+
+                        if (consumingTime >= DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize) {
                             break;
                         }
                     }
@@ -378,15 +389,14 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
 
                 consumingTime = System.currentTimeMillis() - startTime;
-                // mCacheTimer.add(consumingTime); it's wrong
-                if (item != null)
+                if (item != null){
                     mCacheTimer.update(item.time);
-
+                    Log.i("cache", "stop at :"+item.time+","+count+",size:"+danmakus.size());
+                }
                 return consumingTime;
             }
 
             public void begin() {
-                // sendEmptyMessage(BUILD_CACHES);
                 sendEmptyMessage(PREPARE);
             }
 
