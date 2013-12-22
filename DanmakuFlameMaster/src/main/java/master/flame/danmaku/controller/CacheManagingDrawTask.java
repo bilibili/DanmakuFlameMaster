@@ -26,6 +26,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
@@ -46,6 +47,8 @@ public class CacheManagingDrawTask extends DrawTask {
     private CacheManager mCacheManager;
 
     private DanmakuTimer mCacheTimer;
+
+    private Object mDrawingNotify = new Object();
 
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
                                  TaskListener taskListener, int maxCacheSize) {
@@ -73,6 +76,9 @@ public class CacheManagingDrawTask extends DrawTask {
         synchronized (danmakuList) {
             super.draw(canvas);
         }
+        synchronized(mDrawingNotify){
+            mDrawingNotify.notify();
+        }
     }
 
     @Override
@@ -86,8 +92,10 @@ public class CacheManagingDrawTask extends DrawTask {
     @Override
     public void seek(long mills) {
         mTimer.update(mills);
-        mCacheTimer.update(mills);
-        reset();
+        if (mRenderer != null)
+            mRenderer.clear();
+        mCacheManager.evictAllNotInScreen();
+        mCacheManager.resume();
     }
 
     @Override
@@ -292,15 +300,15 @@ public class CacheManagingDrawTask extends DrawTask {
                             if (waitTime > 1000 && waitTime <= maxCacheDuration) {
                                 sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
                                 return;
-                            } else if (waitTime > maxCacheDuration) {
-                                clearTimeOutCaches(mTimer.currMillisecond + maxCacheDuration);
-                            } else if (waitTime < -maxCacheDuration){
+                            } else if (waitTime < 0){
                                 evictAll();
+                            } else if (getFirstCacheTime() - mTimer.currMillisecond > maxCacheDuration){
+                                evictAllNotInScreen();
                             }
                             if(waitTime < 0 || waitTime > maxCacheDuration){
-                                mCacheTimer.update(mTimer.currMillisecond + 1000);
+                                mCacheTimer.update(mTimer.currMillisecond + 100);
                             }
-                            prepareCaches(mTaskListener == null);
+                            prepareCaches(mTaskListener != null);
                             sendEmptyMessage(BUILD_CACHES);
                             if (mTaskListener != null) {
                                 mTaskListener.ready();
@@ -316,15 +324,13 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
             }
 
-            private long prepareCaches(boolean useTimeCounter) {
+            private long prepareCaches(boolean init) {
 
                 long curr = mCacheTimer.currMillisecond;
                 long startTime = System.currentTimeMillis();
-                Danmakus danmakus = null;
-                synchronized (danmakuList) {
-                    danmakus = (Danmakus) danmakuList.sub(curr, curr
-                            + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
-                }
+                Set<BaseDanmaku> danmakus = null;
+                danmakus = danmakuList.subset(curr, curr
+                        + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
 
                 if (danmakus == null || danmakus.size() == 0)
                     return 0;
@@ -333,7 +339,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 BaseDanmaku item = null;
                 long consumingTime = 0;
                 int count = 0;
-                while (itr.hasNext()) {
+                while (itr.hasNext() && !mPause) {
                     item = itr.next();
                     count++;
                     if (item.isTimeOut() || !item.isOutside()) {
@@ -342,46 +348,65 @@ public class CacheManagingDrawTask extends DrawTask {
 
                     // measure
                     if (!item.isMeasured()) {
-                        synchronized (danmakuList) {
-                            item.measure(mDisp);
-                        }
+                        item.measure(mDisp);
                     }
 
                     // build cache
                     if (!item.hasDrawingCache()) {
-                        try {
-                            synchronized (danmakuList) {
-                                // guess cache size
-                                int cacheSize = DanmakuUtils.getCacheSize((int) item.paintWidth,
-                                        (int) item.paintHeight);
-                                if (mRealSize + cacheSize > mMaxSize) {
-                                    break;
+
+                        if (!init) {
+                            try {
+                                synchronized (mDrawingNotify) {
+                                    mDrawingNotify.wait(100);
                                 }
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
-                                DrawingCache cache = mCachePool.acquire();
+                        try {
 
+                            // guess cache size
+                            int cacheSize = DanmakuUtils.getCacheSize((int) item.paintWidth,
+                                    (int) item.paintHeight);
+                            if (mRealSize + cacheSize > mMaxSize) {
+//                                    Log.d("cache", "break at MaxSize:"+mMaxSize);
+                                break;
+                            }
+
+                            DrawingCache cache = mCachePool.acquire();
+                            synchronized (danmakuList) {
                                 DrawingCache newCache = DanmakuUtils.buildDanmakuDrawingCache(item,
                                         mDisp, cache);
                                 item.cache = newCache;
                                 boolean pushed = mCacheManager.push(item);
                                 if (!pushed) {
+                                    item.cache = null;
                                     mCachePool.release(newCache);
                                     newCache.destroy();
+//                                  Log.d("cache", "break at push failed:"+mMaxSize);
                                     break;
                                 }
                             }
 
                         } catch (OutOfMemoryError e) {
+//                            Log.d("cache", "break at OutOfMemoryError");
                             break;
                         } catch (Exception e) {
+//                            Log.d("cache", "break at :"+e.getMessage());
                             break;
                         }
+
+
                     }
 
-                    if (useTimeCounter) {
+
+
+                    if (!init) {
                         consumingTime = System.currentTimeMillis() - startTime;
 
-                        if (consumingTime >= DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize) {
+                        if (consumingTime >= DanmakuFactory.COMMON_DANMAKU_DURATION) {
+//                            Log.d("cache", "break at consumingTime out:"+consumingTime);
                             break;
                         }
                     }
@@ -391,7 +416,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 consumingTime = System.currentTimeMillis() - startTime;
                 if (item != null){
                     mCacheTimer.update(item.time);
-                    Log.i("cache", "stop at :"+item.time+","+count+",size:"+danmakus.size());
+//                    Log.i("cache", "stop at :"+item.time+","+count+",size:"+danmakus.size());
                 }
                 return consumingTime;
             }
@@ -412,6 +437,13 @@ public class CacheManagingDrawTask extends DrawTask {
             public boolean isPause() {
                 return mPause;
             }
+        }
+
+        public long getFirstCacheTime() {
+            if(mCaches!=null && mCaches.size()>0){
+                return mCaches.get(0).time;
+            }
+            return 0;
         }
 
     }

@@ -24,7 +24,7 @@ public class AndroidCounter {
      */
     public void end(String tag) {
         end();
-        Log.e(tag, Long.toString(counter) + " ms");
+        Log.d(tag, Long.toString(counter) + " ms");
     }
 
     public AndroidCounter end() {
