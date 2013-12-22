@@ -88,6 +88,7 @@ public class DanmakuUtils {
             DrawingCache cache) {
         if (cache == null)
             cache = new DrawingCache();
+
         cache.build((int) danmaku.paintWidth + 2, (int) danmaku.paintHeight + 2,
                 disp.getDensityDpi());
         DrawingCacheHolder holder = cache.get();
@@ -97,13 +98,21 @@ public class DanmakuUtils {
         return cache;
     }
 
-    public static int getCacheSize(int w,int h){
-        return w * h * 4;
+    public static int getCacheSize(int w, int h) {
+        return (w + 2) * (h + 2) * 4;
     }
 
     public static int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
         if (obj1 == obj2) {
             return 0;
+        }
+
+        if (obj1 == null) {
+            return -1;
+        }
+
+        if (obj2 == null) {
+            return 1;
         }
 
         long val = obj1.time - obj2.time;

@@ -37,6 +37,10 @@ public class Danmakus implements IDanmakus {
 
     private BaseDanmaku startItem, endItem;
 
+    private BaseDanmaku endSubItem;
+
+    private BaseDanmaku startSubItem;
+
     public Danmakus() {
         this(ST_BY_TIME);
     }
@@ -96,10 +100,29 @@ public class Danmakus implements IDanmakus {
             items.remove(item);
         }
     }
+    
+    public Set<BaseDanmaku> subset(long startTime, long endTime) {
+        if (items == null || items.size() == 0) {
+            return null;
+        }
+        if (subItems == null) {
+            subItems = new Danmakus();
+        }
+        if (startSubItem == null) {
+            startSubItem = createItem("start");
+        }
+        if (endSubItem == null) {
+            endSubItem = createItem("end");
+        }
+
+        startSubItem.time = startTime;
+        endSubItem.time = endTime;
+        return ((SortedSet<BaseDanmaku>) items).subSet(startSubItem, endSubItem);
+    }
 
     @Override
     public IDanmakus sub(long startTime, long endTime) {
-        if(items==null || items.size()==0){
+        if (items == null || items.size() == 0) {
             return null;
         }
         if (subItems == null) {
@@ -118,18 +141,20 @@ public class Danmakus implements IDanmakus {
                 return subItems;
             }
 
-//            if (dtime >= 0 && ((endItem.time - startTime) > dtime)) {
-//                startItem.time = startTime;
-//                Set<BaseDanmaku> retItems = ((SortedSet<BaseDanmaku>) subItems.items).subSet(
-//                        startItem, endItem);
-//                subItems.setItems(retItems);
-//                startItem.time = endItem.time + 1;
-//                endItem.time = endTime;
-//                retItems = ((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem);
-//                subItems.items.addAll(retItems);
-//                startItem.time = startTime;
-//                return subItems;
-//            }
+            // if (dtime >= 0 && ((endItem.time - startTime) > dtime)) {
+            // startItem.time = startTime;
+            // Set<BaseDanmaku> retItems = ((SortedSet<BaseDanmaku>)
+            // subItems.items).subSet(
+            // startItem, endItem);
+            // subItems.setItems(retItems);
+            // startItem.time = endItem.time + 1;
+            // endItem.time = endTime;
+            // retItems = ((SortedSet<BaseDanmaku>) items).subSet(startItem,
+            // endItem);
+            // subItems.items.addAll(retItems);
+            // startItem.time = startTime;
+            // return subItems;
+            // }
         }
 
         startItem.time = startTime;
@@ -193,5 +218,6 @@ public class Danmakus implements IDanmakus {
             return DanmakuUtils.compare(obj1, obj2);
         }
     }
+
 
 }

@@ -346,10 +346,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     long d = timer.update(System.currentTimeMillis() - mTimeBase);
                     if (mCallback != null) {
                         mCallback.updateTimer(timer);
-                    }
-                    if (d == 0) {
-                        sendEmptyMessageDelayed(UPDATE, 10);
-                        return;
+                        d = timer.lastInterval();
                     }
                     if (d < 10) {
                         try {
