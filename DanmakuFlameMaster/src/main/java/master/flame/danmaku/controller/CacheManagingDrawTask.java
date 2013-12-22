@@ -51,7 +51,7 @@ public class CacheManagingDrawTask extends DrawTask {
     private Object mDrawingNotify = new Object();
 
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
-            TaskListener taskListener, int maxCacheSize) {
+                                 TaskListener taskListener, int maxCacheSize) {
         super(timer, context, dispW, dispH, taskListener);
         mMaxCacheSize = maxCacheSize;
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
@@ -200,7 +200,7 @@ public class CacheManagingDrawTask extends DrawTask {
             }
             mRealSize = 0;
         }
-        
+
         private synchronized void evictAllNotInScreen() {
             if (mCaches != null) {
                 for (BaseDanmaku danmaku : mCaches) {
@@ -329,8 +329,8 @@ public class CacheManagingDrawTask extends DrawTask {
                 long curr = mCacheTimer.currMillisecond;
                 long startTime = System.currentTimeMillis();
                 Set<BaseDanmaku> danmakus = null;
-                    danmakus = danmakuList.subset(curr, curr
-                            + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
+                danmakus = danmakuList.subset(curr, curr
+                        + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
 
                 if (danmakus == null || danmakus.size() == 0)
                     return 0;
@@ -345,7 +345,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     if (item.isTimeOut() || !item.isOutside()) {
                         continue;
                     }
-                    
+
                     // measure
                     if (!item.isMeasured()) {
                         item.measure(mDisp);
@@ -353,7 +353,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
                     // build cache
                     if (!item.hasDrawingCache()) {
-                        
+
                         if (!init) {
                             try {
                                 synchronized (mDrawingNotify) {
@@ -363,19 +363,19 @@ public class CacheManagingDrawTask extends DrawTask {
                                 e.printStackTrace();
                             }
                         }
-                        
+
                         try {
-                            
-                                // guess cache size
-                                int cacheSize = DanmakuUtils.getCacheSize((int) item.paintWidth,
-                                        (int) item.paintHeight);
-                                if (mRealSize + cacheSize > mMaxSize) {
+
+                            // guess cache size
+                            int cacheSize = DanmakuUtils.getCacheSize((int) item.paintWidth,
+                                    (int) item.paintHeight);
+                            if (mRealSize + cacheSize > mMaxSize) {
 //                                    Log.d("cache", "break at MaxSize:"+mMaxSize);
-                                    break;
-                                }
-                                
-                                DrawingCache cache = mCachePool.acquire();
-                                synchronized (danmakuList) {
+                                break;
+                            }
+
+                            DrawingCache cache = mCachePool.acquire();
+                            synchronized (danmakuList) {
                                 DrawingCache newCache = DanmakuUtils.buildDanmakuDrawingCache(item,
                                         mDisp, cache);
                                 item.cache = newCache;
@@ -396,10 +396,10 @@ public class CacheManagingDrawTask extends DrawTask {
 //                            Log.d("cache", "break at :"+e.getMessage());
                             break;
                         }
-                      
-                        
+
+
                     }
-                    
+
 
 
                     if (!init) {
