@@ -70,7 +70,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     private void init() {
-        setZOrderOnTop(true);
+        setZOrderMediaOverlay(true);
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
