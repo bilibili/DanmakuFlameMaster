@@ -327,6 +327,7 @@ public class CacheManagingDrawTask extends DrawTask {
             private long prepareCaches(boolean init) {
 
                 long curr = mCacheTimer.currMillisecond;
+                long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
                 long startTime = System.currentTimeMillis();
                 Set<BaseDanmaku> danmakus = null;
                 danmakus = danmakuList.subset(curr, curr
@@ -396,17 +397,12 @@ public class CacheManagingDrawTask extends DrawTask {
 //                            Log.d("cache", "break at :"+e.getMessage());
                             break;
                         }
-
-
                     }
-
-
 
                     if (!init) {
                         consumingTime = System.currentTimeMillis() - startTime;
-
                         if (consumingTime >= DanmakuFactory.COMMON_DANMAKU_DURATION) {
-//                            Log.d("cache", "break at consumingTime out:"+consumingTime);
+//                          Log.d("cache", "break at consumingTime out:"+consumingTime);
                             break;
                         }
                     }
@@ -414,9 +410,11 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
 
                 consumingTime = System.currentTimeMillis() - startTime;
-                if (item != null){
+                if (count == danmakus.size()) {
+                    mCacheTimer.update(end);
+                } else if (item != null) {
                     mCacheTimer.update(item.time);
-//                    Log.i("cache", "stop at :"+item.time+","+count+",size:"+danmakus.size());
+//                  Log.i("cache", "stop at :"+item.time+","+count+",size:"+danmakus.size());
                 }
                 return consumingTime;
             }
