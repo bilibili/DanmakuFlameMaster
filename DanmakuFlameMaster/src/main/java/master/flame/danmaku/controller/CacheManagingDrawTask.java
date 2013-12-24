@@ -36,6 +36,7 @@ import master.flame.danmaku.danmaku.model.android.DrawingCachePoolManager;
 import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Pools;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+import master.flame.danmaku.danmaku.util.AndroidCounter;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class CacheManagingDrawTask extends DrawTask {
@@ -323,14 +324,16 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                 }
             }
+            
+            AndroidCounter counter = new AndroidCounter();
 
             private long prepareCaches(boolean init) {
 
                 long curr = mCacheTimer.currMillisecond;
+                long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
                 long startTime = System.currentTimeMillis();
                 Set<BaseDanmaku> danmakus = null;
-                danmakus = danmakuList.subset(curr, curr
-                        + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
+                danmakus = danmakuList.subset(curr, end);
 
                 if (danmakus == null || danmakus.size() == 0)
                     return 0;
@@ -364,6 +367,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             }
                         }
 
+                        counter.begin();
                         try {
 
                             // guess cache size
@@ -392,21 +396,14 @@ public class CacheManagingDrawTask extends DrawTask {
                         } catch (OutOfMemoryError e) {
 //                            Log.d("cache", "break at OutOfMemoryError");
                             break;
-                        } catch (Exception e) {
-//                            Log.d("cache", "break at :"+e.getMessage());
-                            break;
                         }
-
-
+                        counter.end("build cache"+item.paintWidth);
                     }
-
-
 
                     if (!init) {
                         consumingTime = System.currentTimeMillis() - startTime;
-
                         if (consumingTime >= DanmakuFactory.COMMON_DANMAKU_DURATION) {
-//                            Log.d("cache", "break at consumingTime out:"+consumingTime);
+//                          Log.d("cache", "break at consumingTime out:"+consumingTime);
                             break;
                         }
                     }
@@ -414,9 +411,11 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
 
                 consumingTime = System.currentTimeMillis() - startTime;
-                if (item != null){
+                if (count == danmakus.size()) {
+                    mCacheTimer.update(end);
+                } else if (item != null) {
                     mCacheTimer.update(item.time);
-//                    Log.i("cache", "stop at :"+item.time+","+count+",size:"+danmakus.size());
+//                  Log.i("cache", "stop at :"+item.time+","+count+",size:"+danmakus.size());
                 }
                 return consumingTime;
             }

@@ -70,7 +70,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     private void init() {
-        setZOrderOnTop(true);
+//        setZOrderOnTop(true);
+        setZOrderMediaOverlay(true);
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
@@ -348,9 +349,9 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                         mCallback.updateTimer(timer);
                         d = timer.lastInterval();
                     }
-                    if (d < 10) {
+                    if (d < 12) {
                         try {
-                            Thread.sleep(15 - d);
+                            Thread.sleep(15 - d );
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

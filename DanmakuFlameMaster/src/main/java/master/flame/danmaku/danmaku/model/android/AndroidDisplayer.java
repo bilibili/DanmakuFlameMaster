@@ -77,6 +77,7 @@ public class AndroidDisplayer implements IDisplayer {
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
         PAINT.setColor(Color.RED);
         PAINT.setTextSize(50);
+        PAINT.setTypeface(Typeface.MONOSPACE);
         STROKE.setStrokeWidth(1.5f);
         STROKE.setStyle(Style.FILL_AND_STROKE);
         // TODO: load font from file
