@@ -21,7 +21,6 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,13 +29,11 @@ import java.util.Set;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCachePoolManager;
 import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Pools;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
-import master.flame.danmaku.danmaku.util.AndroidCounter;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class CacheManagingDrawTask extends DrawTask {
@@ -324,8 +321,6 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                 }
             }
-            
-            AndroidCounter counter = new AndroidCounter();
 
             private long prepareCaches(boolean init) {
 
@@ -333,7 +328,8 @@ public class CacheManagingDrawTask extends DrawTask {
                 long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
                 long startTime = System.currentTimeMillis();
                 Set<BaseDanmaku> danmakus = null;
-                danmakus = danmakuList.subset(curr, end);
+                danmakus = danmakuList.subset(curr, curr
+                        + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
 
                 if (danmakus == null || danmakus.size() == 0)
                     return 0;
@@ -367,7 +363,6 @@ public class CacheManagingDrawTask extends DrawTask {
                             }
                         }
 
-                        counter.begin();
                         try {
 
                             // guess cache size
@@ -396,8 +391,10 @@ public class CacheManagingDrawTask extends DrawTask {
                         } catch (OutOfMemoryError e) {
 //                            Log.d("cache", "break at OutOfMemoryError");
                             break;
+                        } catch (Exception e) {
+//                            Log.d("cache", "break at :"+e.getMessage());
+                            break;
                         }
-                        counter.end("build cache"+item.paintWidth);
                     }
 
                     if (!init) {

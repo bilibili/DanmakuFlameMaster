@@ -16,9 +16,12 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import java.util.HashMap;
+
 import android.graphics.*;
 import android.graphics.Paint.Style;
 import android.text.TextPaint;
+import android.util.Log;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -31,6 +34,8 @@ public class AndroidDisplayer implements IDisplayer {
     private Camera camera = new Camera();
 
     private Matrix matrix = new Matrix();
+    
+    private HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>();
 
     private int HIT_CACHE_COUNT = 0;
 
@@ -48,11 +53,6 @@ public class AndroidDisplayer implements IDisplayer {
      * 开启阴影，可动态改变
      */
     public static boolean HAS_SHADOW = true;
-
-    /**
-     * 阴影高度
-     */
-    public static int SHADOW_HEIGHT = 0;
 
     /**
      * 下划线高度
@@ -159,7 +159,7 @@ public class AndroidDisplayer implements IDisplayer {
                     // canvas.translate(left, top);
                     // canvas.drawBitmap(holder.bitmap, 0, 0, null);
                     // canvas.restore();
-                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);
+                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint); //Fixme check draw rect
                     cacheDrawn = true;
                 }
             }
@@ -216,24 +216,24 @@ public class AndroidDisplayer implements IDisplayer {
             ANTI_ALIAS = true;
         }
         TextPaint paint = getPaint(danmaku);
-        if (danmaku.paintHeight > danmaku.textSize) {
-            String[] titleArr = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);
+        if (danmaku.text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
+            String[] titleArr = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR); //Fixme reduce new object
             if (titleArr.length == 1) {
                 if (HAS_STROKE)
                     canvas.drawText(titleArr[0], left, top - STROKE.ascent(), STROKE);
-                canvas.drawText(titleArr[0], left, top - paint.ascent() - SHADOW_HEIGHT, paint);
+                canvas.drawText(titleArr[0], left, top - paint.ascent(), paint);
             } else {
                 for (int t = 0; t < titleArr.length; t++) {
                     if (titleArr[t].length() > 0) {
                         canvas.drawText(titleArr[t], left,
-                                t * danmaku.textSize + top - paint.ascent() - SHADOW_HEIGHT, paint);
+                                t * danmaku.textSize + top - paint.ascent(), paint);
                     }
                 }
             }
         } else {
             if (HAS_STROKE)
                 canvas.drawText(danmaku.text, left, top - STROKE.ascent(), STROKE);
-            canvas.drawText(danmaku.text, left, top - paint.ascent() - SHADOW_HEIGHT, paint);
+            canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
         }
 
         // draw underline
@@ -261,10 +261,8 @@ public class AndroidDisplayer implements IDisplayer {
         }
         if (HAS_SHADOW) {
             PAINT.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
-            SHADOW_HEIGHT = 4;
         } else {
             PAINT.clearShadowLayer();
-            SHADOW_HEIGHT = 0;
         }
         return PAINT;
     }
@@ -279,7 +277,13 @@ public class AndroidDisplayer implements IDisplayer {
 
     private float[] calcPaintWH(String text, TextPaint paint) {
         float w = 0;
-        float textHeight = paint.getTextSize();
+        Float textSize = paint.getTextSize();
+        Float textHeight = TextHeightCache.get(textSize);
+        if(textHeight == null){
+            Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+            textHeight = fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading;
+            TextHeightCache.put(textSize, textHeight);
+        }        
         if (!text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
             w = paint.measureText(text);
             return new float[] {
