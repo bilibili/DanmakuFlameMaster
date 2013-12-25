@@ -16,9 +16,12 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import java.util.HashMap;
+
 import android.graphics.*;
 import android.graphics.Paint.Style;
 import android.text.TextPaint;
+import android.util.Log;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -31,6 +34,8 @@ public class AndroidDisplayer implements IDisplayer {
     private Camera camera = new Camera();
 
     private Matrix matrix = new Matrix();
+    
+    private HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>();
 
     private int HIT_CACHE_COUNT = 0;
 
@@ -271,8 +276,13 @@ public class AndroidDisplayer implements IDisplayer {
 
     private float[] calcPaintWH(String text, TextPaint paint) {
         float w = 0;
-        Paint.FontMetrics fontMetrics = paint.getFontMetrics();
-        float textHeight = fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading;
+        Float textSize = paint.getTextSize();
+        Float textHeight = TextHeightCache.get(textSize);
+        if(textHeight == null){
+            Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+            textHeight = fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading;
+            TextHeightCache.put(textSize, textHeight);
+        }        
         if (!text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
             w = paint.measureText(text);
             return new float[] {
