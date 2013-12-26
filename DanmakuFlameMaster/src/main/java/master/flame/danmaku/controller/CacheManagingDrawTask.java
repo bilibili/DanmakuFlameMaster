@@ -317,7 +317,7 @@ Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
                                 mCacheTimer.update(mTimer.currMillisecond + 100);
                             }
                             prepareCaches(mTaskListener != null);
-                            sendEmptyMessage(BUILD_CACHES);
+                            sendEmptyMessageDelayed(BUILD_CACHES,100);
                             if (mTaskListener != null) {
                                 mTaskListener.ready();
                                 mTaskListener = null;
@@ -355,6 +355,7 @@ Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
                 BaseDanmaku item = null;
                 long consumingTime = 0;
                 int count = 0;
+                boolean isCachePoolFull = false;
                 while (itr.hasNext() && !mPause) {
                     item = itr.next();
                     count++;
@@ -387,6 +388,7 @@ Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
                                     (int) item.paintHeight);
                             if (mRealSize + cacheSize > mMaxSize) {
 //                                    Log.d("cache", "break at MaxSize:"+mMaxSize);
+                                isCachePoolFull = true;
                                 break;
                             }
 
@@ -400,12 +402,14 @@ Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
                                     item.cache = null;
                                     mCachePool.release(newCache);
                                     newCache.destroy();
+                                    isCachePoolFull = true;
 //                                  Log.d("cache", "break at push failed:"+mMaxSize);
                                     break;
                                 }
                             }
 
                         } catch (OutOfMemoryError e) {
+                            isCachePoolFull = true;
 //                            Log.d("cache", "break at OutOfMemoryError");
                             break;
                         } catch (Exception e) {
@@ -425,11 +429,11 @@ Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
                 }
 
                 consumingTime = System.currentTimeMillis() - startTime;
-                if (count == danmakus.size()) {
+                if (isCachePoolFull || count == danmakus.size()) {
                     mCacheTimer.update(end);
                 } else if (item != null) {
                     mCacheTimer.update(item.time);
-//                  Log.i("cache", "stop at :"+item.time+","+count+",size:"+danmakus.size());
+//                    Log.i("cache","stop at :"+item.time+","+count+",size:"+danmakus.size());
                 }
                 return consumingTime;
             }
