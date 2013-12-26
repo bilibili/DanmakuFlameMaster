@@ -100,7 +100,7 @@ public class Danmakus implements IDanmakus {
             items.remove(item);
         }
     }
-    
+
     public Set<BaseDanmaku> subset(long startTime, long endTime) {
         if (items == null || items.size() == 0) {
             return null;
@@ -219,5 +219,20 @@ public class Danmakus implements IDanmakus {
         }
     }
 
+    @Override
+    public BaseDanmaku first() {
+        if (items != null) {
+            return ((SortedSet<BaseDanmaku>) items).first();
+        }
+        return null;
+    }
+
+    @Override
+    public BaseDanmaku last() {
+        if (items != null) {
+            return ((SortedSet<BaseDanmaku>) items).last();
+        }
+        return null;
+    }
 
 }

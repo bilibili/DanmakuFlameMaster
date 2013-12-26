@@ -128,7 +128,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         public HandlerThread mThread;
 
-        List<BaseDanmaku> mCaches = new ArrayList<BaseDanmaku>();
+        Danmakus mCaches = new Danmakus();
 
         DrawingCachePoolManager mCachePoolManager = new DrawingCachePoolManager();
 
@@ -166,8 +166,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         public void end() {
             if (mHandler != null) {
-                mHandler.pause();
-                mHandler.removeCallbacksAndMessages(null);
+                mHandler.pause();                
                 mHandler = null;
             }
             if (mThread != null) {
@@ -193,7 +192,9 @@ public class CacheManagingDrawTask extends DrawTask {
 
         private synchronized void evictAll() {
             if (mCaches != null) {
-                for (BaseDanmaku danmaku : mCaches) {
+                Iterator<BaseDanmaku> it = mCaches.iterator();
+                while(it.hasNext()) {
+                    BaseDanmaku danmaku = it.next();
                     entryRemoved(true, danmaku, null);
                 }
                 mCaches.clear();
@@ -203,7 +204,9 @@ public class CacheManagingDrawTask extends DrawTask {
 
         private synchronized void evictAllNotInScreen() {
             if (mCaches != null) {
-                for (BaseDanmaku danmaku : mCaches) {
+                Iterator<BaseDanmaku> it = mCaches.iterator();
+                while(it.hasNext()) {
+                    BaseDanmaku danmaku = it.next();
                     if(danmaku.isOutside()){
                         entryRemoved(true, danmaku, null);
                     }
@@ -216,8 +219,8 @@ public class CacheManagingDrawTask extends DrawTask {
         protected void entryRemoved(boolean evicted, BaseDanmaku oldValue, BaseDanmaku newValue) {
             mRealSize -= sizeOf(oldValue);
             if (oldValue.cache != null) {
-                mCachePool.release((DrawingCache) oldValue.cache);
                 oldValue.cache.destroy();
+                mCachePool.release((DrawingCache) oldValue.cache);
                 oldValue.cache = null;
             }
         }
@@ -239,15 +242,15 @@ public class CacheManagingDrawTask extends DrawTask {
         private synchronized boolean push(BaseDanmaku item) {
             int size = sizeOf(item);
             while (mRealSize + size > mMaxSize && mCaches.size() > 0) {
-                BaseDanmaku oldValue = mCaches.get(0);
+                BaseDanmaku oldValue = mCaches.first();
                 if (oldValue.isTimeOut()) {
                     entryRemoved(false, oldValue, item);
-                    mCaches.remove(oldValue);
+                    mCaches.removeItem(oldValue);
                 } else {
                     return false;
                 }
             }
-            this.mCaches.add(item);
+            this.mCaches.addItem(item);
             mRealSize += size;
             return true;
         }
@@ -257,23 +260,29 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         private synchronized void clearTimeOutCaches(long time) {
+Log.e("mCaches size", mCaches.size()+" before/"+mRealSize);
             Iterator<BaseDanmaku> it = mCaches.iterator();
             while (it.hasNext()) {
                 BaseDanmaku val = it.next();
                 if (val.isTimeOut(time)) {
                     entryRemoved(false, val, null);
                     it.remove();
+                }else{
+                    break;
                 }
             }
+Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
         }
 
         public class CacheHandler extends Handler {
 
-            private static final int PREPARE = 4;
+            private static final int PREPARE = 0x1;
 
-            public static final int ADD_DANMAKKU = 5;
+            public static final int ADD_DANMAKKU = 0x2;
 
-            public static final int BUILD_CACHES = 1;
+            public static final int BUILD_CACHES = 0x3;
+
+            private static final int CLEAR_CACHES = 0x4;
 
             private boolean mPause;
 
@@ -292,7 +301,6 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
                     case BUILD_CACHES:
                         if (!mPause) {
-                            clearTimeOutCaches();
                             long waitTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                             long maxCacheDuration = DanmakuFactory.MAX_DANMAKU_DURATION
                                     * mScreenSize;
@@ -319,6 +327,13 @@ public class CacheManagingDrawTask extends DrawTask {
                     case ADD_DANMAKKU:
                         synchronized (danmakuList) {
                             CacheManagingDrawTask.super.addDanmaku((BaseDanmaku) msg.obj);
+                        }
+                        break;
+                    case CLEAR_CACHES:
+                        if (!mPause) {
+                            clearTimeOutCaches();
+                            removeMessages(CLEAR_CACHES);
+                            sendEmptyMessageDelayed(CLEAR_CACHES, DanmakuFactory.MAX_DANMAKU_DURATION);
                         }
                         break;
                 }
@@ -421,15 +436,18 @@ public class CacheManagingDrawTask extends DrawTask {
 
             public void begin() {
                 sendEmptyMessage(PREPARE);
+                sendEmptyMessageDelayed(CLEAR_CACHES, DanmakuFactory.MAX_DANMAKU_DURATION);
             }
 
             public void pause() {
                 mPause = true;
+                removeCallbacksAndMessages(null);
             }
 
             public void resume() {
                 mPause = false;
                 sendEmptyMessage(BUILD_CACHES);
+                sendEmptyMessageDelayed(CLEAR_CACHES, DanmakuFactory.MAX_DANMAKU_DURATION);
             }
 
             public boolean isPause() {
@@ -439,7 +457,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         public long getFirstCacheTime() {
             if(mCaches!=null && mCaches.size()>0){
-                return mCaches.get(0).time;
+                return mCaches.first().time;
             }
             return 0;
         }
