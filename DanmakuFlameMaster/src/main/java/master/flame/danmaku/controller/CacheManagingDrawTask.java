@@ -260,18 +260,25 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         private synchronized void clearTimeOutCaches(long time) {
-Log.e("mCaches size", mCaches.size()+" before/"+mRealSize);
+//Log.e("mCaches size", mCaches.size()+" before/"+mRealSize);
             Iterator<BaseDanmaku> it = mCaches.iterator();
             while (it.hasNext()) {
                 BaseDanmaku val = it.next();
                 if (val.isTimeOut(time)) {
+                    try {
+                        synchronized (mDrawingNotify) {
+                            mDrawingNotify.wait(20);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     entryRemoved(false, val, null);
                     it.remove();
                 }else{
                     break;
                 }
             }
-Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
+//Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
         }
 
         public class CacheHandler extends Handler {
@@ -358,7 +365,7 @@ Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
                 boolean isCachePoolFull = false;
                 while (itr.hasNext() && !mPause) {
                     item = itr.next();
-                    count++;
+                    count++;                   
                     if (item.isTimeOut() || !item.isOutside()) {
                         continue;
                     }
@@ -431,6 +438,7 @@ Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
                 consumingTime = System.currentTimeMillis() - startTime;
                 if (isCachePoolFull || count == danmakus.size()) {
                     mCacheTimer.update(end);
+                    sendEmptyMessage(CLEAR_CACHES);
                 } else if (item != null) {
                     mCacheTimer.update(item.time);
 //                    Log.i("cache","stop at :"+item.time+","+count+",size:"+danmakus.size());

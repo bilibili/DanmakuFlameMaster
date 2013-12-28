@@ -349,15 +349,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                         d = timer.lastInterval();
                     }
                     if (d < 10) {
-                        try {
-                            Thread.sleep(15 - d);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        removeMessages(UPDATE);
+                        sendEmptyMessageDelayed(UPDATE, 10-d);
                     }
                     drawDanmakus();
-                    if (!quitFlag)
+                    if (!quitFlag){
+                        removeMessages(UPDATE);
                         sendEmptyMessage(UPDATE);
+                    }
                     break;
             }
         }
