@@ -8,17 +8,49 @@ import android.graphics.Bitmap;
 public class NativeBitmapFactory {
 
     static Field nativeIntField = null;
+
     static Field nativeBitmapField;
-    
+
+    static boolean nativeLibLoaded = false;
+
     static {
         try {
-            System.loadLibrary("ndkbitmap");
+            int sdkInt = android.os.Build.VERSION.SDK_INT;
+            if (sdkInt >= 11 && sdkInt <= 13) {
+                System.loadLibrary("ndkbitmap.11");
+                nativeLibLoaded = true;
+            } else if (android.os.Build.VERSION.SDK_INT == 14) {
+                System.loadLibrary("ndkbitmap.14");
+                nativeLibLoaded = true;
+            } else if (android.os.Build.VERSION.SDK_INT == 15) {
+                System.loadLibrary("ndkbitmap.15");
+                nativeLibLoaded = true;
+            } else if (android.os.Build.VERSION.SDK_INT == 16) {
+                System.loadLibrary("ndkbitmap.16");
+                nativeLibLoaded = true;
+            } else if (android.os.Build.VERSION.SDK_INT == 17) {
+                System.loadLibrary("ndkbitmap.17");
+                nativeLibLoaded = true;
+            } else if (android.os.Build.VERSION.SDK_INT == 18) {
+                System.loadLibrary("ndkbitmap.18");
+                nativeLibLoaded = true;
+            } else if (android.os.Build.VERSION.SDK_INT == 19) {
+                System.loadLibrary("ndkbitmap.19");
+                nativeLibLoaded = true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            nativeLibLoaded = false;
         }
-        initField();
+        if (nativeLibLoaded) {
+            initField();
+            boolean confirm = testLib();
+            if (!confirm) {
+                // 测试so文件函数调用失败
+                nativeLibLoaded = false;
+            }
+        }
     }
-
 
     static void initField() {
         try {
@@ -29,6 +61,22 @@ public class NativeBitmapFactory {
         } catch (NoSuchFieldException e) {
             nativeIntField = null;
             e.printStackTrace();
+        }
+    }
+
+    private static boolean testLib() {
+        Bitmap bitmap = null;
+        try {
+            bitmap = createBitmap(2, 2, Bitmap.Config.ARGB_8888);
+            boolean result = bitmap != null && bitmap.getWidth() == 2 && bitmap.getHeight() == 2;
+            return result;
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (bitmap != null) {
+                bitmap.recycle();
+                bitmap = null;
+            }
         }
     }
 
@@ -46,8 +94,8 @@ public class NativeBitmapFactory {
         }
         return 0;
     }
-    
-    public static int getNativeBitmap(Bitmap bitmap){
+
+    public static int getNativeBitmap(Bitmap bitmap) {
         try {
             if (nativeBitmapField == null) {
                 return 0;
@@ -65,20 +113,29 @@ public class NativeBitmapFactory {
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config) {
         return createBitmap(width, height, config, config.equals(Bitmap.Config.ARGB_8888));
     }
-    
-    public static void recycle(Bitmap bitmap){
+
+    public static void recycle(Bitmap bitmap) {
         bitmap.recycle();
     }
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
+        if (!nativeLibLoaded) {
+            return Bitmap.createBitmap(width, height, config);
+        }
+
         int nativeConfig = getNativeConfig(config);
         if (nativeConfig == 0) {
             return null;
         }
-        return createBitmap(width, height, nativeConfig, hasAlpha);
+        return android.os.Build.VERSION.SDK_INT == 19 ? createBitmap19(width, height, nativeConfig, hasAlpha) : createBitmap(width, height, nativeConfig, hasAlpha);
     }
 
+    // ///////////native methods//////////
+
     private static native Bitmap createBitmap(int width, int height, int nativeConfig,
+            boolean hasAlpha);
+
+    private static native Bitmap createBitmap19(int width, int height, int nativeConfig,
             boolean hasAlpha);
 
 }

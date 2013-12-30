@@ -343,17 +343,24 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     mTimeBase -= deltaMs;
                     drawTask.seek(System.currentTimeMillis() - mTimeBase);
                 case UPDATE:
-                    long d = timer.update(System.currentTimeMillis() - mTimeBase);
+                    long startMS = System.currentTimeMillis();
+                    long d = timer.update(startMS - mTimeBase);
                     if (mCallback != null) {
                         mCallback.updateTimer(timer);
-                        d = timer.lastInterval();
                     }
-                    if (d < 10) {
+                    if(d<=0){
                         removeMessages(UPDATE);
-                        sendEmptyMessageDelayed(UPDATE, 10-d);
+                        sendEmptyMessageDelayed(UPDATE, 15 - d);
+                        break;
                     }
                     drawDanmakus();
-                    if (!quitFlag){
+                    d = System.currentTimeMillis() - startMS;
+                    if (!quitFlag) {
+                        if (d < 12) {
+                            removeMessages(UPDATE);
+                            sendEmptyMessageDelayed(UPDATE, 15 - d);
+                            break;
+                        }
                         removeMessages(UPDATE);
                         sendEmptyMessage(UPDATE);
                     }
