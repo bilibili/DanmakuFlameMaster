@@ -82,7 +82,6 @@ public class DrawTask implements IDrawTask {
         synchronized (danmakuList){
             item.setTimer(mTimer);
             item.index = danmakuList.size();
-            item.underlineColor = Color.RED;
             danmakuList.addItem(item);
         }
     }
