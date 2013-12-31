@@ -45,6 +45,11 @@ public abstract class BaseDanmaku {
      * 文本
      */
     public String text;
+    
+    /**
+     * 多行文本: 如果有包含换行符需事先拆分到lines
+     */
+    public String[] lines;
 
     /**
      * 文本颜色

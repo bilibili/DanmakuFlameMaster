@@ -69,6 +69,9 @@ public class NativeBitmapFactory {
         try {
             bitmap = createBitmap(2, 2, Bitmap.Config.ARGB_8888);
             boolean result = bitmap != null && bitmap.getWidth() == 2 && bitmap.getHeight() == 2;
+            if(result && android.os.Build.VERSION.SDK_INT>=17){
+                result = bitmap.isPremultiplied();
+            }
             return result;
         } catch (Exception e) {
             return false;

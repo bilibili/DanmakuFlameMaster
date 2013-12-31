@@ -35,7 +35,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     private Matrix matrix = new Matrix();
     
-    private HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>();
+    private static HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>();
 
     private int HIT_CACHE_COUNT = 0;
 
@@ -216,17 +216,18 @@ public class AndroidDisplayer implements IDisplayer {
             ANTI_ALIAS = true;
         }
         TextPaint paint = getPaint(danmaku);
-        if (danmaku.text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
-            String[] titleArr = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR); //Fixme reduce new object
-            if (titleArr.length == 1) {
+        if (danmaku.lines != null) {
+            String[] lines = danmaku.lines;
+            if (lines.length == 1) {
                 if (HAS_STROKE)
-                    canvas.drawText(titleArr[0], left, top - STROKE.ascent(), STROKE);
-                canvas.drawText(titleArr[0], left, top - paint.ascent(), paint);
+                    canvas.drawText(lines[0], left, top - STROKE.ascent(), STROKE);
+                canvas.drawText(lines[0], left, top - paint.ascent(), paint);
             } else {
-                for (int t = 0; t < titleArr.length; t++) {
-                    if (titleArr[t].length() > 0) {
-                        canvas.drawText(titleArr[t], left,
-                                t * danmaku.textSize + top - paint.ascent(), paint);
+                Float textHeight = getTextHeight(paint);
+                for (int t = 0; t < lines.length; t++) {
+                    if (lines[t].length() > 0) {
+                        canvas.drawText(lines[t], left,
+                                t * textHeight + top - paint.ascent(), paint);
                     }
                 }
             }
@@ -270,54 +271,39 @@ public class AndroidDisplayer implements IDisplayer {
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
-        float[] wh = calcPaintWH(danmaku.text, paint);
-        danmaku.paintWidth = wh[0]; // paint.measureText(danmaku.text);
-        danmaku.paintHeight = wh[1]; // paint.getTextSize();
+        calcPaintWH(danmaku, paint);
+    }   
+    
+    private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
+        float w = 0;
+        Float textHeight = getTextHeight(paint);
+        if (danmaku.lines == null) {
+            w = paint.measureText(danmaku.text);
+            danmaku.paintWidth = w;
+            danmaku.paintHeight = textHeight;
+            return;
+        }
+
+        for(String tempStr : danmaku.lines){
+            if (tempStr.length() > 0) {
+                float tr = paint.measureText(tempStr);
+                w = Math.max(tr, w);
+            }
+        }
+
+        danmaku.paintWidth = w;
+        danmaku.paintHeight = danmaku.lines.length * textHeight;
     }
 
-    private float[] calcPaintWH(String text, TextPaint paint) {
-        float w = 0;
+    private static Float getTextHeight(TextPaint paint) {
         Float textSize = paint.getTextSize();
         Float textHeight = TextHeightCache.get(textSize);
         if(textHeight == null){
             Paint.FontMetrics fontMetrics = paint.getFontMetrics();
             textHeight = fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading;
             TextHeightCache.put(textSize, textHeight);
-        }        
-        if (!text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
-            w = paint.measureText(text);
-            return new float[] {
-                    w, textHeight
-            };
-        }
-
-        int stPos = 0, endPos = -1;
-        String tempStr;
-        int t = 0;
-
-        while ((endPos = text.indexOf(BaseDanmaku.DANMAKU_BR_CHAR, stPos)) != -1) {
-            t++;
-            tempStr = text.substring(stPos, endPos);
-            if (tempStr.length() > 0) {
-                float tr = paint.measureText(tempStr);
-                if (tr > 0) {
-                    w = tr > w ? tr : w;
-                }
-            }
-            stPos = endPos + 2;
-        }
-        if (stPos < text.length() - 1) {
-            t++;
-            tempStr = text.substring(stPos);
-            if (tempStr.equals(BaseDanmaku.DANMAKU_BR_CHAR) == false && tempStr.length() > 0) {
-                float tr = paint.measureText(tempStr);
-                w = Math.max(tr, w);
-            }
-        }
-
-        return new float[] {
-                w, (t + 1) * textHeight
-        };
+        }  
+        return textHeight;
     }
 
     @Override

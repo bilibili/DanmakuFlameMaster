@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.danmaku.parser;
 
+import android.text.TextUtils;
 import master.flame.danmaku.danmaku.model.*;
 
 public class DanmakuFactory {
@@ -67,6 +68,19 @@ public class DanmakuFactory {
 
     public static void updateDanmakuDuration(BaseDanmaku danmaku, float dispWidth) {
         danmaku.duration = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
+    }
+    
+
+    public static void fillText(BaseDanmaku danmaku, String text) {
+        danmaku.text = text;
+        if (TextUtils.isEmpty(text) || text.indexOf(BaseDanmaku.DANMAKU_BR_CHAR) == -1) {
+            return;
+        }
+
+        String[] lines = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);
+        if (lines.length > 1) {
+            danmaku.lines = lines;
+        }
     }
 
     /**
