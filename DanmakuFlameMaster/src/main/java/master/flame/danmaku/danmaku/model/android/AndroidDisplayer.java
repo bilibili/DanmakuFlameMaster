@@ -21,11 +21,9 @@ import java.util.HashMap;
 import android.graphics.*;
 import android.graphics.Paint.Style;
 import android.text.TextPaint;
-import android.util.Log;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 /**
  * Created by ch on 13-7-5.
@@ -125,8 +123,6 @@ public class AndroidDisplayer implements IDisplayer {
         return densityDpi;
     }
 
-    AndroidCounter counter = new AndroidCounter();
-    
     @Override
     public void draw(BaseDanmaku danmaku) {
         int top = (int)danmaku.getTop();
