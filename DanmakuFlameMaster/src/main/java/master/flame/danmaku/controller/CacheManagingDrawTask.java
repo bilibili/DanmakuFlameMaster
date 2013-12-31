@@ -319,11 +319,10 @@ public class CacheManagingDrawTask extends DrawTask {
                                     * mScreenSize;
 //                            Log.e("cache remain", waitTime+"ms");
                             if (waitTime > 1000 && waitTime <= maxCacheDuration) {
+                                removeMessages(BUILD_CACHES);
                                 sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
                                 return;
-                            } else if (waitTime < 0){
-                                evictAll();
-                            } else if (getFirstCacheTime() - mTimer.currMillisecond > maxCacheDuration){
+                            } else if (waitTime < 0 || getFirstCacheTime() - mTimer.currMillisecond > maxCacheDuration){
                                 evictAllNotInScreen();
                             }
                             if(waitTime < 0 || waitTime > maxCacheDuration){
@@ -340,10 +339,8 @@ public class CacheManagingDrawTask extends DrawTask {
                     case ADD_DANMAKKU:
                         synchronized (danmakuList) {
                             BaseDanmaku item = (BaseDanmaku) msg.obj;
+                            buildCache(item);
                             CacheManagingDrawTask.super.addDanmaku(item);
-                            if(!item.isTimeOut()){
-                                buildCache(item);
-                            }
                         }
                         break;
                     case CLEAR_CACHES:
@@ -411,7 +408,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
 
                 consumingTime = System.currentTimeMillis() - startTime;
-                if (count == danmakus.size() || isPoolFull()) {
+                if (danmakus.isEmpty() || count == danmakus.size() || isPoolFull()) {
                     mCacheTimer.update(end);
                     sendEmptyMessage(CLEAR_CACHES);
                 } else if (item != null) {
