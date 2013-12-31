@@ -366,7 +366,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 while (itr.hasNext() && !mPause) {
                     item = itr.next();
                     count++;                   
-                    if (item.isTimeOut() || !item.isOutside()) {
+                    if (init==false && (item.isTimeOut() || !item.isOutside())) {
                         continue;
                     }
 
