@@ -25,6 +25,7 @@ import android.util.Log;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 /**
  * Created by ch on 13-7-5.
@@ -34,6 +35,10 @@ public class AndroidDisplayer implements IDisplayer {
     private Camera camera = new Camera();
 
     private Matrix matrix = new Matrix();
+    
+    private Rect rectSrc = new Rect();
+    
+    private Rect rectDst = new Rect();
     
     private static HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>();
 
@@ -124,24 +129,27 @@ public class AndroidDisplayer implements IDisplayer {
         return densityDpi;
     }
 
+    AndroidCounter counter = new AndroidCounter();
+    
     @Override
     public void draw(BaseDanmaku danmaku) {
-        float top = danmaku.getTop();
-        float left = danmaku.getLeft();
+        int top = (int)danmaku.getTop();
+        int left = (int)danmaku.getLeft();
+        int paintHeight = (int)danmaku.paintHeight;
         if (danmaku.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
-            top = height - top - danmaku.paintHeight;
+            top = height - top - paintHeight;
         }
         if (canvas != null) {
 
             Paint alphaPaint = null;
-            boolean restore = false;
+            boolean needRestore = false;
             if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
                 if (danmaku.getAlpha() == AlphaValue.TRANSPARENT) {
                     return;
                 }
                 if (danmaku.rotationZ != 0 || danmaku.rotationY != 0) {
                     saveCanvas(danmaku, canvas, left, top);
-                    restore = true;
+                    needRestore = true;
                 }
 
                 if (danmaku.getAlpha() != AlphaValue.MAX) {
@@ -154,11 +162,7 @@ public class AndroidDisplayer implements IDisplayer {
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null) {
-                    // canvas.save();
-                    // canvas.translate(left, top);
-                    // canvas.drawBitmap(holder.bitmap, 0, 0, null);
-                    // canvas.restore();
-                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint); //Fixme check draw rect
+                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
                     cacheDrawn = true;
                 }
             }
@@ -173,8 +177,7 @@ public class AndroidDisplayer implements IDisplayer {
                 drawDanmaku(danmaku, canvas, left, top, true);
             }
 
-            if (restore) {
-                // need to restore canvas
+            if (needRestore) {
                 restoreCanvas(canvas);
             }
         }
