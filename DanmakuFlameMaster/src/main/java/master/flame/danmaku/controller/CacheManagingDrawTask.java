@@ -311,7 +311,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             long waitTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                             long maxCacheDuration = DanmakuFactory.MAX_DANMAKU_DURATION
                                     * mScreenSize;
-                            Log.e("cache remain", waitTime+"ms");
+//                            Log.e("cache remain", waitTime+"ms");
                             if (waitTime > 1000 && waitTime <= maxCacheDuration) {
                                 sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
                                 return;
