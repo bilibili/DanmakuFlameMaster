@@ -36,10 +36,6 @@ public class AndroidDisplayer implements IDisplayer {
 
     private Matrix matrix = new Matrix();
     
-    private Rect rectSrc = new Rect();
-    
-    private Rect rectDst = new Rect();
-    
     private static HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>();
 
     private int HIT_CACHE_COUNT = 0;
