@@ -74,8 +74,7 @@ public class AndroidDisplayer implements IDisplayer {
         STROKE = new Paint();
         ALPHA_PAINT = new Paint();
         UNDERLINE_PAINT = new Paint();
-        UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
-        PAINT.setTypeface(Typeface.MONOSPACE);
+        UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);        
         PAINT.setColor(Color.RED);
         PAINT.setTextSize(50);
         STROKE.setStrokeWidth(1.5f);
