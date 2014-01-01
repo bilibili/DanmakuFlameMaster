@@ -110,6 +110,11 @@ public abstract class BaseDanmaku {
      * 绘制用缓存
      */
     public IDrawingCache cache;
+    
+    /**
+     * 是否是直播弹幕
+     */
+    public boolean isLive;
 
     /**
      * 计时

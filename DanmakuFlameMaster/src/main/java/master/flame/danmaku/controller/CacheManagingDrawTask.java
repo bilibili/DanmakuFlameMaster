@@ -284,7 +284,7 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 //Log.e("mCaches size", mCaches.size()+" after/"+mRealSize);
         }
-
+        int danmakuAddedCount = 0;
         public class CacheHandler extends Handler {
 
             private static final int PREPARE = 0x1;
@@ -317,7 +317,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             long waitTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                             long maxCacheDuration = DanmakuFactory.MAX_DANMAKU_DURATION
                                     * mScreenSize;
-//                            Log.e("cache remain", waitTime+"ms");
+                            Log.e("count", waitTime+"ms");
                             if (waitTime > 1000 && waitTime <= maxCacheDuration) {
                                 removeMessages(BUILD_CACHES);
                                 sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
@@ -325,11 +325,12 @@ public class CacheManagingDrawTask extends DrawTask {
                             } else if (waitTime < 0 || getFirstCacheTime() - mTimer.currMillisecond > maxCacheDuration){
                                 evictAllNotInScreen();
                             }
-                            if(waitTime < 0 || waitTime > maxCacheDuration){
+                            if(Math.abs(waitTime) > maxCacheDuration){
                                 mCacheTimer.update(mTimer.currMillisecond + 100);
                             }
                             prepareCaches(mTaskListener != null);
-                            sendEmptyMessageDelayed(BUILD_CACHES,100);
+                            removeMessages(BUILD_CACHES);
+                            sendEmptyMessageDelayed(BUILD_CACHES,1000);
                             if (mTaskListener != null) {
                                 mTaskListener.ready();
                                 mTaskListener = null;
@@ -341,6 +342,11 @@ public class CacheManagingDrawTask extends DrawTask {
                             BaseDanmaku item = (BaseDanmaku) msg.obj;
                             buildCache(item);
                             CacheManagingDrawTask.super.addDanmaku(item);
+                            if((mCacheTimer.currMillisecond - mTimer.currMillisecond)<DanmakuFactory.MAX_DANMAKU_DURATION){
+                                mCacheTimer.update(mTimer.currMillisecond
+                                        + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
+                            }
+//Log.e("count", "added:"+(++danmakuAddedCount));
                         }
                         break;
                     case CLEAR_CACHES:
@@ -354,8 +360,8 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             private long prepareCaches(boolean init) {
-
-                long curr = mCacheTimer.currMillisecond;
+Log.e("count", "danmakus size:"+danmakuList.size());
+                long curr = mCacheTimer.currMillisecond;                
                 long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
                 long startTime = System.currentTimeMillis();
                 Set<BaseDanmaku> danmakus = null;
@@ -408,7 +414,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
 
                 consumingTime = System.currentTimeMillis() - startTime;
-                if (danmakus.isEmpty() || count == danmakus.size() || isPoolFull()) {
+                if (item==null || count==0 || danmakus.isEmpty() || count == danmakus.size() || isPoolFull()) {
                     mCacheTimer.update(end);
                     sendEmptyMessage(CLEAR_CACHES);
                 } else if (item != null) {
@@ -476,6 +482,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
             public void resume() {
                 mPause = false;
+                removeMessages(BUILD_CACHES);
                 sendEmptyMessage(BUILD_CACHES);
                 sendEmptyMessageDelayed(CLEAR_CACHES, DanmakuFactory.MAX_DANMAKU_DURATION);
             }
