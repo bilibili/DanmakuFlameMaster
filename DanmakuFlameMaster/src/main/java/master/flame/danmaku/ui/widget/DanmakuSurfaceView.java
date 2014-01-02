@@ -185,7 +185,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
             drawTask.draw(canvas);
             if(mShowFps){
                 long dtime = System.currentTimeMillis() - stime;
-                String fps = String.format("fps %.2f", 1000 / (float) dtime);
+                String fps = String.format("%d MS, fps %.2f",dtime, 1000 / (float) dtime);
                 DrawHelper.drawText(canvas, fps);
             }
             mSurfaceHolder.unlockCanvasAndPost(canvas);

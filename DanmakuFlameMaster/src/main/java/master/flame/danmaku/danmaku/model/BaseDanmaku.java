@@ -109,7 +109,7 @@ public abstract class BaseDanmaku {
     /**
      * 绘制用缓存
      */
-    public IDrawingCache cache;
+    public IDrawingCache<?> cache;
     
     /**
      * 是否是直播弹幕
@@ -125,8 +125,6 @@ public abstract class BaseDanmaku {
      * 透明度
      */
     protected int alpha = AlphaValue.MAX;
-
-    private long timer;
 
     public long getDuration() {
         return duration;

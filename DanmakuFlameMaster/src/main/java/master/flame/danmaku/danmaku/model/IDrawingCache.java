@@ -10,5 +10,11 @@ public interface IDrawingCache<T> {
     public void destroy();
 
     public int size();
+    
+    public boolean hasReferences();
+    
+    public void increaseReference();
+    
+    public void decreaseReference();
 
 }

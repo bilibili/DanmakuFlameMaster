@@ -219,16 +219,21 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         protected void entryRemoved(boolean evicted, BaseDanmaku oldValue, BaseDanmaku newValue) {
-            mRealSize -= sizeOf(oldValue);
             if (oldValue.cache != null) {
-                oldValue.cache.destroy();
+                if (oldValue.cache.hasReferences()) {
+                    oldValue.cache.decreaseReference();
+                    oldValue.cache = null;
+                    return;
+                }
+                mRealSize -= sizeOf(oldValue);
+                oldValue.cache.destroy();                
                 mCachePool.release((DrawingCache) oldValue.cache);
                 oldValue.cache = null;
             }
         }
 
         protected int sizeOf(BaseDanmaku value) {
-            if (value.cache != null) {
+            if (value.cache != null && !value.cache.hasReferences()) {                
                 return value.cache.size();
             }
             return 0;
@@ -280,6 +285,21 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
             }
         }
+        
+        private synchronized DrawingCache findReuseableCache(BaseDanmaku refDanmaku) {
+            Iterator<BaseDanmaku> it = mCaches.iterator();
+            while (it.hasNext()) {
+                BaseDanmaku danmaku = it.next();
+                if (danmaku.paintWidth == refDanmaku.paintWidth
+                        && danmaku.paintHeight == refDanmaku.paintHeight
+                        && danmaku.textColor == danmaku.textColor
+                        && danmaku.text.equals(refDanmaku.text)) {
+                    return (DrawingCache) danmaku.cache;
+                }
+            }
+            return null;
+        }
+        
         int danmakuAddedCount = 0;
         public class CacheHandler extends Handler {
 
@@ -326,7 +346,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             }
                             prepareCaches(mTaskListener != null);
                             removeMessages(BUILD_CACHES);
-                            sendEmptyMessageDelayed(BUILD_CACHES,1000);
+                            sendEmptyMessageDelayed(BUILD_CACHES,2000);
                             if (mTaskListener != null) {
                                 mTaskListener.ready();
                                 mTaskListener = null;
@@ -427,6 +447,16 @@ public class CacheManagingDrawTask extends DrawTask {
 
                 DrawingCache cache = null;
                 try {
+                    // try to find reuseable cache
+                    cache = findReuseableCache(item);
+                    if (cache != null) {
+Log.e("count", item.text+"DrawingCache hit!!");
+                        cache.increaseReference();
+                        item.cache = cache;
+                        mCacheManager.push(item);
+                        return true;
+                    }
+                    
                     // guess cache size
                     int cacheSize = DanmakuUtils.getCacheSize((int) item.paintWidth,
                             (int) item.paintHeight);
