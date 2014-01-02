@@ -333,7 +333,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             long waitTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                             long maxCacheDuration = DanmakuFactory.MAX_DANMAKU_DURATION
                                     * mScreenSize;
-                            Log.e("count", waitTime+"ms");
+//                            Log.e("count", waitTime+"ms");
                             if (waitTime > 1000 && waitTime <= maxCacheDuration) {
                                 removeMessages(BUILD_CACHES);
                                 sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
@@ -450,7 +450,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     // try to find reuseable cache
                     cache = findReuseableCache(item);
                     if (cache != null) {
-Log.e("count", item.text+"DrawingCache hit!!");
+//Log.e("count", item.text+"DrawingCache hit!!");
                         cache.increaseReference();
                         item.cache = cache;
                         mCacheManager.push(item);
