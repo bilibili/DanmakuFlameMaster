@@ -134,7 +134,7 @@ public class DrawTask implements IDrawTask {
     @Override
     public void quit() {
         mRenderer.clear();
-        danmakuList.clear();
+        //danmakuList.clear();
     }
 
     public void prepare() {

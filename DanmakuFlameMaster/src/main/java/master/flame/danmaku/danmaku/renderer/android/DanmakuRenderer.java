@@ -24,7 +24,6 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
-import java.util.Iterator;
 
 public class DanmakuRenderer extends Renderer {
 
@@ -52,7 +51,7 @@ public class DanmakuRenderer extends Renderer {
             DanmakusRetainer.fix(drawItem, disp);
 
             // draw
-            if (drawItem.isOutside()==false && drawItem.isShown() && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0) {
+            if (drawItem.isOutside()==false && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0) {
                 if(drawItem.getType() == BaseDanmaku.TYPE_SCROLL_RL){
                     // 同屏弹幕密度只对滚动弹幕有效
                     orderInScreen++;

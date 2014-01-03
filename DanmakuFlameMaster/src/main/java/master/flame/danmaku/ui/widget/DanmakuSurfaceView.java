@@ -125,9 +125,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public void release() {
         stop();
-        if (drawTask != null) {
-            drawTask.quit();
-        }
     }
 
     public void stop() {
@@ -135,6 +132,9 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     private void stopDraw() {
+        if (drawTask != null) {
+            drawTask.quit();
+        }
         if (handler != null) {
             handler.quit();
             handler = null;
@@ -325,6 +325,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 	}
                     break;
                 case START:
+                    removeCallbacksAndMessages(null);
                     pausedPostion = (Long) msg.obj;
                 case RESUME:
                     quitFlag = false;
@@ -339,10 +340,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     break;
                 case SEEK_POS:
+                    removeCallbacksAndMessages(null);
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                     drawTask.seek(System.currentTimeMillis() - mTimeBase);
                 case UPDATE:
+                    if (quitFlag) {
+                        break;
+                    }
                     long startMS = System.currentTimeMillis();
                     long d = timer.update(startMS - mTimeBase);
                     if (mCallback != null) {
@@ -355,15 +360,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     drawDanmakus();
                     d = System.currentTimeMillis() - startMS;
-                    if (!quitFlag) {
-                        if (d < 12) {
-                            removeMessages(UPDATE);
-                            sendEmptyMessageDelayed(UPDATE, 15 - d);
-                            break;
-                        }
+                    if (d < 15) {
                         removeMessages(UPDATE);
-                        sendEmptyMessage(UPDATE);
+                        sendEmptyMessageDelayed(UPDATE, 15 - d);
+                        break;
                     }
+                    removeMessages(UPDATE);
+                    sendEmptyMessage(UPDATE);
                     break;
             }
         }

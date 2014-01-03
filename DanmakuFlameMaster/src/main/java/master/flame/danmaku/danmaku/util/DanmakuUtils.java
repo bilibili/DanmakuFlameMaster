@@ -35,10 +35,13 @@ public class DanmakuUtils {
             long duration, long currTime) {
         if (d1.getType() != d2.getType())
             return false;
-        long dTime = d2.time - d1.time;
-        if (dTime < 0 || Math.abs(dTime) >= duration)
+        if(d1.isOutside()){
             return false;
-        if (d1.isOutside() || d1.isTimeOut() || d2.isTimeOut()) {
+        }
+        long dTime = d2.time - d1.time;
+        if (dTime < 0)
+            return true;
+        if (Math.abs(dTime) >= duration || d1.isTimeOut() || d2.isTimeOut()) {
             return false;
         }
 

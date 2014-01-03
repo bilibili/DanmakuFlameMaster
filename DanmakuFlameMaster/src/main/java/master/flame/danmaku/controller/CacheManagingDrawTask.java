@@ -90,9 +90,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void seek(long mills) {
-        mTimer.update(mills);
-        if (mRenderer != null)
-            mRenderer.clear();
+        super.seek(mills);
         mCacheManager.evictAllNotInScreen();
         mCacheManager.resume();
     }

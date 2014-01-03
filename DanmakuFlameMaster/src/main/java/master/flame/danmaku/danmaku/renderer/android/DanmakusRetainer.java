@@ -111,9 +111,11 @@ public class DanmakusRetainer {
 
                     if(item == drawItem){
                         insertItem = item;
+                        lastItem = null;
+                        shown = true;
                         break;
                     }
-
+                    
                     if (firstItem == null)
                         firstItem = item;
 
@@ -147,23 +149,33 @@ public class DanmakusRetainer {
                         topPos = lastItem.getBottom();
                     else
                         topPos = insertItem.getTop();
-                    mVisibleDanmakus.removeItem(insertItem);
+                    if (insertItem != drawItem){
+                        mVisibleDanmakus.removeItem(insertItem);
+                        shown = false;
+                    }
                 } else if (overwriteInsert) {
                     if (minRightRow != null) {
                         topPos = minRightRow.getTop();
-                        mVisibleDanmakus.removeItem(minRightRow);
+                        if(minRightRow.paintWidth<drawItem.paintWidth){
+                            mVisibleDanmakus.removeItem(minRightRow);
+                            shown = false;
+                        }
                     }
                 } else if (lastItem != null && insertItem == null) {
                     topPos = lastItem.getBottom();
                 } else if (topPos == 0 && firstItem != null) {
                     topPos = firstItem.getTop();
                     mVisibleDanmakus.removeItem(firstItem);
+                    shown = false;
                 } else if (firstItem == null) {
                     topPos = 0;
                 }
 
                 topPos = checkVerticalEdge(overwriteInsert, drawItem, disp, topPos, firstItem,
                         lastItem);
+                if (topPos == 0 && mVisibleDanmakus.size()==0) {
+                    shown = false;
+                }
             }
 
             drawItem.layout(disp, drawItem.getLeft(), topPos);
@@ -176,9 +188,9 @@ public class DanmakusRetainer {
 
         protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
                 IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
-            if (topPos < 0 || topPos + drawItem.paintHeight > disp.getHeight()) {
+            if (topPos < 0 || (firstItem!=null && firstItem.getTop() > 0) || topPos + drawItem.paintHeight > disp.getHeight()) {
                 topPos = 0;
-                mVisibleDanmakus.clear();
+                clear();
             }
             return topPos;
         }
