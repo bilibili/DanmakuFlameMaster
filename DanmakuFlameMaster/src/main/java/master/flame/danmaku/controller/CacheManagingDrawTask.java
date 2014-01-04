@@ -21,7 +21,6 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
 
 import java.util.Iterator;
 import java.util.Set;

@@ -363,7 +363,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     d = drawDanmakus();
                     d %= 15;
                     removeMessages(UPDATE);
-                    if (d > 0) {
+                    if (d != 0) {
                         sendEmptyMessageDelayed(UPDATE, 15 - d);
                         break;
                     }

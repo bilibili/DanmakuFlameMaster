@@ -30,8 +30,6 @@ public class BiliDanmakuLoader implements ILoader {
 
     private AndroidFileSource dataSource;
 
-    private Uri uri;
-
     private BiliDanmakuLoader() {
 
     }
