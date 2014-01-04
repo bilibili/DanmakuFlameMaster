@@ -173,23 +173,25 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         mShowFps = show;
     }
 
-    void drawDanmakus() {
+    long drawDanmakus() {
         if (!isSurfaceCreated)
-            return;
+            return 0;
         if(!isShown())
-            return;
+            return 0;
         long stime = System.currentTimeMillis();
+        long dtime = 0;
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
             DrawHelper.clearCanvas(canvas);
             drawTask.draw(canvas);
+            dtime = System.currentTimeMillis() - stime;
             if(mShowFps){
-                long dtime = System.currentTimeMillis() - stime;
                 String fps = String.format("%d MS, fps %.2f",dtime, 1000 / (float) dtime);
                 DrawHelper.drawText(canvas, fps);
             }
             mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
+        return dtime;
     }
 
     public void toggle() {
@@ -358,14 +360,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                         sendEmptyMessageDelayed(UPDATE, 30 - d);
                         break;
                     }
-                    drawDanmakus();
-                    d = System.currentTimeMillis() - startMS;
-                    if (d < 15) {
-                        removeMessages(UPDATE);
+                    d = drawDanmakus();
+                    d %= 15;
+                    removeMessages(UPDATE);
+                    if (d >0) {
                         sendEmptyMessageDelayed(UPDATE, 15 - d);
                         break;
                     }
-                    removeMessages(UPDATE);
                     sendEmptyMessage(UPDATE);
                     break;
             }
