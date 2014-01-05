@@ -152,8 +152,6 @@ public class AndroidDisplayer implements IDisplayer {
                 if ( alpha != AlphaValue.MAX) {
                     alphaPaint = ALPHA_PAINT;
                     alphaPaint.setAlpha(danmaku.getAlpha());
-                } else if(alpha ==0 ){
-                    return;
                 }
             }
             
@@ -162,7 +160,11 @@ public class AndroidDisplayer implements IDisplayer {
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null) {
-                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
+                    if(alphaPaint!=null && alphaPaint.getAlpha()== AlphaValue.TRANSPARENT){
+                        holder.bitmap.eraseColor(Color.TRANSPARENT);
+                    }else{
+                        canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
+                    }
                     cacheDrawn = true;
                 }
             }
