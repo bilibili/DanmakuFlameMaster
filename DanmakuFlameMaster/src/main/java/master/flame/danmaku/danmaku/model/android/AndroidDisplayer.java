@@ -17,7 +17,6 @@
 package master.flame.danmaku.danmaku.model.android;
 
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import android.graphics.*;
 import android.graphics.Paint.Style;
@@ -155,16 +154,16 @@ public class AndroidDisplayer implements IDisplayer {
                 }
             }
             
+            // skip drawing when danmaku is transparent
+            if(alphaPaint!=null && alphaPaint.getAlpha()== AlphaValue.TRANSPARENT){
+                return;
+            }
             // drawing cache
             boolean cacheDrawn = false;
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null) {
-                    if(alphaPaint!=null && alphaPaint.getAlpha()== AlphaValue.TRANSPARENT){
-                        holder.bitmap.eraseColor(Color.TRANSPARENT);
-                    }else{
-                        canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
-                    }
+                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
                     cacheDrawn = true;
                 }
             }
