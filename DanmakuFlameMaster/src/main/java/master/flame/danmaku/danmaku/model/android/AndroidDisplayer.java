@@ -148,9 +148,12 @@ public class AndroidDisplayer implements IDisplayer {
                     needRestore = true;
                 }
 
-                if (danmaku.getAlpha() != AlphaValue.MAX) {
+                int alpha = danmaku.getAlpha();
+                if ( alpha != AlphaValue.MAX) {
                     alphaPaint = ALPHA_PAINT;
                     alphaPaint.setAlpha(danmaku.getAlpha());
+                } else if(alpha ==0 ){
+                    return;
                 }
             }
             
