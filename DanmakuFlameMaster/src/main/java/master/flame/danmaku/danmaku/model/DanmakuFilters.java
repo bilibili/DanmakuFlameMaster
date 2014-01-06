@@ -129,7 +129,7 @@ public class DanmakuFilters {
         }
         if (filter == null) {
             throwFilterException();
-            return;
+            return null;
         }
         filter.setData(data);
         filters.put(tag, filter);
