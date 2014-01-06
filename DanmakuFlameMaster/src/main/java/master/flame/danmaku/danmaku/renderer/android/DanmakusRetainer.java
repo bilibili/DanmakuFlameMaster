@@ -17,6 +17,7 @@
 package master.flame.danmaku.danmaku.renderer.android;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
@@ -102,7 +103,7 @@ public class DanmakusRetainer {
             boolean shown = drawItem.isShown();
             if (!shown) {
                 // 确定弹幕位置
-                Iterator<BaseDanmaku> it = mVisibleDanmakus.iterator();
+                IDanmakuIterator it = mVisibleDanmakus.iterator();
                 BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null;
                 boolean overwriteInsert = false;
                 while (it.hasNext()) {

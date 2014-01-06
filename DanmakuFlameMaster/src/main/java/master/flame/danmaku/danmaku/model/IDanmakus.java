@@ -31,5 +31,7 @@ public interface IDanmakus {
     public BaseDanmaku first();
     
     public BaseDanmaku last();
+    
+    public IDanmakuIterator iterator();
 
 }

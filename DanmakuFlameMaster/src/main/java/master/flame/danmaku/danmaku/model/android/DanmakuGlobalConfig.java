@@ -40,7 +40,10 @@ public class DanmakuGlobalConfig {
     public boolean SecialDanmakuVisibility = true;
     
     /**
-     * 同屏弹幕数量  -1无限制
+     * 同屏弹幕数量 
+     * -1 无限制
+     *  0 按绘制效率自动调整
+     *  n 同屏最大显示n个弹幕
      */
     public int maxNumsInScreen = -1;
     

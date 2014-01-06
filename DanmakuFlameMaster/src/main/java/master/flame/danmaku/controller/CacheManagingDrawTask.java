@@ -28,6 +28,7 @@ import java.util.Set;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCachePoolManager;
@@ -194,7 +195,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         private synchronized void evictAll() {
             if (mCaches != null) {
-                Iterator<BaseDanmaku> it = mCaches.iterator();
+                IDanmakuIterator it = mCaches.iterator();
                 while(it.hasNext()) {
                     BaseDanmaku danmaku = it.next();
                     entryRemoved(true, danmaku, null);
@@ -206,7 +207,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         private synchronized void evictAllNotInScreen() {
             if (mCaches != null) {
-                Iterator<BaseDanmaku> it = mCaches.iterator();
+                IDanmakuIterator it = mCaches.iterator();
                 while(it.hasNext()) {
                     BaseDanmaku danmaku = it.next();
                     if(danmaku.isOutside()){
@@ -267,7 +268,7 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         private synchronized void clearTimeOutCaches(long time) {
-            Iterator<BaseDanmaku> it = mCaches.iterator();
+            IDanmakuIterator it = mCaches.iterator();
             while (it.hasNext()) {
                 BaseDanmaku val = it.next();
                 if (val.isTimeOut(time)) {
@@ -287,7 +288,7 @@ public class CacheManagingDrawTask extends DrawTask {
         }
         
         private synchronized DrawingCache findReuseableCache(BaseDanmaku refDanmaku) {
-            Iterator<BaseDanmaku> it = mCaches.iterator();
+            IDanmakuIterator it = mCaches.iterator();
             while (it.hasNext()) {
                 BaseDanmaku danmaku = it.next();
                 if (danmaku.paintWidth == refDanmaku.paintWidth

@@ -17,6 +17,7 @@
 package master.flame.danmaku.danmaku.renderer.android;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -33,7 +34,7 @@ public class DanmakuRenderer extends Renderer {
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus) {
         Danmakus drawItems = (Danmakus) danmakus;
-        Iterator<BaseDanmaku> itr = drawItems.iterator();
+        IDanmakuIterator itr = drawItems.iterator();
 
         while (itr.hasNext()) {
 

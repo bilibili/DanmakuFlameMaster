@@ -18,7 +18,6 @@ package master.flame.danmaku.controller;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.util.DisplayMetrics;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
