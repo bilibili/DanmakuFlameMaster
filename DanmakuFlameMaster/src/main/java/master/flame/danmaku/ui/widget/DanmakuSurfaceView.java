@@ -122,7 +122,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
+        mSurfaceHolder = null;
+        isSurfaceCreated = false;
     }
 
     public void release() {
@@ -364,6 +365,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     if (mCallback != null) {
                         mCallback.updateTimer(timer);
                     }
+                    drawDanmakus();
                     if (d < 10) {
                         try {
                             Thread.sleep(15 - d);
@@ -371,7 +373,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                             e.printStackTrace();
                         }
                     }
-                    drawDanmakus();
                     if (!quitFlag)
                         sendEmptyMessage(UPDATE);
                     break;
