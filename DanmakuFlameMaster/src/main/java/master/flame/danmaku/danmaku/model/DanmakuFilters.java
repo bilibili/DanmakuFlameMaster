@@ -48,10 +48,11 @@ public class DanmakuFilters {
 
         @Override
         public void setData(Object data) {
-            if (data == null || data instanceof Integer[]) {
+            if (data == null || data instanceof List<?>) {
                 mFilterTypes.clear();
                 if (data != null) {                    
-                    Integer[] list = (Integer[]) data;
+                    @SuppressWarnings("unchecked")
+                    List<Integer> list = (List<Integer>) data;
                     for (Integer i : list) {
                         enableType(i);
                     }
@@ -105,11 +106,19 @@ public class DanmakuFilters {
     }
 
     private final static Map<String, IDanmakuFilter> filters = Collections.synchronizedSortedMap(new TreeMap<String, IDanmakuFilter>());
+    
+    public IDanmakuFilter get(String tag) {
+        IDanmakuFilter f = filters.get(tag);
+        if (f == null) {
+            f = registerFilter(tag, null);
+        }
+        return f;
+    }
 
-    public void registerFilter(String tag, Object data) {
+    public IDanmakuFilter registerFilter(String tag, Object data) {
         if (tag == null) {
             throwFilterException();
-            return;
+            return null;
         }
         IDanmakuFilter filter = filters.get(tag);
         if (filter == null) {
@@ -124,6 +133,7 @@ public class DanmakuFilters {
         }
         filter.setData(data);
         filters.put(tag, filter);
+        return filter;
     }
 
     public void unregisterFilter(String tag) {

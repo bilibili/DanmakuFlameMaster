@@ -17,6 +17,7 @@
 package master.flame.danmaku.danmaku.renderer.android;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -27,10 +28,6 @@ import java.util.Iterator;
 
 public class DanmakuRenderer extends Renderer {
 
-    public static int ANTI_ALIAS_DISABLE_SIZE = 30;
-
-    public static int ANTI_ALIAS_ENABLE_SIZE = 5;
-
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus) {
         Danmakus drawItems = (Danmakus) danmakus;
@@ -40,7 +37,7 @@ public class DanmakuRenderer extends Renderer {
 
             BaseDanmaku drawItem = itr.next();
 
-            if (drawItem.isTimeOut()) {
+            if (drawItem.isTimeOut() || DanmakuFilters.getDefault().filter(drawItem)) {
                 continue;
             }
 
