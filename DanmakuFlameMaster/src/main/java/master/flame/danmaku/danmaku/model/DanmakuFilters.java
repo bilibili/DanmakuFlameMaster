@@ -27,7 +27,7 @@ public class DanmakuFilters {
      */
     public static class TypeDanmakuFilter implements IDanmakuFilter {
 
-        List<Integer> mFilterTypes = new ArrayList<Integer>();
+        List<Integer> mFilterTypes = Collections.synchronizedList(new ArrayList<Integer>());
 
         public void enableType(Integer type) {
             if (!mFilterTypes.contains(type))
