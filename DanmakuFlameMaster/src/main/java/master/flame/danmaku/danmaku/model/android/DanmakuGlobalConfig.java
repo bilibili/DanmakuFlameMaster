@@ -8,7 +8,7 @@ import android.text.TextPaint;
 
 public class DanmakuGlobalConfig {
     
-    public static DanmakuGlobalConfig Default = new DanmakuGlobalConfig();
+    public static DanmakuGlobalConfig DEFAULT = new DanmakuGlobalConfig();
 
     /**
      * 默认字体
