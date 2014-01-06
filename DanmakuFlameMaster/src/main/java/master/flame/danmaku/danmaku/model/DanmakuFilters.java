@@ -70,10 +70,14 @@ public class DanmakuFilters {
 
     /**
      * 根据注册的过滤器过滤弹幕
-     * 
      * @param danmakus
+     * @return 过滤掉的数量
      */
-    public void filter(IDanmakus danmakus) {
+    public int filter(IDanmakus danmakus) {
+        if(filters.isEmpty()){
+            return 0;
+        }
+        int count = 0;
         IDanmakuIterator it = danmakus.iterator();
         while (it.hasNext()) {
             BaseDanmaku danmaku = it.next();
@@ -82,11 +86,13 @@ public class DanmakuFilters {
                 while (fit.hasNext()) {
                     if (fit.next().filter(danmaku)) {
                         it.remove();
+                        count++;
                         break;
                     }
                 }
             }
         }
+        return count;
     }
 
     private final static Map<String, IDanmakuFilter> filters = Collections.synchronizedSortedMap(new TreeMap<String, IDanmakuFilter>());
