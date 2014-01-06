@@ -2,7 +2,6 @@
 package master.flame.danmaku.danmaku.model.android;
 
 import master.flame.danmaku.danmaku.model.AlphaValue;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
@@ -13,7 +12,7 @@ public class DanmakuGlobalConfig {
     /**
      * 默认字体
      */
-    public Typeface mFont = Typeface.DEFAULT;
+    public Typeface mFont = null;
 
     /**
      * paint alpha:0-255
@@ -74,11 +73,10 @@ public class DanmakuGlobalConfig {
      * @param font
      */
     public DanmakuGlobalConfig setTypeface(Typeface font) {
-        if (font == null)
-            mFont = Typeface.DEFAULT;
-        else
+        if (mFont != font) {
             mFont = font;
-        paint.setTypeface(mFont);
+            paint.setTypeface(mFont);
+        }
         return this;
     }
 
