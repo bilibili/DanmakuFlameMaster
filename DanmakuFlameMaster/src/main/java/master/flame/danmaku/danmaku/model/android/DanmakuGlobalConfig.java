@@ -19,6 +19,8 @@ public class DanmakuGlobalConfig {
      */
     public int alpha = AlphaValue.MAX;
     
+    public boolean isTranslucent = false;
+    
     public float scaleTextSize = 1.0f;
 
     public TextPaint paint = new TextPaint();
@@ -75,7 +77,8 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setTypeface(Typeface font) {
         if (mFont != font) {
             mFont = font;
-            paint.setTypeface(mFont);
+            AndroidDisplayer.clearTextHeightCache();
+            paint.setTypeface(mFont); // thread safe is not necessary
         }
         return this;
     }
@@ -84,7 +87,7 @@ public class DanmakuGlobalConfig {
         int newAlpha = (int) (p * AlphaValue.MAX);
         if (newAlpha != alpha) {
             alpha = newAlpha;
-            paint.setAlpha(alpha);
+            isTranslucent = (newAlpha != AlphaValue.MAX);
         }
         return this;
     }

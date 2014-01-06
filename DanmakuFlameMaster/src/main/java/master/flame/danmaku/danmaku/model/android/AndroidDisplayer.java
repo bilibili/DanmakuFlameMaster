@@ -17,6 +17,7 @@
 package master.flame.danmaku.danmaku.model.android;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import android.graphics.*;
 import android.graphics.Paint.Style;
@@ -34,7 +35,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     private Matrix matrix = new Matrix();
     
-    private HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>();
+    private final static HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>(); // thread safe is not Necessary
 
     private int HIT_CACHE_COUNT = 0;
 
@@ -74,8 +75,6 @@ public class AndroidDisplayer implements IDisplayer {
         ALPHA_PAINT = new Paint();
         UNDERLINE_PAINT = new Paint();
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);        
-        PAINT.setColor(Color.RED);
-        PAINT.setTextSize(50);
         STROKE.setStrokeWidth(1.5f);
         STROKE.setStyle(Style.FILL_AND_STROKE);
         // TODO: load font from file
@@ -149,6 +148,7 @@ public class AndroidDisplayer implements IDisplayer {
                     alphaPaint.setAlpha(danmaku.getAlpha());
                 }
             }
+            
             // drawing cache
             boolean cacheDrawn = false;
             if (danmaku.hasDrawingCache()) {
@@ -249,10 +249,12 @@ public class AndroidDisplayer implements IDisplayer {
         PAINT.setTextSize(danmaku.textSize);
         PAINT.setColor(danmaku.textColor);
         PAINT.setAntiAlias(ANTI_ALIAS);
+        applyPaintConfig(danmaku, PAINT);
         if (HAS_STROKE) {
             // STROKE.setAntiAlias(ANTI_ALIAS);
             STROKE.setTextSize(danmaku.textSize);
             STROKE.setColor(danmaku.textShadowColor);
+            applyPaintConfig(danmaku , STROKE);
         }
         if (HAS_SHADOW) {
             PAINT.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
@@ -260,6 +262,14 @@ public class AndroidDisplayer implements IDisplayer {
             PAINT.clearShadowLayer();
         }
         return PAINT;
+    }
+    
+    private static void applyPaintConfig(BaseDanmaku danmaku, Paint paint) {
+        if (danmaku.getType() != BaseDanmaku.TYPE_SPECIAL) {
+            paint.setAlpha(AlphaValue.MAX);
+        } else {
+            paint.setAlpha(DanmakuGlobalConfig.DEFAULT.alpha);
+        }
     }
 
     @Override
@@ -298,6 +308,10 @@ public class AndroidDisplayer implements IDisplayer {
             TextHeightCache.put(textSize, textHeight);
         }  
         return textHeight;
+    }
+    
+    public static void clearTextHeightCache(){
+        TextHeightCache.clear();
     }
 
     @Override
