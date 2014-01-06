@@ -48,11 +48,10 @@ public class DanmakuFilters {
 
         @Override
         public void setData(Object data) {
-            if (data == null || data instanceof List) {
+            if (data == null || data instanceof Integer[]) {
                 mFilterTypes.clear();
-                if (data != null) {
-                    @SuppressWarnings("unchecked")
-                    List<Integer> list = (List<Integer>) data;
+                if (data != null) {                    
+                    Integer[] list = (Integer[]) data;
                     for (Integer i : list) {
                         enableType(i);
                     }
@@ -62,11 +61,21 @@ public class DanmakuFilters {
 
     }
 
-    public final static String TAG_TYPE_DANMAKU_FILTER = "TypeDanmakuFilter";
+    public final static String TAG_TYPE_DANMAKU_FILTER = "0001_Filter";
 
     private static DanmakuFilters instance = null;
 
     public final Exception filterException = new Exception("not suuport this filter tag");
+    
+    public boolean filter(BaseDanmaku danmaku){
+        Iterator<IDanmakuFilter> fit = filters.values().iterator();
+        while (fit.hasNext()) {
+            if (fit.next().filter(danmaku)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * 根据注册的过滤器过滤弹幕
@@ -85,7 +94,7 @@ public class DanmakuFilters {
                 Iterator<IDanmakuFilter> fit = filters.values().iterator();
                 while (fit.hasNext()) {
                     if (fit.next().filter(danmaku)) {
-                        it.remove();
+                        //it.remove();
                         count++;
                         break;
                     }
@@ -132,7 +141,7 @@ public class DanmakuFilters {
         }
     }
 
-    public static DanmakuFilters getDefulat() {
+    public static DanmakuFilters getDefault() {
         if (instance == null) {
             instance = new DanmakuFilters();
         }
