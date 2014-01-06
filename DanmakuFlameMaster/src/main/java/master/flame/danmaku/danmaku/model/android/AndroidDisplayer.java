@@ -69,7 +69,7 @@ public class AndroidDisplayer implements IDisplayer {
     public static boolean ANTI_ALIAS = true;
 
     static {
-        PAINT = new TextPaint();
+        PAINT = DanmakuGlobalConfig.Default.paint;
         STROKE = new Paint();
         ALPHA_PAINT = new Paint();
         UNDERLINE_PAINT = new Paint();
