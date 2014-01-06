@@ -12,6 +12,11 @@ import android.graphics.Typeface;
 import android.text.TextPaint;
 
 public class DanmakuGlobalConfig {
+    /*
+     * TODO 选项：合并异色同字弹幕缓存
+     *      选项：弹幕阴影样式
+     */
+    
     
     public static DanmakuGlobalConfig DEFAULT = new DanmakuGlobalConfig();
 
