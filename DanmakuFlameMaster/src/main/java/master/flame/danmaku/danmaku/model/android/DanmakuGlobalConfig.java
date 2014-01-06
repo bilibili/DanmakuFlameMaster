@@ -1,7 +1,13 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import master.flame.danmaku.danmaku.model.AlphaValue;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuFilters;
+import master.flame.danmaku.danmaku.model.DanmakuFilters.IDanmakuFilter;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
@@ -111,15 +117,37 @@ public class DanmakuGlobalConfig {
         return FTDanmakuVisibility;
     }
 
+    List<Integer> mFilterTypes = new ArrayList<Integer>();
+    
     /**
      * 设置是否显示顶部弹幕
      * @param visible
      */
     public DanmakuGlobalConfig setFTDanmakuVisibility(boolean visible) {
-        FTDanmakuVisibility = visible;
+        if(FTDanmakuVisibility != visible){
+            FTDanmakuVisibility = visible;
+            setVisible(visible,BaseDanmaku.TYPE_FIX_TOP);
+            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER,mFilterTypes);
+        }
         return this;
     }
 
+    private void setFilterData(String tag, Object data) {
+        IDanmakuFilter filter = DanmakuFilters.getDefault().get(
+                DanmakuFilters.TAG_TYPE_DANMAKU_FILTER);
+        filter.setData(mFilterTypes);
+    }
+
+    private void setVisible(boolean visible, int type) {
+        if (visible) {
+            mFilterTypes.remove(Integer.valueOf(type));
+        } else if (!mFilterTypes.contains(Integer.valueOf(type))) {
+            mFilterTypes.add(Integer.valueOf(type));
+        }
+    }
+
+    
+    
     /**
      * 
      * @return 是否显示底部弹幕
@@ -133,7 +161,11 @@ public class DanmakuGlobalConfig {
      * @param visible
      */
     public DanmakuGlobalConfig setFBDanmakuVisibility(boolean visible) {
-        FBDanmakuVisibility = visible;
+        if(FBDanmakuVisibility != visible){
+            FBDanmakuVisibility = visible;
+            setVisible(visible,BaseDanmaku.TYPE_FIX_BOTTOM);
+            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER,mFilterTypes);
+        }
         return this;
     }
 
@@ -150,7 +182,11 @@ public class DanmakuGlobalConfig {
      * @param visible
      */
     public DanmakuGlobalConfig setL2RDanmakuVisibility(boolean visible) {
-        L2RDanmakuVisibility = visible;
+        if(L2RDanmakuVisibility != visible){
+            L2RDanmakuVisibility = visible;
+            setVisible(visible,BaseDanmaku.TYPE_SCROLL_LR);
+            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER,mFilterTypes);
+        }
         return this;
     }
 
@@ -166,8 +202,12 @@ public class DanmakuGlobalConfig {
      * 设置是否显示右左滚动弹幕
      * @param visible
      */
-    public DanmakuGlobalConfig setR2LDanmakuVisibility(boolean visible) {
-        R2LDanmakuVisibility = visible;
+    public DanmakuGlobalConfig setR2LDanmakuVisibility(boolean visible) {       
+        if(R2LDanmakuVisibility != visible){
+            R2LDanmakuVisibility = visible;
+            setVisible(visible,BaseDanmaku.TYPE_SCROLL_RL);
+            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER,mFilterTypes);
+        }
         return this;
     }
 
@@ -184,7 +224,11 @@ public class DanmakuGlobalConfig {
      * @param visible
      */
     public DanmakuGlobalConfig setSecialDanmakuVisibility(boolean visible) {
-        SecialDanmakuVisibility = visible;
+        if(SecialDanmakuVisibility != visible){
+            SecialDanmakuVisibility = visible;
+            setVisible(visible,BaseDanmaku.TYPE_SPECIAL);
+            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER,mFilterTypes);
+        }
         return this;
     }
 
