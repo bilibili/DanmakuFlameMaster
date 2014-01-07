@@ -33,11 +33,13 @@ public class DanmakuRenderer extends Renderer {
         Danmakus drawItems = (Danmakus) danmakus;
         IDanmakuIterator itr = drawItems.iterator();
 
+        int orderInScreen = 0;
+        Long startTime = Long.valueOf(System.currentTimeMillis());
         while (itr.hasNext()) {
 
             BaseDanmaku drawItem = itr.next();
 
-            if (drawItem.isTimeOut() || DanmakuFilters.getDefault().filter(drawItem)) {
+            if (drawItem.isTimeOut() || DanmakuFilters.getDefault().filter(drawItem , orderInScreen , startTime)) {
                 continue;
             }
 
@@ -51,9 +53,11 @@ public class DanmakuRenderer extends Renderer {
 
             // draw
             if (drawItem.isOutside()==false && drawItem.isShown() && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0) {
-
+                if(drawItem.getType() == BaseDanmaku.TYPE_SCROLL_RL){
+                    // 同屏弹幕密度只对滚动弹幕有效
+                    orderInScreen++;
+                }
                 drawItem.draw(disp);
-
             }
 
         }

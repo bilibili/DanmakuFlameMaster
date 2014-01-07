@@ -33,5 +33,7 @@ public interface IDanmakus {
     public BaseDanmaku last();
     
     public IDanmakuIterator iterator();
+    
+    public boolean contains(BaseDanmaku item);
 
 }

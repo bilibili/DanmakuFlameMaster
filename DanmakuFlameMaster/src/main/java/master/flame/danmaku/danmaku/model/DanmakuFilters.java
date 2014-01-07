@@ -8,16 +8,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import master.flame.danmaku.danmaku.model.android.Danmakus;
+
 public class DanmakuFilters {
 
     public static interface IDanmakuFilter {
         /*
          * 是否过滤
          */
-        public boolean filter(BaseDanmaku danmakus);
+        public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime);
 
         public void setData(Object data);
-        
+
+        public void clear();
+
     }
 
     /**
@@ -27,7 +31,7 @@ public class DanmakuFilters {
      */
     public static class TypeDanmakuFilter implements IDanmakuFilter {
 
-        List<Integer> mFilterTypes = Collections.synchronizedList(new ArrayList<Integer>());
+        final List<Integer> mFilterTypes = Collections.synchronizedList(new ArrayList<Integer>());
 
         public void enableType(Integer type) {
             if (!mFilterTypes.contains(type))
@@ -40,7 +44,7 @@ public class DanmakuFilters {
         }
 
         @Override
-        public boolean filter(BaseDanmaku danmaku) {
+        public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime) {
             if (danmaku != null && mFilterTypes.contains(danmaku.getType()))
                 return true;
             return false;
@@ -50,7 +54,7 @@ public class DanmakuFilters {
         public void setData(Object data) {
             if (data == null || data instanceof List<?>) {
                 mFilterTypes.clear();
-                if (data != null) {                    
+                if (data != null) {
                     @SuppressWarnings("unchecked")
                     List<Integer> list = (List<Integer>) data;
                     for (Integer i : list) {
@@ -60,18 +64,111 @@ public class DanmakuFilters {
             }
         }
 
+        @Override
+        public void clear() {
+            mFilterTypes.clear();
+        }
+
     }
 
-    public final static String TAG_TYPE_DANMAKU_FILTER = "0001_Filter";
+    /**
+     * 根据同屏数量过滤弹幕
+     * 
+     * @author ch
+     */
+    public static class QuantityDanmakuFilter implements IDanmakuFilter {
+
+        protected int mMaximumSize = -1;
+
+        protected final IDanmakus danmakus = new Danmakus();
+
+        @Override
+        public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime) {
+            if (mMaximumSize <= 0 || danmaku.getType() != BaseDanmaku.TYPE_SCROLL_RL) {
+                return false;
+            }
+
+            if (danmakus.contains(danmaku)) {
+                return true;
+            }
+
+            if (orderInScreen > mMaximumSize && !danmaku.isTimeOut()) {
+                danmakus.addItem(danmaku);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void setData(Object data) {
+            if (data instanceof Integer) {
+                Integer maximumSize = (Integer) data;
+                if (maximumSize != mMaximumSize) {
+                    mMaximumSize = maximumSize;
+                    danmakus.clear();
+                }
+            }
+        }
+
+        @Override
+        public void clear() {
+            danmakus.clear();
+        }
+    }
+
+    /**
+     * 根据绘制耗时过滤弹幕
+     * 
+     * @author ch
+     */
+    public static class ElapsedTimeFilter implements IDanmakuFilter {
+
+        long mMaxTime = 40; // 绘制超过40ms就跳过 ，保持接近25fps
+
+        protected final IDanmakus danmakus = new Danmakus();
+
+        @Override
+        public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime) {
+            long elapsedTime = System.currentTimeMillis() - drawingStartTime.longValue();
+            if (danmaku.isTimeOut() || !danmaku.isOutside()) {
+                return false;
+            }
+            if (danmakus.contains(danmaku)) {
+                return true;
+            }
+            if (elapsedTime >= mMaxTime) {
+                danmakus.addItem(danmaku);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void setData(Object data) {
+
+        }
+
+        @Override
+        public void clear() {
+            danmakus.clear();
+        }
+
+    }
+
+    public final static String TAG_TYPE_DANMAKU_FILTER = "1010_Filter";
+
+    public final static String TAG_QUANTITY_DANMAKU_FILTER = "1011_Filter";
+
+    public final static String TAG_ELAPSED_TIME_FILTER = "1012_Filter";
 
     private static DanmakuFilters instance = null;
 
     public final Exception filterException = new Exception("not suuport this filter tag");
-    
-    public boolean filter(BaseDanmaku danmaku){
+
+    public boolean filter(BaseDanmaku danmaku, int index, Long drawingStartTime) {
         Iterator<IDanmakuFilter> fit = filters.values().iterator();
         while (fit.hasNext()) {
-            if (fit.next().filter(danmaku)) {
+            if (fit.next().filter(danmaku, index, drawingStartTime)) {
                 return true;
             }
         }
@@ -80,11 +177,12 @@ public class DanmakuFilters {
 
     /**
      * 根据注册的过滤器过滤弹幕
+     * 
      * @param danmakus
      * @return 过滤掉的数量
      */
-    public int filter(IDanmakus danmakus) {
-        if(filters.isEmpty()){
+    public int filter(IDanmakus danmakus, int orderInScreen, Long startTime) {
+        if (filters.isEmpty()) {
             return 0;
         }
         int count = 0;
@@ -94,8 +192,8 @@ public class DanmakuFilters {
             synchronized (this) {
                 Iterator<IDanmakuFilter> fit = filters.values().iterator();
                 while (fit.hasNext()) {
-                    if (fit.next().filter(danmaku)) {
-                        //it.remove();
+                    if (fit.next().filter(danmaku, orderInScreen, startTime)) {
+                        // it.remove();
                         count++;
                         break;
                     }
@@ -105,8 +203,9 @@ public class DanmakuFilters {
         return count;
     }
 
-    private final static Map<String, IDanmakuFilter> filters = Collections.synchronizedSortedMap(new TreeMap<String, IDanmakuFilter>());
-    
+    private final static Map<String, IDanmakuFilter> filters = Collections
+            .synchronizedSortedMap(new TreeMap<String, IDanmakuFilter>());
+
     public IDanmakuFilter get(String tag) {
         IDanmakuFilter f = filters.get(tag);
         if (f == null) {
@@ -124,6 +223,10 @@ public class DanmakuFilters {
         if (filter == null) {
             if (TAG_TYPE_DANMAKU_FILTER.equals(tag)) {
                 filter = new TypeDanmakuFilter();
+            } else if (TAG_QUANTITY_DANMAKU_FILTER.equals(tag)) {
+                filter = new QuantityDanmakuFilter();
+            } else if (TAG_ELAPSED_TIME_FILTER.equals(tag)) {
+                filter = new ElapsedTimeFilter();
             }
             // add more filter
         }
@@ -137,7 +240,10 @@ public class DanmakuFilters {
     }
 
     public void unregisterFilter(String tag) {
-        filters.remove(tag);
+        IDanmakuFilter f = filters.remove(tag);
+        if (f != null)
+            f.clear();
+        f = null;
     }
 
     public void reset() {

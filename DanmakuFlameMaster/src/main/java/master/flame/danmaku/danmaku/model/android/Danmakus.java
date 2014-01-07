@@ -277,5 +277,10 @@ public class Danmakus implements IDanmakus {
         }
     }
 
+    @Override
+    public boolean contains(BaseDanmaku item) {
+        return this.items != null && this.items.contains(item);
+    }
+
 
 }
