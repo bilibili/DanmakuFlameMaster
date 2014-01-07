@@ -18,6 +18,7 @@ package master.flame.danmaku.danmaku.model.android;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
@@ -40,6 +41,8 @@ public class Danmakus implements IDanmakus {
     private BaseDanmaku endSubItem;
 
     private BaseDanmaku startSubItem;
+    
+    private DanmakuIterator iterator;
 
     public Danmakus() {
         this(ST_BY_TIME);
@@ -55,6 +58,7 @@ public class Danmakus implements IDanmakus {
             comparator = new YPosDescComparator();
         }
         items = new TreeSet<BaseDanmaku>(comparator);
+        iterator = new DanmakuIterator(items);
     }
 
     public Danmakus(Set<BaseDanmaku> items) {
@@ -75,14 +79,12 @@ public class Danmakus implements IDanmakus {
                 }
             }
         }
-
+        iterator.setDatas(items);
     }
 
-    public Iterator<BaseDanmaku> iterator() {
-        if (items != null) {
-            return items.iterator();
-        }
-        return null;
+    public IDanmakuIterator iterator() {
+        iterator.reset();
+        return iterator;
     }
 
     @Override
@@ -100,7 +102,7 @@ public class Danmakus implements IDanmakus {
             items.remove(item);
         }
     }
-    
+
     public Set<BaseDanmaku> subset(long startTime, long endTime) {
         if (items == null || items.size() == 0) {
             return null;
@@ -179,13 +181,69 @@ public class Danmakus implements IDanmakus {
         if (items != null)
             items.clear();
         if (subItems != null) {
-            Iterator<BaseDanmaku> it = subItems.iterator();
+            IDanmakuIterator it = subItems.iterator();
             while (it.hasNext()) {
                 BaseDanmaku item = it.next();
                 item.setVisibility(false);
             }
             subItems.clear();
         }
+    }
+
+    @Override
+    public BaseDanmaku first() {
+        if (items != null && !items.isEmpty()) {
+            return ((SortedSet<BaseDanmaku>) items).first();
+        }
+        return null;
+    }
+
+    @Override
+    public BaseDanmaku last() {
+        if (items != null && !items.isEmpty()) {
+            return ((SortedSet<BaseDanmaku>) items).last();
+        }
+        return null;
+    }
+    
+    private class DanmakuIterator implements IDanmakuIterator{
+        
+        private Set<BaseDanmaku> mData;
+        private Iterator<BaseDanmaku> it;
+
+        public DanmakuIterator(Set<BaseDanmaku> datas){
+            setDatas(datas);
+        }
+        
+        public synchronized void reset(){
+            if(mData!=null){
+                it = mData.iterator();
+            }else{
+                it = null;
+            }
+        }
+
+        public synchronized void setDatas(Set<BaseDanmaku> datas){
+            mData = datas;
+        }
+
+        @Override
+        public synchronized BaseDanmaku next() {
+            return it != null ? it.next() : null;
+        }
+
+        @Override
+        public synchronized boolean hasNext() {
+            return it != null && it.hasNext();
+        }
+
+        @Override
+        public synchronized void remove() {
+            if(it!=null){
+                it.remove();
+            }
+        }
+
     }
 
     private class TimeComparator implements Comparator<BaseDanmaku> {
@@ -217,6 +275,11 @@ public class Danmakus implements IDanmakus {
             }
             return DanmakuUtils.compare(obj1, obj2);
         }
+    }
+
+    @Override
+    public boolean contains(BaseDanmaku item) {
+        return this.items != null && this.items.contains(item);
     }
 
 

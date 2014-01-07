@@ -21,7 +21,6 @@ import java.util.HashMap;
 import android.graphics.*;
 import android.graphics.Paint.Style;
 import android.text.TextPaint;
-import android.util.Log;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -35,7 +34,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     private Matrix matrix = new Matrix();
     
-    private HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>();
+    private final static HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>(); // thread safe is not Necessary
 
     private int HIT_CACHE_COUNT = 0;
 
@@ -43,44 +42,45 @@ public class AndroidDisplayer implements IDisplayer {
 
     public static TextPaint PAINT;
 
-    public static Paint STROKE;
-
     private static Paint ALPHA_PAINT;
 
     private static Paint UNDERLINE_PAINT;
-
-    /**
-     * 开启阴影，可动态改变
-     */
-    public static boolean HAS_SHADOW = true;
-
+    
     /**
      * 下划线高度
      */
     public static int UNDERLINE_HEIGHT = 4;
+    
+
+    /**
+     * 开启阴影，可动态改变
+     */
+    public static boolean CONFIG_HAS_SHADOW = true;
+    private static boolean HAS_SHADOW = CONFIG_HAS_SHADOW;
 
     /**
      * 开启描边，可动态改变
      */
-    public static boolean HAS_STROKE = false;
+    public static boolean CONFIG_HAS_STROKE = false;
+    private static boolean HAS_STROKE = CONFIG_HAS_STROKE;
 
     /**
      * 开启抗锯齿，可动态改变
      */
-    public static boolean ANTI_ALIAS = true;
+    public static boolean CONFIG_ANTI_ALIAS = true;
+    private static boolean ANTI_ALIAS = CONFIG_ANTI_ALIAS;
 
     static {
         PAINT = new TextPaint();
-        STROKE = new Paint();
+        PAINT.setStrokeWidth(4);
         ALPHA_PAINT = new Paint();
         UNDERLINE_PAINT = new Paint();
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
-        PAINT.setColor(Color.RED);
-        PAINT.setTextSize(50);
-        PAINT.setTypeface(Typeface.MONOSPACE);
-        STROKE.setStrokeWidth(1.5f);
-        STROKE.setStyle(Style.FILL_AND_STROKE);
-        // TODO: load font from file
+    }
+    
+    public static void setTypeFace(Typeface font){
+        if(PAINT!=null)
+            PAINT.setTypeface(font);
     }
 
     public Canvas canvas;
@@ -127,55 +127,55 @@ public class AndroidDisplayer implements IDisplayer {
 
     @Override
     public void draw(BaseDanmaku danmaku) {
-        float top = danmaku.getTop();
-        float left = danmaku.getLeft();
+        int top = (int)danmaku.getTop();
+        int left = (int)danmaku.getLeft();
+        int paintHeight = (int)danmaku.paintHeight;
         if (danmaku.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
-            top = height - top - danmaku.paintHeight;
+            top = height - top - paintHeight;
         }
         if (canvas != null) {
 
             Paint alphaPaint = null;
-            boolean restore = false;
+            boolean needRestore = false;
             if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
                 if (danmaku.getAlpha() == AlphaValue.TRANSPARENT) {
                     return;
                 }
                 if (danmaku.rotationZ != 0 || danmaku.rotationY != 0) {
                     saveCanvas(danmaku, canvas, left, top);
-                    restore = true;
+                    needRestore = true;
                 }
 
-                if (danmaku.getAlpha() != AlphaValue.MAX) {
+                int alpha = danmaku.getAlpha();
+                if ( alpha != AlphaValue.MAX) {
                     alphaPaint = ALPHA_PAINT;
                     alphaPaint.setAlpha(danmaku.getAlpha());
                 }
+            }
+            
+            // skip drawing when danmaku is transparent
+            if(alphaPaint!=null && alphaPaint.getAlpha()== AlphaValue.TRANSPARENT){
+                return;
             }
             // drawing cache
             boolean cacheDrawn = false;
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null) {
-                    // canvas.save();
-                    // canvas.translate(left, top);
-                    // canvas.drawBitmap(holder.bitmap, 0, 0, null);
-                    // canvas.restore();
-                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint); //Fixme check draw rect
+                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
                     cacheDrawn = true;
                 }
             }
             if (!cacheDrawn) {
                 if (alphaPaint != null) {
                     PAINT.setAlpha(alphaPaint.getAlpha());
-                    STROKE.setAlpha(alphaPaint.getAlpha());
                 } else {
                     resetPaintAlpha(PAINT);
-                    resetPaintAlpha(STROKE);
                 }
                 drawDanmaku(danmaku, canvas, left, top, true);
             }
 
-            if (restore) {
-                // need to restore canvas
+            if (needRestore) {
                 restoreCanvas(canvas);
             }
         }
@@ -211,28 +211,39 @@ public class AndroidDisplayer implements IDisplayer {
             HAS_SHADOW = false;
             ANTI_ALIAS = false;
         } else {
-            HAS_STROKE = false;
-            HAS_SHADOW = true;
-            ANTI_ALIAS = true;
+            HAS_STROKE = CONFIG_HAS_STROKE;
+            HAS_SHADOW = CONFIG_HAS_SHADOW;
+            ANTI_ALIAS = CONFIG_ANTI_ALIAS;
         }
         TextPaint paint = getPaint(danmaku);
-        if (danmaku.text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
-            String[] titleArr = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR); //Fixme reduce new object
-            if (titleArr.length == 1) {
-                if (HAS_STROKE)
-                    canvas.drawText(titleArr[0], left, top - STROKE.ascent(), STROKE);
-                canvas.drawText(titleArr[0], left, top - paint.ascent(), paint);
+        if (danmaku.lines != null) {
+            String[] lines = danmaku.lines;
+            if (lines.length == 1) {
+                if (HAS_STROKE){
+                    paint.setStyle(Style.STROKE);
+                    paint.setColor(danmaku.textShadowColor);
+                    canvas.drawText(lines[0], left, top - paint.ascent(), paint);
+                }
+                paint.setStyle(Style.FILL);
+                paint.setColor(danmaku.textColor);
+                canvas.drawText(lines[0], left, top - paint.ascent(), paint);
             } else {
-                for (int t = 0; t < titleArr.length; t++) {
-                    if (titleArr[t].length() > 0) {
-                        canvas.drawText(titleArr[t], left,
-                                t * danmaku.textSize + top - paint.ascent(), paint);
+                Float textHeight = getTextHeight(paint);
+                for (int t = 0; t < lines.length; t++) {
+                    if (lines[t].length() > 0) {
+                        canvas.drawText(lines[t], left,
+                                t * textHeight + top - paint.ascent(), paint);
                     }
                 }
             }
         } else {
-            if (HAS_STROKE)
-                canvas.drawText(danmaku.text, left, top - STROKE.ascent(), STROKE);
+            if (HAS_STROKE){                
+                paint.setStyle(Style.STROKE);
+                paint.setColor(danmaku.textShadowColor);
+                canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
+            }
+            paint.setStyle(Style.FILL);
+            paint.setColor(danmaku.textColor);
             canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
         }
 
@@ -254,11 +265,7 @@ public class AndroidDisplayer implements IDisplayer {
         PAINT.setTextSize(danmaku.textSize);
         PAINT.setColor(danmaku.textColor);
         PAINT.setAntiAlias(ANTI_ALIAS);
-        if (HAS_STROKE) {
-            // STROKE.setAntiAlias(ANTI_ALIAS);
-            STROKE.setTextSize(danmaku.textSize);
-            STROKE.setColor(danmaku.textShadowColor);
-        }
+        applyPaintConfig(danmaku, PAINT);
         if (HAS_SHADOW) {
             PAINT.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
         } else {
@@ -266,58 +273,55 @@ public class AndroidDisplayer implements IDisplayer {
         }
         return PAINT;
     }
+    
+    private static void applyPaintConfig(BaseDanmaku danmaku, Paint paint) {
+        if (danmaku.getType() != BaseDanmaku.TYPE_SPECIAL) {
+            paint.setAlpha(AlphaValue.MAX);
+        } else {
+            paint.setAlpha(DanmakuGlobalConfig.DEFAULT.alpha);
+        }
+    }
 
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
-        float[] wh = calcPaintWH(danmaku.text, paint);
-        danmaku.paintWidth = wh[0]; // paint.measureText(danmaku.text);
-        danmaku.paintHeight = wh[1]; // paint.getTextSize();
+        calcPaintWH(danmaku, paint);
+    }   
+    
+    private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
+        float w = 0;
+        Float textHeight = getTextHeight(paint);
+        if (danmaku.lines == null) {
+            w = paint.measureText(danmaku.text);
+            danmaku.paintWidth = w;
+            danmaku.paintHeight = textHeight;
+            return;
+        }
+
+        for(String tempStr : danmaku.lines){
+            if (tempStr.length() > 0) {
+                float tr = paint.measureText(tempStr);
+                w = Math.max(tr, w);
+            }
+        }
+
+        danmaku.paintWidth = w;
+        danmaku.paintHeight = danmaku.lines.length * textHeight;
     }
 
-    private float[] calcPaintWH(String text, TextPaint paint) {
-        float w = 0;
+    private static Float getTextHeight(TextPaint paint) {
         Float textSize = paint.getTextSize();
         Float textHeight = TextHeightCache.get(textSize);
         if(textHeight == null){
             Paint.FontMetrics fontMetrics = paint.getFontMetrics();
             textHeight = fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading;
             TextHeightCache.put(textSize, textHeight);
-        }        
-        if (!text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
-            w = paint.measureText(text);
-            return new float[] {
-                    w, textHeight
-            };
-        }
-
-        int stPos = 0, endPos = -1;
-        String tempStr;
-        int t = 0;
-
-        while ((endPos = text.indexOf(BaseDanmaku.DANMAKU_BR_CHAR, stPos)) != -1) {
-            t++;
-            tempStr = text.substring(stPos, endPos);
-            if (tempStr.length() > 0) {
-                float tr = paint.measureText(tempStr);
-                if (tr > 0) {
-                    w = tr > w ? tr : w;
-                }
-            }
-            stPos = endPos + 2;
-        }
-        if (stPos < text.length() - 1) {
-            t++;
-            tempStr = text.substring(stPos);
-            if (tempStr.equals(BaseDanmaku.DANMAKU_BR_CHAR) == false && tempStr.length() > 0) {
-                float tr = paint.measureText(tempStr);
-                w = Math.max(tr, w);
-            }
-        }
-
-        return new float[] {
-                w, (t + 1) * textHeight
-        };
+        }  
+        return textHeight;
+    }
+    
+    public static void clearTextHeightCache(){
+        TextHeightCache.clear();
     }
 
     @Override

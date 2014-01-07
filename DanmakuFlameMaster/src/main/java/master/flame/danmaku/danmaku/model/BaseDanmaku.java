@@ -45,6 +45,11 @@ public abstract class BaseDanmaku {
      * 文本
      */
     public String text;
+    
+    /**
+     * 多行文本: 如果有包含换行符需事先拆分到lines
+     */
+    public String[] lines;
 
     /**
      * 文本颜色
@@ -104,7 +109,12 @@ public abstract class BaseDanmaku {
     /**
      * 绘制用缓存
      */
-    public IDrawingCache cache;
+    public IDrawingCache<?> cache;
+    
+    /**
+     * 是否是直播弹幕
+     */
+    public boolean isLive;
 
     /**
      * 计时
@@ -115,8 +125,6 @@ public abstract class BaseDanmaku {
      * 透明度
      */
     protected int alpha = AlphaValue.MAX;
-
-    private long timer;
 
     public long getDuration() {
         return duration;

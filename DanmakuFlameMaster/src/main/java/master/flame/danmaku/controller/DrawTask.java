@@ -18,9 +18,9 @@ package master.flame.danmaku.controller;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.util.DisplayMetrics;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
@@ -82,7 +82,6 @@ public class DrawTask implements IDrawTask {
         synchronized (danmakuList){
             item.setTimer(mTimer);
             item.index = danmakuList.size();
-            item.underlineColor = Color.RED;
             danmakuList.addItem(item);
         }
     }
@@ -135,7 +134,7 @@ public class DrawTask implements IDrawTask {
     @Override
     public void quit() {
         mRenderer.clear();
-        danmakuList.clear();
+        //danmakuList.clear();
     }
 
     public void prepare() {

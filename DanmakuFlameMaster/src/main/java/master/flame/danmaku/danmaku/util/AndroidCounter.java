@@ -5,7 +5,7 @@ import android.util.Log;
 
 public class AndroidCounter {
 
-    private long counter = 0;
+    public long counter = 0;
 
     public AndroidCounter() {
     }

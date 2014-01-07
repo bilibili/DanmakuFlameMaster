@@ -25,7 +25,7 @@ public class SpecialDanmaku extends BaseDanmaku {
 
     public float pivotX, pivotY;
 
-    private float[] currStateValues = new float[4]; // currX,currY,currAlpha;
+    private float[] currStateValues = new float[4];
 
     @Override
     public void layout(IDisplayer displayer, float x, float y) {
@@ -42,9 +42,13 @@ public class SpecialDanmaku extends BaseDanmaku {
 
         // caculate alpha
         if (alphaDuration > 0 && deltaAlpha != 0) {
-            float alphaProgress = deltaTime / (float) alphaDuration;
-            int vectorAlpha = (int) (deltaAlpha * alphaProgress);
-            alpha = beginAlpha + vectorAlpha;
+            if(deltaTime >= alphaDuration){
+                alpha = endAlpha;
+            }else{
+                float alphaProgress = deltaTime / (float) alphaDuration;
+                int vectorAlpha = (int) (deltaAlpha * alphaProgress);
+                alpha = beginAlpha + vectorAlpha;
+            }
         }
 
         // caculate x y
@@ -61,6 +65,9 @@ public class SpecialDanmaku extends BaseDanmaku {
                 float vectorY = deltaY * tranalationProgress;
                 currY = beginY + vectorY;
             }
+        } else if(dtime > translationDuration){
+            currX = endX;
+            currY = endY;
         }
 
         currStateValues[0] = currX;

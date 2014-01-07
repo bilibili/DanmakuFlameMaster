@@ -17,29 +17,28 @@
 package master.flame.danmaku.danmaku.renderer.android;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuFilters;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
-import java.util.Iterator;
 
 public class DanmakuRenderer extends Renderer {
-
-    public static int ANTI_ALIAS_DISABLE_SIZE = 30;
-
-    public static int ANTI_ALIAS_ENABLE_SIZE = 5;
 
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus) {
         Danmakus drawItems = (Danmakus) danmakus;
-        Iterator<BaseDanmaku> itr = drawItems.iterator();
+        IDanmakuIterator itr = drawItems.iterator();
 
+        int orderInScreen = 0;
+        Long startTime = Long.valueOf(System.currentTimeMillis());
         while (itr.hasNext()) {
 
             BaseDanmaku drawItem = itr.next();
 
-            if (drawItem.isTimeOut()) {
+            if (drawItem.isTimeOut() || DanmakuFilters.getDefault().filter(drawItem , orderInScreen , startTime)) {
                 continue;
             }
 
@@ -52,10 +51,12 @@ public class DanmakuRenderer extends Renderer {
             DanmakusRetainer.fix(drawItem, disp);
 
             // draw
-            if (drawItem.isOutside()==false && drawItem.isShown() && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0) {
-
+            if (drawItem.isOutside()==false && drawItem.getLeft() < disp.getWidth() && drawItem.getRight() > 0) {
+                if(drawItem.getType() == BaseDanmaku.TYPE_SCROLL_RL){
+                    // 同屏弹幕密度只对滚动弹幕有效
+                    orderInScreen++;
+                }
                 drawItem.draw(disp);
-
             }
 
         }
@@ -64,6 +65,7 @@ public class DanmakuRenderer extends Renderer {
     @Override
     public void clear() {
         DanmakusRetainer.clear();
+        DanmakuFilters.getDefault().reset();
     }
 
 }

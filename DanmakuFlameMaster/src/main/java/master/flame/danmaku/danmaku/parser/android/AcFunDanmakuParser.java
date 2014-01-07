@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import android.graphics.Color;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
@@ -48,7 +47,7 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                         item.textSize = textSize * (mDispDensity - 0.6f);
                         item.textColor = color;
                         item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
-                        item.text = obj.optString("m", "....");
+                        DanmakuFactory.fillText(item, obj.optString("m", "...."));
                         item.index = i;
                         item.setTimer(mTimer);
                         danmakus.addItem(item);

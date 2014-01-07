@@ -35,10 +35,13 @@ public class DanmakuUtils {
             long duration, long currTime) {
         if (d1.getType() != d2.getType())
             return false;
-        long dTime = d2.time - d1.time;
-        if (dTime < 0 || Math.abs(dTime) >= duration)
+        if(d1.isOutside()){
             return false;
-        if (d1.isOutside() || d1.isTimeOut() || d2.isTimeOut()) {
+        }
+        long dTime = d2.time - d1.time;
+        if (dTime < 0)
+            return true;
+        if (Math.abs(dTime) >= duration || d1.isTimeOut() || d2.isTimeOut()) {
             return false;
         }
 
@@ -120,10 +123,13 @@ public class DanmakuUtils {
         } else if (val < 0) {
             return -1;
         }
+        
+        int result = Integer.valueOf(obj1.index).compareTo(obj2.index);
+        if (result != 0) {
+            return result;
+        }
 
-        Integer t1 = obj1.getType();
-        Integer t2 = obj2.getType();
-        int result = t1.compareTo(t2);
+        result = Integer.valueOf(obj1.getType()).compareTo(obj2.getType());
         if (result != 0) {
             return result;
         }
@@ -149,8 +155,6 @@ public class DanmakuUtils {
             return r < 0 ? -1 : 1;
 
         r = obj1.hashCode() - obj1.hashCode();
-        if (r != 0)
-            return r < 0 ? -1 : 1;
         return r;
     }
 
