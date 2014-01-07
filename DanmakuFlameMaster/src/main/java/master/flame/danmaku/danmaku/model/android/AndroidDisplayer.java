@@ -72,7 +72,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     static {
         PAINT = new TextPaint();
-        PAINT.setStrokeWidth(4);
+        PAINT.setStrokeWidth(3.5f);
         ALPHA_PAINT = new Paint();
         UNDERLINE_PAINT = new Paint();
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
