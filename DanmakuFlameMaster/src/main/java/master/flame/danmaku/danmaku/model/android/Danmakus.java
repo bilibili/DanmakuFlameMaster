@@ -192,7 +192,7 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public BaseDanmaku first() {
-        if (items != null) {
+        if (items != null && !items.isEmpty()) {
             return ((SortedSet<BaseDanmaku>) items).first();
         }
         return null;
@@ -200,7 +200,7 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public BaseDanmaku last() {
-        if (items != null) {
+        if (items != null && !items.isEmpty()) {
             return ((SortedSet<BaseDanmaku>) items).last();
         }
         return null;

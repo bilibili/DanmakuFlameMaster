@@ -237,6 +237,7 @@ public class DanmakuGlobalConfig {
         if (maxSize == 0) {
             DanmakuFilters.getDefault()
                     .unregisterFilter(DanmakuFilters.TAG_QUANTITY_DANMAKU_FILTER);
+            DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_ELAPSED_TIME_FILTER);
             return this;
         }
         // 自动调整

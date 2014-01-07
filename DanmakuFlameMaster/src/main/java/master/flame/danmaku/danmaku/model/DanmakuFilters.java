@@ -2,6 +2,7 @@
 package master.flame.danmaku.danmaku.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +21,7 @@ public class DanmakuFilters {
 
         public void setData(Object data);
 
-        public void clear();
+        public void reset();
 
     }
 
@@ -65,7 +66,7 @@ public class DanmakuFilters {
         }
 
         @Override
-        public void clear() {
+        public void reset() {
             mFilterTypes.clear();
         }
 
@@ -84,6 +85,11 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime) {
+            
+            if(danmakus.last()!=null && danmakus.last().isTimeOut()){
+                reset();
+            }
+            
             if (mMaximumSize <= 0 || danmaku.getType() != BaseDanmaku.TYPE_SCROLL_RL) {
                 return false;
             }
@@ -111,7 +117,7 @@ public class DanmakuFilters {
         }
 
         @Override
-        public void clear() {
+        public void reset() {
             danmakus.clear();
         }
     }
@@ -129,6 +135,11 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime) {
+            
+            if(danmakus.last()!=null && danmakus.last().isTimeOut()){
+                reset();
+            }
+            
             long elapsedTime = System.currentTimeMillis() - drawingStartTime.longValue();
             if (danmaku.isTimeOut() || !danmaku.isOutside()) {
                 return false;
@@ -149,7 +160,7 @@ public class DanmakuFilters {
         }
 
         @Override
-        public void clear() {
+        public void reset() {
             danmakus.clear();
         }
 
@@ -242,12 +253,18 @@ public class DanmakuFilters {
     public void unregisterFilter(String tag) {
         IDanmakuFilter f = filters.remove(tag);
         if (f != null)
-            f.clear();
+            f.reset();
         f = null;
     }
 
-    public void reset() {
+    public void clear() {
         filters.clear();
+    }
+    
+    public void reset() {
+        for (IDanmakuFilter f : filters.values()) {
+            f.reset();
+        }
     }
 
     private void throwFilterException() {
