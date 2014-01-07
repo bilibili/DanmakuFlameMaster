@@ -43,41 +43,46 @@ public class AndroidDisplayer implements IDisplayer {
 
     public static TextPaint PAINT;
 
-    public static Paint STROKE;
-
     private static Paint ALPHA_PAINT;
 
     private static Paint UNDERLINE_PAINT;
-
-    /**
-     * 开启阴影，可动态改变
-     */
-    public static boolean HAS_SHADOW = true;
-
+    
     /**
      * 下划线高度
      */
     public static int UNDERLINE_HEIGHT = 4;
+    
+
+    /**
+     * 开启阴影，可动态改变
+     */
+    public static boolean CONFIG_HAS_SHADOW = true;
+    private static boolean HAS_SHADOW = CONFIG_HAS_SHADOW;
 
     /**
      * 开启描边，可动态改变
      */
-    public static boolean HAS_STROKE = false;
+    public static boolean CONFIG_HAS_STROKE = false;
+    private static boolean HAS_STROKE = CONFIG_HAS_STROKE;
 
     /**
      * 开启抗锯齿，可动态改变
      */
-    public static boolean ANTI_ALIAS = true;
+    public static boolean CONFIG_ANTI_ALIAS = true;
+    private static boolean ANTI_ALIAS = CONFIG_ANTI_ALIAS;
 
     static {
-        PAINT = DanmakuGlobalConfig.DEFAULT.paint;
-        STROKE = new Paint();
+        PAINT = new TextPaint();
+        PAINT.setStrokeWidth(4);
         ALPHA_PAINT = new Paint();
         UNDERLINE_PAINT = new Paint();
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);        
-        STROKE.setStrokeWidth(1.5f);
-        STROKE.setStyle(Style.FILL_AND_STROKE);
         // TODO: load font from file
+    }
+    
+    public static void setTypeFace(Typeface font){
+        if(PAINT!=null)
+            PAINT.setTypeface(font);
     }
 
     public Canvas canvas;
@@ -161,10 +166,8 @@ public class AndroidDisplayer implements IDisplayer {
             if (!cacheDrawn) {
                 if (alphaPaint != null) {
                     PAINT.setAlpha(alphaPaint.getAlpha());
-                    STROKE.setAlpha(alphaPaint.getAlpha());
                 } else {
                     resetPaintAlpha(PAINT);
-                    resetPaintAlpha(STROKE);
                 }
                 drawDanmaku(danmaku, canvas, left, top, true);
             }
@@ -205,16 +208,21 @@ public class AndroidDisplayer implements IDisplayer {
             HAS_SHADOW = false;
             ANTI_ALIAS = false;
         } else {
-            HAS_STROKE = false;
-            HAS_SHADOW = true;
-            ANTI_ALIAS = true;
+            HAS_STROKE = CONFIG_HAS_STROKE;
+            HAS_SHADOW = CONFIG_HAS_SHADOW;
+            ANTI_ALIAS = CONFIG_ANTI_ALIAS;
         }
         TextPaint paint = getPaint(danmaku);
         if (danmaku.lines != null) {
             String[] lines = danmaku.lines;
             if (lines.length == 1) {
-                if (HAS_STROKE)
-                    canvas.drawText(lines[0], left, top - STROKE.ascent(), STROKE);
+                if (HAS_STROKE){
+                    paint.setStyle(Style.STROKE);
+                    paint.setColor(danmaku.textShadowColor);
+                    canvas.drawText(lines[0], left, top - paint.ascent(), paint);
+                }
+                paint.setStyle(Style.FILL);
+                paint.setColor(danmaku.textColor);
                 canvas.drawText(lines[0], left, top - paint.ascent(), paint);
             } else {
                 Float textHeight = getTextHeight(paint);
@@ -226,8 +234,13 @@ public class AndroidDisplayer implements IDisplayer {
                 }
             }
         } else {
-            if (HAS_STROKE)
-                canvas.drawText(danmaku.text, left, top - STROKE.ascent(), STROKE);
+            if (HAS_STROKE){                
+                paint.setStyle(Style.STROKE);
+                paint.setColor(danmaku.textShadowColor);
+                canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
+            }
+            paint.setStyle(Style.FILL);
+            paint.setColor(danmaku.textColor);
             canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
         }
 
@@ -250,12 +263,6 @@ public class AndroidDisplayer implements IDisplayer {
         PAINT.setColor(danmaku.textColor);
         PAINT.setAntiAlias(ANTI_ALIAS);
         applyPaintConfig(danmaku, PAINT);
-        if (HAS_STROKE) {
-            // STROKE.setAntiAlias(ANTI_ALIAS);
-            STROKE.setTextSize(danmaku.textSize);
-            STROKE.setColor(danmaku.textShadowColor);
-            applyPaintConfig(danmaku , STROKE);
-        }
         if (HAS_SHADOW) {
             PAINT.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
         } else {

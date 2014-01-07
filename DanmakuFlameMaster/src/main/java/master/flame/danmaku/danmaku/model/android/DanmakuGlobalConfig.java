@@ -13,7 +13,7 @@ import android.text.TextPaint;
 
 public class DanmakuGlobalConfig {
     /*
-     * TODO 选项：合并异色同字弹幕缓存 选项：弹幕阴影样式
+     * TODO 选项：合并异色同字弹幕缓存 
      */
 
     public static DanmakuGlobalConfig DEFAULT = new DanmakuGlobalConfig();
@@ -31,8 +31,6 @@ public class DanmakuGlobalConfig {
     public boolean isTranslucent = false;
 
     public float scaleTextSize = 1.0f;
-
-    public TextPaint paint = new TextPaint();
 
     /**
      * 弹幕大小是否被缩放
@@ -89,7 +87,7 @@ public class DanmakuGlobalConfig {
         if (mFont != font) {
             mFont = font;
             AndroidDisplayer.clearTextHeightCache();
-            paint.setTypeface(mFont); // thread safe is not necessary
+            AndroidDisplayer.setTypeFace(font);
         }
         return this;
     }
@@ -119,6 +117,8 @@ public class DanmakuGlobalConfig {
     }
 
     List<Integer> mFilterTypes = new ArrayList<Integer>();
+
+    private int mDanmakuStyle;
 
     /**
      * 设置是否显示顶部弹幕
@@ -231,6 +231,11 @@ public class DanmakuGlobalConfig {
         return this;
     }
 
+    /**
+     * 设置同屏弹幕密度 -1自动 0无限制
+     * @param maxSize
+     * @return
+     */
     public DanmakuGlobalConfig setMaximumVisibleSizeInScreen(int maxSize) {
         maximumNumsInScreen = maxSize;
         // 无限制
@@ -249,6 +254,33 @@ public class DanmakuGlobalConfig {
             return this;
         }
         setFilterData(DanmakuFilters.TAG_QUANTITY_DANMAKU_FILTER, maxSize);
+        return this;
+    }
+    
+    public final static int DANMAKU_STYLE_NONE = 0; //无
+    public final static int DANMAKU_STYLE_SHADOW = 1; //阴影
+    public final static int DANMAKU_STYLE_STROKEN = 2; //描边
+    /**
+     * 设置描边样式
+     * @param type DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or DANMAKU_STYLE_STROKEN
+     * @return
+     */
+    public DanmakuGlobalConfig setDanmakuStyle(int style){
+        mDanmakuStyle = style;
+        switch(style){
+            case DANMAKU_STYLE_NONE:
+                AndroidDisplayer.CONFIG_HAS_SHADOW = false;
+                AndroidDisplayer.CONFIG_HAS_STROKE = false;
+                break;
+            case DANMAKU_STYLE_SHADOW:
+                AndroidDisplayer.CONFIG_HAS_SHADOW = true;
+                AndroidDisplayer.CONFIG_HAS_STROKE = false;
+                break;
+            case DANMAKU_STYLE_STROKEN:
+                AndroidDisplayer.CONFIG_HAS_SHADOW = false;
+                AndroidDisplayer.CONFIG_HAS_STROKE = true;
+                break;
+        }
         return this;
     }
 
