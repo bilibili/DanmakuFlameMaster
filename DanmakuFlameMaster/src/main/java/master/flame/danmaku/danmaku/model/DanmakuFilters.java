@@ -129,7 +129,7 @@ public class DanmakuFilters {
      */
     public static class ElapsedTimeFilter implements IDanmakuFilter {
 
-        long mMaxTime = 30; // 绘制超过30ms就跳过 ，默认保持接近30fps
+        long mMaxTime = 20; // 绘制超过20ms就跳过 ，默认保持接近50fps
 
         protected final IDanmakus danmakus = new Danmakus();
 
@@ -139,14 +139,16 @@ public class DanmakuFilters {
             if(danmakus.last()!=null && danmakus.last().isTimeOut()){
                 reset();
             }
-            
-            long elapsedTime = System.currentTimeMillis() - drawingStartTime.longValue();
-            if (danmaku.isTimeOut() || !danmaku.isOutside()) {
-                return false;
-            }
+
             if (danmakus.contains(danmaku)) {
                 return true;
             }
+            
+            if (!danmaku.isOutside()) {
+                return false;
+            }
+            
+            long elapsedTime = System.currentTimeMillis() - drawingStartTime.longValue();
             if (elapsedTime >= mMaxTime) {
                 danmakus.addItem(danmaku);
                 return true;
