@@ -22,6 +22,8 @@ public class L2RDanmaku extends BaseDanmaku {
 
     private float y = -1;
 
+    private float[] RECT = null;
+
     public L2RDanmaku(long duration) {
         this.duration = duration;
     }
@@ -54,10 +56,14 @@ public class L2RDanmaku extends BaseDanmaku {
         if (!isMeasured())
             return null;
         float left = getLeft(displayer, time);
-        float[] rect = new float[] {
-                left, y, left + paintWidth, y + paintHeight
-        };
-        return rect;
+        if (RECT == null) {
+            RECT = new float[4];
+        }
+        RECT[0] = left;
+        RECT[1] = y;
+        RECT[2] = left + paintWidth;
+        RECT[3] = y + paintHeight; 
+        return RECT;
     }
 
     @Override
