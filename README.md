@@ -42,6 +42,8 @@ android上的弹幕转换、渲染输出源码
 
 - lib目录问题()
 
+- 减少clearCanvas刷新次数
+
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
