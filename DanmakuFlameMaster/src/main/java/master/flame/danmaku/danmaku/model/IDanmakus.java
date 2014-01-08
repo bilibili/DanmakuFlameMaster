@@ -27,5 +27,13 @@ public interface IDanmakus {
     public int size();
 
     public void clear();
+    
+    public BaseDanmaku first();
+    
+    public BaseDanmaku last();
+    
+    public IDanmakuIterator iterator();
+    
+    public boolean contains(BaseDanmaku item);
 
 }

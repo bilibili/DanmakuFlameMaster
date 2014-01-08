@@ -30,8 +30,6 @@ public class BiliDanmakuLoader implements ILoader {
 
     private AndroidFileSource dataSource;
 
-    private Uri uri;
-
     private BiliDanmakuLoader() {
 
     }
@@ -44,9 +42,8 @@ public class BiliDanmakuLoader implements ILoader {
     }
 
     public void load(String uri) throws IllegalDataException {
-        try {
-            this.uri = Uri.parse(uri);
-            dataSource = new AndroidFileSource(this.uri);
+        try {            
+            dataSource = new AndroidFileSource(uri);
         } catch (Exception e) {
         	throw new IllegalDataException(e);
         }

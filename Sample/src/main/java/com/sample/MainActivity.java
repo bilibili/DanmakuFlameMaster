@@ -1,7 +1,5 @@
 package com.sample;
 
-import java.io.InputStream;
-
 import master.flame.danmaku.controller.DMSiteType;
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;

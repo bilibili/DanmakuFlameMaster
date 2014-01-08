@@ -18,10 +18,10 @@ package master.flame.danmaku.controller;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.util.DisplayMetrics;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
@@ -83,7 +83,6 @@ public class DrawTask implements IDrawTask {
         synchronized (danmakuList){
             item.setTimer(mTimer);
             item.index = danmakuList.size();
-            item.underlineColor = Color.RED;
             danmakuList.addItem(item);
         }
     }
@@ -129,9 +128,14 @@ public class DrawTask implements IDrawTask {
     }
 
     @Override
+    public void start() {
+
+    }
+
+    @Override
     public void quit() {
         mRenderer.clear();
-        danmakuList.clear();
+        //danmakuList.clear();
     }
 
     public void prepare() throws IllegalDataException {
@@ -154,10 +158,12 @@ public class DrawTask implements IDrawTask {
         if (danmakuList != null) {
             long currMills = timer.currMillisecond;
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
-            if (danmakus != null) {
-                mDisp.update(canvas);
-                mRenderer.draw(mDisp, danmakus);
-            }
+            int size = danmakus.size();            
+            DrawHelper.clearCanvas(canvas);
+            mDisp.update(canvas);
+            if (size == 0)
+                return;
+            mRenderer.draw(mDisp, danmakus);
         }
     }
 

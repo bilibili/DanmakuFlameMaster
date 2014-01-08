@@ -35,10 +35,13 @@ public class DanmakuUtils {
             long duration, long currTime) {
         if (d1.getType() != d2.getType())
             return false;
-        long dTime = d2.time - d1.time;
-        if (dTime < 0 || Math.abs(dTime) >= duration)
+        if(d1.isOutside()){
             return false;
-        if (d1.isOutside() || d1.isTimeOut() || d2.isTimeOut()) {
+        }
+        long dTime = d2.time - d1.time;
+        if (dTime < 0)
+            return true;
+        if (Math.abs(dTime) >= duration || d1.isTimeOut() || d2.isTimeOut()) {
             return false;
         }
 
@@ -88,8 +91,8 @@ public class DanmakuUtils {
             DrawingCache cache) {
         if (cache == null)
             cache = new DrawingCache();
-        cache.build((int) danmaku.paintWidth + 2, (int) danmaku.paintHeight + 2,
-                disp.getDensityDpi());
+
+        cache.build((int) danmaku.paintWidth, (int) danmaku.paintHeight, disp.getDensityDpi());
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
             AndroidDisplayer.drawDanmaku(danmaku, holder.canvas, 0, 0, false);
@@ -97,9 +100,21 @@ public class DanmakuUtils {
         return cache;
     }
 
+    public static int getCacheSize(int w, int h) {
+        return (w) * (h) * 4;
+    }
+
     public static int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
         if (obj1 == obj2) {
             return 0;
+        }
+
+        if (obj1 == null) {
+            return -1;
+        }
+
+        if (obj2 == null) {
+            return 1;
         }
 
         long val = obj1.time - obj2.time;
@@ -108,10 +123,13 @@ public class DanmakuUtils {
         } else if (val < 0) {
             return -1;
         }
+        
+        int result = Integer.valueOf(obj1.index).compareTo(obj2.index);
+        if (result != 0) {
+            return result;
+        }
 
-        Integer t1 = obj1.getType();
-        Integer t2 = obj2.getType();
-        int result = t1.compareTo(t2);
+        result = Integer.valueOf(obj1.getType()).compareTo(obj2.getType());
         if (result != 0) {
             return result;
         }
@@ -137,8 +155,6 @@ public class DanmakuUtils {
             return r < 0 ? -1 : 1;
 
         r = obj1.hashCode() - obj1.hashCode();
-        if (r != 0)
-            return r < 0 ? -1 : 1;
         return r;
     }
 

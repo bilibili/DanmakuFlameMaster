@@ -23,6 +23,7 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -123,7 +124,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
             if (item != null) {
-                item.text = decodeXmlString(new String(ch, start, length));
+                DanmakuFactory.fillText(item, decodeXmlString(new String(ch, start, length)));
                 item.index = index++;
 
                 // initial specail danmaku data

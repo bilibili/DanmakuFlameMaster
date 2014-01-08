@@ -25,6 +25,8 @@ public class FTDanmaku extends BaseDanmaku {
 
     protected float y = -1;
 
+    private float[] RECT = null;
+
     public FTDanmaku(long duration) {
         this.duration = duration;
     }
@@ -33,15 +35,15 @@ public class FTDanmaku extends BaseDanmaku {
     public void layout(IDisplayer displayer, float x, float y) {
         if (mTimer != null) {
             long deltaDuration = mTimer.currMillisecond - time;
-            if (deltaDuration >= 0 && deltaDuration <= duration) {
+            if (deltaDuration > 0 && deltaDuration < duration) {
                 if (this.visibility == INVISIBLE) {
                     this.x = getLeft(displayer);
                     this.y = y;
                     this.visibility = VISIBLE;
                 }
-            } else if (deltaDuration > duration) {
+            } else if (deltaDuration >= duration) {
                 this.visibility = INVISIBLE;
-            } else if (deltaDuration < 0) {
+            } else if (deltaDuration <= 0) {
                 this.visibility = INVISIBLE;
             }
         }
@@ -58,10 +60,14 @@ public class FTDanmaku extends BaseDanmaku {
         if (!isMeasured())
             return null;
         float left = getLeft(displayer);
-        float[] rect = new float[] {
-                left, y, left + paintWidth, y + paintHeight
-        };
-        return rect;
+        if (RECT == null) {
+            RECT = new float[4];
+        }
+        RECT[0] = left;
+        RECT[1] = y;
+        RECT[2] = left + paintWidth;
+        RECT[3] = y + paintHeight; 
+        return RECT;
     }
 
     @Override

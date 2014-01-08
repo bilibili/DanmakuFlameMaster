@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.danmaku.parser;
 
+import android.text.TextUtils;
 import master.flame.danmaku.danmaku.model.*;
 
 public class DanmakuFactory {
@@ -24,15 +25,22 @@ public class DanmakuFactory {
 
     public static float BILI_PLAYER_HEIGHT = 385;
 
-    public static long COMMON_DANMAKU_DURATION = 3500; // B站原始分辨率下弹幕存活时间
+    public static long COMMON_DANMAKU_DURATION = 3800; // B站原始分辨率下弹幕存活时间
 
     public static long REAL_DANMAKU_DURATION = -1;
 
     public static long MAX_DANMAKU_DURATION = -1;
 
+    public static long MIN_DANMAKU_DURATION = 4000;
+
+    public static long MAX_DANMAKU_DURATION_HIGH_DENSITY = 8000;
+
     public static BaseDanmaku createDanmaku(int type, float dispWidth) {
-        if (REAL_DANMAKU_DURATION == -1)
+        if (REAL_DANMAKU_DURATION == -1) {
             REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
+            REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY, REAL_DANMAKU_DURATION);
+            REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
+        }
         if (MAX_DANMAKU_DURATION == -1) {
             MAX_DANMAKU_DURATION = Math.max(REAL_DANMAKU_DURATION, COMMON_DANMAKU_DURATION);
         }
@@ -53,7 +61,7 @@ public class DanmakuFactory {
             case 7: // 特殊弹幕
                 instance = new SpecialDanmaku();
                 break;
-            // TODO: more Danmaku type
+        // TODO: more Danmaku type
         }
         return instance;
     }
@@ -61,9 +69,23 @@ public class DanmakuFactory {
     public static void updateDanmakuDuration(BaseDanmaku danmaku, float dispWidth) {
         danmaku.duration = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
     }
+    
+
+    public static void fillText(BaseDanmaku danmaku, String text) {
+        danmaku.text = text;
+        if (TextUtils.isEmpty(text) || text.indexOf(BaseDanmaku.DANMAKU_BR_CHAR) == -1) {
+            return;
+        }
+
+        String[] lines = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);
+        if (lines.length > 1) {
+            danmaku.lines = lines;
+        }
+    }
 
     /**
      * Initial translation data of the special danmaku
+     * 
      * @param item
      * @param dispWidth
      * @param dispHeight
@@ -74,9 +96,9 @@ public class DanmakuFactory {
      * @param translationDuration
      * @param translationStartDelay
      */
-    public static void fillTranslationData(BaseDanmaku item, int dispWidth, int dispHeight, float beginX,
-                                           float beginY, float endX, float endY, long translationDuration,
-                                           long translationStartDelay) {
+    public static void fillTranslationData(BaseDanmaku item, int dispWidth, int dispHeight,
+            float beginX, float beginY, float endX, float endY, long translationDuration,
+            long translationStartDelay) {
         if (item.getType() != BaseDanmaku.TYPE_SPECIAL)
             return;
         float scaleX = dispWidth / BILI_PLAYER_WIDTH;
@@ -87,14 +109,14 @@ public class DanmakuFactory {
 
     /**
      * Initial alpha data of the special danmaku
-     *
+     * 
      * @param item
      * @param beginAlpha
      * @param endAlpha
      * @param alphaDuraion
      */
     public static void fillAlphaData(BaseDanmaku item, int beginAlpha, int endAlpha,
-                                     long alphaDuraion) {
+            long alphaDuraion) {
         if (item.getType() != BaseDanmaku.TYPE_SPECIAL)
             return;
         ((SpecialDanmaku) item).setAlphaData(beginAlpha, endAlpha, alphaDuraion);

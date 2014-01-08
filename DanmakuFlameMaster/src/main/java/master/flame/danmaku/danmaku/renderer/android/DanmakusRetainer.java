@@ -17,6 +17,7 @@
 package master.flame.danmaku.danmaku.renderer.android;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
@@ -92,7 +93,6 @@ public class DanmakusRetainer {
 
     private static class RLDanmakusRetainer implements IDanmakusRetainer {
 
-        private static int LINE_SPACING = 7;
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
 
         @Override
@@ -103,7 +103,7 @@ public class DanmakusRetainer {
             boolean shown = drawItem.isShown();
             if (!shown) {
                 // 确定弹幕位置
-                Iterator<BaseDanmaku> it = mVisibleDanmakus.iterator();
+                IDanmakuIterator it = mVisibleDanmakus.iterator();
                 BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null;
                 boolean overwriteInsert = false;
                 while (it.hasNext()) {
@@ -111,13 +111,15 @@ public class DanmakusRetainer {
 
                     if(item == drawItem){
                         insertItem = item;
+                        lastItem = null;
+                        shown = true;
                         break;
                     }
-
+                    
                     if (firstItem == null)
                         firstItem = item;
 
-                    if (drawItem.paintHeight + item.getTop() + LINE_SPACING > disp.getHeight()) {
+                    if (drawItem.paintHeight + item.getTop() > disp.getHeight()) {
                         overwriteInsert = true;
                         break;
                     }
@@ -147,29 +149,35 @@ public class DanmakusRetainer {
                         topPos = lastItem.getBottom();
                     else
                         topPos = insertItem.getTop();
-                    mVisibleDanmakus.removeItem(insertItem);
+                    if (insertItem != drawItem){
+                        mVisibleDanmakus.removeItem(insertItem);
+                        shown = false;
+                    }
                 } else if (overwriteInsert) {
                     if (minRightRow != null) {
                         topPos = minRightRow.getTop();
-                        mVisibleDanmakus.removeItem(minRightRow);
+                        if(minRightRow.paintWidth<drawItem.paintWidth){
+                            mVisibleDanmakus.removeItem(minRightRow);
+                            shown = false;
+                        }
                     }
                 } else if (lastItem != null && insertItem == null) {
                     topPos = lastItem.getBottom();
                 } else if (topPos == 0 && firstItem != null) {
                     topPos = firstItem.getTop();
                     mVisibleDanmakus.removeItem(firstItem);
+                    shown = false;
                 } else if (firstItem == null) {
                     topPos = 0;
                 }
 
                 topPos = checkVerticalEdge(overwriteInsert, drawItem, disp, topPos, firstItem,
                         lastItem);
+                if (topPos == 0 && mVisibleDanmakus.size()==0) {
+                    shown = false;
+                }
             }
 
-            // layout
-            if(topPos>0){
-                topPos += LINE_SPACING;
-            }
             drawItem.layout(disp, drawItem.getLeft(), topPos);
 
             if (!shown) {
@@ -180,9 +188,9 @@ public class DanmakusRetainer {
 
         protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
                 IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
-            if (topPos < 0 || topPos + drawItem.paintHeight + LINE_SPACING > disp.getHeight()) {
+            if (topPos < 0 || (firstItem!=null && firstItem.getTop() > 0) || topPos + drawItem.paintHeight > disp.getHeight()) {
                 topPos = 0;
-                mVisibleDanmakus.clear();
+                clear();
             }
             return topPos;
         }

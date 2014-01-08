@@ -5,7 +5,7 @@ import android.util.Log;
 
 public class AndroidCounter {
 
-    private long counter = 0;
+    public long counter = 0;
 
     public AndroidCounter() {
     }
@@ -24,7 +24,7 @@ public class AndroidCounter {
      */
     public void end(String tag) {
         end();
-        Log.e(tag, Long.toString(counter) + " ms");
+        Log.d(tag, Long.toString(counter) + " ms");
     }
 
     public AndroidCounter end() {

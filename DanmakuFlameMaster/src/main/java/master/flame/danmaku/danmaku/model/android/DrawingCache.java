@@ -13,6 +13,8 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
     private DrawingCache mNextElement;
 
     private boolean mIsPooled;
+    
+    private int referenceCount = 0;
 
     public DrawingCache() {
         mHolder = new DrawingCacheHolder();
@@ -44,6 +46,7 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
             mHolder.recycle();
         }
         mSize = 0;
+        referenceCount = 0;
     }
 
     @Override
@@ -72,5 +75,20 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
     @Override
     public void setPooled(boolean isPooled) {
         mIsPooled = isPooled;
+    }
+
+    @Override
+    public boolean hasReferences() {
+        return referenceCount > 0;
+    }
+
+    @Override
+    public void increaseReference() {
+        referenceCount++;
+    }
+
+    @Override
+    public void decreaseReference() {
+        referenceCount--;
     }
 }

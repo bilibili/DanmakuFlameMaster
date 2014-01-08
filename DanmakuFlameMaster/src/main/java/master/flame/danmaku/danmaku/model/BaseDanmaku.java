@@ -45,6 +45,11 @@ public abstract class BaseDanmaku {
      * 文本
      */
     public String text;
+    
+    /**
+     * 多行文本: 如果有包含换行符需事先拆分到lines
+     */
+    public String[] lines;
 
     /**
      * 文本颜色
@@ -104,7 +109,12 @@ public abstract class BaseDanmaku {
     /**
      * 绘制用缓存
      */
-    public IDrawingCache cache;
+    public IDrawingCache<?> cache;
+    
+    /**
+     * 是否是直播弹幕
+     */
+    public boolean isLive;
 
     /**
      * 计时
@@ -115,8 +125,6 @@ public abstract class BaseDanmaku {
      * 透明度
      */
     protected int alpha = AlphaValue.MAX;
-
-    private long timer;
 
     public long getDuration() {
         return duration;
@@ -154,7 +162,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isTimeOut(long ctime) {
-        return ctime - time > duration;
+        return ctime - time >= duration;
     }
 
     public boolean isOutside() {
@@ -165,7 +173,8 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isOutside(long ctime) {
-        return time > ctime || ctime - time > duration;
+        long dtime = ctime - time;
+        return dtime <= 0 ||  dtime >= duration;
     }
 
     public void setVisibility(boolean b) {

@@ -72,7 +72,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     private void init() {
-        setZOrderOnTop(true);
+        setZOrderMediaOverlay(true);
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
@@ -128,9 +128,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public void release() {
         stop();
-        if (drawTask != null) {
-            drawTask.quit();
-        }
     }
 
     public void stop() {
@@ -138,6 +135,9 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     private void stopDraw() {
+        if (drawTask != null) {
+            drawTask.quit();
+        }
         if (handler != null) {
             handler.quit();
             handler = null;
@@ -176,23 +176,24 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         mShowFps = show;
     }
 
-    void drawDanmakus() {
+    long drawDanmakus() {
         if (!isSurfaceCreated)
-            return;
+            return 0;
         if(!isShown())
-            return;
+            return 0;
         long stime = System.currentTimeMillis();
+        long dtime = 0;
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
-            DrawHelper.clearCanvas(canvas);
             drawTask.draw(canvas);
+            dtime = System.currentTimeMillis() - stime;
             if(mShowFps){
-                long dtime = System.currentTimeMillis() - stime;
-                String fps = String.format("fps %.2f", 1000 / (float) dtime);
+                String fps = String.format("%02d MS, fps %.2f",dtime, 1000 / (float) dtime);
                 DrawHelper.drawText(canvas, fps);
             }
             mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
+        return dtime;
     }
 
     public void toggle() {
@@ -343,6 +344,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 	}
                     break;
                 case START:
+                    removeCallbacksAndMessages(null);
                     pausedPostion = (Long) msg.obj;
                 case RESUME:
                     quitFlag = false;
@@ -351,27 +353,36 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                         timer.update(pausedPostion);
                         removeMessages(RESUME);
                         sendEmptyMessage(UPDATE);
+                        drawTask.start();
                     } else {
                         sendEmptyMessageDelayed(RESUME, 100);
                     }
                     break;
                 case SEEK_POS:
+                    removeCallbacksAndMessages(null);
                     if(quitFlag) break;
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                     drawTask.seek(System.currentTimeMillis() - mTimeBase);
                 case UPDATE:
-                    long d = timer.update(System.currentTimeMillis() - mTimeBase);
+                    if (quitFlag) {
+                        break;
+                    }
+                    long startMS = System.currentTimeMillis();
+                    long d = timer.update(startMS - mTimeBase);
                     if (mCallback != null) {
                         mCallback.updateTimer(timer);
                     }
-                    drawDanmakus();
-                    if (d < 10) {
-                        try {
-                            Thread.sleep(15 - d);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    if(d<=0){
+                        removeMessages(UPDATE);
+                        sendEmptyMessageDelayed(UPDATE, 60 - d);
+                        break;
+                    }
+                    d = drawDanmakus();
+                    removeMessages(UPDATE);
+                    if (d < 15) {
+                        sendEmptyMessageDelayed(UPDATE, 15 - d);
+                        break;
                     }
                     if (!quitFlag)
                         sendEmptyMessage(UPDATE);
