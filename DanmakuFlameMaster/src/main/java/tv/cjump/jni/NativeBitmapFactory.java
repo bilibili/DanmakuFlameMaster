@@ -4,6 +4,7 @@ package tv.cjump.jni;
 import java.lang.reflect.Field;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 public class NativeBitmapFactory {
 
@@ -41,6 +42,9 @@ public class NativeBitmapFactory {
         } catch (Exception e) {
             e.printStackTrace();
             nativeLibLoaded = false;
+        } catch (Error e){
+            e.printStackTrace();
+            nativeLibLoaded = false;
         }
         if (nativeLibLoaded) {
             initField();
@@ -49,7 +53,7 @@ public class NativeBitmapFactory {
                 // 测试so文件函数调用失败
                 nativeLibLoaded = false;
             }
-        }
+        }        
     }
 
     static void initField() {

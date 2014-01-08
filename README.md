@@ -40,6 +40,8 @@ android上的弹幕转换、渲染输出源码
 
 - 使用步长控制/优化滚动抖动
 
+- lib目录问题()
+
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
