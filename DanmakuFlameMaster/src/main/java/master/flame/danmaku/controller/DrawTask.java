@@ -157,10 +157,12 @@ public class DrawTask implements IDrawTask {
         if (danmakuList != null) {
             long currMills = timer.currMillisecond;
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
-            if (danmakus != null) {
-                mDisp.update(canvas);
-                mRenderer.draw(mDisp, danmakus);
-            }
+            int size = danmakus.size();            
+            DrawHelper.clearCanvas(canvas);
+            mDisp.update(canvas);
+            if (size == 0)
+                return;
+            mRenderer.draw(mDisp, danmakus);
         }
     }
 

@@ -129,7 +129,7 @@ public class DanmakuFilters {
      */
     public static class ElapsedTimeFilter implements IDanmakuFilter {
 
-        long mMaxTime = 40; // 绘制超过40ms就跳过 ，保持接近25fps
+        long mMaxTime = 30; // 绘制超过30ms就跳过 ，默认保持接近30fps
 
         protected final IDanmakus danmakus = new Danmakus();
 

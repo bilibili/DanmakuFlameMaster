@@ -127,8 +127,8 @@ public class AndroidDisplayer implements IDisplayer {
 
     @Override
     public void draw(BaseDanmaku danmaku) {
-        int top = (int)danmaku.getTop();
-        int left = (int)danmaku.getLeft();
+        float top = danmaku.getTop();
+        float left = danmaku.getLeft();
         int paintHeight = (int)danmaku.paintHeight;
         if (danmaku.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
             top = height - top - paintHeight;

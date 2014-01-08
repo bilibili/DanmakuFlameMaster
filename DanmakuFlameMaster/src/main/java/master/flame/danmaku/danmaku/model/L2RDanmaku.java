@@ -30,15 +30,15 @@ public class L2RDanmaku extends BaseDanmaku {
     public void layout(IDisplayer displayer, float x, float y) {
         if (mTimer != null) {
             long deltaDuration = mTimer.currMillisecond - time;
-            if (deltaDuration >= 0 && deltaDuration <= duration) {
+            if (deltaDuration > 0 && deltaDuration < duration) {
                 this.x = getLeft(displayer, mTimer.currMillisecond);
                 if (this.visibility == INVISIBLE) {
                     this.y = y;
                     this.visibility = VISIBLE;
                 }
-            } else if (deltaDuration > duration) {
+            } else if (deltaDuration >= duration) {
                 this.visibility = INVISIBLE;
-            } else if (deltaDuration < 0) {
+            } else if (deltaDuration <= 0) {
                 this.visibility = INVISIBLE;
             }
         }

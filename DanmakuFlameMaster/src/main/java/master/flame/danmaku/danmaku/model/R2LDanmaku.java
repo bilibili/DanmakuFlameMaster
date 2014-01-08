@@ -22,6 +22,10 @@ public class R2LDanmaku extends BaseDanmaku {
 
     private float y = -1;
 
+    private int mDistance;
+
+    private int mHorizontalStep;
+
     public R2LDanmaku(long duration) {
         this.duration = duration;
     }
@@ -30,23 +34,26 @@ public class R2LDanmaku extends BaseDanmaku {
     public void layout(IDisplayer displayer, float x, float y) {
         if (mTimer != null) {
             long deltaDuration = mTimer.currMillisecond - time;
-            if (deltaDuration >= 0 && deltaDuration <= duration) {
+            if (deltaDuration > 0 && deltaDuration < duration) {
                 this.x = getLeft(displayer, mTimer.currMillisecond);
                 if (this.visibility == INVISIBLE) {
                     this.y = y;
                     this.visibility = VISIBLE;
                 }
-            } else if (deltaDuration > duration) {
+            } else if (deltaDuration >= duration) {
                 this.visibility = INVISIBLE;
-            } else if (deltaDuration < 0) {
+            } else if (deltaDuration <= 0) {
                 this.visibility = INVISIBLE;
             }
         }
     }
 
     private float getLeft(IDisplayer displayer, long currTime) {
-        return (1 - (currTime - time) / (float) duration) * (displayer.getWidth() + paintWidth)
-                - paintWidth;
+        long elapsedTime = currTime - time;
+        if(elapsedTime >= duration){
+            return -paintWidth;
+        }
+        return displayer.getWidth() - elapsedTime * mDistance / duration;
     }
 
     @Override
@@ -83,6 +90,12 @@ public class R2LDanmaku extends BaseDanmaku {
     @Override
     public int getType() {
         return TYPE_SCROLL_RL;
+    }
+    
+    @Override
+    public void measure(IDisplayer displayer) {
+        super.measure(displayer);
+        mDistance = (int) (displayer.getWidth() + paintWidth);
     }
 
 }

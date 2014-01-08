@@ -162,7 +162,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isTimeOut(long ctime) {
-        return ctime - time > duration;
+        return ctime - time >= duration;
     }
 
     public boolean isOutside() {
@@ -173,7 +173,8 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isOutside(long ctime) {
-        return time > ctime || ctime - time > duration;
+        long dtime = ctime - time;
+        return dtime <= 0 ||  dtime >= duration;
     }
 
     public void setVisibility(boolean b) {

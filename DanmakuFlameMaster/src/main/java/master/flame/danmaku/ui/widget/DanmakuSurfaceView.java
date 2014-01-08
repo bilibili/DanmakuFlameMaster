@@ -182,11 +182,10 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         long dtime = 0;
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null) {
-            DrawHelper.clearCanvas(canvas);
             drawTask.draw(canvas);
             dtime = System.currentTimeMillis() - stime;
             if(mShowFps){
-                String fps = String.format("%d MS, fps %.2f",dtime, 1000 / (float) dtime);
+                String fps = String.format("%02d MS, fps %.2f",dtime, 1000 / (float) dtime);
                 DrawHelper.drawText(canvas, fps);
             }
             mSurfaceHolder.unlockCanvasAndPost(canvas);
@@ -357,7 +356,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     if(d<=0){
                         removeMessages(UPDATE);
-                        sendEmptyMessageDelayed(UPDATE, 30 - d);
+                        sendEmptyMessageDelayed(UPDATE, 60 - d);
                         break;
                     }
                     d = drawDanmakus();
