@@ -122,7 +122,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        mSurfaceHolder = null;
         isSurfaceCreated = false;
     }
 
