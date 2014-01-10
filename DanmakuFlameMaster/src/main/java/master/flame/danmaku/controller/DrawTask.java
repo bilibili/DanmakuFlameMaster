@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.DisplayMetrics;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
@@ -54,6 +53,8 @@ public class DrawTask implements IDrawTask {
     AndroidCounter mCounter;
 
     private IDanmakus danmakus;
+
+    private boolean clearFlag;
 
     public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
             TaskListener taskListener) {
@@ -97,6 +98,7 @@ public class DrawTask implements IDrawTask {
             danmakus.clear();
         if (mRenderer != null)
             mRenderer.clear();
+        clearFlag = false;
     }
 
     /*
@@ -155,14 +157,18 @@ public class DrawTask implements IDrawTask {
 
     protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {
         if (danmakuList != null) {
+            if(!clearFlag){
+                DrawHelper.clearCanvas(canvas);
+                clearFlag = true;
+            }
             long currMills = timer.currMillisecond;
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
-            int size = danmakus.size();            
-            DrawHelper.clearCanvas(canvas);
-            mDisp.update(canvas);
-            if (size == 0)
-                return;
-            mRenderer.draw(mDisp, danmakus);
+            if (danmakus != null && danmakus.size() > 0) {
+                mDisp.update(canvas);
+                mRenderer.draw(mDisp, danmakus);
+                clearFlag = false;
+            }
+
         }
     }
 
