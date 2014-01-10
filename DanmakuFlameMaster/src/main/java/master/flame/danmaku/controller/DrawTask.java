@@ -123,7 +123,7 @@ public class DrawTask implements IDrawTask {
      */
 
     @Override
-    public void seek(long mills) {
+    public void seek(long mills) {        
         reset();
         mTimer.update(mills);
     }
@@ -160,6 +160,8 @@ public class DrawTask implements IDrawTask {
             if(!clearFlag){
                 DrawHelper.clearCanvas(canvas);
                 clearFlag = true;
+            }else{
+                DrawHelper.clearCanvas(canvas, 0, 0, canvas.getWidth(), canvas.getHeight()>>2);
             }
             long currMills = timer.currMillisecond;
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
