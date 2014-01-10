@@ -217,7 +217,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     public void resume() {
-        if (handler != null && mDrawThread != null && handler.isStop())
+        if (handler != null && mDrawThread != null && handler.isPrepared())
             handler.sendEmptyMessage(DrawHandler.RESUME);
         else {
             restart();
@@ -295,7 +295,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         private long pausedPostion = 0;
 
-        private boolean quitFlag;
+        private boolean quitFlag = true;
 
         private boolean mReady;
 
@@ -334,7 +334,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     break;
                 case START:
                     removeCallbacksAndMessages(null);
-                    pausedPostion = (Long) msg.obj;
+                    Long startTime = (Long) msg.obj;
+                    if(startTime!=null){
+                        pausedPostion = startTime.longValue();
+                    }else{
+                        pausedPostion = 0;
+                    }
                 case RESUME:
                     quitFlag = false;
                     if (mReady) {
@@ -348,10 +353,14 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     break;
                 case SEEK_POS:
-                    removeCallbacksAndMessages(null);
+                    removeMessages(UPDATE);
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
-                    drawTask.seek(System.currentTimeMillis() - mTimeBase);
+                    timer.update(System.currentTimeMillis() - mTimeBase);
+                    drawTask.seek(timer.currMillisecond);
+                    pausedPostion = timer.currMillisecond;
+                    sendEmptyMessage(RESUME);
+                    break;
                 case UPDATE:
                     if (quitFlag) {
                         break;
