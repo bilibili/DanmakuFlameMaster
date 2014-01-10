@@ -84,7 +84,7 @@ public class DanmakuFilters {
 
         protected final IDanmakus danmakus = new Danmakus();
 
-        protected BaseDanmaku mLastSkiped = null;
+        protected BaseDanmaku mLastSkipped = null;
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
@@ -104,8 +104,8 @@ public class DanmakuFilters {
             }
 
             if (totalsizeInScreen < mMaximumSize || danmaku.isShown()
-                    || (mLastSkiped != null && (danmaku.time - mLastSkiped.time) > 1000)) {
-                mLastSkiped = danmaku;
+                    || (mLastSkipped != null && (danmaku.time - mLastSkipped.time > 500))) {
+                mLastSkipped = danmaku;
                 return false;
             }
 
@@ -113,7 +113,7 @@ public class DanmakuFilters {
                 danmakus.addItem(danmaku);
                 return true;
             }
-
+            mLastSkipped = danmaku;
             return false;
         }
 
