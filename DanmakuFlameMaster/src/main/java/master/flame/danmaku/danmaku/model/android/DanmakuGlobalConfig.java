@@ -266,7 +266,7 @@ public class DanmakuGlobalConfig {
      * @param type DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or DANMAKU_STYLE_STROKEN
      * @return
      */
-    public DanmakuGlobalConfig setDanmakuStyle(int style){
+    public DanmakuGlobalConfig setDanmakuStyle(int style , float size ){
         mDanmakuStyle = style;
         switch(style){
             case DANMAKU_STYLE_NONE:
@@ -281,6 +281,7 @@ public class DanmakuGlobalConfig {
             case DANMAKU_STYLE_STROKEN:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = false;
                 AndroidDisplayer.CONFIG_HAS_STROKE = true;
+                AndroidDisplayer.setPaintStorkeWidth(size);
                 break;
         }
         return this;

@@ -83,6 +83,10 @@ public class AndroidDisplayer implements IDisplayer {
         if(PAINT!=null)
             PAINT.setTypeface(font);
     }
+    
+    public static void setPaintStorkeWidth(float s){
+        PAINT.setStrokeWidth(s);
+    }
 
     public Canvas canvas;
 
