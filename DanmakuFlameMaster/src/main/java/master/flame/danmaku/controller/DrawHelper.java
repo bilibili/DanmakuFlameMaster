@@ -20,32 +20,44 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.util.Log;
 
 public class DrawHelper {
 
-    public static Paint paint;
+    public static Paint PAINT;
+
+    public static Rect RECT;
     static {
-        paint = new Paint();
-        paint.setColor(Color.RED);
-        paint.setTextSize(50);
-        //paint.setAntiAlias(true);
+        PAINT = new Paint();
+        PAINT.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        RECT = new Rect();
     }
 
     public static void drawText(Canvas canvas, String text) {
 
-        canvas.drawText(text, 10, canvas.getHeight() - 50, paint);
+        canvas.drawText(text, 10, canvas.getHeight() - 50, PAINT);
 
-    }
-
-    public static void drawDuration(Canvas canvas, String text) {
-        canvas.drawText(text, 100, 100, paint);
-    }
-
-    public static void drawCircle(float cx, float cy, Canvas canvas) {
-        canvas.drawCircle(cx, cy, 50, paint);
     }
 
     public static void clearCanvas(Canvas canvas) {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+    }
+
+    public static void clearCanvas(Canvas canvas, int left, int top, int right, int bottom) {
+        RECT.set(Math.max(0, left), Math.max(0, top), Math.min(canvas.getWidth(),right), Math.min(canvas.getHeight(),bottom));
+        clearCanvas(canvas, RECT);
+    }
+
+    private static void clearCanvas(Canvas canvas, Rect rect) {
+        Log.e("DrawHelper rect", rect.toString());
+        if (rect.width() <= 0 || rect.height() <= 0) {
+            return;
+        }
+        if (rect.contains(0, 0, canvas.getWidth(), canvas.getHeight()))
+            clearCanvas(canvas);
+        else
+            canvas.drawRect(rect, PAINT);
     }
 }
