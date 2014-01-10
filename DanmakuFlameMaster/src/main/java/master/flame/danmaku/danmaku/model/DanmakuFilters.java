@@ -2,7 +2,6 @@
 package master.flame.danmaku.danmaku.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -17,7 +16,8 @@ public class DanmakuFilters {
         /*
          * 是否过滤
          */
-        public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime);
+        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                Long drawingStartTime);
 
         public void setData(Object data);
 
@@ -45,7 +45,8 @@ public class DanmakuFilters {
         }
 
         @Override
-        public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime) {
+        public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
+                Long drawingStartTime) {
             if (danmaku != null && mFilterTypes.contains(danmaku.getType()))
                 return true;
             return false;
@@ -83,13 +84,17 @@ public class DanmakuFilters {
 
         protected final IDanmakus danmakus = new Danmakus();
 
+        protected BaseDanmaku mLastSkiped = null;
+
         @Override
-        public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime) {
-            
-            if(danmakus.last()!=null && danmakus.last().isTimeOut()){
+        public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
+                Long drawingStartTime) {
+            BaseDanmaku last = danmakus.last();
+            if (last != null && last.isTimeOut()) {
                 reset();
+                last = null;
             }
-            
+
             if (mMaximumSize <= 0 || danmaku.getType() != BaseDanmaku.TYPE_SCROLL_RL) {
                 return false;
             }
@@ -98,10 +103,17 @@ public class DanmakuFilters {
                 return true;
             }
 
+            if (totalsizeInScreen < mMaximumSize || danmaku.isShown()
+                    || (mLastSkiped != null && (danmaku.time - mLastSkiped.time) > 1000)) {
+                mLastSkiped = danmaku;
+                return false;
+            }
+
             if (orderInScreen > mMaximumSize && !danmaku.isTimeOut()) {
                 danmakus.addItem(danmaku);
                 return true;
             }
+
             return false;
         }
 
@@ -134,20 +146,21 @@ public class DanmakuFilters {
         protected final IDanmakus danmakus = new Danmakus();
 
         @Override
-        public boolean filter(BaseDanmaku danmaku, int orderInScreen, Long drawingStartTime) {
-            
-            if(danmakus.last()!=null && danmakus.last().isTimeOut()){
+        public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
+                Long drawingStartTime) {
+
+            if (danmakus.last() != null && danmakus.last().isTimeOut()) {
                 reset();
             }
 
             if (danmakus.contains(danmaku)) {
                 return true;
             }
-            
+
             if (!danmaku.isOutside()) {
                 return false;
             }
-            
+
             long elapsedTime = System.currentTimeMillis() - drawingStartTime.longValue();
             if (elapsedTime >= mMaxTime) {
                 danmakus.addItem(danmaku);
@@ -178,10 +191,11 @@ public class DanmakuFilters {
 
     public final Exception filterException = new Exception("not suuport this filter tag");
 
-    public boolean filter(BaseDanmaku danmaku, int index, Long drawingStartTime) {
+    public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+            Long drawingStartTime) {
         Iterator<IDanmakuFilter> fit = filters.values().iterator();
         while (fit.hasNext()) {
-            if (fit.next().filter(danmaku, index, drawingStartTime)) {
+            if (fit.next().filter(danmaku, index, totalsizeInScreen, drawingStartTime)) {
                 return true;
             }
         }
@@ -194,7 +208,7 @@ public class DanmakuFilters {
      * @param danmakus
      * @return 过滤掉的数量
      */
-    public int filter(IDanmakus danmakus, int orderInScreen, Long startTime) {
+    public int filter(IDanmakus danmakus, int orderInScreen, int totalsizeInScreen, Long startTime) {
         if (filters.isEmpty()) {
             return 0;
         }
@@ -205,7 +219,7 @@ public class DanmakuFilters {
             synchronized (this) {
                 Iterator<IDanmakuFilter> fit = filters.values().iterator();
                 while (fit.hasNext()) {
-                    if (fit.next().filter(danmaku, orderInScreen, startTime)) {
+                    if (fit.next().filter(danmaku, orderInScreen, totalsizeInScreen, startTime)) {
                         // it.remove();
                         count++;
                         break;
@@ -262,7 +276,7 @@ public class DanmakuFilters {
     public void clear() {
         filters.clear();
     }
-    
+
     public void reset() {
         for (IDanmakuFilter f : filters.values()) {
             f.reset();
