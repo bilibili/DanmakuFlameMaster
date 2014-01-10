@@ -231,6 +231,7 @@ public class AndroidDisplayer implements IDisplayer {
                 applyPaintConfig(danmaku, paint, false);
                 canvas.drawText(lines[0], left, top - paint.ascent(), paint);
             } else {
+                applyPaintConfig(danmaku, paint, false);
                 Float textHeight = getTextHeight(paint);
                 for (int t = 0; t < lines.length; t++) {
                     if (lines[t].length() > 0) {
