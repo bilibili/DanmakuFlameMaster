@@ -22,8 +22,6 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
-import java.util.Iterator;
-
 public class DanmakusRetainer {
 
     private static IDanmakusRetainer rldrInstance = null;
