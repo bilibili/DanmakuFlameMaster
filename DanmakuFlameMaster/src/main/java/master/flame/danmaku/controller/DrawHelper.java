@@ -41,7 +41,9 @@ public class DrawHelper {
     }
 
     public static void clearCanvas(Canvas canvas) {
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        // canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        RECT.set(0, 0, canvas.getWidth(), canvas.getHeight());
+        clearCanvas(canvas, RECT);
     }
 
     public static void clearCanvas(Canvas canvas, int left, int top, int right, int bottom) {
@@ -53,9 +55,6 @@ public class DrawHelper {
         if (rect.width() <= 0 || rect.height() <= 0) {
             return;
         }
-        if (rect.contains(0, 0, canvas.getWidth(), canvas.getHeight()))
-            clearCanvas(canvas);
-        else
-            canvas.drawRect(rect, PAINT);
+        canvas.drawRect(rect, PAINT);
     }
 }
