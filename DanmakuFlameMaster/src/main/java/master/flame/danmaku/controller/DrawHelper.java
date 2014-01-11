@@ -51,7 +51,6 @@ public class DrawHelper {
     }
 
     private static void clearCanvas(Canvas canvas, Rect rect) {
-        Log.e("DrawHelper rect", rect.toString());
         if (rect.width() <= 0 || rect.height() <= 0) {
             return;
         }
