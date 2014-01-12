@@ -4,6 +4,9 @@ package tv.cjump.jni;
 import java.lang.reflect.Field;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 
 public class NativeBitmapFactory {
 
@@ -41,6 +44,9 @@ public class NativeBitmapFactory {
         } catch (Exception e) {
             e.printStackTrace();
             nativeLibLoaded = false;
+        } catch (Error e){
+            e.printStackTrace();
+            nativeLibLoaded = false;
         }
         if (nativeLibLoaded) {
             initField();
@@ -49,7 +55,9 @@ public class NativeBitmapFactory {
                 // 测试so文件函数调用失败
                 nativeLibLoaded = false;
             }
-        }
+        }  
+        
+//        Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
     }
 
     static void initField() {
@@ -66,16 +74,27 @@ public class NativeBitmapFactory {
 
     private static boolean testLib() {
         Bitmap bitmap = null;
+        Canvas canvas = null;
         try {
             bitmap = createBitmap(2, 2, Bitmap.Config.ARGB_8888);
             boolean result = bitmap != null && bitmap.getWidth() == 2 && bitmap.getHeight() == 2;
+            canvas = new Canvas(bitmap);
+            Paint paint = new Paint();
+            paint.setColor(Color.RED);
+            canvas.drawRect(0f, 0f, (float)bitmap.getWidth(), (float)bitmap.getHeight(), paint);
             if(result && android.os.Build.VERSION.SDK_INT>=17){
                 result = bitmap.isPremultiplied();
             }
             return result;
         } catch (Exception e) {
             return false;
+        } catch (Error e){  //catch jni error?
+            return false; 
         } finally {
+            if(canvas!=null){
+                canvas.setBitmap(null);
+                canvas = null;
+            }
             if (bitmap != null) {
                 bitmap.recycle();
                 bitmap = null;

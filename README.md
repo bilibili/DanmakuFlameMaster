@@ -38,6 +38,12 @@ android上的弹幕转换、渲染输出源码
 
 - jni代码优化
 
+- 使用步长控制/优化滚动抖动
+
+- lib目录问题()
+
+- 减少clearCanvas刷新次数
+
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>

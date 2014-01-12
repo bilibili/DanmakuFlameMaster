@@ -257,6 +257,7 @@ public class DanmakuGlobalConfig {
         return this;
     }
     
+    public final static int DANMAKU_STYLE_DEFAULT = -1; //自动
     public final static int DANMAKU_STYLE_NONE = 0; //无
     public final static int DANMAKU_STYLE_SHADOW = 1; //阴影
     public final static int DANMAKU_STYLE_STROKEN = 2; //描边
@@ -265,7 +266,7 @@ public class DanmakuGlobalConfig {
      * @param type DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or DANMAKU_STYLE_STROKEN
      * @return
      */
-    public DanmakuGlobalConfig setDanmakuStyle(int style){
+    public DanmakuGlobalConfig setDanmakuStyle(int style , float size ){
         mDanmakuStyle = style;
         switch(style){
             case DANMAKU_STYLE_NONE:
@@ -276,9 +277,11 @@ public class DanmakuGlobalConfig {
                 AndroidDisplayer.CONFIG_HAS_SHADOW = true;
                 AndroidDisplayer.CONFIG_HAS_STROKE = false;
                 break;
+            case DANMAKU_STYLE_DEFAULT:
             case DANMAKU_STYLE_STROKEN:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = false;
                 AndroidDisplayer.CONFIG_HAS_STROKE = true;
+                AndroidDisplayer.setPaintStorkeWidth(size);
                 break;
         }
         return this;

@@ -113,6 +113,11 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
     	isSurfaceCreated = true;
+    	Canvas canvas = surfaceHolder.lockCanvas();
+    	if(canvas!=null){
+    	    DrawHelper.clearCanvas(canvas);
+    	    surfaceHolder.unlockCanvasAndPost(canvas);
+    	}
     }
 
     @Override
@@ -344,7 +349,12 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     break;
                 case START:
                     removeCallbacksAndMessages(null);
-                    pausedPostion = (Long) msg.obj;
+                    Long startTime = (Long) msg.obj;
+                    if(startTime!=null){
+                        pausedPostion = startTime.longValue();
+                    }else{
+                        pausedPostion = 0;
+                    }
                 case RESUME:
                     quitFlag = false;
                     if (mReady) {
@@ -358,11 +368,15 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     break;
                 case SEEK_POS:
-                    removeCallbacksAndMessages(null);
-                    if(quitFlag) break;
+                    removeMessages(UPDATE);
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                     drawTask.seek(System.currentTimeMillis() - mTimeBase);
+                    if (drawTask != null)
+                        drawTask.seek(timer.currMillisecond);
+                    pausedPostion = timer.currMillisecond;
+                    sendEmptyMessage(RESUME);
+                    break;
                 case UPDATE:
                     if (quitFlag) {
                         break;
