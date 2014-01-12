@@ -357,7 +357,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                     timer.update(System.currentTimeMillis() - mTimeBase);
-                    drawTask.seek(timer.currMillisecond);
+                    if (drawTask != null)
+                        drawTask.seek(timer.currMillisecond);
                     pausedPostion = timer.currMillisecond;
                     sendEmptyMessage(RESUME);
                     break;
