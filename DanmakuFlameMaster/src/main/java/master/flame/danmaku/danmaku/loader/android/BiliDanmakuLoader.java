@@ -16,13 +16,11 @@
 
 package master.flame.danmaku.danmaku.loader.android;
 
+import java.io.InputStream;
+
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.parser.android.AndroidFileSource;
-
-import android.net.Uri;
-
-import java.io.InputStream;
 
 public class BiliDanmakuLoader implements ILoader {
 

@@ -18,13 +18,16 @@ package master.flame.danmaku.danmaku.model.android;
 
 import java.util.HashMap;
 
-import android.graphics.*;
-import android.graphics.Paint.Style;
-import android.text.TextPaint;
-import android.util.Log;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import android.graphics.Camera;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
+import android.graphics.Typeface;
+import android.text.TextPaint;
 
 /**
  * Created by ch on 13-7-5.

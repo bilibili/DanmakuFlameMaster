@@ -9,7 +9,6 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.DanmakuFilters.IDanmakuFilter;
 import android.graphics.Typeface;
-import android.text.TextPaint;
 
 public class DanmakuGlobalConfig {
     /*
