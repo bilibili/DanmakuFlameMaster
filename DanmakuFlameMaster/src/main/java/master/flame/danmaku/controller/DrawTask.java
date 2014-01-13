@@ -21,6 +21,8 @@ import android.graphics.Canvas;
 import android.util.DisplayMetrics;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.GlobalFlagValues;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -124,8 +126,16 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void seek(long mills) {        
-        mTimer.update(mills);
+        long dtime = mTimer.lastInterval();
+//        mTimer.update(mills);
         reset();
+//        if(danmakuList!=null){
+//            IDanmakuIterator it = danmakuList.iterator();
+//            while(it.hasNext()){
+//                it.next().resetLayout();
+//            }
+//        }
+        GlobalFlagValues.updateVisibleFlag();
     }
 
     @Override
@@ -135,8 +145,8 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void quit() {
-        mRenderer.clear();
-        //danmakuList.clear();
+        if (mRenderer != null)
+            mRenderer.release();
     }
 
     public void prepare() {
@@ -149,13 +159,14 @@ public class DrawTask implements IDrawTask {
 
     protected void loadDanmakus(BaseDanmakuParser parser) {
         danmakuList = parser.setDisp(mDisp).setTimer(mTimer).parse();
+        GlobalFlagValues.resetAll();
     }
 
     public void setParser(BaseDanmakuParser parser) {
         mParser = parser;
     }
 
-    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {
+    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {        
         if (danmakuList != null) {
             if(!clearFlag){
                 DrawHelper.clearCanvas(canvas);

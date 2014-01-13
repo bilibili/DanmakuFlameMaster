@@ -22,7 +22,7 @@ public class DanmakuTimer {
     private long lastInterval;
 
     public long update(long curr) {
-        lastInterval = Math.abs(curr - currMillisecond);
+        lastInterval = curr - currMillisecond;
         currMillisecond = curr;
         return lastInterval;
     }

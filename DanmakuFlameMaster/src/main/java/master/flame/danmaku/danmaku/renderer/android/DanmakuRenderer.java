@@ -70,4 +70,9 @@ public class DanmakuRenderer extends Renderer {
         //DanmakuFilters.getDefault().reset();
     }
 
+    @Override
+    public void release() {
+        DanmakusRetainer.release();
+    }
+
 }

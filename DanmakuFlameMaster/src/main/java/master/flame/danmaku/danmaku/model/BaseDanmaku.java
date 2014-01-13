@@ -105,6 +105,11 @@ public abstract class BaseDanmaku {
      * 是否可见
      */
     public int visibility;
+    
+    /**
+     * 重置位 private
+     */
+    private int visibleResetFlag = 0;
 
     /**
      * 绘制用缓存
@@ -151,7 +156,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isShown() {
-        return this.visibility == VISIBLE;
+        return this.visibility == VISIBLE && visibleResetFlag == GlobalFlagValues.VISIBLE_RESET_FLAG;
     }
 
     public boolean isTimeOut() {
@@ -178,7 +183,11 @@ public abstract class BaseDanmaku {
     }
 
     public void setVisibility(boolean b) {
-        this.visibility = (b ? VISIBLE : INVISIBLE);
+        if(b){
+            this.visibleResetFlag = GlobalFlagValues.VISIBLE_RESET_FLAG;
+            this.visibility = VISIBLE;
+        }else
+            this.visibility = INVISIBLE;
     }
 
     public abstract void layout(IDisplayer displayer, float x, float y);
@@ -212,4 +221,5 @@ public abstract class BaseDanmaku {
     public int getAlpha() {
         return alpha;
     }
+    
 }

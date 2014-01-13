@@ -234,6 +234,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     public void start(long postion) {
         if (handler == null) {
             prepare();
+        }else{
+            handler.removeCallbacksAndMessages(null);
         }
         handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
     }
@@ -332,7 +334,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 	}
                     break;
                 case START:
-                    removeCallbacksAndMessages(null);
                     Long startTime = (Long) msg.obj;
                     if(startTime!=null){
                         pausedPostion = startTime.longValue();
@@ -352,13 +353,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     break;
                 case SEEK_POS:
-                    removeMessages(UPDATE);
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                     timer.update(System.currentTimeMillis() - mTimeBase);
                     if (drawTask != null)
                         drawTask.seek(timer.currMillisecond);
                     pausedPostion = timer.currMillisecond;
+                    removeMessages(RESUME);
                     sendEmptyMessage(RESUME);
                     break;
                 case UPDATE:

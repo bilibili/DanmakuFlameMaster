@@ -84,7 +84,6 @@ public class CacheManagingDrawTask extends DrawTask {
         // mCacheTimer.update(mTimer.currMillisecond);
         if (mRenderer != null)
             mRenderer.clear();
-        mCacheManager.evictAll();
     }
 
     @Override

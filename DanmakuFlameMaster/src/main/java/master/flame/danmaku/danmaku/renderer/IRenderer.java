@@ -24,5 +24,7 @@ public interface IRenderer {
     public void draw(IDisplayer disp, IDanmakus danmakus);
 
     public void clear();
+    
+    public void release();
 
 }
