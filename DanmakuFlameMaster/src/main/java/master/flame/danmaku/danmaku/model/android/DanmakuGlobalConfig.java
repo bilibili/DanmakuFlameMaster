@@ -34,6 +34,7 @@ public class DanmakuGlobalConfig {
     /**
      * 弹幕大小是否被缩放
      */
+    @SuppressWarnings("unused")
     private boolean isTextScaled = false;
 
     /**
@@ -117,6 +118,7 @@ public class DanmakuGlobalConfig {
 
     List<Integer> mFilterTypes = new ArrayList<Integer>();
 
+    @SuppressWarnings("unused")
     private int mDanmakuStyle;
 
     /**

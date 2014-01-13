@@ -32,8 +32,10 @@ import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 public class DrawTask implements IDrawTask {
 
+    @SuppressWarnings("unused")
     private static final String TAG = "DrawTask";
 
+    @SuppressWarnings("unused")
     private final int DEBUG_OPTION = 1;
 
     protected AndroidDisplayer mDisp;

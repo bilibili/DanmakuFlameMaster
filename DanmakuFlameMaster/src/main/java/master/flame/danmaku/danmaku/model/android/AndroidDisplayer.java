@@ -40,8 +40,10 @@ public class AndroidDisplayer implements IDisplayer {
     
     private final static HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>(); // thread safe is not Necessary
 
+    @SuppressWarnings("unused")
     private int HIT_CACHE_COUNT = 0;
 
+    @SuppressWarnings("unused")
     private int NO_CACHE_COUNT = 0;
 
     public static TextPaint PAINT;
