@@ -124,8 +124,8 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void seek(long mills) {        
-        reset();
         mTimer.update(mills);
+        reset();
     }
 
     @Override
