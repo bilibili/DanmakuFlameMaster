@@ -119,6 +119,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
     public class CacheManager {
 
+        @SuppressWarnings("unused")
         private static final String TAG = "CacheManager";
 
         public HandlerThread mThread;

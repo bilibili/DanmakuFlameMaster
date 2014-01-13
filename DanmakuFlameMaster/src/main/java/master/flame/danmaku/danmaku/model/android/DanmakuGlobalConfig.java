@@ -9,7 +9,6 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.DanmakuFilters.IDanmakuFilter;
 import android.graphics.Typeface;
-import android.text.TextPaint;
 
 public class DanmakuGlobalConfig {
     /*
@@ -35,6 +34,7 @@ public class DanmakuGlobalConfig {
     /**
      * 弹幕大小是否被缩放
      */
+    @SuppressWarnings("unused")
     private boolean isTextScaled = false;
 
     /**
@@ -118,6 +118,7 @@ public class DanmakuGlobalConfig {
 
     List<Integer> mFilterTypes = new ArrayList<Integer>();
 
+    @SuppressWarnings("unused")
     private int mDanmakuStyle;
 
     /**
