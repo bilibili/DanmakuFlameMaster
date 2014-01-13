@@ -253,6 +253,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public void seekBy(Long deltaMs) {
         if (handler != null) {
+            handler.removeMessages(DrawHandler.UPDATE);
             handler.obtainMessage(DrawHandler.SEEK_POS, deltaMs).sendToTarget();
         }
     }
