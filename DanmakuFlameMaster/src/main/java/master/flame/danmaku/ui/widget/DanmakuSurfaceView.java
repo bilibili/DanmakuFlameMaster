@@ -116,18 +116,16 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     	    DrawHelper.clearCanvas(canvas);
     	    surfaceHolder.unlockCanvasAndPost(canvas);
     	}
-    	
-    	
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        
+        isSurfaceCreated = true;
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
+        isSurfaceCreated = false;
     }
 
     public void release() {
