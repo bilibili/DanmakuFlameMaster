@@ -344,7 +344,8 @@ public class CacheManagingDrawTask extends DrawTask {
                             }
                             prepareCaches(mTaskListener != null);
                             removeMessages(BUILD_CACHES);
-                            sendEmptyMessageDelayed(BUILD_CACHES,2000);
+                            if(!mPause)
+                                sendEmptyMessageDelayed(BUILD_CACHES,2000);
                             if (mTaskListener != null) {
                                 mTaskListener.ready();
                                 mTaskListener = null;
