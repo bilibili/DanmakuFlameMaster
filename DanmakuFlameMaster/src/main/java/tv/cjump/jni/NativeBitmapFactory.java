@@ -55,7 +55,7 @@ public class NativeBitmapFactory {
             }
         }  
         
-//        Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
+//Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
     }
 
     static void initField() {
@@ -125,14 +125,12 @@ public class NativeBitmapFactory {
     }
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
-        if (!nativeLibLoaded) {
+        if (nativeLibLoaded == false || nativeIntField == null) {
+//Log.e("NativeBitmapFactory", "ndk bitmap create failed");
             return Bitmap.createBitmap(width, height, config);
         }
-
         int nativeConfig = getNativeConfig(config);
-        if (nativeConfig == 0) {
-            return Bitmap.createBitmap(width, height, config);
-        }
+//Log.e("NativeBitmapFactory", "nativeConfig:"+nativeConfig);
         return android.os.Build.VERSION.SDK_INT == 19 ? createBitmap19(width, height, nativeConfig, hasAlpha) : createBitmap(width, height, nativeConfig, hasAlpha);
     }
 
