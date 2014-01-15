@@ -10,9 +10,7 @@ import android.graphics.Paint;
 
 public class NativeBitmapFactory {
 
-    static Field nativeIntField = null;
-
-    static Field nativeBitmapField;
+    static Field nativeIntField = null;    
 
     static boolean nativeLibLoaded = false;
 
@@ -57,15 +55,13 @@ public class NativeBitmapFactory {
             }
         }  
         
-//        Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
+//Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
     }
 
     static void initField() {
         try {
             nativeIntField = Bitmap.Config.class.getDeclaredField("nativeInt");
             nativeIntField.setAccessible(true);
-            nativeBitmapField = Bitmap.class.getDeclaredField("mNativeBitmap");
-            nativeBitmapField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             nativeIntField = null;
             e.printStackTrace();
@@ -73,11 +69,14 @@ public class NativeBitmapFactory {
     }
 
     private static boolean testLib() {
+        if (nativeIntField == null) {
+            return false;
+        }
         Bitmap bitmap = null;
         Canvas canvas = null;
         try {
             bitmap = createBitmap(2, 2, Bitmap.Config.ARGB_8888);
-            boolean result = bitmap != null && bitmap.getWidth() == 2 && bitmap.getHeight() == 2;
+            boolean result = (bitmap != null && bitmap.getWidth() == 2 && bitmap.getHeight() == 2);
             canvas = new Canvas(bitmap);
             Paint paint = new Paint();
             paint.setColor(Color.RED);
@@ -117,21 +116,6 @@ public class NativeBitmapFactory {
         return 0;
     }
 
-    public static int getNativeBitmap(Bitmap bitmap) {
-        try {
-            if (nativeBitmapField == null) {
-                return 0;
-            }
-            int nativeBitmap = nativeBitmapField.getInt(bitmap);
-            return nativeBitmap;
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config) {
         return createBitmap(width, height, config, config.equals(Bitmap.Config.ARGB_8888));
     }
@@ -141,14 +125,12 @@ public class NativeBitmapFactory {
     }
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
-        if (!nativeLibLoaded) {
+        if (nativeLibLoaded == false || nativeIntField == null) {
+//Log.e("NativeBitmapFactory", "ndk bitmap create failed");
             return Bitmap.createBitmap(width, height, config);
         }
-
         int nativeConfig = getNativeConfig(config);
-        if (nativeConfig == 0) {
-            return null;
-        }
+//Log.e("NativeBitmapFactory", "nativeConfig:"+nativeConfig);
         return android.os.Build.VERSION.SDK_INT == 19 ? createBitmap19(width, height, nativeConfig, hasAlpha) : createBitmap(width, height, nativeConfig, hasAlpha);
     }
 
