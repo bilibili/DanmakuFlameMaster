@@ -33,57 +33,63 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import java.io.IOException;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
-
+    
     static {
         System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
     }
-
+    
     @Override
     public Danmakus parse() {
-
+        Danmakus danmakus = null;
+        
         if (mDataSource != null) {
             AndroidFileSource source = (AndroidFileSource) mDataSource;
+            
             try {
                 XMLReader xmlReader = XMLReaderFactory.createXMLReader();
                 XmlContentHandler contentHandler = new XmlContentHandler();
                 xmlReader.setContentHandler(contentHandler);
                 xmlReader.parse(new InputSource(source.data()));
-                return contentHandler.getResult();
+                
+                danmakus = contentHandler.getResult();
             } catch (SAXException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
-
-        return null;
+        
+        if (danmakus != null) {
+            danmakuCount = danmakus.size();
+        }
+        
+        return danmakus;
     }
-
+    
     public class XmlContentHandler extends DefaultHandler {
-
+        
         public Danmakus result = null;
-
+        
         public BaseDanmaku item = null;
-
+        
         public boolean completed = false;
-
+        
         public int index = 0;
-
+        
         public Danmakus getResult() {
             return result;
         }
-
+        
         @Override
         public void startDocument() throws SAXException {
             result = new Danmakus();
         }
-
+        
         @Override
         public void endDocument() throws SAXException {
             completed = true;
         }
-
+        
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes)
                 throws SAXException {
@@ -109,7 +115,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                 }
             }
         }
-
+        
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             if (item != null) {
@@ -121,13 +127,13 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                 item = null;
             }
         }
-
+        
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
             if (item != null) {
                 DanmakuFactory.fillText(item, decodeXmlString(new String(ch, start, length)));
                 item.index = index++;
-
+                
                 // initial specail danmaku data
                 String text = item.text.trim();
                 if (item.getType() == BaseDanmaku.TYPE_SPECIAL && text.startsWith("[")
@@ -168,10 +174,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                             beginY, endX, endY, translationDuration, translationStartDelay);
                     DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
                 }
-
+                
             }
         }
-
+        
         private String decodeXmlString(String title) {
             if (title.indexOf("&amp;") > -1) {
                 title = title.replace("&amp;", "&");
@@ -187,6 +193,6 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
             }
             return title;
         }
-
+        
     }
 }

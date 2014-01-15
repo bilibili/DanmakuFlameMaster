@@ -20,35 +20,42 @@ import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 
-/**
- *
- */
 public abstract class BaseDanmakuParser {
+    
     protected IDataSource<?> mDataSource;
-
+    
     protected DanmakuTimer mTimer;
     protected int mDispWidth;
     protected int mDispHeight;
     protected float mDispDensity;
     protected float mScaledDensity;
     
-    public BaseDanmakuParser setDisp(IDisplayer disp){
-    	mDispWidth = disp.getWidth();
+    protected int danmakuCount = -1;
+    
+    public BaseDanmakuParser setDisp(IDisplayer disp) {
+        mDispWidth = disp.getWidth();
         mDispHeight = disp.getHeight();
         mDispDensity = disp.getDensity();
         mScaledDensity = disp.getScaledDensity();
+        
         return this;
     }
     
     public BaseDanmakuParser load(IDataSource<?> source) {
         mDataSource = source;
+        
         return this;
     }
-    public BaseDanmakuParser setTimer(DanmakuTimer timer){
-    	mTimer = timer;
-    	return this;
+    
+    public BaseDanmakuParser setTimer(DanmakuTimer timer) {
+        mTimer = timer;
+        
+        return this;
     }
-
+    
+    public int getDanmakuCount() {
+        return danmakuCount;
+    }
+    
     public abstract Danmakus parse();
-
 }
