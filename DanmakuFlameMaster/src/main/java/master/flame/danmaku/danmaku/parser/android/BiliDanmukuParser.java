@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.danmaku.parser.android;
 
-import android.graphics.Color;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -31,7 +30,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import java.io.IOException;
+import android.graphics.Color;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
 

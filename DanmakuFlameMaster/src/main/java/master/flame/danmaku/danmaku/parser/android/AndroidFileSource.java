@@ -16,18 +16,19 @@
 
 package master.flame.danmaku.danmaku.parser.android;
 
-import master.flame.danmaku.danmaku.parser.IDataSource;
-import master.flame.danmaku.danmaku.util.IOUtils;
-
-import android.net.Uri;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
-import org.apache.http.client.HttpClient;
+import master.flame.danmaku.danmaku.parser.IDataSource;
+import master.flame.danmaku.danmaku.util.IOUtils;
+import android.net.Uri;
 
 public class AndroidFileSource implements IDataSource<InputStream> {
 
