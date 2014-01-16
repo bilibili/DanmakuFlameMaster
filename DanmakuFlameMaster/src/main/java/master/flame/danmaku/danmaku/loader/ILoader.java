@@ -18,8 +18,6 @@ package master.flame.danmaku.danmaku.loader;
 
 import java.io.InputStream;
 
-import android.net.Uri;
-
 import master.flame.danmaku.danmaku.parser.IDataSource;
 
 public interface ILoader {
