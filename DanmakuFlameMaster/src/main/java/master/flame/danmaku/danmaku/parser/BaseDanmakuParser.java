@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.danmaku.parser;
 
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -49,6 +50,6 @@ public abstract class BaseDanmakuParser {
     	return this;
     }
 
-    public abstract Danmakus parse();
+    public abstract Danmakus parse() throws IllegalDataException;
 
 }

@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.danmaku.loader.android;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import master.flame.danmaku.danmaku.loader.ILoader;
@@ -54,5 +55,11 @@ public class BiliDanmakuLoader implements ILoader {
     @Override
     public AndroidFileSource getDataSource() {
         return dataSource;
+    }
+
+    @Override
+    public void loadData(String data) throws IllegalDataException {
+        InputStream stream = new ByteArrayInputStream(data.getBytes());
+        load(stream);
     }
 }

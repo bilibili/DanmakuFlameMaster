@@ -22,8 +22,12 @@ import master.flame.danmaku.danmaku.util.IOUtils;
 import android.net.Uri;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+
+import org.apache.http.client.HttpClient;
 
 public class AndroidFileSource implements IDataSource<InputStream> {
 
@@ -64,10 +68,13 @@ public class AndroidFileSource implements IDataSource<InputStream> {
 
     public void fillStreamFromHttpFile(Uri uri) {
         try {
-            URL url = new URL(uri.getPath());
-            url.openConnection();
-            inStream = new BufferedInputStream(url.openStream());
-
+            URL url = new URL(uri.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36");
+            int code = connection.getResponseCode();
+            if(code == 200 || code == 206)
+                inStream = new BufferedInputStream(connection.getInputStream());
+            
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

@@ -19,6 +19,7 @@ package master.flame.danmaku.controller;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.DisplayMetrics;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
@@ -151,7 +152,7 @@ public class DrawTask implements IDrawTask {
             mRenderer.release();
     }
 
-    public void prepare() {
+    public void prepare() throws IllegalDataException {
         assert (mParser != null);
         loadDanmakus(mParser);
         if (mTaskListener != null) {
@@ -159,7 +160,7 @@ public class DrawTask implements IDrawTask {
         }
     }
 
-    protected void loadDanmakus(BaseDanmakuParser parser) {
+    protected void loadDanmakus(BaseDanmakuParser parser) throws IllegalDataException {
         danmakuList = parser.setDisp(mDisp).setTimer(mTimer).parse();
         GlobalFlagValues.resetAll();
     }

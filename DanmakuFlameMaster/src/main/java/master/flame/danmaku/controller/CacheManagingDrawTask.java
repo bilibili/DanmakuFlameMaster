@@ -25,6 +25,7 @@ import android.os.Message;
 import java.util.Iterator;
 import java.util.Set;
 
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
@@ -111,7 +112,7 @@ public class CacheManagingDrawTask extends DrawTask {
     }
 
     @Override
-    public void prepare() {
+    public void prepare() throws IllegalDataException {
         assert (mParser != null);
         loadDanmakus(mParser);
         mCacheManager.begin();

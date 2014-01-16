@@ -29,10 +29,12 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Toast;
 import master.flame.danmaku.controller.CacheManagingDrawTask;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.DrawTask;
 import master.flame.danmaku.controller.IDrawTask;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
@@ -234,8 +236,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     public void start(long postion) {
         if (handler == null) {
             prepare();
-        }else{
-            handler.removeCallbacksAndMessages(null);
         }
         handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
     }
@@ -253,7 +253,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public void seekBy(Long deltaMs) {
         if (handler != null) {
-            handler.removeMessages(DrawHandler.UPDATE);
+        	handler.removeMessages(DrawHandler.UPDATE);
             handler.obtainMessage(DrawHandler.SEEK_POS, deltaMs).sendToTarget();
         }
     }
@@ -263,7 +263,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     private IDrawTask createTask(boolean useDrwaingCache, DanmakuTimer timer, Context context,
-            int width, int height, IDrawTask.TaskListener taskListener) {
+            int width, int height, IDrawTask.TaskListener taskListener) throws IllegalDataException {
         IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, width, height,
                 taskListener, 1024 * 1024 * getMemoryClass(getContext()) / 3) : new DrawTask(timer,
                 context, width, height, taskListener);
@@ -281,6 +281,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         public void prepared();
 
         public void updateTimer(DanmakuTimer timer);
+
+        public void error(Throwable error);
     }
 
     public class DrawHandler extends Handler {
@@ -296,7 +298,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         private long pausedPostion = 0;
 
-        private boolean quitFlag = true;
+        private boolean quitFlag;
 
         private boolean mReady;
 
@@ -322,15 +324,28 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 	if(mParser==null || !isSurfaceCreated){
                 		sendEmptyMessageDelayed(PREPARE,100);
                 	}else{
-	                    prepare(new Runnable() {
-	                        @Override
-	                        public void run() {
-	                            mReady = true;
-	                            if (mCallback != null) {
-	                                mCallback.prepared();
-	                            }
-	                        }
-	                    });
+	                    try {
+                            prepare(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mReady = true;
+                                    if (mCallback != null) {
+                                        mCallback.prepared();
+                                    }
+                                }
+                            });
+                        } catch (IllegalDataException e) {
+                            if (mCallback != null) {
+                                mCallback.error(e);
+                            }else{
+                                Log.e(TAG, "something wrong..",e);
+                                Toast.makeText(getContext(), "Error: Please check logcat output for more details ", Toast.LENGTH_SHORT).show();
+                            }
+                            /*
+                             * stop thread.
+                             */
+                            quit();
+                        }
                 	}
                     break;
                 case START:
@@ -355,7 +370,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 case SEEK_POS:
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
-                    timer.update(System.currentTimeMillis() - mTimeBase);
+                    drawTask.seek(System.currentTimeMillis() - mTimeBase);
                     if (drawTask != null)
                         drawTask.seek(timer.currMillisecond);
                     pausedPostion = timer.currMillisecond;
@@ -382,12 +397,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                         sendEmptyMessageDelayed(UPDATE, 15 - d);
                         break;
                     }
-                    sendEmptyMessage(UPDATE);
+                    if (!quitFlag)
+                        sendEmptyMessage(UPDATE);
                     break;
             }
         }
 
-        private void prepare(final Runnable runnable) {
+        private void prepare(final Runnable runnable) throws IllegalDataException {
             if (drawTask == null) {
                 drawTask = createTask(mEnableDanmakuDrwaingCache, timer, getContext(), getWidth(),
                         getHeight(), new IDrawTask.TaskListener() {

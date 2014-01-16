@@ -18,6 +18,7 @@ package master.flame.danmaku.controller;
 
 import android.graphics.Canvas;
 
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
@@ -35,7 +36,7 @@ public interface IDrawTask {
 
     public void quit();
 
-    public void prepare();
+    public void prepare() throws IllegalDataException;
 
     public void setParser(BaseDanmakuParser parser);
 

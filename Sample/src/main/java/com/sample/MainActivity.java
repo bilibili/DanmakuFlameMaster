@@ -1,23 +1,22 @@
-
 package com.sample;
 
-import java.io.InputStream;
+import master.flame.danmaku.controller.DMSiteType;
+import master.flame.danmaku.danmaku.loader.ILoader;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.IDataSource;
+import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
-import android.view.*;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 import android.widget.VideoView;
-import master.flame.danmaku.danmaku.loader.ILoader;
-import master.flame.danmaku.danmaku.loader.IllegalDataException;
-import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.IDataSource;
-import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
-import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
-
-import com.sample.R;
 
 public class MainActivity extends Activity {
 
@@ -28,28 +27,45 @@ public class MainActivity extends Activity {
     private View mMediaController;
 
     public PopupWindow mPopupWindow;
+    
+    DMSiteType mType = DMSiteType.BILI;
+    String mVideoPath = "http://f.youku.com/player/getFlvPath/sid/1387355677398_00/st/mp4/fileid/030008010052AF8EC8DF6B13A1F5D931F954B8-E615-896C-F13C-ADC840C07D71?K=302bf9e26b1554a02411a421,k2:1bc34fddf78cbd103";
+
+//    String mVideoPath = "/sdcard/Download/0.mp4";
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (mVideoPath == null) {
+            Toast.makeText(this, "Please edit MainActivity sample, and set mVideoPath variable to your media file URL/path", Toast.LENGTH_LONG).show();
+            return;
+        }
         findViews();
+        loadDanmakus("http://comment.bilibili.tv/1269904.xml");
     }
-    
-	private BaseDanmakuParser createParser(InputStream stream) {
-		ILoader loader = DanmakuLoaderFactory
-				.create(DanmakuLoaderFactory.TAG_BILI);
-
-		try {
-			loader.load(stream);
-		} catch (IllegalDataException e) {
-			e.printStackTrace();
-		}
-		BaseDanmakuParser parser = new BiliDanmukuParser();
-		IDataSource<?> dataSource = loader.getDataSource();
-		parser.load(dataSource);
-		return parser;
-
+	private void loadDanmakus(final String url) {
+	    
+		final ILoader loader = mType.getLoader();
+		new Thread(){
+		    public void run() {
+		        try {
+		            loader.load(url);
+		            runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            BaseDanmakuParser parser = mType.getParser();
+                            IDataSource<?> dataSource = loader.getDataSource();
+                            parser.load(dataSource);
+                            mDanmakuView.prepare(parser);
+                        }
+                    });
+		        } catch (IllegalDataException e) {
+		            e.printStackTrace();
+		        }
+		    }
+		}.start();
 	}
 
     private void findViews() {
@@ -73,10 +89,6 @@ public class MainActivity extends Activity {
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
-			BaseDanmakuParser parser = createParser(this.getResources()
-					.openRawResource(R.raw.comments));
-			mDanmakuView.prepare(parser);
-
             mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
             mDanmakuView.setOnClickListener(new View.OnClickListener() {
@@ -111,7 +123,7 @@ public class MainActivity extends Activity {
                      mDanmakuView.start();
                  }
              });
-            mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
+            mVideoView.setVideoPath(mVideoPath);
         }
 
 

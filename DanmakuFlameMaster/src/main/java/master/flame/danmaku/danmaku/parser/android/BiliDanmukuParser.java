@@ -17,6 +17,7 @@
 package master.flame.danmaku.danmaku.parser.android;
 
 import android.graphics.Color;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -39,7 +40,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
     }
 
     @Override
-    public Danmakus parse() {
+    public Danmakus parse() throws IllegalDataException {
 
         if (mDataSource != null) {
             AndroidFileSource source = (AndroidFileSource) mDataSource;
@@ -49,10 +50,8 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                 xmlReader.setContentHandler(contentHandler);
                 xmlReader.parse(new InputSource(source.data()));
                 return contentHandler.getResult();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                throw new IllegalDataException(e);
             }
 
         }
