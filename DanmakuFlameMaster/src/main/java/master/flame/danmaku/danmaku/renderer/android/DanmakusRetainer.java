@@ -81,6 +81,14 @@ public class DanmakusRetainer {
             fbdrInstance.clear();
         }
     }
+    
+    public static void release(){
+        clear();
+        rldrInstance = null;
+        lrdrInstance = null;
+        ftdrInstance = null;
+        fbdrInstance = null;
+    }
 
     public interface IDanmakusRetainer {
         public void fix(BaseDanmaku drawItem, IDisplayer disp);

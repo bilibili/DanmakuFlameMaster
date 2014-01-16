@@ -85,7 +85,6 @@ public class CacheManagingDrawTask extends DrawTask {
         // mCacheTimer.update(mTimer.currMillisecond);
         if (mRenderer != null)
             mRenderer.clear();
-        mCacheManager.evictAll();
     }
 
     @Override
@@ -121,6 +120,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
     public class CacheManager {
 
+        @SuppressWarnings("unused")
         private static final String TAG = "CacheManager";
 
         public HandlerThread mThread;
@@ -345,7 +345,8 @@ public class CacheManagingDrawTask extends DrawTask {
                             }
                             prepareCaches(mTaskListener != null);
                             removeMessages(BUILD_CACHES);
-                            sendEmptyMessageDelayed(BUILD_CACHES,2000);
+                            if(!mPause)
+                                sendEmptyMessageDelayed(BUILD_CACHES,2000);
                             if (mTaskListener != null) {
                                 mTaskListener.ready();
                                 mTaskListener = null;

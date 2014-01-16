@@ -20,6 +20,7 @@ public class DrawingCacheHolder {
 
     public boolean drawn;
 
+    @SuppressWarnings("unused")
     private int mDensity;
 
     public DrawingCacheHolder() {

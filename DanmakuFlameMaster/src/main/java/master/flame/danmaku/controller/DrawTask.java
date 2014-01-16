@@ -22,6 +22,8 @@ import android.util.DisplayMetrics;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.GlobalFlagValues;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -33,8 +35,10 @@ import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 public class DrawTask implements IDrawTask {
 
+    @SuppressWarnings("unused")
     private static final String TAG = "DrawTask";
 
+    @SuppressWarnings("unused")
     private final int DEBUG_OPTION = 1;
 
     protected AndroidDisplayer mDisp;
@@ -125,8 +129,16 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void seek(long mills) {        
+        long dtime = mTimer.lastInterval();
+//        mTimer.update(mills);
         reset();
-        mTimer.update(mills);
+//        if(danmakuList!=null){
+//            IDanmakuIterator it = danmakuList.iterator();
+//            while(it.hasNext()){
+//                it.next().resetLayout();
+//            }
+//        }
+        GlobalFlagValues.updateVisibleFlag();
     }
 
     @Override
@@ -136,8 +148,8 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void quit() {
-        mRenderer.clear();
-        //danmakuList.clear();
+        if (mRenderer != null)
+            mRenderer.release();
     }
 
     public void prepare() throws IllegalDataException {
@@ -150,13 +162,14 @@ public class DrawTask implements IDrawTask {
 
     protected void loadDanmakus(BaseDanmakuParser parser) throws IllegalDataException {
         danmakuList = parser.setDisp(mDisp).setTimer(mTimer).parse();
+        GlobalFlagValues.resetAll();
     }
 
     public void setParser(BaseDanmakuParser parser) {
         mParser = parser;
     }
 
-    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {
+    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {        
         if (danmakuList != null) {
             if(!clearFlag){
                 DrawHelper.clearCanvas(canvas);

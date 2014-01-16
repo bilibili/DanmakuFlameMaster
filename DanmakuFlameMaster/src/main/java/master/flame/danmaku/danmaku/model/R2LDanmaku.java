@@ -36,14 +36,14 @@ public class R2LDanmaku extends BaseDanmaku {
             long deltaDuration = mTimer.currMillisecond - time;
             if (deltaDuration > 0 && deltaDuration < duration) {
                 this.x = getLeft(displayer, mTimer.currMillisecond);
-                if (this.visibility == INVISIBLE) {
+                if (!this.isShown()) {
                     this.y = y;
-                    this.visibility = VISIBLE;
+                    this.setVisibility(true);
                 }
             } else if (deltaDuration >= duration) {
-                this.visibility = INVISIBLE;
+                this.setVisibility(false);
             } else if (deltaDuration <= 0) {
-                this.visibility = INVISIBLE;
+                this.setVisibility(false);
             }
         }
     }

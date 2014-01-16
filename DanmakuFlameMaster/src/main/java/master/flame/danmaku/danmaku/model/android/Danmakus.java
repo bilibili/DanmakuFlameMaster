@@ -65,20 +65,8 @@ public class Danmakus implements IDanmakus {
         setItems(items);
     }
 
-    public void setItems(Set<BaseDanmaku> items) {
-        Set<BaseDanmaku> oldItems = this.items;
+    public void setItems(Set<BaseDanmaku> items) {        
         this.items = items;
-        if (oldItems != null) {
-            Iterator<BaseDanmaku> it = oldItems.iterator();
-            while (it.hasNext()) {
-                BaseDanmaku item = it.next();
-                if (item.isOutside()) {
-                    item.setVisibility(false);
-                } else {
-                    break;
-                }
-            }
-        }
         iterator.setDatas(items);
     }
 
@@ -178,14 +166,10 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public void clear() {
-        if (items != null)
+        if (items != null){
             items.clear();
+        }
         if (subItems != null) {
-            IDanmakuIterator it = subItems.iterator();
-            while (it.hasNext()) {
-                BaseDanmaku item = it.next();
-                item.setVisibility(false);
-            }
             subItems.clear();
         }
     }

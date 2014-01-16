@@ -122,7 +122,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        
+        isSurfaceCreated = true;
     }
 
     @Override
@@ -217,7 +217,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     public void resume() {
-        if (handler != null && mDrawThread != null && handler.isStop())
+        if (handler != null && mDrawThread != null && handler.isPrepared())
             handler.sendEmptyMessage(DrawHandler.RESUME);
         else {
             restart();
@@ -253,6 +253,7 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public void seekBy(Long deltaMs) {
         if (handler != null) {
+        	handler.removeMessages(DrawHandler.UPDATE);
             handler.obtainMessage(DrawHandler.SEEK_POS, deltaMs).sendToTarget();
         }
     }
@@ -348,7 +349,6 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 	}
                     break;
                 case START:
-                    removeCallbacksAndMessages(null);
                     Long startTime = (Long) msg.obj;
                     if(startTime!=null){
                         pausedPostion = startTime.longValue();
@@ -368,13 +368,13 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     break;
                 case SEEK_POS:
-                    removeMessages(UPDATE);
                     Long deltaMs = (Long) msg.obj;
                     mTimeBase -= deltaMs;
                     drawTask.seek(System.currentTimeMillis() - mTimeBase);
                     if (drawTask != null)
                         drawTask.seek(timer.currMillisecond);
                     pausedPostion = timer.currMillisecond;
+                    removeMessages(RESUME);
                     sendEmptyMessage(RESUME);
                     break;
                 case UPDATE:

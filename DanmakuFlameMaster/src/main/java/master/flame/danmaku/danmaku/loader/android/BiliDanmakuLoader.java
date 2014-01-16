@@ -22,7 +22,6 @@ import java.io.InputStream;
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.parser.android.AndroidFileSource;
-import android.net.Uri;
 
 public class BiliDanmakuLoader implements ILoader {
 

@@ -44,6 +44,8 @@ android上的弹幕转换、渲染输出源码
 
 - 减少clearCanvas刷新次数
 
+- 缓存线程同步danmakufitlers,进一步提高性能
+
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
