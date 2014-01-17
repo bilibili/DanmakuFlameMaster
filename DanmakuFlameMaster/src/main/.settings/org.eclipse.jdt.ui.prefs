@@ -1,0 +1,7 @@
+eclipse.preferences.version=1
+formatter_profile=_AndroidCodeStyle
+formatter_settings_version=12
+org.eclipse.jdt.ui.ignorelowercasenames=true
+org.eclipse.jdt.ui.importorder=android;com;dalvik;gov;junit;libcore;net;org;java;javax;
+org.eclipse.jdt.ui.ondemandthreshold=99
+org.eclipse.jdt.ui.staticondemandthreshold=99
