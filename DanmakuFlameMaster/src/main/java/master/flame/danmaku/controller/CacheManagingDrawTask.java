@@ -21,11 +21,13 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 
 import java.util.Iterator;
 import java.util.Set;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -374,9 +376,9 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             private long prepareCaches(boolean init) {
-                long curr = mCacheTimer.currMillisecond;                
+                long curr = mCacheTimer.currMillisecond;
                 long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
-                long startTime = System.currentTimeMillis();
+                Long startTime =  Long.valueOf(System.currentTimeMillis());
                 Set<BaseDanmaku> danmakus = null;
                 danmakus = danmakuList.subset(curr, curr
                         + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
@@ -388,6 +390,9 @@ public class CacheManagingDrawTask extends DrawTask {
                 BaseDanmaku item = null;
                 long consumingTime = 0;
                 int count = 0;
+                int orderInScreen = 0;
+                int currScreenIndex = 0;
+                int sizeInScreen = danmakus.size();
                 while (itr.hasNext() && !mPause) {
                     item = itr.next();
                     count++;
@@ -398,6 +403,22 @@ public class CacheManagingDrawTask extends DrawTask {
                     
                     if (init==false && (item.isTimeOut() || !item.isOutside())) {
                         continue;
+                    }
+                    boolean skip = DanmakuFilters.getDefault().filter(item , orderInScreen , sizeInScreen , startTime );
+                    Log.e("prepareCache", currScreenIndex+","+orderInScreen+"," + item.time+"skip:"+skip);
+                    if(skip){
+                        continue;
+                    }
+                    
+                    if(item.getType() == BaseDanmaku.TYPE_SCROLL_RL){
+                        // 同屏弹幕密度只对滚动弹幕有效
+                        int screenIndex = (int) ((item.time - curr)/DanmakuFactory.MAX_DANMAKU_DURATION);
+                        if(currScreenIndex == screenIndex)
+                            orderInScreen++;
+                        else{
+                            orderInScreen = 0;
+                            currScreenIndex = screenIndex;
+                        }
                     }
 
                     // build cache
