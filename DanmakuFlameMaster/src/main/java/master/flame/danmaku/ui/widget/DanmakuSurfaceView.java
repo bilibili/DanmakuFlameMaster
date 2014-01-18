@@ -193,7 +193,8 @@ public class DanmakuSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 String fps = String.format("%02d MS, fps %.2f",dtime, 1000 / (float) dtime);
                 DrawHelper.drawText(canvas, fps);
             }
-            mSurfaceHolder.unlockCanvasAndPost(canvas);
+            if(isSurfaceCreated)
+                mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
         return dtime;
     }
