@@ -26,6 +26,10 @@ public class R2LDanmaku extends BaseDanmaku {
 
     private float[] RECT = null;
 
+    private float mStepX;
+
+    private float mOldPaintWidth;
+
     public R2LDanmaku(long duration) {
         this.duration = duration;
     }
@@ -50,10 +54,11 @@ public class R2LDanmaku extends BaseDanmaku {
 
     private float getLeft(IDisplayer displayer, long currTime) {
         long elapsedTime = currTime - time;
-        if(elapsedTime >= duration){
+        if (elapsedTime >= duration) {
             return -paintWidth;
         }
-        return displayer.getWidth() - elapsedTime * mDistance / duration;
+
+        return displayer.getWidth() - elapsedTime * mStepX;
     }
 
     @Override
@@ -99,7 +104,11 @@ public class R2LDanmaku extends BaseDanmaku {
     @Override
     public void measure(IDisplayer displayer) {
         super.measure(displayer);
-        mDistance = (int) (displayer.getWidth() + paintWidth);
+        if (mOldPaintWidth != paintWidth) {
+            mDistance = (int) (displayer.getWidth() + paintWidth);
+            mStepX = mDistance / (float) duration;
+            mOldPaintWidth = paintWidth;
+        }
     }
 
 }
