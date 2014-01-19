@@ -22,7 +22,6 @@ import android.util.DisplayMetrics;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -105,38 +104,10 @@ public class DrawTask implements IDrawTask {
         clearFlag = false;
     }
 
-    /*
-     * protected void loadDanmakus(Context context, DanmakuTimer timer) { try {
-     * if (DEBUG_OPTION == 0) {
-     * loadAcDanmakus(context.getAssets().open("comment.json"), timer); } else {
-     * loadBiliDanmakus( context.getResources().openRawResource(
-     * master.flame.danmaku.activity.R.raw.comments), timer); } } catch
-     * (IOException e) { Log.e(TAG, "open assets error", e); } } private void
-     * loadBiliDanmakus(InputStream stream, DanmakuTimer timer) { mLoader =
-     * DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI); try {
-     * mLoader.load(stream); dataSource = mLoader.getDataSource(); mParser = new
-     * BiliDanmukuParser(mDisp); danmakuList =
-     * mParser.load(dataSource).setTimer(timer).parse(); } catch
-     * (IllegalDataException e) { Log.e(TAG, "load error", e); } } private void
-     * loadAcDanmakus(InputStream stream, DanmakuTimer timer) { mLoader =
-     * DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_ACFUN); try {
-     * mLoader.load(stream); dataSource = mLoader.getDataSource(); mParser = new
-     * AcFunDanmakuParser(mDisp); danmakuList =
-     * mParser.load(dataSource).setTimer(timer).parse(); } catch
-     * (IllegalDataException e) { Log.e(TAG, "load error", e); } }
-     */
-
     @Override
     public void seek(long mills) {        
-        long dtime = mTimer.lastInterval();
-//        mTimer.update(mills);
+        mTimer.lastInterval();
         reset();
-//        if(danmakuList!=null){
-//            IDanmakuIterator it = danmakuList.iterator();
-//            while(it.hasNext()){
-//                it.next().resetLayout();
-//            }
-//        }
         GlobalFlagValues.updateVisibleFlag();
     }
 
