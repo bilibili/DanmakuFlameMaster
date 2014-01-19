@@ -21,7 +21,6 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -405,7 +404,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         continue;
                     }
                     boolean skip = DanmakuFilters.getDefault().filter(item , orderInScreen , sizeInScreen , startTime );
-                    Log.e("prepareCache", currScreenIndex+","+orderInScreen+"," + item.time+"skip:"+skip);
+//Log.e("prepareCache", currScreenIndex+","+orderInScreen+"," + item.time+"skip:"+skip);
                     if(skip){
                         continue;
                     }
