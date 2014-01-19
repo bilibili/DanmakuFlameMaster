@@ -33,12 +33,6 @@ import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 public class DrawTask implements IDrawTask {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = "DrawTask";
-
-    @SuppressWarnings("unused")
-    private final int DEBUG_OPTION = 1;
-
     protected AndroidDisplayer mDisp;
 
     protected Danmakus danmakuList;
@@ -105,8 +99,7 @@ public class DrawTask implements IDrawTask {
     }
 
     @Override
-    public void seek(long mills) {        
-        mTimer.lastInterval();
+    public void seek(long mills) {
         reset();
         GlobalFlagValues.updateVisibleFlag();
     }
