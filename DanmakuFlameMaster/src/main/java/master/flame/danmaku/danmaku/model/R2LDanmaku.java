@@ -18,15 +18,15 @@ package master.flame.danmaku.danmaku.model;
 
 public class R2LDanmaku extends BaseDanmaku {
 
-    private float x = 0;
+    protected float x = 0;
 
-    private float y = -1;
+    protected float y = -1;
 
-    private int mDistance;
+    protected int mDistance;
 
     private float[] RECT = null;
 
-    private float mStepX;
+    protected float mStepX;
 
     private float mOldPaintWidth;
 
@@ -52,7 +52,7 @@ public class R2LDanmaku extends BaseDanmaku {
         }
     }
 
-    private float getLeft(IDisplayer displayer, long currTime) {
+    protected float getLeft(IDisplayer displayer, long currTime) {
         long elapsedTime = currTime - time;
         if (elapsedTime >= duration) {
             return -paintWidth;

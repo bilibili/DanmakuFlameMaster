@@ -16,54 +16,19 @@
 
 package master.flame.danmaku.danmaku.model;
 
-public class L2RDanmaku extends BaseDanmaku {
-
-    private float x = 0;
-
-    private float y = -1;
-
-    private float[] RECT = null;
+public class L2RDanmaku extends R2LDanmaku {
 
     public L2RDanmaku(long duration) {
-        this.duration = duration;
+        super(duration);
     }
 
     @Override
-    public void layout(IDisplayer displayer, float x, float y) {
-        if (mTimer != null) {
-            long deltaDuration = mTimer.currMillisecond - time;
-            if (deltaDuration > 0 && deltaDuration < duration) {
-                this.x = getLeft(displayer, mTimer.currMillisecond);
-                if (!this.isShown()) {
-                    this.y = y;
-                    this.setVisibility(true);
-                }
-            } else if (deltaDuration >= duration) {
-                this.setVisibility(false);
-            } else if (deltaDuration <= 0) {
-                this.setVisibility(false);
-            }
+    protected float getLeft(IDisplayer displayer, long currTime) {
+        long elapsedTime = currTime - time;
+        if (elapsedTime >= duration) {
+            return displayer.getWidth();
         }
-    }
-
-    private float getLeft(IDisplayer displayer, long currTime) {
-        return (currTime - time) / (float) duration * (displayer.getWidth() + paintWidth)
-                - paintWidth;
-    }
-
-    @Override
-    public float[] getRectAtTime(IDisplayer displayer, long time) {
-        if (!isMeasured())
-            return null;
-        float left = getLeft(displayer, time);
-        if (RECT == null) {
-            RECT = new float[4];
-        }
-        RECT[0] = left;
-        RECT[1] = y;
-        RECT[2] = left + paintWidth;
-        RECT[3] = y + paintHeight; 
-        return RECT;
+        return mStepX * elapsedTime - paintWidth;
     }
 
     @Override
