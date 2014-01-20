@@ -6,22 +6,27 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.*;
 import android.widget.PopupWindow;
 import android.widget.VideoView;
+
+import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
+import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
+import master.flame.danmaku.ui.widget.DanmakuTextureView;
 
 import com.sample.R;
 
 public class MainActivity extends Activity {
 
-    private DanmakuSurfaceView mDanmakuView;
+    private DanmakuTextureView mDanmakuView;
 
     private VideoView mVideoView;
 
@@ -71,10 +76,22 @@ public class MainActivity extends Activity {
         // VideoView
         mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
-        mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
+        mDanmakuView = (DanmakuTextureView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
 			BaseDanmakuParser parser = createParser(this.getResources()
 					.openRawResource(R.raw.comments));
+			mDanmakuView.setCallback(new Callback() {
+                
+                @Override
+                public void updateTimer(DanmakuTimer timer) {
+                                        
+                }
+                
+                @Override
+                public void prepared() {
+                    mDanmakuView.start();
+                }
+            });
 			mDanmakuView.prepare(parser);
 
             mDanmakuView.showFPS(true);
@@ -108,7 +125,6 @@ public class MainActivity extends Activity {
                  @Override
                  public void onPrepared(MediaPlayer mediaPlayer) {
                      mediaPlayer.start();
-                     mDanmakuView.start();
                  }
              });
             mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
