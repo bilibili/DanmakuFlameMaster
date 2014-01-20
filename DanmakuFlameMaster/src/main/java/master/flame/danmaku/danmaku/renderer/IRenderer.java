@@ -20,8 +20,8 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
 public interface IRenderer {
-
-    public void draw(IDisplayer disp, IDanmakus danmakus);
+    
+    public void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime);
 
     public void clear();
     

@@ -28,7 +28,18 @@ import master.flame.danmaku.danmaku.renderer.Renderer;
 public class DanmakuRenderer extends Renderer {
 
     @Override
-    public void draw(IDisplayer disp, IDanmakus danmakus) {
+    public void clear() {
+        DanmakusRetainer.clear();
+        //DanmakuFilters.getDefault().reset();
+    }
+
+    @Override
+    public void release() {
+        DanmakusRetainer.release();
+    }
+
+    @Override
+    public void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
         Danmakus drawItems = (Danmakus) danmakus;
         IDanmakuIterator itr = drawItems.iterator();
 
@@ -39,7 +50,10 @@ public class DanmakuRenderer extends Renderer {
 
             BaseDanmaku drawItem = itr.next();
 
-            if (drawItem.isTimeOut() || DanmakuFilters.getDefault().filter(drawItem , orderInScreen , sizeInScreen , startTime )) {
+            if (drawItem.time < startRenderTime
+                    || drawItem.isTimeOut()
+                    || DanmakuFilters.getDefault().filter(drawItem, orderInScreen, sizeInScreen,
+                            startTime)) {
                 continue;
             }
             
@@ -62,17 +76,6 @@ public class DanmakuRenderer extends Renderer {
             }
 
         }
-    }
-
-    @Override
-    public void clear() {
-        DanmakusRetainer.clear();
-        //DanmakuFilters.getDefault().reset();
-    }
-
-    @Override
-    public void release() {
-        DanmakusRetainer.release();
     }
 
 }

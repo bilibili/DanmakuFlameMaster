@@ -53,6 +53,8 @@ public class DrawTask implements IDrawTask {
 
     private boolean clearFlag;
 
+    private long mStartRenderTime = 0;
+
     public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
             TaskListener taskListener) {
         mTaskListener = taskListener;
@@ -102,6 +104,7 @@ public class DrawTask implements IDrawTask {
     public void seek(long mills) {
         reset();
         GlobalFlagValues.updateVisibleFlag();
+        mStartRenderTime = mills < 1000 ? 0 : mills;
     }
 
     @Override
@@ -144,7 +147,7 @@ public class DrawTask implements IDrawTask {
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
             if (danmakus != null && danmakus.size() > 0) {
                 mDisp.update(canvas);
-                mRenderer.draw(mDisp, danmakus);
+                mRenderer.draw(mDisp, danmakus, mStartRenderTime);
                 clearFlag = false;
             }
 
