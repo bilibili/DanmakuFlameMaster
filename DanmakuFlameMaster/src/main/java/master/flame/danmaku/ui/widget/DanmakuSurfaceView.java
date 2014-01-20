@@ -120,6 +120,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         stop();
     }
 
+    @Override
     public void stop() {
         stopDraw();
     }
@@ -153,16 +154,19 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         }
     }
 
+    @Override
     public void prepare(BaseDanmakuParser parser) {
     	prepare();
         handler.setParser(parser);
         handler.setCallback(mCallback);
     }
 
-    public boolean isPrepared(){
-        return handler!=null && handler.isPrepared();
+    @Override
+    public boolean isPrepared() {
+        return handler != null && handler.isPrepared();
     }
 
+    @Override
     public void showFPS(boolean show){
         mShowFps = show;
     }
@@ -171,7 +175,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     public long drawDanmakus() {
         if (!isSurfaceCreated)
             return 0;
-        if(!isShown())
+        if (!isShown())
             return 0;
         long stime = System.currentTimeMillis();
         long dtime = 0;
@@ -179,11 +183,11 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         if (canvas != null) {
             handler.drawTask.draw(canvas);
             dtime = System.currentTimeMillis() - stime;
-            if(mShowFps){
-                String fps = String.format("%02d MS, fps %.2f",dtime, 1000 / (float) dtime);
+            if (mShowFps) {
+                String fps = String.format("%02d MS, fps %.2f", dtime, 1000 / (float) dtime);
                 DrawHelper.drawText(canvas, fps);
             }
-            if(isSurfaceCreated)
+            if (isSurfaceCreated)
                 mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
         return dtime;
@@ -200,14 +204,16 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         }
     }
 
+    @Override
     public void pause() {
         if (handler != null)
             handler.quit();
     }
 
+    @Override
     public void resume() {
         if (handler != null && mDrawThread != null && handler.isPrepared())
-            handler.sendEmptyMessage(DrawHandler.RESUME);
+            handler.resume();
         else {
             restart();
         }
@@ -218,10 +224,12 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         start();
     }
 
+    @Override
     public void start() {
         start(0);
     }
 
+    @Override
     public void start(long postion) {
         if (handler == null) {
             prepare();

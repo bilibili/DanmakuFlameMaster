@@ -195,4 +195,8 @@ public class DrawHandler extends Handler {
         }
     }
 
+    public void resume() {
+        sendEmptyMessage(DrawHandler.RESUME);
+    }
+
 }
