@@ -26,7 +26,7 @@ import com.sample.R;
 
 public class MainActivity extends Activity {
 
-    private DanmakuTextureView mDanmakuView;
+    private DanmakuSurfaceView mDanmakuView;
 
     private VideoView mVideoView;
 
@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
         // VideoView
         mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
-        mDanmakuView = (DanmakuTextureView) findViewById(R.id.sv_danmaku);
+        mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         if (mDanmakuView != null) {
 			BaseDanmakuParser parser = createParser(this.getResources()
 					.openRawResource(R.raw.comments));

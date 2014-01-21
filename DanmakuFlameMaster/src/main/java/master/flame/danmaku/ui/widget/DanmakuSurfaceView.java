@@ -267,5 +267,10 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         return isSurfaceCreated;
     }
 
+    @Override
+    public View getView() {
+        return this;
+    }
+
 
 }

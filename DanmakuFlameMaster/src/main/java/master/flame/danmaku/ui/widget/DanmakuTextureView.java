@@ -32,6 +32,12 @@ import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
+/**
+ * DanmakuTextureView需要开启GPU加速才能显示弹幕
+ * 很遗憾...经过测试TextureView没有提升绘制速度,也许哪里用的不对
+ * @author ch
+ *
+ */
 public class DanmakuTextureView extends TextureView implements IDanmakuView,
         TextureView.SurfaceTextureListener, View.OnClickListener {
 
@@ -264,6 +270,11 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public boolean isViewReady() {
         return isSurfaceCreated;
+    }
+
+    @Override
+    public View getView() {
+        return this;
     }
 
 }
