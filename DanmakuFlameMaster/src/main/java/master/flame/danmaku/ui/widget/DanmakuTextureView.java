@@ -51,7 +51,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     private boolean isSurfaceCreated;
 
-    private boolean mEnableDanmakuDrwaingCache;
+    private boolean mEnableDanmakuDrwaingCache = true;
 
     private OnClickListener mOnClickListener;
 

@@ -46,7 +46,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     
     private boolean isSurfaceCreated;
 
-    private boolean mEnableDanmakuDrwaingCache;
+    private boolean mEnableDanmakuDrwaingCache = true;
 
     private OnClickListener mOnClickListener;
     
