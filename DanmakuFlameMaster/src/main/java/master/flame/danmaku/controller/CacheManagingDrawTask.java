@@ -449,7 +449,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     if (repositioned == false && (item.isTimeOut() || !item.isOutside())) {
                         continue;
                     }
-                    boolean skip = DanmakuFilters.getDefault().filter(item , orderInScreen , sizeInScreen , startTime );
+                    boolean skip = DanmakuFilters.getDefault().filter(item , orderInScreen , sizeInScreen , null );
 //Log.e("prepareCache", currScreenIndex+","+orderInScreen+"," + item.time+"skip:"+skip);
                     if (skip) {
                         continue;

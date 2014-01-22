@@ -160,10 +160,10 @@ public class DanmakuFilters {
                 return true;
             }
 
-            if (!danmaku.isOutside()) {
+            if (drawingStartTime == null || !danmaku.isOutside()) {
                 return false;
             }
-
+            
             long elapsedTime = System.currentTimeMillis() - drawingStartTime.longValue();
             if (elapsedTime >= mMaxTime) {
                 danmakus.addItem(danmaku);
