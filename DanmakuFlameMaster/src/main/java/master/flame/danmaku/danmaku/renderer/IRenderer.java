@@ -20,11 +20,41 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
 public interface IRenderer {
-    
+
+    public class Area {
+
+        public final int[] mRefreshRect = new int[4];
+        private int mMaxHeight;
+        private int mMaxWidth;
+
+        public void setEdge(int maxWidth, int maxHeight) {
+            mMaxWidth = maxWidth;
+            mMaxHeight = maxHeight;
+        }
+
+        public void reset() {
+            set(mMaxWidth, mMaxHeight, 0, 0);
+        }
+
+        public void resizeToMax() {
+            set(0, 0, mMaxWidth, mMaxHeight);
+        }
+
+        public void set(int left, int top, int right, int bottom) {
+            mRefreshRect[0] = left;
+            mRefreshRect[1] = top;
+            mRefreshRect[2] = right;
+            mRefreshRect[3] = bottom;
+        }
+
+    }
+
     public void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime);
 
     public void clear();
-    
+
     public void release();
+
+    public Area getRefreshArea();
 
 }

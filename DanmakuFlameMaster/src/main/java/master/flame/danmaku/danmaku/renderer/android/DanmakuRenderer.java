@@ -21,27 +21,31 @@ import master.flame.danmaku.danmaku.model.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
 
 public class DanmakuRenderer extends Renderer {
 
+    private final Area mRefreshArea = new Area();    
+   
+
     @Override
     public void clear() {
         DanmakusRetainer.clear();
-        //DanmakuFilters.getDefault().reset();
+        mRefreshArea.resizeToMax();
     }
 
     @Override
     public void release() {
         DanmakusRetainer.release();
     }
-
+    
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
-        Danmakus drawItems = (Danmakus) danmakus;
-        IDanmakuIterator itr = drawItems.iterator();
+        
+        int left = disp.getWidth(),top = disp.getHeight(), right = 0 ,bottom = 0;
+        
+        IDanmakuIterator itr = danmakus.iterator();
 
         int orderInScreen = 0;
         Long startTime = Long.valueOf(System.currentTimeMillis());
@@ -51,7 +55,6 @@ public class DanmakuRenderer extends Renderer {
             BaseDanmaku drawItem = itr.next();
 
             if (drawItem.time < startRenderTime
-                    || drawItem.isTimeOut()
                     || DanmakuFilters.getDefault().filter(drawItem, orderInScreen, sizeInScreen,
                             startTime)) {
                 continue;
@@ -74,8 +77,27 @@ public class DanmakuRenderer extends Renderer {
             if (drawItem.isOutside()==false && drawItem.isShown()) {
                 drawItem.draw(disp);
             }
-
+            
+            int dleft = (int) drawItem.getLeft();
+            int dtop = (int) (drawItem.getTop());
+            int dright = (int) (drawItem.getRight());
+            int dbottom = (int) (dtop + drawItem.paintHeight);
+            if(drawItem.getType() == BaseDanmaku.TYPE_FIX_BOTTOM){
+                dtop = (int) (disp.getHeight() - dtop - drawItem.paintHeight);
+                dbottom = (int) (disp.getHeight() - drawItem.getTop());
+            }
+            left = Math.min(dleft, left);
+            top = Math.min(dtop, top);
+            right = Math.max(dright, right);
+            bottom = Math.max(dbottom, bottom);
         }
+        
+        mRefreshArea.set(left, top, right, bottom);
+    }
+
+    @Override
+    public Area getRefreshArea() {
+        return mRefreshArea ;
     }
 
 }

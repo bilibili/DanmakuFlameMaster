@@ -37,18 +37,19 @@ public class R2LDanmaku extends BaseDanmaku {
     @Override
     public void layout(IDisplayer displayer, float x, float y) {
         if (mTimer != null) {
-            long deltaDuration = mTimer.currMillisecond - time;
+            long currMS = mTimer.currMillisecond;
+            long deltaDuration = currMS - time;
             if (deltaDuration > 0 && deltaDuration < duration) {
-                this.x = getLeft(displayer, mTimer.currMillisecond);
+                this.x = getLeft(displayer, currMS);
                 if (!this.isShown()) {
                     this.y = y;
                     this.setVisibility(true);
                 }
-            } else if (deltaDuration >= duration) {
-                this.setVisibility(false);
-            } else if (deltaDuration <= 0) {
-                this.setVisibility(false);
-            }
+                return;
+            } 
+            this.setVisibility(false);
+            this.x = -paintWidth;
+            this.y = -1;
         }
     }
 

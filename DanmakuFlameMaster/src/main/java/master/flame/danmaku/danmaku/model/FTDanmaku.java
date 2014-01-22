@@ -41,11 +41,11 @@ public class FTDanmaku extends BaseDanmaku {
                     this.y = y;
                     this.setVisibility(true);
                 }
-            } else if (deltaDuration >= duration) {
-                this.setVisibility(false);
-            } else if (deltaDuration <= 0) {
-                this.setVisibility(false);
-            }
+                return;
+            } 
+
+            this.setVisibility(false);
+            this.y = -paintHeight;
         }
 
     }

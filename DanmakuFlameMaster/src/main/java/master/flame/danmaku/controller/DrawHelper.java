@@ -46,7 +46,7 @@ public class DrawHelper {
     }
 
     public static void clearCanvas(Canvas canvas, int left, int top, int right, int bottom) {
-        RECT.set(Math.max(0, left), Math.max(0, top), Math.min(canvas.getWidth(),right), Math.min(canvas.getHeight(),bottom));
+        RECT.set(left, top, right, bottom);
         clearCanvas(canvas, RECT);
     }
 

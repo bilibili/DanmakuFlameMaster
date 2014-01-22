@@ -19,6 +19,7 @@ package master.flame.danmaku.controller;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.DisplayMetrics;
+
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
@@ -51,7 +52,7 @@ public class DrawTask implements IDrawTask {
 
     private IDanmakus danmakus;
 
-    private boolean clearFlag;
+    private int clearFlag;
 
     private long mStartRenderTime = 0;
 
@@ -68,6 +69,7 @@ public class DrawTask implements IDrawTask {
         mDisp.density = displayMetrics.density;
         mDisp.densityDpi = displayMetrics.densityDpi;
         mDisp.scaledDensity = displayMetrics.scaledDensity;
+        mDisp.slopPixel = (int) (Math.max(displayMetrics.density,displayMetrics.scaledDensity) * 12);
         initTimer(timer);
     }
 
@@ -97,12 +99,12 @@ public class DrawTask implements IDrawTask {
             danmakus.clear();
         if (mRenderer != null)
             mRenderer.clear();
-        clearFlag = false;
     }
 
     @Override
     public void seek(long mills) {
         reset();
+        clearFlag = 5;
         GlobalFlagValues.updateVisibleFlag();
         mStartRenderTime = mills < 1000 ? 0 : mills;
     }
@@ -135,22 +137,25 @@ public class DrawTask implements IDrawTask {
         mParser = parser;
     }
 
-    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {        
+    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {
         if (danmakuList != null) {
-            if(!clearFlag){
+            if (clearFlag > 0) {
                 DrawHelper.clearCanvas(canvas);
-                clearFlag = true;
-            }else{
-                DrawHelper.clearCanvas(canvas, 0, 0, canvas.getWidth(), canvas.getHeight()>>2);
+                clearFlag--;
+            } else {
+                int[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
+                DrawHelper.clearCanvas(canvas, Math.max(0, refreshRect[0]),
+                        Math.max(0, refreshRect[1]),
+                        Math.min(canvas.getWidth(), refreshRect[2] + mDisp.slopPixel),
+                        Math.min(canvas.getHeight(), refreshRect[3] + mDisp.slopPixel));
             }
             long currMills = timer.currMillisecond;
-            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION, currMills);
-            if (danmakus != null && danmakus.size() > 0) {
+            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION - 100,
+                    currMills);
+            if (danmakus != null) {
                 mDisp.update(canvas);
                 mRenderer.draw(mDisp, danmakus, mStartRenderTime);
-                clearFlag = false;
             }
-
         }
     }
 

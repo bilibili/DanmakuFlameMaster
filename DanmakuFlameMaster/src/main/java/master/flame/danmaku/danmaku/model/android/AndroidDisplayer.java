@@ -105,6 +105,8 @@ public class AndroidDisplayer implements IDisplayer {
 
     public float scaledDensity = 1;
 
+    public int slopPixel = 20;
+
     public void update(Canvas c) {
         canvas = c;
         if (c != null) {
@@ -308,7 +310,11 @@ public class AndroidDisplayer implements IDisplayer {
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
+        if (HAS_STROKE){                
+            applyPaintConfig(danmaku, paint, true);
+        }
         calcPaintWH(danmaku, paint);
+        applyPaintConfig(danmaku, paint, false);
     }   
     
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
