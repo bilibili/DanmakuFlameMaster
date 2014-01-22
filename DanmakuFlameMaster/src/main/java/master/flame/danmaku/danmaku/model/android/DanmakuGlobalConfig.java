@@ -4,10 +4,10 @@ package master.flame.danmaku.danmaku.model.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import master.flame.danmaku.controller.DanmakuFilters;
+import master.flame.danmaku.controller.DanmakuFilters.IDanmakuFilter;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuFilters;
-import master.flame.danmaku.danmaku.model.DanmakuFilters.IDanmakuFilter;
 import android.graphics.Typeface;
 
 public class DanmakuGlobalConfig {
