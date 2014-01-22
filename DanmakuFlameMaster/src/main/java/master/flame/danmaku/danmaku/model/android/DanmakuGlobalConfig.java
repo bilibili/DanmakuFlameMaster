@@ -287,5 +287,15 @@ public class DanmakuGlobalConfig {
         }
         return this;
     }
+    
+    /**
+     * 设置是否粗体显示,对某些字体无效
+     * @param bold
+     * @return
+     */
+    public DanmakuGlobalConfig setDanmakuBold(boolean bold){
+        AndroidDisplayer.setFakeBoldText(bold);
+        return this;
+    }
 
 }

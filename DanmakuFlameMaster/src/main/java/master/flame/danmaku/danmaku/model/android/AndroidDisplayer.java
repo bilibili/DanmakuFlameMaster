@@ -92,6 +92,10 @@ public class AndroidDisplayer implements IDisplayer {
     public static void setPaintStorkeWidth(float s){
         PAINT.setStrokeWidth(s);
     }
+    
+    public static void setFakeBoldText(boolean fakeBoldText){
+        PAINT.setFakeBoldText(fakeBoldText);
+    }
 
     public Canvas canvas;
 
