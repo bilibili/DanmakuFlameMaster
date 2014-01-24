@@ -29,6 +29,10 @@ public class DrawHandler extends Handler {
 
     public static final int PREPARE = 5;
 
+    private static final int QUIT = 6;
+
+    private static final int PAUSE = 7;
+
     private long pausedPostion = 0;
 
     private boolean quitFlag = true;
@@ -68,9 +72,8 @@ public class DrawHandler extends Handler {
     }
 
     public void quit() {
-        quitFlag = true;
-        pausedPostion = timer.currMillisecond;
         removeCallbacksAndMessages(null);
+        sendEmptyMessage(QUIT);
     }
 
     public boolean isStop() {
@@ -147,6 +150,16 @@ public class DrawHandler extends Handler {
                 }
                 sendEmptyMessage(UPDATE);
                 break;
+            case PAUSE:
+            case QUIT:
+                removeCallbacksAndMessages(null);
+                quitFlag = true;
+                pausedPostion = timer.currMillisecond;
+                if (what == QUIT){
+                    this.drawTask.quit();
+                    this.getLooper().quit();
+                }
+                break;
         }
     }
 
@@ -201,6 +214,10 @@ public class DrawHandler extends Handler {
 
     public void prepare() {
         sendEmptyMessage(DrawHandler.PREPARE);
+    }
+
+    public void pause() {
+        sendEmptyMessage(DrawHandler.PAUSE);
     }
 
 }

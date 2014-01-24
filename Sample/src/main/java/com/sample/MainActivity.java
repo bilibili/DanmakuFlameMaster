@@ -136,6 +136,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if(mDanmakuView!=null){
+            // dont forget release!
             mDanmakuView.release();
         }
         super.onDestroy();

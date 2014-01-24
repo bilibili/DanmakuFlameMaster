@@ -69,7 +69,7 @@ public class DrawTask implements IDrawTask {
         mDisp.density = displayMetrics.density;
         mDisp.densityDpi = displayMetrics.densityDpi;
         mDisp.scaledDensity = displayMetrics.scaledDensity;
-        mDisp.slopPixel = (int) (Math.max(displayMetrics.density,displayMetrics.scaledDensity) * 12);
+        mDisp.slopPixel = (int) (Math.max(displayMetrics.density,displayMetrics.scaledDensity) * 18);
         initTimer(timer);
     }
 

@@ -21,6 +21,7 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -104,9 +105,10 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void quit() {
-        mCacheManager.end();
         super.quit();
         reset();
+        mCacheManager.end();
+        mCacheManager = null;
     }
 
     @Override
@@ -169,20 +171,17 @@ public class CacheManagingDrawTask extends DrawTask {
         public void end() {
             if (mHandler != null) {
                 mHandler.pause();
-                mHandler.getLooper().quit();
                 mHandler = null;
             }
             if (mThread != null) {
-                mThread.quit();
-                try {
-                    mThread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    mThread.join();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                mThread.quit();
                 mThread = null;
             }
-            evictAll();
-            clearCachePool();
         }
 
         public void resume() {
@@ -326,6 +325,8 @@ public class CacheManagingDrawTask extends DrawTask {
             public static final int CLEAR_CACHES = 0x4;
             
             public static final int SEEK = 0x5;
+            
+            public static final int QUIT = 0x6;
 
             private boolean mPause;
 
@@ -404,6 +405,18 @@ public class CacheManagingDrawTask extends DrawTask {
                             evictAllNotInScreen();
                             resume();
                         }
+                        break;
+                    case QUIT:
+                        Log.e("CacheManaging", "before removeCallbacksAndMessages");
+                        removeCallbacksAndMessages(null);
+                        mPause = true;
+                        Log.e("CacheManaging", "after removeCallbacksAndMessages");
+                        evictAll();
+                        Log.e("CacheManaging", "after evictAll");
+                        clearCachePool();
+                        Log.e("CacheManaging", "after clearCachePool");
+                        this.getLooper().quit();
+                        Log.e("CacheManaging", "after getLooper quit");
                         break;
                 }
             }
@@ -557,8 +570,8 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             public void pause() {
-                mPause = true;
                 removeCallbacksAndMessages(null);
+                sendEmptyMessage(QUIT);
             }
 
             public void resume() {

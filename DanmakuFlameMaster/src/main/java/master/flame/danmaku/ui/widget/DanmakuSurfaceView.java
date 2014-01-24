@@ -116,6 +116,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         isSurfaceCreated = false;
     }
 
+    @Override
     public void release() {
         stop();
     }
@@ -127,20 +128,16 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
 
     private void stopDraw() {
         if (handler != null) {
-            if (handler.drawTask != null) {
-                handler.drawTask.quit();
-            }
             handler.quit();
-            handler.getLooper().quit();
             handler = null;
         }
         if (mDrawThread != null) {
-            mDrawThread.quit();
             try {
                 mDrawThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            mDrawThread.quit();
             mDrawThread = null;
         }
     }
@@ -207,7 +204,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     @Override
     public void pause() {
         if (handler != null)
-            handler.quit();
+            handler.pause();
     }
 
     @Override
