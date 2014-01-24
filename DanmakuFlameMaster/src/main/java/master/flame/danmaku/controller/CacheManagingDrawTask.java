@@ -174,12 +174,12 @@ public class CacheManagingDrawTask extends DrawTask {
                 mHandler = null;
             }
             if (mThread != null) {
-//                try {
-//                    mThread.join();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                mThread.quit();
+                try {
+                    mThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mThread.quit();
                 mThread = null;
             }
         }
@@ -407,16 +407,11 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
                         break;
                     case QUIT:
-                        Log.e("CacheManaging", "before removeCallbacksAndMessages");
                         removeCallbacksAndMessages(null);
                         mPause = true;
-                        Log.e("CacheManaging", "after removeCallbacksAndMessages");
-                        evictAll();
-                        Log.e("CacheManaging", "after evictAll");
+                        evictAll();                        
                         clearCachePool();
-                        Log.e("CacheManaging", "after clearCachePool");
                         this.getLooper().quit();
-                        Log.e("CacheManaging", "after getLooper quit");
                         break;
                 }
             }

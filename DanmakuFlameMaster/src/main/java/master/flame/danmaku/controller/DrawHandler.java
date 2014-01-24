@@ -156,8 +156,10 @@ public class DrawHandler extends Handler {
                 quitFlag = true;
                 pausedPostion = timer.currMillisecond;
                 if (what == QUIT){
-                    if (this.drawTask != null)
+                    if (this.drawTask != null){
                         this.drawTask.quit();
+                        this.drawTask = null;
+                    }
                     this.getLooper().quit();
                 }
                 break;
