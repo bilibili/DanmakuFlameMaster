@@ -424,8 +424,8 @@ public class CacheManagingDrawTask extends DrawTask {
                 if (cache == null) {
                     return;
                 }
-                mCachePool.release(cache);
                 cache.destroy();
+                mCachePool.release(cache);
             }
 
             private long prepareCaches(boolean repositioned) {
