@@ -34,8 +34,7 @@ public class DanmakuGlobalConfig {
     /**
      * 弹幕大小是否被缩放
      */
-    @SuppressWarnings("unused")
-    private boolean isTextScaled = false;
+    public boolean isTextScaled = false;
 
     /**
      * 弹幕显示隐藏设置

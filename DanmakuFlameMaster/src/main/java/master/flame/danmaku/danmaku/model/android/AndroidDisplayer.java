@@ -16,11 +16,6 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import java.util.HashMap;
-
-import master.flame.danmaku.danmaku.model.AlphaValue;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
 import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -28,6 +23,14 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.text.TextPaint;
+import android.util.Log;
+
+import master.flame.danmaku.danmaku.model.AlphaValue;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by ch on 13-7-5.
@@ -308,17 +311,31 @@ public class AndroidDisplayer implements IDisplayer {
             }
             paint.setAlpha(AlphaValue.MAX);
         }
-
+        
+        if(DanmakuGlobalConfig.DEFAULT.isTextScaled){
+            Float size = cachedSize.get(danmaku.textSize);
+            
+            if(size == null || sLastScaleTextSize != DanmakuGlobalConfig.DEFAULT.scaleTextSize) {
+                sLastScaleTextSize = DanmakuGlobalConfig.DEFAULT.scaleTextSize;
+                size = Float.valueOf(danmaku.textSize * DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+                cachedSize.put(danmaku.textSize, size);
+            }else{
+                Log.i("====", "get size from cache");
+            }
+            paint.setTextSize(size.floatValue());
+        }
+            
     }
-
+    private static float sLastScaleTextSize;
+    private static Map<Float,Float> cachedSize = new HashMap<Float, Float>(10);
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
-        if (HAS_STROKE){                
-            applyPaintConfig(danmaku, paint, true);
-        }
+//        if (HAS_STROKE){                
+//            applyPaintConfig(danmaku, paint, true);
+//        }
+        applyPaintConfig(danmaku, paint, HAS_STROKE);
         calcPaintWH(danmaku, paint);
-        applyPaintConfig(danmaku, paint, false);
     }   
     
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
