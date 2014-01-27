@@ -331,11 +331,11 @@ public class AndroidDisplayer implements IDisplayer {
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
-//        if (HAS_STROKE){                
-//            applyPaintConfig(danmaku, paint, true);
-//        }
-        applyPaintConfig(danmaku, paint, HAS_STROKE);
+        if (HAS_STROKE){                
+            applyPaintConfig(danmaku, paint, true);
+        }
         calcPaintWH(danmaku, paint);
+        applyPaintConfig(danmaku, paint, false);
     }   
     
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
