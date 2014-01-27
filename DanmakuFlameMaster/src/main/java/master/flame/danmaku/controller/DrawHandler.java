@@ -231,6 +231,7 @@ public class DrawHandler extends Handler {
     }
 
     public void showDanmakus() {
+        mDanmakuView.clear();
         mDanmakusVisible = true;
     }
 
