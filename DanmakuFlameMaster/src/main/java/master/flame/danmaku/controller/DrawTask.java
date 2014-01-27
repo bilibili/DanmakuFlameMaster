@@ -144,8 +144,8 @@ public class DrawTask implements IDrawTask {
                 clearFlag--;
             } else {
                 int[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
-                DrawHelper.clearCanvas(canvas, Math.max(0, refreshRect[0]),
-                        Math.max(0, refreshRect[1]),
+                DrawHelper.clearCanvas(canvas, Math.max(0, refreshRect[0] - mDisp.slopPixel),
+                        Math.max(0, refreshRect[1] - mDisp.slopPixel),
                         Math.min(canvas.getWidth(), refreshRect[2] + mDisp.slopPixel),
                         Math.min(canvas.getHeight(), refreshRect[3] + mDisp.slopPixel));
             }
