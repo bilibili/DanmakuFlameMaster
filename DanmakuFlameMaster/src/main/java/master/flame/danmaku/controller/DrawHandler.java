@@ -51,8 +51,11 @@ public class DrawHandler extends Handler {
 
     private IDanmakuView mDanmakuView;
 
-    public DrawHandler(Looper looper, IDanmakuView view) {
+    private boolean mDanmakusVisible = true;
+
+    public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
+        mDanmakusVisible = danmakuVisibile;
         if (timer == null) {
             timer = new DanmakuTimer();
         }
@@ -142,8 +145,13 @@ public class DrawHandler extends Handler {
                     sendEmptyMessageDelayed(UPDATE, 60 - d);
                     break;
                 }
-                d = mDanmakuView.drawDanmakus();
+                d = mDanmakuView.drawDanmakus();                
                 removeMessages(UPDATE);
+                if (d == -1) {
+                    // reduce refresh rate
+                    sendEmptyMessageDelayed(UPDATE, 100);
+                    break;
+                }
                 if (d < 15) {
                     sendEmptyMessageDelayed(UPDATE, 15 - d);
                     break;
@@ -220,6 +228,19 @@ public class DrawHandler extends Handler {
 
     public void pause() {
         sendEmptyMessage(DrawHandler.PAUSE);
+    }
+
+    public void showDanmakus() {
+        mDanmakusVisible = true;
+    }
+
+    public void hideDanmakus() {
+        mDanmakusVisible = false;
+        mDanmakuView.clear();
+    }
+
+    public boolean getVisibility() {
+        return mDanmakusVisible;
     }
 
 }

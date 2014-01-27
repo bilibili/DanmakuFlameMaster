@@ -52,6 +52,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     
     private boolean mShowFps;
 
+    private boolean mDanmakuVisibile = true;
+
     public DanmakuSurfaceView(Context context) {
         super(context);
         init();
@@ -146,7 +148,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         if (mDrawThread == null) {
             mDrawThread = new HandlerThread("draw thread");
             mDrawThread.start();
-            handler = new DrawHandler(mDrawThread.getLooper() , this);
+            handler = new DrawHandler(mDrawThread.getLooper() , this , mDanmakuVisibile);
         }
     }
 
@@ -173,7 +175,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         if (!isSurfaceCreated)
             return 0;
         if (!isShown())
-            return 0;
+            return -1;
         long stime = System.currentTimeMillis();
         long dtime = 0;
         Canvas canvas = mSurfaceHolder.lockCanvas();
@@ -267,6 +269,44 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     @Override
     public View getView() {
         return this;
+    }
+
+    @Override
+    public void show() {
+        mDanmakuVisibile = true; 
+        if (handler == null) {
+            return;
+        }
+        handler.showDanmakus();
+    }
+
+    @Override
+    public void hide() {
+        mDanmakuVisibile = false;
+        if (handler == null) {
+            return;
+        }
+        handler.hideDanmakus();
+    }
+
+    @Override
+    public void clear() {
+        if (!isViewReady()) {
+            return;
+        }
+        Canvas canvas = mSurfaceHolder.lockCanvas();
+        if (canvas != null) {
+            DrawHelper.clearCanvas(canvas);
+            mSurfaceHolder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    @Override
+    public boolean isShown() {
+        if (handler == null || !isViewReady()) {
+            return false;
+        }
+        return handler.getVisibility();
     }
 
 

@@ -57,6 +57,8 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     private boolean mShowFps;
 
+    private boolean mDanmakuVisibile = true;
+
     public DanmakuTextureView(Context context) {
         super(context);
         init();
@@ -151,7 +153,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         if (mDrawThread == null) {
             mDrawThread = new HandlerThread("draw thread");
             mDrawThread.start();
-            handler = new DrawHandler(mDrawThread.getLooper(), this);
+            handler = new DrawHandler(mDrawThread.getLooper(), this , mDanmakuVisibile);
         }
     }
 
@@ -178,7 +180,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         if (!isSurfaceCreated)
             return 0;
         if (!isShown())
-            return 0;
+            return -1;
         long stime = System.currentTimeMillis();
         long dtime = 0;
         Canvas canvas = lockCanvas();
@@ -271,6 +273,44 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public View getView() {
         return this;
+    }
+
+    @Override
+    public void show() {
+        mDanmakuVisibile  = true; 
+        if (handler == null) {
+            return;
+        }
+        handler.showDanmakus();
+    }
+
+    @Override
+    public void hide() {
+        mDanmakuVisibile = false;
+        if (handler == null) {
+            return;
+        }
+        handler.hideDanmakus();
+    }
+
+    @Override
+    public void clear() {
+        if (!isViewReady()) {
+            return;
+        }
+        Canvas canvas = lockCanvas();
+        if (canvas != null) {
+            DrawHelper.clearCanvas(canvas);
+            unlockCanvasAndPost(canvas);
+        }
+    }
+
+    @Override
+    public boolean isShown() {
+        if (handler == null || !isViewReady()) {
+            return false;
+        }
+        return handler.getVisibility();
     }
 
 }

@@ -61,5 +61,11 @@ public interface IDanmakuView {
     public void release();
     
     public void toggle();
+    
+    public void show();
+    
+    public void hide();
+    
+    public void clear();
 
 }
