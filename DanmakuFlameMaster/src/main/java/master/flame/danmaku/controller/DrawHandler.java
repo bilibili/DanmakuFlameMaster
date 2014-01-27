@@ -158,7 +158,6 @@ public class DrawHandler extends Handler {
                 if (what == QUIT){
                     if (this.drawTask != null){
                         this.drawTask.quit();
-                        this.drawTask = null;
                     }
                     this.getLooper().quit();
                 }
