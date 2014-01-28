@@ -391,7 +391,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                     case CLEAR_CACHES:
                         if (!mPause) {
-                            if (getPoolPercent() > 0.3f) {
+                            if (getPoolPercent() > 0.1f) {
                                 clearTimeOutCaches();
                             }
                             removeMessages(CLEAR_CACHES);
