@@ -42,6 +42,9 @@ public class AndroidDisplayer implements IDisplayer {
     private Matrix matrix = new Matrix();
     
     private final static HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>(); // thread safe is not Necessary
+    
+    private static float sLastScaleTextSize;
+    private static Map<Float,Float> cachedScaleSize = new HashMap<Float, Float>(10);
 
     @SuppressWarnings("unused")
     private int HIT_CACHE_COUNT = 0;
@@ -279,6 +282,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     public static TextPaint getPaint(BaseDanmaku danmaku) {
         PAINT.setTextSize(danmaku.textSize);
+        applyTextScaleConfig(danmaku, PAINT);
         PAINT.setAntiAlias(ANTI_ALIAS);
         if (HAS_SHADOW) {
             PAINT.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
@@ -311,32 +315,35 @@ public class AndroidDisplayer implements IDisplayer {
             }
             paint.setAlpha(AlphaValue.MAX);
         }
-        
-        if(DanmakuGlobalConfig.DEFAULT.isTextScaled){
-            Float size = cachedSize.get(danmaku.textSize);
-            
-            if(size == null || sLastScaleTextSize != DanmakuGlobalConfig.DEFAULT.scaleTextSize) {
-                sLastScaleTextSize = DanmakuGlobalConfig.DEFAULT.scaleTextSize;
-                size = Float.valueOf(danmaku.textSize * DanmakuGlobalConfig.DEFAULT.scaleTextSize);
-                cachedSize.put(danmaku.textSize, size);
-            }else{
-                Log.i("====", "get size from cache");
-            }
-            paint.setTextSize(size.floatValue());
-        }
             
     }
-    private static float sLastScaleTextSize;
-    private static Map<Float,Float> cachedSize = new HashMap<Float, Float>(10);
+
+    private static void applyTextScaleConfig(BaseDanmaku danmaku, Paint paint) {
+        if (!DanmakuGlobalConfig.DEFAULT.isTextScaled) {
+            return;
+        }
+        Float size = cachedScaleSize.get(danmaku.textSize);
+        if (size == null || sLastScaleTextSize != DanmakuGlobalConfig.DEFAULT.scaleTextSize) {
+            sLastScaleTextSize = DanmakuGlobalConfig.DEFAULT.scaleTextSize;
+            size = Float.valueOf(danmaku.textSize * DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+            cachedScaleSize.put(danmaku.textSize, size);
+        } else {
+            Log.i("====", "get size from cache");
+        }
+        paint.setTextSize(size.floatValue());
+    }
+    
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
-        if (HAS_STROKE){                
+        if (HAS_STROKE) {
             applyPaintConfig(danmaku, paint, true);
         }
         calcPaintWH(danmaku, paint);
-        applyPaintConfig(danmaku, paint, false);
-    }   
+        if (HAS_STROKE) {
+            applyPaintConfig(danmaku, paint, false);
+        }
+    } 
     
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
         float w = 0;
@@ -372,6 +379,7 @@ public class AndroidDisplayer implements IDisplayer {
     
     public static void clearTextHeightCache(){
         TextHeightCache.clear();
+        cachedScaleSize.clear();
     }
 
     @Override

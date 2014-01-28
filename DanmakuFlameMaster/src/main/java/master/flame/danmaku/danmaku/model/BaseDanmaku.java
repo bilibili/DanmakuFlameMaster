@@ -107,9 +107,14 @@ public abstract class BaseDanmaku {
     public int visibility;
     
     /**
-     * 重置位 private
+     * 重置位 visible
      */
     private int visibleResetFlag = 0;
+    
+    /**
+     * 重置位 measure
+     */
+    private int measureResetFlag = 0;
 
     /**
      * 绘制用缓存
@@ -144,11 +149,13 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isMeasured() {
-        return paintWidth >= 0 && paintHeight >= 0;
+        return paintWidth >= 0 && paintHeight >= 0
+                && measureResetFlag == GlobalFlagValues.MEASURE_RESET_FLAG;
     }
 
     public void measure(IDisplayer displayer) {
         displayer.measure(this);
+        this.measureResetFlag = GlobalFlagValues.MEASURE_RESET_FLAG;
     }
 
     public boolean hasDrawingCache() {
@@ -156,7 +163,8 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isShown() {
-        return this.visibility == VISIBLE && visibleResetFlag == GlobalFlagValues.VISIBLE_RESET_FLAG;
+        return this.visibility == VISIBLE
+                && visibleResetFlag == GlobalFlagValues.VISIBLE_RESET_FLAG;
     }
 
     public boolean isTimeOut() {

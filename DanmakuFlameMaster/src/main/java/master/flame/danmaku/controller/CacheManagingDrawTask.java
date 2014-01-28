@@ -17,6 +17,7 @@
 package master.flame.danmaku.controller;
 
 import android.content.Context;
+import android.content.IntentSender.SendIntentException;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -29,6 +30,8 @@ import java.util.Set;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.ConfigChangedCallback;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCachePoolManager;
@@ -120,7 +123,7 @@ public class CacheManagingDrawTask extends DrawTask {
         mCacheManager.begin();
     }
 
-    public class CacheManager {
+    public class CacheManager implements ConfigChangedCallback {
 
         @SuppressWarnings("unused")
         private static final String TAG = "CacheManager";
@@ -168,9 +171,13 @@ public class CacheManagingDrawTask extends DrawTask {
             if (mHandler == null)
                 mHandler = new CacheHandler(mThread.getLooper());
             mHandler.begin();
+            
+            DanmakuGlobalConfig.DEFAULT.registerConfigChangedCallback(this);
         }
 
         public void end() {
+            DanmakuGlobalConfig.DEFAULT.unregisterConfigChangedCallback(this);
+            
             if (mHandler != null) {
                 mHandler.pause();
                 mHandler = null;
@@ -184,6 +191,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 mThread.quit();
                 mThread = null;
             }
+            
         }
 
         public void resume() {
@@ -330,6 +338,8 @@ public class CacheManagingDrawTask extends DrawTask {
             
             public static final int QUIT = 0x6;
 
+            public static final int CLEAR_ALL_CACHES = 0x7;
+
             private boolean mPause;
 
             private boolean buildSuccess;
@@ -414,6 +424,10 @@ public class CacheManagingDrawTask extends DrawTask {
                         evictAll();                        
                         clearCachePool();
                         this.getLooper().quit();
+                        break;
+                    case CLEAR_ALL_CACHES:
+                        evictAll();
+                        seek(mTimer.currMillisecond);
                         break;
                 }
             }
@@ -588,6 +602,14 @@ public class CacheManagingDrawTask extends DrawTask {
                 return mCaches.first().time;
             }
             return 0;
+        }
+
+        @Override
+        public void onScaleTextSizeChanged(float oldValue, float newValue) {
+            if (mHandler != null) {
+                mHandler.removeMessages(CacheHandler.CLEAR_ALL_CACHES);
+                mHandler.sendEmptyMessage(CacheHandler.CLEAR_ALL_CACHES);
+            }
         }
 
     }

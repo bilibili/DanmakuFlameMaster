@@ -8,6 +8,8 @@ import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DanmakuFilters.IDanmakuFilter;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.GlobalFlagValues;
+
 import android.graphics.Typeface;
 
 public class DanmakuGlobalConfig {
@@ -102,7 +104,14 @@ public class DanmakuGlobalConfig {
 
     public DanmakuGlobalConfig setScaleTextSize(float p) {
         if (scaleTextSize != p) {
+            if (mCallbackList != null) {
+                for(ConfigChangedCallback cb : mCallbackList){
+                    cb.onScaleTextSizeChanged(scaleTextSize, p);
+                }
+            }
             scaleTextSize = p;
+            AndroidDisplayer.clearTextHeightCache();
+            GlobalFlagValues.updateMeasureFlag();
         }
         isTextScaled = (scaleTextSize != 1f);
         return this;
@@ -119,6 +128,8 @@ public class DanmakuGlobalConfig {
 
     @SuppressWarnings("unused")
     private int mDanmakuStyle;
+
+    private ArrayList<ConfigChangedCallback> mCallbackList;
 
     /**
      * 设置是否显示顶部弹幕
@@ -295,6 +306,23 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setDanmakuBold(boolean bold){
         AndroidDisplayer.setFakeBoldText(bold);
         return this;
+    }
+    
+    public interface ConfigChangedCallback{
+        public void onScaleTextSizeChanged(float oldValue,float newValue);
+    }
+    
+    public void registerConfigChangedCallback(ConfigChangedCallback listener) {
+        if (mCallbackList == null) {
+            mCallbackList = new ArrayList<ConfigChangedCallback>();
+        }
+        mCallbackList.add(listener);
+    }
+    
+    public void unregisterConfigChangedCallback(ConfigChangedCallback listener) {
+        if (mCallbackList == null)
+            return;
+        mCallbackList.remove(listener);
     }
 
 }
