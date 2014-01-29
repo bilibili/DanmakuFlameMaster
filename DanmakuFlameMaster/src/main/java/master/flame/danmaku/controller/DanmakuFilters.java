@@ -217,7 +217,7 @@ public class DanmakuFilters {
         return f;
     }
 
-    IDanmakuFilter[] mFilterArray;
+    IDanmakuFilter[] mFilterArray = new IDanmakuFilter[0];
 
     public IDanmakuFilter registerFilter(String tag, Object data) {
         if (tag == null) {
@@ -241,7 +241,7 @@ public class DanmakuFilters {
         }
         filter.setData(data);
         filters.put(tag, filter);
-        mFilterArray = (IDanmakuFilter[]) filters.values().toArray();
+        mFilterArray = (IDanmakuFilter[]) filters.values().toArray(mFilterArray);
         return filter;
     }
 
@@ -250,13 +250,13 @@ public class DanmakuFilters {
         if (f != null){
             f.reset();
             f = null;
-            mFilterArray = (IDanmakuFilter[]) filters.values().toArray();
+            mFilterArray = (IDanmakuFilter[]) filters.values().toArray(mFilterArray);
         }
     }
 
     public void clear() {
         filters.clear();
-        mFilterArray = null;
+        mFilterArray = new IDanmakuFilter[0];
     }
 
     public void reset() {
