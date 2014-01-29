@@ -247,10 +247,11 @@ public class DanmakuFilters {
 
     public void unregisterFilter(String tag) {
         IDanmakuFilter f = filters.remove(tag);
-        if (f != null)
+        if (f != null){
             f.reset();
-        f = null;
-        mFilterArray = (IDanmakuFilter[]) filters.values().toArray();
+            f = null;
+            mFilterArray = (IDanmakuFilter[]) filters.values().toArray();
+        }
     }
 
     public void clear() {
