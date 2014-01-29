@@ -163,7 +163,7 @@ public class DanmakuFilters {
             if (drawingStartTime == null || !danmaku.isOutside()) {
                 return false;
             }
-            
+
             long elapsedTime = System.currentTimeMillis() - drawingStartTime.longValue();
             if (elapsedTime >= mMaxTime) {
                 danmakus.addItem(danmaku);
@@ -196,41 +196,14 @@ public class DanmakuFilters {
 
     public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
             Long drawingStartTime) {
-        Iterator<IDanmakuFilter> fit = filters.values().iterator();
-        while (fit.hasNext()) {
-            if (fit.next().filter(danmaku, index, totalsizeInScreen, drawingStartTime)) {
+        if (mFilterArray == null)
+            return false;
+        for (IDanmakuFilter f : mFilterArray) {
+            if (f.filter(danmaku, index, totalsizeInScreen, drawingStartTime)) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * 根据注册的过滤器过滤弹幕
-     * 
-     * @param danmakus
-     * @return 过滤掉的数量
-     */
-    public int filter(IDanmakus danmakus, int orderInScreen, int totalsizeInScreen, Long startTime) {
-        if (filters.isEmpty()) {
-            return 0;
-        }
-        int count = 0;
-        IDanmakuIterator it = danmakus.iterator();
-        while (it.hasNext()) {
-            BaseDanmaku danmaku = it.next();
-            synchronized (this) {
-                Iterator<IDanmakuFilter> fit = filters.values().iterator();
-                while (fit.hasNext()) {
-                    if (fit.next().filter(danmaku, orderInScreen, totalsizeInScreen, startTime)) {
-                        // it.remove();
-                        count++;
-                        break;
-                    }
-                }
-            }
-        }
-        return count;
     }
 
     private final static Map<String, IDanmakuFilter> filters = Collections
@@ -243,6 +216,8 @@ public class DanmakuFilters {
         }
         return f;
     }
+
+    IDanmakuFilter[] mFilterArray;
 
     public IDanmakuFilter registerFilter(String tag, Object data) {
         if (tag == null) {
@@ -266,6 +241,7 @@ public class DanmakuFilters {
         }
         filter.setData(data);
         filters.put(tag, filter);
+        mFilterArray = (IDanmakuFilter[]) filters.values().toArray();
         return filter;
     }
 
@@ -274,14 +250,19 @@ public class DanmakuFilters {
         if (f != null)
             f.reset();
         f = null;
+        mFilterArray = (IDanmakuFilter[]) filters.values().toArray();
     }
 
     public void clear() {
         filters.clear();
+        mFilterArray = null;
     }
 
     public void reset() {
-        for (IDanmakuFilter f : filters.values()) {
+        if (mFilterArray == null) {
+            return;
+        }
+        for (IDanmakuFilter f : mFilterArray) {
             f.reset();
         }
     }
