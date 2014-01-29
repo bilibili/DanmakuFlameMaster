@@ -196,10 +196,8 @@ public class DanmakuFilters {
 
     public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
             Long drawingStartTime) {
-        if (mFilterArray == null)
-            return false;
         for (IDanmakuFilter f : mFilterArray) {
-            if (f.filter(danmaku, index, totalsizeInScreen, drawingStartTime)) {
+            if (f != null && f.filter(danmaku, index, totalsizeInScreen, drawingStartTime)) {
                 return true;
             }
         }
@@ -241,16 +239,16 @@ public class DanmakuFilters {
         }
         filter.setData(data);
         filters.put(tag, filter);
-        mFilterArray = (IDanmakuFilter[]) filters.values().toArray(mFilterArray);
+        mFilterArray = filters.values().toArray(mFilterArray);
         return filter;
     }
 
     public void unregisterFilter(String tag) {
         IDanmakuFilter f = filters.remove(tag);
-        if (f != null){
+        if (f != null) {
             f.reset();
             f = null;
-            mFilterArray = (IDanmakuFilter[]) filters.values().toArray(mFilterArray);
+            mFilterArray = filters.values().toArray(mFilterArray);
         }
     }
 
@@ -260,11 +258,9 @@ public class DanmakuFilters {
     }
 
     public void reset() {
-        if (mFilterArray == null) {
-            return;
-        }
         for (IDanmakuFilter f : mFilterArray) {
-            f.reset();
+            if (f != null)
+                f.reset();
         }
     }
 
