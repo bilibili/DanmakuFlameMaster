@@ -18,6 +18,7 @@ package master.flame.danmaku.danmaku.renderer.android;
 
 import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -27,7 +28,7 @@ import master.flame.danmaku.danmaku.renderer.Renderer;
 public class DanmakuRenderer extends Renderer {
 
     private final Area mRefreshArea = new Area();    
-   
+    private final DanmakuTimer mStartTimer = new DanmakuTimer();
 
     @Override
     public void clear() {
@@ -47,8 +48,8 @@ public class DanmakuRenderer extends Renderer {
         
         IDanmakuIterator itr = danmakus.iterator();
 
-        int orderInScreen = 0;
-        Long startTime = Long.valueOf(System.currentTimeMillis());
+        int orderInScreen = 0;        
+        mStartTimer.update(System.currentTimeMillis());
         int sizeInScreen = danmakus.size();
         while (itr.hasNext()) {
 
@@ -56,7 +57,7 @@ public class DanmakuRenderer extends Renderer {
 
             if (drawItem.time < startRenderTime
                     || DanmakuFilters.getDefault().filter(drawItem, orderInScreen, sizeInScreen,
-                            startTime)) {
+                            mStartTimer)) {
                 continue;
             }
             

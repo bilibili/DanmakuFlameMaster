@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -20,7 +21,7 @@ public class DanmakuFilters {
          * 是否过滤
          */
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                Long drawingStartTime);
+                DanmakuTimer timer);
 
         public void setData(Object data);
 
@@ -49,7 +50,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
-                Long drawingStartTime) {
+                DanmakuTimer timer) {
             if (danmaku != null && mFilterTypes.contains(danmaku.getType()))
                 return true;
             return false;
@@ -91,7 +92,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
-                Long drawingStartTime) {
+                DanmakuTimer timer) {
             BaseDanmaku last = danmakus.last();
             if (last != null && last.isTimeOut()) {
                 reset();
@@ -150,7 +151,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
-                Long drawingStartTime) {
+                DanmakuTimer timer) {
 
             if (danmakus.last() != null && danmakus.last().isTimeOut()) {
                 reset();
@@ -160,11 +161,11 @@ public class DanmakuFilters {
                 return true;
             }
 
-            if (drawingStartTime == null || !danmaku.isOutside()) {
+            if (timer == null || !danmaku.isOutside()) {
                 return false;
             }
 
-            long elapsedTime = System.currentTimeMillis() - drawingStartTime.longValue();
+            long elapsedTime = System.currentTimeMillis() - timer.currMillisecond;
             if (elapsedTime >= mMaxTime) {
                 danmakus.addItem(danmaku);
                 return true;
@@ -195,9 +196,9 @@ public class DanmakuFilters {
     public final Exception filterException = new Exception("not suuport this filter tag");
 
     public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-            Long drawingStartTime) {
+            DanmakuTimer timer) {
         for (IDanmakuFilter f : mFilterArray) {
-            if (f != null && f.filter(danmaku, index, totalsizeInScreen, drawingStartTime)) {
+            if (f != null && f.filter(danmaku, index, totalsizeInScreen, timer)) {
                 return true;
             }
         }
