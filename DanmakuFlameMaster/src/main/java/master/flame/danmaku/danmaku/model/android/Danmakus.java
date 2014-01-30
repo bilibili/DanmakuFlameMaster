@@ -148,7 +148,7 @@ public class Danmakus implements IDanmakus {
         }
 
         startItem.time = startTime;
-        endItem.time = endTime;
+        endItem.time = endTime + 1000; // +1000减少subSet次数
         subItems.setItems(((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem));
         return subItems;
     }
