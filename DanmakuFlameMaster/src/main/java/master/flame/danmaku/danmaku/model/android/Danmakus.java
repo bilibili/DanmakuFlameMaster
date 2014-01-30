@@ -44,6 +44,8 @@ public class Danmakus implements IDanmakus {
     
     private DanmakuIterator iterator;
 
+    private int mSize = 0;
+
     public Danmakus() {
         this(ST_BY_TIME);
     }
@@ -58,6 +60,7 @@ public class Danmakus implements IDanmakus {
             comparator = new YPosDescComparator();
         }
         items = new TreeSet<BaseDanmaku>(comparator);
+        mSize = 0;
         iterator = new DanmakuIterator(items);
     }
 
@@ -67,6 +70,7 @@ public class Danmakus implements IDanmakus {
 
     public void setItems(Set<BaseDanmaku> items) {        
         this.items = items;
+        mSize = (items == null ? 0 : items.size());
         iterator.setDatas(items);
     }
 
@@ -77,8 +81,10 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public void addItem(BaseDanmaku item) {
-        if (items != null)
-            items.add(item);
+        if (items != null) {
+            if (items.add(item))
+                mSize++;
+        }
     }
 
     @Override
@@ -87,7 +93,8 @@ public class Danmakus implements IDanmakus {
             item.setVisibility(false);
         }
         if (items != null) {
-            items.remove(item);
+            if (items.remove(item))
+                mSize--;
         }
     }
 
@@ -158,16 +165,14 @@ public class Danmakus implements IDanmakus {
     }
 
     public int size() {
-        if (items != null) {
-            return items.size();
-        }
-        return 0;
+        return mSize;
     }
 
     @Override
     public void clear() {
         if (items != null){
             items.clear();
+            mSize = 0;
         }
         if (subItems != null) {
             subItems.clear();
