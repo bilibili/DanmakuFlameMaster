@@ -205,7 +205,7 @@ public class Danmakus implements IDanmakus {
         }
         
         public synchronized void reset(){
-            if(mData!=null){
+            if(mData!=null || mSize > 0){
                 it = mData.iterator();
             }else{
                 it = null;
