@@ -124,14 +124,18 @@ public class DanmakuUtils {
             return -1;
         }
         
-        int result = Integer.valueOf(obj1.index).compareTo(obj2.index);
-        if (result != 0) {
-            return result;
+        int result = obj1.index - obj2.index;
+        if (result > 0) {
+            return 1;
+        } else if (result < 0) {
+            return -1;
         }
 
-        result = Integer.valueOf(obj1.getType()).compareTo(obj2.getType());
-        if (result != 0) {
-            return result;
+        result = obj1.getType() - obj2.getType();
+        if (result > 0) {
+            return 1;
+        } else if (result < 0) {
+            return -1;
         }
 
         if (obj1.text == null) {
@@ -146,7 +150,7 @@ public class DanmakuUtils {
             return r;
         }
 
-        r = (obj1.textColor - obj2.textColor);
+        r = obj1.textColor - obj2.textColor;
         if (r != 0)
             return r < 0 ? -1 : 1;
 
