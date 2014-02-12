@@ -33,7 +33,7 @@ public class DanmakuFactory {
 
     public static long MIN_DANMAKU_DURATION = 4000;
 
-    public static long MAX_DANMAKU_DURATION_HIGH_DENSITY = 8000;
+    public static long MAX_DANMAKU_DURATION_HIGH_DENSITY = 8600;
 
     public static BaseDanmaku createDanmaku(int type, float dispWidth) {
         if (REAL_DANMAKU_DURATION == -1) {
