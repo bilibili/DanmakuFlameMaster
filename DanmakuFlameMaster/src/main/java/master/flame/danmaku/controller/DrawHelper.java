@@ -17,6 +17,7 @@
 package master.flame.danmaku.controller;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -24,7 +25,7 @@ import android.graphics.Rect;
 
 public class DrawHelper {
 
-    public static Paint PAINT;
+    public static Paint PAINT, PAINT_FPS;
 
     public static Rect RECT;
     static {
@@ -33,10 +34,16 @@ public class DrawHelper {
         RECT = new Rect();
     }
 
-    public static void drawText(Canvas canvas, String text) {
-
-        canvas.drawText(text, 10, canvas.getHeight() - 50, PAINT);
-
+    public static void drawFPS(Canvas canvas, String text) {
+        if (PAINT_FPS == null) {
+            PAINT_FPS = new Paint();
+            PAINT_FPS.setColor(Color.RED);
+            PAINT_FPS.setTextSize(50);
+        }
+        int top = canvas.getHeight() - 50;
+        
+        clearCanvas(canvas, 10, top - 50, (int) (PAINT_FPS.measureText(text) + 20), canvas.getHeight());
+        canvas.drawText(text, 10, top, PAINT_FPS);
     }
 
     public static void clearCanvas(Canvas canvas) {

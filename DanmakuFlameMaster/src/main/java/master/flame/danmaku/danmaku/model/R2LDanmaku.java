@@ -48,8 +48,6 @@ public class R2LDanmaku extends BaseDanmaku {
                 return;
             } 
             this.setVisibility(false);
-            this.x = -paintWidth;
-            this.y = -1;
         }
     }
 

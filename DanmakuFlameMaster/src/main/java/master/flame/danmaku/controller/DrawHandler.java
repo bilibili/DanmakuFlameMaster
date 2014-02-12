@@ -140,7 +140,7 @@ public class DrawHandler extends Handler {
                 if (mCallback != null) {
                     mCallback.updateTimer(timer);
                 }
-                if (d <= 0) {
+                if (d < 0) {
                     removeMessages(UPDATE);
                     sendEmptyMessageDelayed(UPDATE, 60 - d);
                     break;
@@ -152,7 +152,7 @@ public class DrawHandler extends Handler {
                     sendEmptyMessageDelayed(UPDATE, 100);
                     break;
                 }
-                if (d < 15) {
+                if (d <= 13) {
                     sendEmptyMessageDelayed(UPDATE, 15 - d);
                     break;
                 }
