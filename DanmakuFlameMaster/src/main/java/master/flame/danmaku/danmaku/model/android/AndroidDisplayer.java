@@ -115,7 +115,7 @@ public class AndroidDisplayer implements IDisplayer {
 
     public float scaledDensity = 1;
 
-    public int slopPixel = 20;
+    public int slopPixel = 0;
 
     public void update(Canvas c) {
         canvas = c;
@@ -127,13 +127,11 @@ public class AndroidDisplayer implements IDisplayer {
 
     @Override
     public int getWidth() {
-
         return width;
     }
 
     @Override
     public int getHeight() {
-
         return height;
     }
 

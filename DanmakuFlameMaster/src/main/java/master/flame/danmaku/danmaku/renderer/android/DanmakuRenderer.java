@@ -45,6 +45,7 @@ public class DanmakuRenderer extends Renderer {
     public void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
         
         int left = disp.getWidth(),top = disp.getHeight(), right = 0 ,bottom = 0;
+        boolean fullScreenRefreshing = false;
         
         IDanmakuIterator itr = danmakus.iterator();
 
@@ -79,11 +80,24 @@ public class DanmakuRenderer extends Renderer {
                 drawItem.draw(disp);
             }
             
+            if (fullScreenRefreshing)
+                continue;
+            
+            // calculate the refreshing area
+            if (drawItem.getType() == BaseDanmaku.TYPE_SPECIAL
+                    && (drawItem.rotationY != 0 || drawItem.rotationZ != 0)) {
+                left = 0;
+                top = 0;
+                right = disp.getWidth();
+                bottom = disp.getHeight();
+                fullScreenRefreshing = true;
+                continue;
+            }
             int dleft = (int) drawItem.getLeft();
             int dtop = (int) (drawItem.getTop());
             int dright = (int) (drawItem.getRight());
             int dbottom = (int) (dtop + drawItem.paintHeight);
-            if(drawItem.getType() == BaseDanmaku.TYPE_FIX_BOTTOM){
+            if (drawItem.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
                 dtop = (int) (disp.getHeight() - dtop - drawItem.paintHeight);
                 dbottom = (int) (disp.getHeight() - drawItem.getTop());
             }
@@ -91,6 +105,7 @@ public class DanmakuRenderer extends Renderer {
             top = Math.min(dtop, top);
             right = Math.max(dright, right);
             bottom = Math.max(dbottom, bottom);
+
         }
         
         mRefreshArea.set(left, top, right, bottom);

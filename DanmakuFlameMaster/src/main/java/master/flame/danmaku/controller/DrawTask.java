@@ -18,6 +18,7 @@ package master.flame.danmaku.controller;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.DisplayMetrics;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -69,7 +70,7 @@ public class DrawTask implements IDrawTask {
         mDisp.density = displayMetrics.density;
         mDisp.densityDpi = displayMetrics.densityDpi;
         mDisp.scaledDensity = displayMetrics.scaledDensity;
-        mDisp.slopPixel = (int) (Math.max(displayMetrics.density,displayMetrics.scaledDensity) * 18);
+        mDisp.slopPixel = (int) (Math.max(displayMetrics.density,displayMetrics.scaledDensity) * 20);
         initTimer(timer);
     }
 
