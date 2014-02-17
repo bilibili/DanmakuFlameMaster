@@ -148,8 +148,9 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         if (mDrawThread == null) {
             mDrawThread = new HandlerThread("draw thread");
             mDrawThread.start();
-            handler = new DrawHandler(mDrawThread.getLooper() , this , mDanmakuVisibile);
         }
+        if (handler == null)
+            handler = new DrawHandler(mDrawThread.getLooper(), this, mDanmakuVisibile);
     }
 
     @Override
