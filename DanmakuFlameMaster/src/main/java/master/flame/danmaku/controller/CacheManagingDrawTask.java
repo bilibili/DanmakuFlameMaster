@@ -17,12 +17,10 @@
 package master.flame.danmaku.controller;
 
 import android.content.Context;
-import android.content.IntentSender.SendIntentException;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -598,8 +596,11 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         public long getFirstCacheTime() {
-            if(mCaches!=null && mCaches.size()>0){
-                return mCaches.first().time;
+            if (mCaches != null && mCaches.size() > 0) {
+                BaseDanmaku firstItem = mCaches.first();
+                if (firstItem == null)
+                    return 0;
+                return firstItem.time;
             }
             return 0;
         }
