@@ -88,6 +88,7 @@ public class AndroidDisplayer implements IDisplayer {
         ALPHA_PAINT = new Paint();
         UNDERLINE_PAINT = new Paint();
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
+        UNDERLINE_PAINT.setStyle(Style.STROKE);
     }
     
     public static void setTypeFace(Typeface font){
@@ -267,8 +268,8 @@ public class AndroidDisplayer implements IDisplayer {
         // draw underline
         if (danmaku.underlineColor != 0) {
             Paint linePaint = getUnderlinePaint(danmaku);
-            float bottom = top + danmaku.paintHeight;
-            canvas.drawLine(left, bottom - UNDERLINE_HEIGHT, left + danmaku.paintWidth, bottom, linePaint);
+            float bottom = top + danmaku.paintHeight - UNDERLINE_HEIGHT;
+            canvas.drawLine(left, bottom, left + danmaku.paintWidth, bottom, linePaint);
         }
 
     }
