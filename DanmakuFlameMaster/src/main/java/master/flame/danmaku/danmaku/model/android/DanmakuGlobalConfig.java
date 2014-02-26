@@ -38,7 +38,7 @@ public class DanmakuGlobalConfig {
     /**
      * paint alpha:0-255
      */
-    public int alpha = AlphaValue.MAX;
+    public int transparency = AlphaValue.MAX;
 
     public boolean isTranslucent = false;
 
@@ -105,11 +105,11 @@ public class DanmakuGlobalConfig {
         return this;
     }
 
-    public DanmakuGlobalConfig setGlobalAlpha(float p) {
-        int newAlpha = (int) (p * AlphaValue.MAX);
-        if (newAlpha != alpha) {
-            alpha = newAlpha;
-            isTranslucent = (newAlpha != AlphaValue.MAX);
+    public DanmakuGlobalConfig setDanmakuTransparency(float p) {
+        int newTransparency = (int) (p * AlphaValue.MAX);
+        if (newTransparency != transparency) {
+            transparency = newTransparency;
+            isTranslucent = (newTransparency != AlphaValue.MAX);
             notifyConfigureChanged(DanmakuConfigTag.ALPHA, p);
         }
         return this;

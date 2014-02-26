@@ -296,14 +296,14 @@ public class AndroidDisplayer implements IDisplayer {
         if (DanmakuGlobalConfig.DEFAULT.isTranslucent) {
             if(stroke){
                 paint.setStyle(Style.STROKE);
-                int color = (danmaku.textShadowColor & 0x00FFFFFF) | (DanmakuGlobalConfig.DEFAULT.alpha<<24);
+                int color = (danmaku.textShadowColor & 0x00FFFFFF) | (DanmakuGlobalConfig.DEFAULT.transparency<<24);
                 paint.setColor(color);
             }else{
                 paint.setStyle(Style.FILL);
-                int color = (danmaku.textColor & 0x00FFFFFF) | (DanmakuGlobalConfig.DEFAULT.alpha<<24);
+                int color = (danmaku.textColor & 0x00FFFFFF) | (DanmakuGlobalConfig.DEFAULT.transparency<<24);
                 paint.setColor(color);
             }
-            paint.setAlpha(DanmakuGlobalConfig.DEFAULT.alpha);
+            paint.setAlpha(DanmakuGlobalConfig.DEFAULT.transparency);
         } else {
             if(stroke){
                 paint.setStyle(Style.STROKE);
