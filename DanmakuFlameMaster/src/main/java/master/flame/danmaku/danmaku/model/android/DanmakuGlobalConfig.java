@@ -13,8 +13,19 @@ import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import android.graphics.Typeface;
 
 public class DanmakuGlobalConfig {
+
+    public enum DanmakuConfigTag {
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, ALPHA, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD;
+
+        public boolean isVisibilityTag() {
+            return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
+                    || this.equals(L2R_DANMAKU_VISIBILITY) || this.equals(R2L_DANMAKU_VISIBILIY)
+                    || this.equals(SPECIAL_DANMAKU_VISIBILITY);
+        }
+    }
+
     /*
-     * TODO 选项：合并异色同字弹幕缓存 
+     * TODO 选项：合并异色同字弹幕缓存
      */
 
     public static DanmakuGlobalConfig DEFAULT = new DanmakuGlobalConfig();
@@ -89,6 +100,7 @@ public class DanmakuGlobalConfig {
             mFont = font;
             AndroidDisplayer.clearTextHeightCache();
             AndroidDisplayer.setTypeFace(font);
+            notifyConfigureChanged(DanmakuConfigTag.TYPEFACE);
         }
         return this;
     }
@@ -98,20 +110,17 @@ public class DanmakuGlobalConfig {
         if (newAlpha != alpha) {
             alpha = newAlpha;
             isTranslucent = (newAlpha != AlphaValue.MAX);
+            notifyConfigureChanged(DanmakuConfigTag.ALPHA, p);
         }
         return this;
     }
 
     public DanmakuGlobalConfig setScaleTextSize(float p) {
         if (scaleTextSize != p) {
-            if (mCallbackList != null) {
-                for(ConfigChangedCallback cb : mCallbackList){
-                    cb.onScaleTextSizeChanged(scaleTextSize, p);
-                }
-            }
             scaleTextSize = p;
             AndroidDisplayer.clearTextHeightCache();
             GlobalFlagValues.updateMeasureFlag();
+            notifyConfigureChanged(DanmakuConfigTag.SCALE_TEXTSIZE, p);
         }
         isTextScaled = (scaleTextSize != 1f);
         return this;
@@ -139,8 +148,9 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setFTDanmakuVisibility(boolean visible) {
         if (FTDanmakuVisibility != visible) {
             FTDanmakuVisibility = visible;
-            setVisible(visible, BaseDanmaku.TYPE_FIX_TOP);
+            setDanmakuVisible(visible, BaseDanmaku.TYPE_FIX_TOP);
             setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+            notifyConfigureChanged(DanmakuConfigTag.FT_DANMAKU_VISIBILITY, visible);
         }
         return this;
     }
@@ -150,7 +160,7 @@ public class DanmakuGlobalConfig {
         filter.setData(data);
     }
 
-    private void setVisible(boolean visible, int type) {
+    private void setDanmakuVisible(boolean visible, int type) {
         if (visible) {
             mFilterTypes.remove(Integer.valueOf(type));
         } else if (!mFilterTypes.contains(Integer.valueOf(type))) {
@@ -173,8 +183,9 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setFBDanmakuVisibility(boolean visible) {
         if (FBDanmakuVisibility != visible) {
             FBDanmakuVisibility = visible;
-            setVisible(visible, BaseDanmaku.TYPE_FIX_BOTTOM);
+            setDanmakuVisible(visible, BaseDanmaku.TYPE_FIX_BOTTOM);
             setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+            notifyConfigureChanged(DanmakuConfigTag.FB_DANMAKU_VISIBILITY, visible);
         }
         return this;
     }
@@ -194,8 +205,9 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setL2RDanmakuVisibility(boolean visible) {
         if (L2RDanmakuVisibility != visible) {
             L2RDanmakuVisibility = visible;
-            setVisible(visible, BaseDanmaku.TYPE_SCROLL_LR);
+            setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_LR);
             setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+            notifyConfigureChanged(DanmakuConfigTag.L2R_DANMAKU_VISIBILITY, visible);
         }
         return this;
     }
@@ -215,8 +227,9 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setR2LDanmakuVisibility(boolean visible) {
         if (R2LDanmakuVisibility != visible) {
             R2LDanmakuVisibility = visible;
-            setVisible(visible, BaseDanmaku.TYPE_SCROLL_RL);
+            setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_RL);
             setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+            notifyConfigureChanged(DanmakuConfigTag.R2L_DANMAKU_VISIBILIY, visible);
         }
         return this;
     }
@@ -233,17 +246,19 @@ public class DanmakuGlobalConfig {
      * 
      * @param visible
      */
-    public DanmakuGlobalConfig setSecialDanmakuVisibility(boolean visible) {
+    public DanmakuGlobalConfig setSpecialDanmakuVisibility(boolean visible) {
         if (SecialDanmakuVisibility != visible) {
             SecialDanmakuVisibility = visible;
-            setVisible(visible, BaseDanmaku.TYPE_SPECIAL);
+            setDanmakuVisible(visible, BaseDanmaku.TYPE_SPECIAL);
             setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+            notifyConfigureChanged(DanmakuConfigTag.SPECIAL_DANMAKU_VISIBILITY, visible);
         }
         return this;
     }
 
     /**
      * 设置同屏弹幕密度 -1自动 0无限制
+     * 
      * @param maxSize
      * @return
      */
@@ -254,6 +269,7 @@ public class DanmakuGlobalConfig {
             DanmakuFilters.getDefault()
                     .unregisterFilter(DanmakuFilters.TAG_QUANTITY_DANMAKU_FILTER);
             DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_ELAPSED_TIME_FILTER);
+            notifyConfigureChanged(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN, maxSize);
             return this;
         }
         // 自动调整
@@ -262,24 +278,29 @@ public class DanmakuGlobalConfig {
                     .unregisterFilter(DanmakuFilters.TAG_QUANTITY_DANMAKU_FILTER);
             DanmakuFilters.getDefault()
                     .registerFilter(DanmakuFilters.TAG_ELAPSED_TIME_FILTER, null);
+            notifyConfigureChanged(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN, maxSize);
             return this;
         }
         setFilterData(DanmakuFilters.TAG_QUANTITY_DANMAKU_FILTER, maxSize);
+        notifyConfigureChanged(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN, maxSize);
         return this;
     }
-    
-    public final static int DANMAKU_STYLE_DEFAULT = -1; //自动
-    public final static int DANMAKU_STYLE_NONE = 0; //无
-    public final static int DANMAKU_STYLE_SHADOW = 1; //阴影
-    public final static int DANMAKU_STYLE_STROKEN = 2; //描边
+
+    public final static int DANMAKU_STYLE_DEFAULT = -1; // 自动
+    public final static int DANMAKU_STYLE_NONE = 0; // 无
+    public final static int DANMAKU_STYLE_SHADOW = 1; // 阴影
+    public final static int DANMAKU_STYLE_STROKEN = 2; // 描边
+
     /**
      * 设置描边样式
-     * @param type DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or DANMAKU_STYLE_STROKEN
+     * 
+     * @param type DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or
+     *            DANMAKU_STYLE_STROKEN
      * @return
      */
-    public DanmakuGlobalConfig setDanmakuStyle(int style , float size ){
+    public DanmakuGlobalConfig setDanmakuStyle(int style, float size) {
         mDanmakuStyle = style;
-        switch(style){
+        switch (style) {
             case DANMAKU_STYLE_NONE:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = false;
                 AndroidDisplayer.CONFIG_HAS_STROKE = false;
@@ -295,34 +316,46 @@ public class DanmakuGlobalConfig {
                 AndroidDisplayer.setPaintStorkeWidth(size);
                 break;
         }
+        notifyConfigureChanged(DanmakuConfigTag.DANMAKU_STYLE, style, size);
         return this;
     }
-    
+
     /**
      * 设置是否粗体显示,对某些字体无效
+     * 
      * @param bold
      * @return
      */
-    public DanmakuGlobalConfig setDanmakuBold(boolean bold){
+    public DanmakuGlobalConfig setDanmakuBold(boolean bold) {
         AndroidDisplayer.setFakeBoldText(bold);
+        notifyConfigureChanged(DanmakuConfigTag.DANMAKU_BOLD, bold);
         return this;
     }
-    
-    public interface ConfigChangedCallback{
-        public void onScaleTextSizeChanged(float oldValue,float newValue);
+
+    public interface ConfigChangedCallback {
+        public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
+                Object... value);
     }
-    
+
     public void registerConfigChangedCallback(ConfigChangedCallback listener) {
         if (mCallbackList == null) {
             mCallbackList = new ArrayList<ConfigChangedCallback>();
         }
         mCallbackList.add(listener);
     }
-    
+
     public void unregisterConfigChangedCallback(ConfigChangedCallback listener) {
         if (mCallbackList == null)
             return;
         mCallbackList.remove(listener);
+    }
+
+    private void notifyConfigureChanged(DanmakuConfigTag tag, Object... values) {
+        if (mCallbackList != null) {
+            for (ConfigChangedCallback cb : mCallbackList) {
+                cb.onDanmakuConfigChanged(this, tag, values);
+            }
+        }
     }
 
 }

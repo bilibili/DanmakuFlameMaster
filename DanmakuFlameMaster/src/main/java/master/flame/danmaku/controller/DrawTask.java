@@ -52,7 +52,7 @@ public class DrawTask implements IDrawTask {
 
     private IDanmakus danmakus;
 
-    private int clearFlag;
+    protected int clearFlag;
 
     private long mStartRenderTime = 0;
 
@@ -104,7 +104,7 @@ public class DrawTask implements IDrawTask {
     @Override
     public void seek(long mills) {
         reset();
-        clearFlag = 5;
+        requestCanvasClear();
         GlobalFlagValues.updateVisibleFlag();
         mStartRenderTime = mills < 1000 ? 0 : mills;
     }
@@ -157,6 +157,10 @@ public class DrawTask implements IDrawTask {
                 mRenderer.draw(mDisp, danmakus, mStartRenderTime);
             }
         }
+    }
+    
+    protected void requestCanvasClear(){
+        clearFlag = 5;
     }
 
 }
