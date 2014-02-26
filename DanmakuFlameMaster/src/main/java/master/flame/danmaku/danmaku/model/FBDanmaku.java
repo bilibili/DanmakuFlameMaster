@@ -18,7 +18,7 @@ package master.flame.danmaku.danmaku.model;
 
 public class FBDanmaku extends FTDanmaku {
 
-    public FBDanmaku(long duration) {
+    public FBDanmaku(Duration duration) {
         super(duration);
     }
 

@@ -19,6 +19,7 @@ package master.flame.danmaku.danmaku.parser.android;
 import android.graphics.Color;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
@@ -161,7 +162,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         translationDuration = Integer.parseInt(textArr[9]);
                         translationStartDelay = (long) (Float.parseFloat(textArr[10]));
                     }
-                    item.duration = alphaDuraion;
+                    item.duration = new Duration(alphaDuraion);
                     item.rotationZ = rotateZ;
                     item.rotationY = rotateY;
                     DanmakuFactory.fillTranslationData(item, mDispWidth, mDispHeight, beginX,

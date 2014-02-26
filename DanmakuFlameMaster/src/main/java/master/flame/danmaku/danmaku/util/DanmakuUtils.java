@@ -57,7 +57,7 @@ public class DanmakuUtils {
             return true;
         }
 
-        long time = d1.time + d1.duration;
+        long time = d1.time + d1.getDuration();
         rectArr1 = d1.getRectAtTime(disp, time);
         rectArr2 = d2.getRectAtTime(disp, time);
         if (rectArr1 == null || rectArr2 == null)

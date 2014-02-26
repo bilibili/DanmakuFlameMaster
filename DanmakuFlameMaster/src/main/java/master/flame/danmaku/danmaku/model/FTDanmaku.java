@@ -27,7 +27,7 @@ public class FTDanmaku extends BaseDanmaku {
 
     private float[] RECT = null;
 
-    public FTDanmaku(long duration) {
+    public FTDanmaku(Duration duration) {
         this.duration = duration;
     }
 
@@ -35,7 +35,7 @@ public class FTDanmaku extends BaseDanmaku {
     public void layout(IDisplayer displayer, float x, float y) {
         if (mTimer != null) {
             long deltaDuration = mTimer.currMillisecond - time;
-            if (deltaDuration > 0 && deltaDuration < duration) {
+            if (deltaDuration > 0 && deltaDuration < duration.value) {
                 if (!this.isShown()) {
                     this.x = getLeft(displayer);
                     this.y = y;

@@ -28,6 +28,7 @@ import java.util.Set;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
+import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.ConfigChangedCallback;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.DanmakuConfigTag;
@@ -223,18 +224,33 @@ public class CacheManagingDrawTask extends DrawTask {
             }            
             mRealSize = 0;
         }
-
+        
         private synchronized void evictAllNotInScreen() {
+            evictAllNotInScreen(false);
+        }
+
+        private synchronized void evictAllNotInScreen(boolean removeAllReferences) {
             if (mCaches != null) {
                 IDanmakuIterator it = mCaches.iterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     BaseDanmaku danmaku = it.next();
-                    if(danmaku.isOutside() ||  (danmaku.cache!=null && danmaku.cache.hasReferences())){
+                    IDrawingCache<?> cache = danmaku.cache;
+                    boolean hasReferences = cache != null && cache.hasReferences();
+                    if (removeAllReferences && hasReferences) {
+                        if (cache.get() != null) {
+                            mRealSize -= cache.size();
+                            cache.destroy();
+                        }
+                        entryRemoved(true, danmaku, null);
+                        it.remove();
+                        continue;
+                    }
+                    if (danmaku.hasDrawingCache() == false || danmaku.isOutside()) {
                         entryRemoved(true, danmaku, null);
                         it.remove();
                     }
                 }
-//                mCaches.clear();
+                // mCaches.clear();
             }
             mRealSize = 0;
         }
@@ -436,7 +452,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         clearFlag = 5;
                         break;
                     case CLEAR_ALL_OUTSIDE_CACHES:
-                        evictAllNotInScreen();
+                        evictAllNotInScreen(true);
                         reset();
                         mCacheTimer.update(mTimer.currMillisecond);
                         requestCanvasClear();
@@ -629,7 +645,8 @@ public class CacheManagingDrawTask extends DrawTask {
         @Override
         public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
                 Object... values) {
-            if(tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)){
+            if (tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)
+                    || tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
                 return;
             }
             if (tag.isVisibilityTag()) {
@@ -641,6 +658,12 @@ public class CacheManagingDrawTask extends DrawTask {
                     }
                 }
                 requestCanvasClear();
+                return;
+            }
+            if (tag.equals(DanmakuConfigTag.TRANSPARENCY)) {
+                mHandler.removeMessages(CacheHandler.CLEAR_ALL_CACHES);
+                mHandler.sendEmptyMessage(CacheHandler.CLEAR_ALL_CACHES);
+                mHandler.requestBuildCacheAndDraw();
                 return;
             }
             if (mHandler != null) {

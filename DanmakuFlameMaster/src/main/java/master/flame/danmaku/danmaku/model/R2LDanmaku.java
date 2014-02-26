@@ -28,9 +28,7 @@ public class R2LDanmaku extends BaseDanmaku {
 
     protected float mStepX;
 
-    private float mOldPaintWidth;
-
-    public R2LDanmaku(long duration) {
+    public R2LDanmaku(Duration duration) {
         this.duration = duration;
     }
 
@@ -39,7 +37,7 @@ public class R2LDanmaku extends BaseDanmaku {
         if (mTimer != null) {
             long currMS = mTimer.currMillisecond;
             long deltaDuration = currMS - time;
-            if (deltaDuration > 0 && deltaDuration < duration) {
+            if (deltaDuration > 0 && deltaDuration < duration.value) {
                 this.x = getLeft(displayer, currMS);
                 if (!this.isShown()) {
                     this.y = y;
@@ -53,7 +51,7 @@ public class R2LDanmaku extends BaseDanmaku {
 
     protected float getLeft(IDisplayer displayer, long currTime) {
         long elapsedTime = currTime - time;
-        if (elapsedTime >= duration) {
+        if (elapsedTime >= duration.value) {
             return -paintWidth;
         }
 
@@ -103,11 +101,8 @@ public class R2LDanmaku extends BaseDanmaku {
     @Override
     public void measure(IDisplayer displayer) {
         super.measure(displayer);
-        if (mOldPaintWidth != paintWidth) {
-            mDistance = (int) (displayer.getWidth() + paintWidth);
-            mStepX = mDistance / (float) duration;
-            mOldPaintWidth = paintWidth;
-        }
+        mDistance = (int) (displayer.getWidth() + paintWidth);
+        mStepX = mDistance / (float) duration.value;        
     }
 
 }

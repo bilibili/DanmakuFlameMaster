@@ -94,7 +94,7 @@ public abstract class BaseDanmaku {
     /**
      * 存活时间(毫秒)
      */
-    public long duration;
+    public Duration duration;
 
     /**
      * 索引/编号
@@ -142,10 +142,10 @@ public abstract class BaseDanmaku {
     protected int alpha = AlphaValue.MAX;
 
     public long getDuration() {
-        return duration;
+        return duration.value;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
@@ -180,7 +180,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isTimeOut(long ctime) {
-        return ctime - time >= duration;
+        return ctime - time >= duration.value;
     }
 
     public boolean isOutside() {
@@ -192,7 +192,7 @@ public abstract class BaseDanmaku {
 
     public boolean isOutside(long ctime) {
         long dtime = ctime - time;
-        return dtime <= 0 ||  dtime >= duration;
+        return dtime <= 0 ||  dtime >= duration.value;
     }
 
     public void setVisibility(boolean b) {

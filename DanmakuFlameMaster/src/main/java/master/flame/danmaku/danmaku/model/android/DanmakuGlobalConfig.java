@@ -9,13 +9,14 @@ import master.flame.danmaku.controller.DanmakuFilters.IDanmakuFilter;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 import android.graphics.Typeface;
 
 public class DanmakuGlobalConfig {
 
     public enum DanmakuConfigTag {
-        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, PUBLISHER_ID_BLACK_LIST;
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, PUBLISHER_ID_BLACK_LIST, SCROLL_SPEED_FACTOR;
 
         public boolean isVisibilityTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
@@ -74,7 +75,6 @@ public class DanmakuGlobalConfig {
      */
     public float scrollSpeedFactor = 1.0f;
 
-    public boolean isScrollSpeedChanged = false;
 
     /**
      * 绘制刷新率(毫秒)
@@ -376,6 +376,20 @@ public class DanmakuGlobalConfig {
         return this;
     }
     
+    /**
+     * 设置弹幕滚动速度,只对滚动弹幕有效
+     * @param p 0 ~ 1.0f
+     * @return
+     */
+    public DanmakuGlobalConfig setScrollSpeedFactor(float p){
+        if (scrollSpeedFactor != p) {
+            scrollSpeedFactor = p;
+            DanmakuFactory.updateDurationFactor(p);
+            GlobalFlagValues.updateMeasureFlag();
+            notifyConfigureChanged(DanmakuConfigTag.SCROLL_SPEED_FACTOR, p);
+        }
+        return this;
+    }
     
     
     public interface ConfigChangedCallback {

@@ -18,14 +18,14 @@ package master.flame.danmaku.danmaku.model;
 
 public class L2RDanmaku extends R2LDanmaku {
 
-    public L2RDanmaku(long duration) {
-        super(duration);
+    public L2RDanmaku(Duration duration) {
+        super(duration); 
     }
 
     @Override
     protected float getLeft(IDisplayer displayer, long currTime) {
         long elapsedTime = currTime - time;
-        if (elapsedTime >= duration) {
+        if (elapsedTime >= duration.value) {
             return displayer.getWidth();
         }
         return mStepX * elapsedTime - paintWidth;
