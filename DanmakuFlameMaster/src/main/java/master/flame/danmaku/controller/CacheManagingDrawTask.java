@@ -628,7 +628,10 @@ public class CacheManagingDrawTask extends DrawTask {
         @Override
         public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
                 Object... values) {
-            if (tag == null || tag.isVisibilityTag()) {
+            if(tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)){
+                return;
+            }
+            if (tag.isVisibilityTag()) {
                 if (values != null && values.length > 0) {
                     if (values[0] != null && ((Boolean) values[0]).booleanValue() == true) {
                         if (mHandler != null) {
