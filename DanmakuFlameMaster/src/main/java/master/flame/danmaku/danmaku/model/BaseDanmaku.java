@@ -125,6 +125,11 @@ public abstract class BaseDanmaku {
      * 是否是直播弹幕
      */
     public boolean isLive;
+    
+    /**
+     * 弹幕发布者id, 0表示游客
+     */
+    public int publisherId = 0;
 
     /**
      * 计时

@@ -182,12 +182,104 @@ public class DanmakuFilters {
         }
 
     }
+    
+    /**
+     * 根据文本颜色白名单过滤
+     * @author ch
+     *
+     */
+    public static class TextColorFilter  implements IDanmakuFilter {
+        
+        public List<Integer> mWhiteList = new ArrayList<Integer>(); 
+        
+        private void addToWhiteList(Integer color){
+            if(!mWhiteList.contains(color)){
+                mWhiteList.add(color);
+            }
+        }
+        
+        @Override
+        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                DanmakuTimer timer) {
+            if (danmaku != null && !mWhiteList.contains(danmaku.textColor))
+                return true;
+            return false;
+        }
+
+        @Override
+        public void setData(Object data) {
+            if (data == null || data instanceof List<?>) {
+                mWhiteList.clear();
+                if (data != null) {
+                    @SuppressWarnings("unchecked")
+                    List<Integer> list = (List<Integer>) data;
+                    for (Integer i : list) {
+                        addToWhiteList(i);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void reset() {
+            mWhiteList.clear();
+        }
+        
+    }
+    
+    /**
+     * 根据用户Id黑名单过滤
+     * @author ch
+     *
+     */
+    public static class PublisherIdFilter  implements IDanmakuFilter {
+        
+        public List<Integer> mBlackList = new ArrayList<Integer>(); 
+        
+        private void addToWhiteList(Integer color){
+            if(!mBlackList.contains(color)){
+                mBlackList.add(color);
+            }
+        }
+        
+        @Override
+        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                DanmakuTimer timer) {
+            if (danmaku != null && !mBlackList.contains(danmaku.publisherId))
+                return true;
+            return false;
+        }
+
+        @Override
+        public void setData(Object data) {
+            if (data == null || data instanceof List<?>) {
+                mBlackList.clear();
+                if (data != null) {
+                    @SuppressWarnings("unchecked")
+                    List<Integer> list = (List<Integer>) data;
+                    for (Integer i : list) {
+                        addToWhiteList(i);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void reset() {
+            mBlackList.clear();
+        }
+        
+    }
 
     public final static String TAG_TYPE_DANMAKU_FILTER = "1010_Filter";
 
     public final static String TAG_QUANTITY_DANMAKU_FILTER = "1011_Filter";
 
     public final static String TAG_ELAPSED_TIME_FILTER = "1012_Filter";
+    
+    public final static String TAG_TEXT_COLOR_DANMAKU_FILTER = "1013_Filter";
+    
+    public final static String TAG_PUBLISHER_ID_FILTER = "1014_Filter";
 
     private static DanmakuFilters instance = null;
 
@@ -229,6 +321,10 @@ public class DanmakuFilters {
                 filter = new QuantityDanmakuFilter();
             } else if (TAG_ELAPSED_TIME_FILTER.equals(tag)) {
                 filter = new ElapsedTimeFilter();
+            } else if (TAG_TEXT_COLOR_DANMAKU_FILTER.equals(tag)) {
+                filter = new TextColorFilter();
+            } else if (TAG_PUBLISHER_ID_FILTER.equals(tag)) {
+                filter = new PublisherIdFilter();
             }
             // add more filter
         }

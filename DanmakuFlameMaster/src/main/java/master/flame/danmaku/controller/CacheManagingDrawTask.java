@@ -438,6 +438,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     case CLEAR_ALL_OUTSIDE_CACHES:
                         evictAllNotInScreen();
                         reset();
+                        mCacheTimer.update(mTimer.currMillisecond);
                         requestCanvasClear();
                         break;
                 }

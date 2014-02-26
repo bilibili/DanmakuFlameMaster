@@ -15,7 +15,7 @@ import android.graphics.Typeface;
 public class DanmakuGlobalConfig {
 
     public enum DanmakuConfigTag {
-        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD;
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, PUBLISHER_ID_BLACK_LIST;
 
         public boolean isVisibilityTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
@@ -61,6 +61,8 @@ public class DanmakuGlobalConfig {
     public boolean R2LDanmakuVisibility = true;
 
     public boolean SecialDanmakuVisibility = true;
+    
+    List<Integer> mFilterTypes = new ArrayList<Integer>();
 
     /**
      * 同屏弹幕数量 -1 按绘制效率自动调整 0 无限制 n 同屏最大显示n个弹幕
@@ -85,10 +87,24 @@ public class DanmakuGlobalConfig {
     public enum BorderType {
         NONE, SHADOW, STROKEN
     }
+    
+    public final static int DANMAKU_STYLE_DEFAULT = -1; // 自动
+    public final static int DANMAKU_STYLE_NONE = 0; // 无
+    public final static int DANMAKU_STYLE_SHADOW = 1; // 阴影
+    public final static int DANMAKU_STYLE_STROKEN = 2; // 描边
 
     public BorderType shadowType = BorderType.SHADOW;
 
     public int shadowRadius = 3;
+    
+    @SuppressWarnings("unused")
+    private int mDanmakuStyle;
+    
+    List<Integer> mColorValueWhiteList = new ArrayList<Integer>();
+    
+    List<Integer> mPubliserIdBlackList = new ArrayList<Integer>(); 
+
+    private ArrayList<ConfigChangedCallback> mCallbackList;
 
     /**
      * set typeface
@@ -132,13 +148,6 @@ public class DanmakuGlobalConfig {
     public boolean getFTDanmakuVisibility() {
         return FTDanmakuVisibility;
     }
-
-    List<Integer> mFilterTypes = new ArrayList<Integer>();
-
-    @SuppressWarnings("unused")
-    private int mDanmakuStyle;
-
-    private ArrayList<ConfigChangedCallback> mCallbackList;
 
     /**
      * 设置是否显示顶部弹幕
@@ -286,11 +295,6 @@ public class DanmakuGlobalConfig {
         return this;
     }
 
-    public final static int DANMAKU_STYLE_DEFAULT = -1; // 自动
-    public final static int DANMAKU_STYLE_NONE = 0; // 无
-    public final static int DANMAKU_STYLE_SHADOW = 1; // 阴影
-    public final static int DANMAKU_STYLE_STROKEN = 2; // 描边
-
     /**
      * 设置描边样式
      * 
@@ -331,7 +335,49 @@ public class DanmakuGlobalConfig {
         notifyConfigureChanged(DanmakuConfigTag.DANMAKU_BOLD, bold);
         return this;
     }
-
+    
+    /**
+     * 设置色彩过滤弹幕白名单
+     * @param colors
+     * @return
+     */
+    public DanmakuGlobalConfig setColorValueWhiteList(Integer... colors) {
+        mColorValueWhiteList.clear();
+        if (colors == null || colors.length == 0) {
+            DanmakuFilters.getDefault().unregisterFilter(
+                    DanmakuFilters.TAG_TEXT_COLOR_DANMAKU_FILTER);
+        } else {
+            for (Integer color : colors) {
+                mColorValueWhiteList.add(color);
+            }
+            setFilterData(DanmakuFilters.TAG_TEXT_COLOR_DANMAKU_FILTER, mColorValueWhiteList);
+        }
+        notifyConfigureChanged(DanmakuConfigTag.COLOR_VALUE_WHITE_LIST, mColorValueWhiteList);
+        return this;
+    }
+    
+    /**
+     * 设置屏蔽弹幕用户id , 0 表示游客弹幕
+     * @param ids 
+     * @return
+     */
+    public DanmakuGlobalConfig setPubliserIdBlackList(Integer... ids) {
+        mPubliserIdBlackList.clear();
+        if (ids == null || ids.length == 0) {
+            DanmakuFilters.getDefault().unregisterFilter(
+                    DanmakuFilters.TAG_PUBLISHER_ID_FILTER);
+        } else {
+            for (Integer id : ids) {
+                mPubliserIdBlackList.add(id);
+            }
+            setFilterData(DanmakuFilters.TAG_PUBLISHER_ID_FILTER, mPubliserIdBlackList);
+        }
+        notifyConfigureChanged(DanmakuConfigTag.PUBLISHER_ID_BLACK_LIST, mPubliserIdBlackList);
+        return this;
+    }
+    
+    
+    
     public interface ConfigChangedCallback {
         public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
                 Object... value);
