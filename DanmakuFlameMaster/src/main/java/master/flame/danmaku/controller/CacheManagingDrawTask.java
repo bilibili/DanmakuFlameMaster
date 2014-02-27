@@ -651,7 +651,9 @@ public class CacheManagingDrawTask extends DrawTask {
             }
             if (tag.isVisibilityTag()) {
                 if (values != null && values.length > 0) {
-                    if (values[0] != null && ((Boolean) values[0]).booleanValue() == true) {
+                    if (values[0] != null
+                            && ((values[0] instanceof Boolean) == false || ((Boolean) values[0])
+                                    .booleanValue() == true)) {
                         if (mHandler != null) {
                             mHandler.requestBuildCacheAndDraw();
                         }

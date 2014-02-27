@@ -21,7 +21,8 @@ public class DanmakuGlobalConfig {
         public boolean isVisibilityTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
                     || this.equals(L2R_DANMAKU_VISIBILITY) || this.equals(R2L_DANMAKU_VISIBILIY)
-                    || this.equals(SPECIAL_DANMAKU_VISIBILITY);
+                    || this.equals(SPECIAL_DANMAKU_VISIBILITY) || this.equals(COLOR_VALUE_WHITE_LIST)
+                    || this.equals(PUBLISHER_ID_BLACK_LIST);
         }
     }
 
