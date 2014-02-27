@@ -668,6 +668,9 @@ public class CacheManagingDrawTask extends DrawTask {
                 mHandler.requestBuildCacheAndDraw();
                 return;
             }
+            if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE) ) {
+                mDisp.slopPixel = (int) (Math.max(mDisp.density,mDisp.scaledDensity) * 20 * DanmakuGlobalConfig.DEFAULT.scaleTextSize);  //TODO:fix me
+            }
             if (mHandler != null) {
                 mHandler.removeMessages(CacheHandler.CLEAR_ALL_OUTSIDE_CACHES);
                 mHandler.sendEmptyMessage(CacheHandler.CLEAR_ALL_OUTSIDE_CACHES);

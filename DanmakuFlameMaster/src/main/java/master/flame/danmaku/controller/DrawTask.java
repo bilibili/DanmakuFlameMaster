@@ -25,6 +25,7 @@ import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
@@ -69,7 +70,7 @@ public class DrawTask implements IDrawTask {
         mDisp.density = displayMetrics.density;
         mDisp.densityDpi = displayMetrics.densityDpi;
         mDisp.scaledDensity = displayMetrics.scaledDensity;
-        mDisp.slopPixel = (int) (Math.max(displayMetrics.density,displayMetrics.scaledDensity) * 20);
+        mDisp.slopPixel = (int) (Math.max(mDisp.density,mDisp.scaledDensity) * 20 * DanmakuGlobalConfig.DEFAULT.scaleTextSize);  //TODO:fix me
         initTimer(timer);
     }
 
