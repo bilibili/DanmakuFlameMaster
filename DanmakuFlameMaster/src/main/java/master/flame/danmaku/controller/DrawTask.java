@@ -70,7 +70,7 @@ public class DrawTask implements IDrawTask {
         mDisp.density = displayMetrics.density;
         mDisp.densityDpi = displayMetrics.densityDpi;
         mDisp.scaledDensity = displayMetrics.scaledDensity;
-        mDisp.slopPixel = (int) (Math.max(mDisp.density,mDisp.scaledDensity) * 20 * DanmakuGlobalConfig.DEFAULT.scaleTextSize);  //TODO:fix me
+        mDisp.slopPixel = (int) (Math.max(mDisp.density,mDisp.scaledDensity) * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE * DanmakuGlobalConfig.DEFAULT.scaleTextSize);  //TODO:fix me
         initTimer(timer);
     }
 

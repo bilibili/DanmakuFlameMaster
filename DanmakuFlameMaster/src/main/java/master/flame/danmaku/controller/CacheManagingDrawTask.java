@@ -669,7 +669,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 return;
             }
             if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE) ) {
-                mDisp.slopPixel = (int) (Math.max(mDisp.density,mDisp.scaledDensity) * 20 * DanmakuGlobalConfig.DEFAULT.scaleTextSize);  //TODO:fix me
+                mDisp.slopPixel = (int) (Math.max(mDisp.density,mDisp.scaledDensity) * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE * DanmakuGlobalConfig.DEFAULT.scaleTextSize);  //TODO:fix me
             }
             if (mHandler != null) {
                 mHandler.removeMessages(CacheHandler.CLEAR_ALL_OUTSIDE_CACHES);
