@@ -23,7 +23,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.text.TextPaint;
-import android.util.Log;
 
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -326,8 +325,6 @@ public class AndroidDisplayer implements IDisplayer {
             sLastScaleTextSize = DanmakuGlobalConfig.DEFAULT.scaleTextSize;
             size = Float.valueOf(danmaku.textSize * DanmakuGlobalConfig.DEFAULT.scaleTextSize);
             cachedScaleSize.put(danmaku.textSize, size);
-        } else {
-            Log.i("====", "get size from cache");
         }
         paint.setTextSize(size.floatValue());
     }
