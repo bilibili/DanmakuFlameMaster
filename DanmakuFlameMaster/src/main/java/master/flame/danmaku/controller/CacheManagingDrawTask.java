@@ -653,7 +653,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 if (values != null && values.length > 0) {
                     if (values[0] != null
                             && ((values[0] instanceof Boolean) == false || ((Boolean) values[0])
-                                    .booleanValue() == true)) {
+                                    .booleanValue())) {
                         if (mHandler != null) {
                             mHandler.requestBuildCacheAndDraw();
                         }
