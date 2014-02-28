@@ -36,7 +36,7 @@ public class DanmakuFactory {
 
     public static long MIN_DANMAKU_DURATION = 4000;
 
-    public static long MAX_DANMAKU_DURATION_HIGH_DENSITY = 8600;
+    public static long MAX_DANMAKU_DURATION_HIGH_DENSITY = 9000;
     
     public static Duration Duration_Scroll_Danmaku;
     
