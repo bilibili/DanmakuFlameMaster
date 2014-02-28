@@ -27,6 +27,7 @@ import android.text.TextPaint;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -381,6 +382,14 @@ public class AndroidDisplayer implements IDisplayer {
     @Override
     public float getScaledDensity() {
         return scaledDensity;
+    }
+
+    @Override
+    public void resetSlopPixel(float factor) { // TODO:fix me
+        float slop = Math.max(density, scaledDensity) * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE;
+        slopPixel = (int) slop;
+        if (factor > 1f)
+            slopPixel = (int) (slop * factor);
     }
 
 }

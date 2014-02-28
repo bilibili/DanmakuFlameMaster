@@ -627,7 +627,7 @@ public class CacheManagingDrawTask extends DrawTask {
             public void requestBuildCacheAndDraw() {
                 removeMessages(CacheHandler.BUILD_CACHES);
                 mSeekedFlag = true;
-                mCacheTimer.update(mTimer.currMillisecond);
+                mCacheTimer.update(mTimer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION);
                 sendEmptyMessage(CacheHandler.BUILD_CACHES);
             }
         }
@@ -662,14 +662,14 @@ public class CacheManagingDrawTask extends DrawTask {
                 requestCanvasClear();
                 return;
             }
-            if (tag.equals(DanmakuConfigTag.TRANSPARENCY)) {
+            if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
+                mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+            }
+            if (tag.equals(DanmakuConfigTag.TRANSPARENCY) || tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
                 mHandler.removeMessages(CacheHandler.CLEAR_ALL_CACHES);
                 mHandler.sendEmptyMessage(CacheHandler.CLEAR_ALL_CACHES);
                 mHandler.requestBuildCacheAndDraw();
                 return;
-            }
-            if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE) ) {
-                mDisp.slopPixel = (int) (Math.max(mDisp.density,mDisp.scaledDensity) * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE * DanmakuGlobalConfig.DEFAULT.scaleTextSize);  //TODO:fix me
             }
             if (mHandler != null) {
                 mHandler.removeMessages(CacheHandler.CLEAR_ALL_OUTSIDE_CACHES);

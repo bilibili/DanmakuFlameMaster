@@ -83,7 +83,9 @@ public class DanmakuFactory {
         return instance;
     }
     
-    public static void updateDurationFactor(float f){
+    public static void updateDurationFactor(float f) {
+        if (Duration_Scroll_Danmaku == null || Duration_Fix_Danmaku == null)
+            return;
         Duration_Scroll_Danmaku.setFactor(f);
         MAX_DANMAKU_DURATION = Math.max(Duration_Scroll_Danmaku.value, Duration_Fix_Danmaku.value);
         MAX_DANMAKU_DURATION = Math.max(COMMON_DANMAKU_DURATION, MAX_DANMAKU_DURATION);

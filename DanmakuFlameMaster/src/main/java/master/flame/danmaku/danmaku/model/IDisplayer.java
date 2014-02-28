@@ -35,4 +35,6 @@ public interface IDisplayer {
      * @return
      */
     public abstract void measure(BaseDanmaku danmaku);
+
+    void resetSlopPixel(float factor);
 }
