@@ -1,8 +1,11 @@
 DanmakuFlameMaster
 ==================
 
-android上的弹幕转换、渲染输出源码
-
+android上开源弹幕解析绘制引擎项目。
+实际效果可安装以下app参看:
+- https://play.google.com/store/apps/details?id=tv.ac.fun
+- https://play.google.com/store/apps/details?id=tv.acfundanmaku.video
+- https://play.google.com/store/apps/details?id=tv.danmaku.bili
 
 ### Features
 
@@ -28,21 +31,15 @@ android上的弹幕转换、渲染输出源码
 
 - 支持多种参数设置
 
-### TODO:
+- 支持多种方式的弹幕屏蔽
 
-- 弹幕屏蔽
+### TODO:
 
 - 计算和绘制线程分离
 
-- 减少浮点运算
+- 减少cpu占用
 
 - jni代码优化
-
-- 使用步长控制/优化滚动抖动
-
-- lib目录问题()
-
-- 减少clearCanvas刷新次数
 
 - 缓存线程同步danmakufitlers,进一步提高性能
 
