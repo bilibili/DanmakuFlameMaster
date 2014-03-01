@@ -2,10 +2,18 @@ DanmakuFlameMaster
 ==================
 
 android上开源弹幕解析绘制引擎项目。
-实际效果可安装以下app参看:
-- https://play.google.com/store/apps/details?id=tv.ac.fun
-- https://play.google.com/store/apps/details?id=tv.acfundanmaku.video
-- https://play.google.com/store/apps/details?id=tv.danmaku.bili
+
+### DFM Inside: 
+[![hacfun](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/hacfun.png?raw=true)](https://play.google.com/store/apps/details?id=tv.ac.fun)
+[![acfun](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/acfun.png?raw=true)](https://play.google.com/store/apps/details?id=tv.acfundanmaku.video)
+[![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
+
+- AcFun视频民间版 https://play.google.com/store/apps/details?id=tv.ac.fun
+- AcFun视频官方版 https://play.google.com/store/apps/details?id=tv.acfundanmaku.video
+- 哔哩哔哩动画 https://play.google.com/store/apps/details?id=tv.danmaku.bili
+
+实际效果可安装以上app参看。
+
 
 ### Features
 
