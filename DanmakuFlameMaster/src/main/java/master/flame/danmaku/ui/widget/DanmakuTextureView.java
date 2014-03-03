@@ -186,11 +186,13 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         long dtime = 0;
         Canvas canvas = lockCanvas();
         if (canvas != null) {
-            handler.drawTask.draw(canvas);
-            dtime = System.currentTimeMillis() - stime;
-            if (mShowFps) {
-                String fps = String.format("%02d MS, fps %.2f", dtime, 1000 / (float) dtime);
-                DrawHelper.drawFPS(canvas, fps);
+            if(handler != null){
+                handler.drawTask.draw(canvas);
+                dtime = System.currentTimeMillis() - stime;
+                if (mShowFps) {
+                    String fps = String.format("%02d MS, fps %.2f", dtime, 1000 / (float) dtime);
+                    DrawHelper.drawFPS(canvas, fps);
+                }
             }
             if (isSurfaceCreated)
                 unlockCanvasAndPost(canvas);
