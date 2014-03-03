@@ -379,21 +379,25 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
                     case BUILD_CACHES:
                         if (!mPause) {
+                            boolean repositioned = (mTaskListener != null || mSeekedFlag);
                             long waitTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                             long maxCacheDuration = DanmakuFactory.MAX_DANMAKU_DURATION
                                     * mScreenSize;
 //                            Log.e("count", waitTime+"ms");
-                            if (waitTime > 1000 && waitTime <= maxCacheDuration) {
-                                removeMessages(BUILD_CACHES);
-                                sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
-                                return;
-                            } else if (waitTime < 0 || getFirstCacheTime() - mTimer.currMillisecond > maxCacheDuration){
-                                evictAllNotInScreen();
+                            if (!repositioned) {
+                                if (waitTime > 1000 && waitTime <= maxCacheDuration) {
+                                    removeMessages(BUILD_CACHES);
+                                    sendEmptyMessageDelayed(BUILD_CACHES, waitTime - 1000);
+                                    return;
+                                } else if (waitTime < 0
+                                        || getFirstCacheTime() - mTimer.currMillisecond > maxCacheDuration) {
+                                    evictAllNotInScreen();
+                                }
+                                if (Math.abs(waitTime) > maxCacheDuration) {
+                                    mCacheTimer.update(mTimer.currMillisecond + 100);
+                                }
                             }
-                            if(Math.abs(waitTime) > maxCacheDuration){
-                                mCacheTimer.update(mTimer.currMillisecond + 100);
-                            }
-                            boolean repositioned = (mTaskListener != null || mSeekedFlag);
+                           
                             prepareCaches(repositioned);
                             if (repositioned)
                                 mSeekedFlag = false;                     
