@@ -16,13 +16,13 @@ import android.graphics.Typeface;
 public class DanmakuGlobalConfig {
 
     public enum DanmakuConfigTag {
-        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, PUBLISHER_ID_BLACK_LIST, SCROLL_SPEED_FACTOR;
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, SCROLL_SPEED_FACTOR;
 
         public boolean isVisibilityTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
                     || this.equals(L2R_DANMAKU_VISIBILITY) || this.equals(R2L_DANMAKU_VISIBILIY)
                     || this.equals(SPECIAL_DANMAKU_VISIBILITY) || this.equals(COLOR_VALUE_WHITE_LIST)
-                    || this.equals(PUBLISHER_ID_BLACK_LIST);
+                    || this.equals(USER_ID_BLACK_LIST);
         }
     }
 
@@ -103,7 +103,7 @@ public class DanmakuGlobalConfig {
     
     List<Integer> mColorValueWhiteList = new ArrayList<Integer>();
     
-    List<Integer> mPubliserIdBlackList = new ArrayList<Integer>(); 
+    List<Integer> mUserIdBlackList = new ArrayList<Integer>(); 
 
     private ArrayList<ConfigChangedCallback> mCallbackList;
 
@@ -362,18 +362,18 @@ public class DanmakuGlobalConfig {
      * @param ids 
      * @return
      */
-    public DanmakuGlobalConfig setPubliserIdBlackList(Integer... ids) {
-        mPubliserIdBlackList.clear();
+    public DanmakuGlobalConfig setUserIdBlackList(Integer... ids) {
+        mUserIdBlackList.clear();
         if (ids == null || ids.length == 0) {
             DanmakuFilters.getDefault().unregisterFilter(
-                    DanmakuFilters.TAG_PUBLISHER_ID_FILTER);
+                    DanmakuFilters.TAG_USER_ID_FILTER);
         } else {
             for (Integer id : ids) {
-                mPubliserIdBlackList.add(id);
+                mUserIdBlackList.add(id);
             }
-            setFilterData(DanmakuFilters.TAG_PUBLISHER_ID_FILTER, mPubliserIdBlackList);
+            setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
         }
-        notifyConfigureChanged(DanmakuConfigTag.PUBLISHER_ID_BLACK_LIST, mPubliserIdBlackList);
+        notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
     }
     

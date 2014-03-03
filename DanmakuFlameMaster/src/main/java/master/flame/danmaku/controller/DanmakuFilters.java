@@ -279,7 +279,7 @@ public class DanmakuFilters {
     
     public final static String TAG_TEXT_COLOR_DANMAKU_FILTER = "1013_Filter";
     
-    public final static String TAG_PUBLISHER_ID_FILTER = "1014_Filter";
+    public final static String TAG_USER_ID_FILTER = "1014_Filter";
 
     private static DanmakuFilters instance = null;
 
@@ -323,7 +323,7 @@ public class DanmakuFilters {
                 filter = new ElapsedTimeFilter();
             } else if (TAG_TEXT_COLOR_DANMAKU_FILTER.equals(tag)) {
                 filter = new TextColorFilter();
-            } else if (TAG_PUBLISHER_ID_FILTER.equals(tag)) {
+            } else if (TAG_USER_ID_FILTER.equals(tag)) {
                 filter = new UserIdFilter();
             }
             // add more filter
