@@ -232,7 +232,7 @@ public class DanmakuFilters {
      * @author ch
      *
      */
-    public static class PublisherIdFilter  implements IDanmakuFilter {
+    public static class UserIdFilter  implements IDanmakuFilter {
         
         public List<Integer> mBlackList = new ArrayList<Integer>(); 
         
@@ -245,7 +245,7 @@ public class DanmakuFilters {
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
                 DanmakuTimer timer) {
-            if (danmaku != null && !mBlackList.contains(danmaku.publisherId))
+            if (danmaku != null && !mBlackList.contains(danmaku.userId))
                 return true;
             return false;
         }
@@ -324,7 +324,7 @@ public class DanmakuFilters {
             } else if (TAG_TEXT_COLOR_DANMAKU_FILTER.equals(tag)) {
                 filter = new TextColorFilter();
             } else if (TAG_PUBLISHER_ID_FILTER.equals(tag)) {
-                filter = new PublisherIdFilter();
+                filter = new UserIdFilter();
             }
             // add more filter
         }

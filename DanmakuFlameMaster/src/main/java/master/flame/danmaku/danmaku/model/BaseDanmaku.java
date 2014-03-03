@@ -129,7 +129,7 @@ public abstract class BaseDanmaku {
     /**
      * 弹幕发布者id, 0表示游客
      */
-    public int publisherId = 0;
+    public int userId = 0;
 
     /**
      * 计时
