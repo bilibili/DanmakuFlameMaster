@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -54,6 +55,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     private boolean mShowFps;
 
     private boolean mDanmakuVisibile = true;
+
+    protected int mDrawingThreadType = THREAD_TYPE_NORMAL_PRIORITY;
 
     public DanmakuSurfaceView(Context context) {
         super(context);
@@ -145,14 +148,43 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
             mDrawThread = null;
         }
     }
+    
+    protected Looper getLooper(int type){
+        if (mDrawThread != null) {
+            mDrawThread.quit();
+            mDrawThread = null;
+        }
+        int priority = Thread.NORM_PRIORITY;
+        String threadName = "DFM Drawing thread";
+        switch (type) {
+            case THREAD_TYPE_MAIN_THREAD: {                
+                return Looper.getMainLooper();
+            }
+            case THREAD_TYPE_HIGH_PRIORITY: {
+                priority = Thread.MAX_PRIORITY;
+                threadName += Thread.MAX_PRIORITY;
+            }
+                break;
+            case THREAD_TYPE_NORMAL_PRIORITY: {
+                priority = Thread.NORM_PRIORITY;
+                threadName += Thread.NORM_PRIORITY;
+            }
+                break;
+            case THREAD_TYPE_LOW_PRIORITY: {
+                priority = Thread.MIN_PRIORITY;
+                threadName += Thread.MIN_PRIORITY;
+            }
+                break;
+        }
+        
+        mDrawThread = new HandlerThread(threadName, priority);
+        mDrawThread.start();
+        return mDrawThread.getLooper();
+    }
 
     private void prepare() {
-        if (mDrawThread == null) {
-            mDrawThread = new HandlerThread("draw thread");
-            mDrawThread.start();
-        }
         if (handler == null)
-            handler = new DrawHandler(mDrawThread.getLooper(), this, mDanmakuVisibile);
+            handler = new DrawHandler(getLooper(mDrawingThreadType), this, mDanmakuVisibile);
     }
 
     @Override
@@ -217,7 +249,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
 
     @Override
     public void resume() {
-        if (handler != null && mDrawThread != null && handler.isPrepared())
+        if (handler != null && handler.isPrepared())
             handler.resume();
         else {
             restart();
@@ -313,6 +345,11 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
             return false;
         }
         return handler.getVisibility();
+    }
+
+    @Override
+    public void setDrawingThreadType(int type) {
+        mDrawingThreadType  = type;
     }
 
 
