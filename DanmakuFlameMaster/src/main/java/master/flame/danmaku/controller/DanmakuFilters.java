@@ -56,8 +56,8 @@ public class DanmakuFilters {
 
         @Override
         public void setData(Object data) {
+            reset();
             if (data == null || data instanceof List<?>) {
-                mFilterTypes.clear();
                 if (data != null) {
                     @SuppressWarnings("unchecked")
                     List<Integer> list = (List<Integer>) data;
@@ -121,11 +121,11 @@ public class DanmakuFilters {
 
         @Override
         public void setData(Object data) {
+            reset();
             if (data instanceof Integer) {
                 Integer maximumSize = (Integer) data;
                 if (maximumSize != mMaximumSize) {
                     mMaximumSize = maximumSize;
-                    reset();
                 }
             }
         }
@@ -173,7 +173,7 @@ public class DanmakuFilters {
 
         @Override
         public void setData(Object data) {
-
+            reset();
         }
 
         @Override
@@ -208,8 +208,8 @@ public class DanmakuFilters {
 
         @Override
         public void setData(Object data) {
+            reset();
             if (data == null || data instanceof List<?>) {
-                mWhiteList.clear();
                 if (data != null) {
                     @SuppressWarnings("unchecked")
                     List<Integer> list = (List<Integer>) data;
@@ -252,8 +252,8 @@ public class DanmakuFilters {
 
         @Override
         public void setData(Object data) {
+            reset();
             if (data == null || data instanceof List<?>) {
-                mBlackList.clear();
                 if (data != null) {
                     @SuppressWarnings("unchecked")
                     List<Integer> list = (List<Integer>) data;
