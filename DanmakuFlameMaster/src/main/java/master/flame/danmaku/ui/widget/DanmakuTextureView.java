@@ -27,6 +27,7 @@ import android.view.TextureView;
 import android.view.View;
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
+import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -126,6 +127,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public void release() {
         stop();
+        DanmakuFilters.getDefault().clear();
     }
 
     @Override
