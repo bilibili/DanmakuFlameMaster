@@ -89,11 +89,11 @@ public class DanmakuFilters {
         protected BaseDanmaku mLastSkipped = null;
 
         @Override
-        public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
+        public synchronized boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
                 DanmakuTimer timer) {
             BaseDanmaku last = danmakus.last();
             if (last != null && last.isTimeOut()) {
-                reset();
+                danmakus.clear();
                 last = null;
             }
 
@@ -125,13 +125,13 @@ public class DanmakuFilters {
                 Integer maximumSize = (Integer) data;
                 if (maximumSize != mMaximumSize) {
                     mMaximumSize = maximumSize;
-                    danmakus.clear();
+                    reset();
                 }
             }
         }
 
         @Override
-        public void reset() {
+        public synchronized void reset() {
             danmakus.clear();
         }
     }
@@ -148,11 +148,11 @@ public class DanmakuFilters {
         protected final IDanmakus danmakus = new Danmakus();
 
         @Override
-        public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
+        public synchronized boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
                 DanmakuTimer timer) {
 
             if (danmakus.last() != null && danmakus.last().isTimeOut()) {
-                reset();
+                danmakus.clear();
             }
 
             if (danmakus.contains(danmaku)) {
@@ -177,7 +177,7 @@ public class DanmakuFilters {
         }
 
         @Override
-        public void reset() {
+        public synchronized void reset() {
             danmakus.clear();
         }
 
