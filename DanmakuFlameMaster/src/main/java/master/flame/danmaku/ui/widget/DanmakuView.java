@@ -266,7 +266,7 @@ public class DanmakuView extends View implements IDanmakuView, View.OnClickListe
 
     @Override
     public void resume() {
-        if (handler != null && mDrawThread != null && handler.isPrepared())
+        if (handler != null && handler.isPrepared())
             handler.resume();
         else {
             restart();
