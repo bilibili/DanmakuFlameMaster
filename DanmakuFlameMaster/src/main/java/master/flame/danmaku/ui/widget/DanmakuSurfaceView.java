@@ -184,7 +184,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null){
             if(handler != null){
-                handler.drawTask.draw(canvas);
+                handler.draw(canvas);
                 if (mShowFps) {
                     dtime = System.currentTimeMillis() - stime;  //not so accurate
                     String fps = String.format("%02d MS, fps %.2f", dtime, 1000 / (float) dtime);
