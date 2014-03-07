@@ -24,7 +24,7 @@ public class DanmakuFactory {
 
     public static float BILI_PLAYER_WIDTH = 539;
     
-    public static float CURRENT_DISP_WIDTH = 0;
+    public static int CURRENT_DISP_WIDTH = 0;
 
     public static float BILI_PLAYER_HEIGHT = 385;
 
@@ -46,7 +46,9 @@ public class DanmakuFactory {
     
 
     public static BaseDanmaku createDanmaku(int type, float dispWidth) {
-        if (CURRENT_DISP_WIDTH != dispWidth) {
+        boolean sizeChanged = false;
+        if (CURRENT_DISP_WIDTH != (int) dispWidth) {
+            sizeChanged = true;
             REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (dispWidth / BILI_PLAYER_WIDTH));
             REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY, REAL_DANMAKU_DURATION);
             REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
@@ -60,8 +62,8 @@ public class DanmakuFactory {
             Duration_Fix_Danmaku = new Duration(COMMON_DANMAKU_DURATION);
         }
 
-        if (CURRENT_DISP_WIDTH != dispWidth) {
-            CURRENT_DISP_WIDTH = dispWidth;
+        if (sizeChanged) {
+            CURRENT_DISP_WIDTH = (int) dispWidth;
             updateMaxDanmakuDuration();
         }
 
