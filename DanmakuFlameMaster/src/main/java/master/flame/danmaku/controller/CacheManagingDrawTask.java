@@ -649,11 +649,14 @@ public class CacheManagingDrawTask extends DrawTask {
         @Override
         public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
                 Object... values) {
-            if (tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)
-                    || tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
+            if (tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)) {
                 return;
             }
-            if (tag.isVisibilityTag()) {
+            if (tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
+                requestCanvasClear();
+                return;
+            }
+            if (tag.isVisibilityRelatedTag()) {
                 if (values != null && values.length > 0) {
                     if (values[0] != null
                             && ((values[0] instanceof Boolean) == false || ((Boolean) values[0])
