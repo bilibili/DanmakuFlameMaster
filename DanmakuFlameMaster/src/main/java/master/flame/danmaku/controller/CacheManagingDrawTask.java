@@ -631,7 +631,7 @@ public class CacheManagingDrawTask extends DrawTask {
             public void requestBuildCacheAndDraw() {
                 removeMessages(CacheHandler.BUILD_CACHES);
                 mSeekedFlag = true;
-                mCacheTimer.update(mTimer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION);
+                mCacheTimer.update(mTimer.currMillisecond);
                 sendEmptyMessage(CacheHandler.BUILD_CACHES);
             }
         }
