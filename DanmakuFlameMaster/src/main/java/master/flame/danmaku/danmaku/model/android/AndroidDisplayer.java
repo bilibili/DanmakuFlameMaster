@@ -67,13 +67,13 @@ public class AndroidDisplayer implements IDisplayer {
     /**
      * 开启阴影，可动态改变
      */
-    public static boolean CONFIG_HAS_SHADOW = true;
+    public static boolean CONFIG_HAS_SHADOW = false;
     private static boolean HAS_SHADOW = CONFIG_HAS_SHADOW;
 
     /**
      * 开启描边，可动态改变
      */
-    public static boolean CONFIG_HAS_STROKE = false;
+    public static boolean CONFIG_HAS_STROKE = true;
     private static boolean HAS_STROKE = CONFIG_HAS_STROKE;
 
     /**
@@ -227,13 +227,11 @@ public class AndroidDisplayer implements IDisplayer {
 
     public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
                                    boolean quick) {
+        HAS_STROKE = CONFIG_HAS_STROKE;
+        HAS_SHADOW = CONFIG_HAS_SHADOW;
         if (quick) {
-            HAS_STROKE = false;
-            HAS_SHADOW = false;
             ANTI_ALIAS = false;
         } else {
-            HAS_STROKE = CONFIG_HAS_STROKE;
-            HAS_SHADOW = CONFIG_HAS_SHADOW;
             ANTI_ALIAS = CONFIG_ANTI_ALIAS;
         }
         TextPaint paint = getPaint(danmaku);
