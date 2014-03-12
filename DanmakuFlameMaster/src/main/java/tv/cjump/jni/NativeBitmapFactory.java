@@ -87,13 +87,9 @@ public class NativeBitmapFactory {
             return result;
         } catch (Exception e) {
             return false;
-        } catch (Error e){  //catch jni error?
+        } catch (Error e){
             return false; 
         } finally {
-            if(canvas!=null){
-                canvas.setBitmap(null);
-                canvas = null;
-            }
             if (bitmap != null) {
                 bitmap.recycle();
                 bitmap = null;
