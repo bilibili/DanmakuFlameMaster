@@ -44,9 +44,14 @@ public abstract class BaseDanmakuParser {
         mDataSource = source;
         return this;
     }
-    public BaseDanmakuParser setTimer(DanmakuTimer timer){
-    	mTimer = timer;
-    	return this;
+    
+    public BaseDanmakuParser setTimer(DanmakuTimer timer) {
+        mTimer = timer;
+        return this;
+    }
+
+    public DanmakuTimer getTimer() {
+        return mTimer;
     }
 
     public abstract Danmakus parse();
