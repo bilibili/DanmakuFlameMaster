@@ -383,11 +383,18 @@ public class AndroidDisplayer implements IDisplayer {
     }
 
     @Override
-    public void resetSlopPixel(float factor) { // TODO:fix me
-        float slop = Math.max(density, scaledDensity) * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE;
+    public void resetSlopPixel(float factor) {
+        float d = Math.max(density, scaledDensity);
+        d = Math.max(factor, getWidth() / (float) DanmakuFactory.BILI_PLAYER_WIDTH); //correct for low density and high resolution
+        float slop = d * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE; 
         slopPixel = (int) slop;
         if (factor > 1f)
             slopPixel = (int) (slop * factor);
+    }
+
+    @Override
+    public int getSlopPixel() {
+        return slopPixel;
     }
 
 }
