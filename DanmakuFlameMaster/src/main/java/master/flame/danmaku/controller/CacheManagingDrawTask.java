@@ -455,7 +455,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
                     return 0;
                 }
-                if (level == 1f) {
+                if (level >= 0.9f) {
                     return 0;
                 }
                 // check cache time
