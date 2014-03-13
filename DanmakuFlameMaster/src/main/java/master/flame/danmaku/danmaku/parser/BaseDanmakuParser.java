@@ -59,6 +59,7 @@ public abstract class BaseDanmakuParser {
     public Danmakus getDanmakus() {
         if (mDanmakus != null)
             return mDanmakus;
+        DanmakuFactory.resetDurationsData();
         mDanmakus = parse();
         if (mDanmakus != null)
             DanmakuFactory.updateMaxDanmakuDuration();

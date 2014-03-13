@@ -22,28 +22,36 @@ import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 
 public class DanmakuFactory {
 
-    public static float BILI_PLAYER_WIDTH = 539;
+    public final static float BILI_PLAYER_WIDTH = 539;
     
     public static int CURRENT_DISP_WIDTH = 0;
 
-    public static float BILI_PLAYER_HEIGHT = 385;
+    public final static float BILI_PLAYER_HEIGHT = 385;
 
-    public static long COMMON_DANMAKU_DURATION = 3800; // B站原始分辨率下弹幕存活时间
+    public final static long COMMON_DANMAKU_DURATION = 3800; // B站原始分辨率下弹幕存活时间
     
     public static final int DANMAKU_MEDIUM_TEXTSIZE = 25;
 
-    public static long MIN_DANMAKU_DURATION = 4000;
+    public final static long MIN_DANMAKU_DURATION = 4000;
     
     public static long REAL_DANMAKU_DURATION = COMMON_DANMAKU_DURATION;
 
     public static long MAX_DANMAKU_DURATION = MIN_DANMAKU_DURATION;
 
-    public static long MAX_DANMAKU_DURATION_HIGH_DENSITY = 9000;
+    public final static long MAX_DANMAKU_DURATION_HIGH_DENSITY = 9000;
     
-    public static Duration Duration_Scroll_Danmaku;
+    public static Duration MAX_Duration_Scroll_Danmaku;
     
-    public static Duration Duration_Fix_Danmaku;
+    public static Duration MAX_Duration_Fix_Danmaku;
     
+    public static Duration MAX_Duration_Special_Danmaku;
+    
+    public static void resetDurationsData() {
+        MAX_Duration_Scroll_Danmaku = null;
+        MAX_Duration_Fix_Danmaku = null;
+        MAX_Duration_Special_Danmaku = null;
+        MAX_DANMAKU_DURATION = MIN_DANMAKU_DURATION;
+    }
 
     public static BaseDanmaku createDanmaku(int type, float dispWidth) {
         boolean sizeChanged = false;
@@ -54,12 +62,12 @@ public class DanmakuFactory {
             REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
         }
 
-        if(Duration_Scroll_Danmaku == null){
-            Duration_Scroll_Danmaku = new Duration(REAL_DANMAKU_DURATION);
-            Duration_Scroll_Danmaku.setFactor(DanmakuGlobalConfig.DEFAULT.scrollSpeedFactor);
+        if(MAX_Duration_Scroll_Danmaku == null){
+            MAX_Duration_Scroll_Danmaku = new Duration(REAL_DANMAKU_DURATION);
+            MAX_Duration_Scroll_Danmaku.setFactor(DanmakuGlobalConfig.DEFAULT.scrollSpeedFactor);
         }
-        if(Duration_Fix_Danmaku == null){
-            Duration_Fix_Danmaku = new Duration(COMMON_DANMAKU_DURATION);
+        if(MAX_Duration_Fix_Danmaku == null){
+            MAX_Duration_Fix_Danmaku = new Duration(COMMON_DANMAKU_DURATION);
         }
 
         if (sizeChanged) {
@@ -70,35 +78,40 @@ public class DanmakuFactory {
         BaseDanmaku instance = null;
         switch (type) {
             case 1: // 从右往左滚动
-                instance = new R2LDanmaku(Duration_Scroll_Danmaku);
+                instance = new R2LDanmaku(MAX_Duration_Scroll_Danmaku);
                 break;
             case 4: // 底端固定
-                instance = new FBDanmaku(Duration_Fix_Danmaku);
+                instance = new FBDanmaku(MAX_Duration_Fix_Danmaku);
                 break;
             case 5: // 顶端固定
-                instance = new FTDanmaku(Duration_Fix_Danmaku);
+                instance = new FTDanmaku(MAX_Duration_Fix_Danmaku);
                 break;
             case 6: // 从左往右滚动
-                instance = new L2RDanmaku(Duration_Scroll_Danmaku);
+                instance = new L2RDanmaku(MAX_Duration_Scroll_Danmaku);
                 break;
             case 7: // 特殊弹幕
                 instance = new SpecialDanmaku();
                 break;
-        // TODO: more Danmaku type
         }
         return instance;
     }
     
     public static void updateMaxDanmakuDuration() {
-        MAX_DANMAKU_DURATION = Math.max(Duration_Scroll_Danmaku.value, Duration_Fix_Danmaku.value);
+        long maxScrollDuration = (MAX_Duration_Scroll_Danmaku == null ? 0: MAX_Duration_Scroll_Danmaku.value), 
+              maxFixDuration = (MAX_Duration_Fix_Danmaku == null ? 0 : MAX_Duration_Fix_Danmaku.value), 
+              maxSpecialDuration = (MAX_Duration_Special_Danmaku == null ? 0: MAX_Duration_Special_Danmaku.value);
+
+        MAX_DANMAKU_DURATION = Math.max(maxScrollDuration, maxFixDuration);
+        MAX_DANMAKU_DURATION = Math.max(MAX_DANMAKU_DURATION, maxSpecialDuration);
+
         MAX_DANMAKU_DURATION = Math.max(COMMON_DANMAKU_DURATION, MAX_DANMAKU_DURATION);
         MAX_DANMAKU_DURATION = Math.max(REAL_DANMAKU_DURATION, MAX_DANMAKU_DURATION);
     }
     
     public static void updateDurationFactor(float f) {
-        if (Duration_Scroll_Danmaku == null || Duration_Fix_Danmaku == null)
+        if (MAX_Duration_Scroll_Danmaku == null || MAX_Duration_Fix_Danmaku == null)
             return;
-        Duration_Scroll_Danmaku.setFactor(f);
+        MAX_Duration_Scroll_Danmaku.setFactor(f);
         updateMaxDanmakuDuration();
     }
     
@@ -136,6 +149,7 @@ public class DanmakuFactory {
         float scaleY = dispHeight / BILI_PLAYER_HEIGHT;
         ((SpecialDanmaku) item).setTranslationData(beginX * scaleX, beginY * scaleY, endX * scaleX,
                 endY * scaleY, translationDuration, translationStartDelay);
+        updateSpecicalDanmakuDuration(item);
     }
 
     /**
@@ -151,5 +165,13 @@ public class DanmakuFactory {
         if (item.getType() != BaseDanmaku.TYPE_SPECIAL)
             return;
         ((SpecialDanmaku) item).setAlphaData(beginAlpha, endAlpha, alphaDuraion);
+        updateSpecicalDanmakuDuration(item);
+    }
+    
+    private static void updateSpecicalDanmakuDuration(BaseDanmaku item) {
+        if (MAX_Duration_Special_Danmaku == null || (item.duration != null && item.duration.value > MAX_Duration_Special_Danmaku.value)) {
+            MAX_Duration_Special_Danmaku = item.duration;
+            updateMaxDanmakuDuration();
+        }
     }
 }
