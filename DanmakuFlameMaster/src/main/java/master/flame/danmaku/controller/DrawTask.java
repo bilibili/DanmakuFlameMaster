@@ -130,7 +130,7 @@ public class DrawTask implements IDrawTask {
     }
 
     protected void loadDanmakus(BaseDanmakuParser parser) {
-        danmakuList = parser.setDisp(mDisp).setTimer(mTimer).parse();
+        danmakuList = parser.setDisp(mDisp).setTimer(mTimer).getDanmakus();
         GlobalFlagValues.resetAll();
     }
 

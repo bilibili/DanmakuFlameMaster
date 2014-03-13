@@ -31,6 +31,8 @@ public abstract class BaseDanmakuParser {
     protected int mDispHeight;
     protected float mDispDensity;
     protected float mScaledDensity;
+
+    private Danmakus mDanmakus;
     
     public BaseDanmakuParser setDisp(IDisplayer disp){
     	mDispWidth = disp.getWidth();
@@ -53,7 +55,16 @@ public abstract class BaseDanmakuParser {
     public DanmakuTimer getTimer() {
         return mTimer;
     }
+    
+    public Danmakus getDanmakus() {
+        if (mDanmakus != null)
+            return mDanmakus;
+        mDanmakus = parse();
+        if (mDanmakus != null)
+            DanmakuFactory.updateMaxDanmakuDuration();
+        return mDanmakus;
+    }
 
-    public abstract Danmakus parse();
+    protected abstract Danmakus parse();
 
 }
