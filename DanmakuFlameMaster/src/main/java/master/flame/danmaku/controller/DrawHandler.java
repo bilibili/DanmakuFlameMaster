@@ -153,7 +153,12 @@ public class DrawHandler extends Handler {
                     break;
                 }
                 if (d <= 13) {
-                    sendEmptyMessageDelayed(UPDATE, 15 - d);
+                    sendEmptyMessage(UPDATE);
+                    try {
+                        Thread.sleep(16 - d);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
                 sendEmptyMessage(UPDATE);
