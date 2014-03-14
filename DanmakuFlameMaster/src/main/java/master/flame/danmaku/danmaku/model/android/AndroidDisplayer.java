@@ -280,12 +280,12 @@ public class AndroidDisplayer implements IDisplayer {
     public static TextPaint getPaint(BaseDanmaku danmaku) {
         PAINT.setTextSize(danmaku.textSize);
         applyTextScaleConfig(danmaku, PAINT);
-        PAINT.setAntiAlias(ANTI_ALIAS);
         if (HAS_SHADOW) {
             PAINT.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
         } else {
             PAINT.clearShadowLayer();
         }
+        PAINT.setAntiAlias(ANTI_ALIAS);
         return PAINT;
     }
     
