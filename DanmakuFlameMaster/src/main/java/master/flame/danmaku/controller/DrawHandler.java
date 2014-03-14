@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
@@ -152,13 +153,10 @@ public class DrawHandler extends Handler {
                     sendEmptyMessageDelayed(UPDATE, 100);
                     break;
                 }
+                
                 if (d <= 13) {
                     sendEmptyMessage(UPDATE);
-                    try {
-                        Thread.sleep(16 - d);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    SystemClock.sleep(16 - d);
                     break;
                 }
                 sendEmptyMessage(UPDATE);
