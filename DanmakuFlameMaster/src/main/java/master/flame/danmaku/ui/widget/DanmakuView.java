@@ -225,24 +225,25 @@ public class DanmakuView extends View implements IDanmakuView, View.OnClickListe
             Log.e(TAG, "ondraw:" + isSurfaceCreated + ",isshow:" + isShown());
             if (!isSurfaceCreated)
                 return;
+            long stime = System.currentTimeMillis();
             if (!isShown()) {
                 // DrawHelper.clearCanvas(canvas);
                 return;
             }
-            long stime = System.currentTimeMillis();
             if (canvas != null) {
                 if (handler != null) {
                     Log.e(TAG, "ondraw:" + isSurfaceCreated + ",isshow:" + isShown()
                             + "handler.DRAWTASK:" + (handler.drawTask == null));
                     handler.draw(canvas);
-                    dtime = System.currentTimeMillis() - stime;
                     if (mShowFps) {
+                        dtime = System.currentTimeMillis() - stime;
                         String fps = String.format("%02d MS, fps %.2f", dtime,
                                 1000 / (float) Math.max(dtime, 1));
                         DrawHelper.drawFPS(canvas, fps);
                     }
                 }
             }
+            dtime = System.currentTimeMillis() - stime;
         }
     }
  
