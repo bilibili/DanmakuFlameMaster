@@ -49,8 +49,6 @@ android上开源弹幕解析绘制引擎项目。
 
 - jni代码优化
 
-- 缓存线程同步danmakufitlers,进一步提高性能
-
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
