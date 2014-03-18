@@ -26,6 +26,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import java.util.Locale;
+
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DanmakuFilters;
@@ -104,6 +106,7 @@ public class DanmakuView extends View implements IDanmakuView, View.OnClickListe
     }
 
     @Override
+    @TargetApi(8)
     protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
         if (visibility == View.VISIBLE) {
@@ -237,7 +240,7 @@ public class DanmakuView extends View implements IDanmakuView, View.OnClickListe
                     handler.draw(canvas);
                     if (mShowFps) {
                         dtime = System.currentTimeMillis() - stime;
-                        String fps = String.format("%02d MS, fps %.2f", dtime,
+                        String fps = String.format(Locale.getDefault(), "%02d MS, fps %.2f", dtime,
                                 1000 / (float) Math.max(dtime, 1));
                         DrawHelper.drawFPS(canvas, fps);
                     }

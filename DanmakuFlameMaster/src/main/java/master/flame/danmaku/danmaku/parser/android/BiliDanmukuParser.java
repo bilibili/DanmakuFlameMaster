@@ -32,6 +32,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
 
@@ -89,7 +90,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         public void startElement(String uri, String localName, String qName, Attributes attributes)
                 throws SAXException {
             String tagName = localName.length() != 0 ? localName : qName;
-            tagName = tagName.toLowerCase().trim();
+            tagName = tagName.toLowerCase(Locale.getDefault()).trim();
             if (tagName.equals("d")) {
                 String pValue = attributes.getValue("p");
                 // parse p value to danmaku

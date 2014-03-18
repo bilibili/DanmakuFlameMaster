@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.ui.widget;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -26,6 +27,9 @@ import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.TextureView;
 import android.view.View;
+
+import java.util.Locale;
+
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DanmakuFilters;
@@ -40,6 +44,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
  * @author ch
  *
  */
+@SuppressLint("NewApi")
 public class DanmakuTextureView extends TextureView implements IDanmakuView,
         TextureView.SurfaceTextureListener, View.OnClickListener {
 
@@ -224,7 +229,8 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
                 handler.draw(canvas);
                 if (mShowFps) {
                     dtime = System.currentTimeMillis() - stime;
-                    String fps = String.format("%02d MS, fps %.2f", dtime, 1000 / (float) dtime);
+                    String fps = String.format(Locale.getDefault(), "%02d MS, fps %.2f", dtime,
+                            1000 / (float) dtime);
                     DrawHelper.drawFPS(canvas, fps);
                 }
             }

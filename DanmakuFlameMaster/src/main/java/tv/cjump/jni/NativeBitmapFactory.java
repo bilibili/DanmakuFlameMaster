@@ -3,10 +3,12 @@ package tv.cjump.jni;
 
 import java.lang.reflect.Field;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 public class NativeBitmapFactory {
 
@@ -55,7 +57,7 @@ public class NativeBitmapFactory {
             }
         }  
         
-//Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
+Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
     }
 
     static void initField() {
@@ -68,6 +70,7 @@ public class NativeBitmapFactory {
         }
     }
 
+    @SuppressLint("NewApi")
     private static boolean testLib() {
         if (nativeIntField == null) {
             return false;

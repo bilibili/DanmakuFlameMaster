@@ -25,6 +25,9 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+
+import java.util.Locale;
+
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DanmakuFilters;
@@ -219,7 +222,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
                 handler.draw(canvas);
                 if (mShowFps) {
                     dtime = System.currentTimeMillis() - stime;  //not so accurate
-                    String fps = String.format("%02d MS, fps %.2f", dtime, 1000 / (float) dtime);
+                    String fps = String.format(Locale.getDefault(), "%02d MS, fps %.2f", dtime,
+                            1000 / (float) dtime);
                     DrawHelper.drawFPS(canvas, fps);
                 }
             }
