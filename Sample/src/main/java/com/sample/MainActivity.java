@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.*;
 import android.widget.PopupWindow;
 import android.widget.VideoView;
@@ -20,7 +19,6 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
-import master.flame.danmaku.ui.widget.DanmakuTextureView;
 
 import com.sample.R;
 
