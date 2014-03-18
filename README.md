@@ -1,7 +1,7 @@
 DanmakuFlameMaster
 ==================
 
-android上开源弹幕解析绘制引擎项目。
+android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis-ci.org/ctiao/DanmakuFlameMaster.png?branch=master)](https://travis-ci.org/ctiao/DanmakuFlameMaster)
 
 ### DFM Inside: 
 [![hacfun](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/hacfun.png?raw=true)](https://play.google.com/store/apps/details?id=tv.ac.fun)
