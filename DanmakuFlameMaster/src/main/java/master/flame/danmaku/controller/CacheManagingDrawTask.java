@@ -463,6 +463,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 if (deltaTime < 0) {
                     removeMessages(CLEAR_OUTSIDE_CACHES);
                     sendEmptyMessage(CLEAR_OUTSIDE_CACHES);
+                    sendEmptyMessage(BUILD_CACHES);
                     return 0;
                 } else if (deltaTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
                     removeMessages(CLEAR_TIMEOUT_CACHES);
