@@ -26,6 +26,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import java.util.LinkedList;
 import java.util.Locale;
 
 import master.flame.danmaku.controller.DrawHandler;
@@ -129,6 +130,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     public void release() {
         stop();
         DanmakuFilters.getDefault().clear();
+        if(mDrawTimes!= null) mDrawTimes.clear();
     }
 
     @Override
@@ -207,23 +209,36 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     public void showFPS(boolean show){
         mShowFps = show;
     }
-
+    private static final int MAX_RECORD_SIZE = 50;
+    private static final int ONE_SECOND = 1000;
+    private LinkedList<Long> mDrawTimes;
+    private float fps() {
+        long lastTime = System.currentTimeMillis();
+        mDrawTimes.addLast(lastTime);
+        float dtime = lastTime - mDrawTimes.getFirst();
+        int frames = mDrawTimes.size();
+        if (frames > MAX_RECORD_SIZE) {
+            mDrawTimes.removeFirst();
+        }
+        return dtime > 0 ? mDrawTimes.size() * ONE_SECOND / dtime : 0.0f;
+    }
     @Override
     public long drawDanmakus() {
         if (!isSurfaceCreated)
             return 0;
-        long stime = System.currentTimeMillis();
         if (!isShown())
             return -1;
+        long stime = System.currentTimeMillis();
         long dtime = 0;
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null){
             if(handler != null){
                 handler.draw(canvas);
                 if (mShowFps) {
+                    if(mDrawTimes == null) mDrawTimes = new LinkedList<Long>();
                     dtime = System.currentTimeMillis() - stime;  //not so accurate
                     String fps = String.format(Locale.getDefault(), "%02d MS, fps %.2f", dtime,
-                            1000 / (float) dtime);
+                            fps());
                     DrawHelper.drawFPS(canvas, fps);
                 }
             }
