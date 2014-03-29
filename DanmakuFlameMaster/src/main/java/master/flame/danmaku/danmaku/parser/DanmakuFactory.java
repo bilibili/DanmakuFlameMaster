@@ -121,7 +121,7 @@ public class DanmakuFactory {
             return;
         }
 
-        String[] lines = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);
+        String[] lines = text.split(BaseDanmaku.DANMAKU_BR_CHAR);
         if (lines.length > 1) {
             danmaku.lines = lines;
         }

@@ -27,6 +27,7 @@ import android.text.TextPaint;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.SpannedDanmku;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 import java.util.HashMap;
@@ -254,13 +255,16 @@ public class AndroidDisplayer implements IDisplayer {
                     }
                 }
             }
+        } else if(SpannedDanmku.class.isInstance(danmaku)){
+            ((SpannedDanmku)danmaku).drawLayout(canvas);
         } else {
             if (HAS_STROKE){                
                 applyPaintConfig(danmaku, paint, true);
-                canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
+                canvas.drawText(danmaku.text, 0, danmaku.text.length(), left, top - paint.ascent(), paint);
             }
             applyPaintConfig(danmaku, paint, false);
-            canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
+            canvas.drawText(danmaku.text, 0, danmaku.text.length(), left, top - paint.ascent(), paint);
+            
         }
 
         // draw underline
@@ -344,7 +348,7 @@ public class AndroidDisplayer implements IDisplayer {
         float w = 0;
         Float textHeight = getTextHeight(paint);
         if (danmaku.lines == null) {
-            w = paint.measureText(danmaku.text);
+            w = paint.measureText(danmaku.text, 0, danmaku.text.length());
             danmaku.paintWidth = w;
             danmaku.paintHeight = textHeight;
             return;
