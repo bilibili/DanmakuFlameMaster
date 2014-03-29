@@ -27,7 +27,7 @@ import android.text.TextPaint;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.SpannedDanmku;
+import master.flame.danmaku.danmaku.model.SpannedDanmaku;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 import java.util.HashMap;
@@ -255,15 +255,19 @@ public class AndroidDisplayer implements IDisplayer {
                     }
                 }
             }
-        } else if(SpannedDanmku.class.isInstance(danmaku)){
+        } else if (danmaku instanceof SpannedDanmaku
+                && ((SpannedDanmaku) danmaku).isDanmakuSpanned()) {
+            // do drawText by SpannedDanmaku itself
+            // TODO: support Stroke span
             if (HAS_STROKE) {
                 applyPaintConfig(danmaku, paint, true);
-                ((SpannedDanmku) danmaku).drawLayout(canvas, paint, left, top);
+                ((SpannedDanmaku) danmaku).drawLayout(canvas, paint, left, top);
             }
             applyPaintConfig(danmaku, paint, false);
-            ((SpannedDanmku) danmaku).drawLayout(canvas, paint, left, top);
+            ((SpannedDanmaku) danmaku).drawLayout(canvas, paint, left, top);
+            return;
         } else {
-            if (HAS_STROKE){                
+            if (HAS_STROKE) {
                 applyPaintConfig(danmaku, paint, true);
                 canvas.drawText(danmaku.text, 0, danmaku.text.length(), left, top - paint.ascent(), paint);
             }
@@ -350,14 +354,14 @@ public class AndroidDisplayer implements IDisplayer {
     } 
     
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
-        float w = 0;
-        Float textHeight = getTextHeight(paint);
         
-        if (SpannedDanmku.class.isInstance(danmaku)) {
-            danmaku.paintWidth = ((SpannedDanmku) danmaku).getLineWidth(0, paint);
-            danmaku.paintHeight = textHeight;
+        if (danmaku instanceof SpannedDanmaku && ((SpannedDanmaku) danmaku).isDanmakuSpanned()) {
+            ((SpannedDanmaku) danmaku).measureWithLayout(paint);
             return;
         }
+        
+        float w = 0;
+        Float textHeight = getTextHeight(paint);
         
         if (danmaku.lines == null) {
             w = paint.measureText(danmaku.text, 0, danmaku.text.length());

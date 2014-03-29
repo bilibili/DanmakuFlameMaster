@@ -16,7 +16,14 @@
 
 package master.flame.danmaku.danmaku.model;
 
-public class R2LDanmaku extends BaseDanmaku {
+import android.graphics.Canvas;
+import android.text.Layout;
+import android.text.Spanned;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.Layout.Alignment;
+
+public class R2LDanmaku extends BaseDanmaku implements SpannedDanmaku{
 
     protected float x = 0;
 
@@ -103,6 +110,37 @@ public class R2LDanmaku extends BaseDanmaku {
         super.measure(displayer);
         mDistance = (int) (displayer.getWidth() + paintWidth);
         mStepX = mDistance / (float) duration.value;        
+    }
+
+    private Layout mLayoutInner;
+    @Override
+    public void drawLayout(Canvas canvas, TextPaint paint, float left, float top) {
+        if(mLayoutInner == null) return;
+        boolean needRestore = false;
+        if (left != 0 || top != 0) {
+            canvas.save();
+            canvas.translate(-left, -top);
+            needRestore = true;
+        }
+        mLayoutInner.draw(canvas);
+        if (needRestore) {
+            canvas.restore();
+        }
+    }
+
+    @Override
+    public void measureWithLayout(TextPaint paint) {
+        if (mLayoutInner == null) {
+            mLayoutInner = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(text,
+                    paint), Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+        }
+        paintWidth = mLayoutInner.getWidth();
+        paintHeight = mLayoutInner.getLineTop(1);
+    }
+
+    @Override
+    public boolean isDanmakuSpanned() {
+        return text instanceof Spanned;
     }
 
 }
