@@ -256,7 +256,12 @@ public class AndroidDisplayer implements IDisplayer {
                 }
             }
         } else if(SpannedDanmku.class.isInstance(danmaku)){
-            ((SpannedDanmku)danmaku).drawLayout(canvas);
+            if (HAS_STROKE) {
+                applyPaintConfig(danmaku, paint, true);
+                ((SpannedDanmku) danmaku).drawLayout(canvas, paint, left, top);
+            }
+            applyPaintConfig(danmaku, paint, false);
+            ((SpannedDanmku) danmaku).drawLayout(canvas, paint, left, top);
         } else {
             if (HAS_STROKE){                
                 applyPaintConfig(danmaku, paint, true);
@@ -347,6 +352,13 @@ public class AndroidDisplayer implements IDisplayer {
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
         float w = 0;
         Float textHeight = getTextHeight(paint);
+        
+        if (SpannedDanmku.class.isInstance(danmaku)) {
+            danmaku.paintWidth = ((SpannedDanmku) danmaku).getLineWidth(0, paint);
+            danmaku.paintHeight = textHeight;
+            return;
+        }
+        
         if (danmaku.lines == null) {
             w = paint.measureText(danmaku.text, 0, danmaku.text.length());
             danmaku.paintWidth = w;

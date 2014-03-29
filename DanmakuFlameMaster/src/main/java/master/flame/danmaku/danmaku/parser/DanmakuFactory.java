@@ -77,6 +77,9 @@ public class DanmakuFactory {
 
         BaseDanmaku instance = null;
         switch (type) {
+            case 11:
+                instance = new SpannedDanmku(MAX_Duration_Scroll_Danmaku);
+                break;
             case 1: // 从右往左滚动
                 instance = new R2LDanmaku(MAX_Duration_Scroll_Danmaku);
                 break;
