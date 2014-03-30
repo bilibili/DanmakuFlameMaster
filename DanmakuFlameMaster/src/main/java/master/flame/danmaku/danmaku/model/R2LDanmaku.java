@@ -107,6 +107,9 @@ public class R2LDanmaku extends BaseDanmaku implements SpannedDanmaku{
     
     @Override
     public void measure(IDisplayer displayer) {
+        if (!isMeasured()) {
+            mLayoutInner = null;
+        }
         super.measure(displayer);
         mDistance = (int) (displayer.getWidth() + paintWidth);
         mStepX = mDistance / (float) duration.value;        
