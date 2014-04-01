@@ -52,7 +52,7 @@ public class AndroidDisplayer implements IDisplayer {
     @SuppressWarnings("unused")
     private int NO_CACHE_COUNT = 0;
 
-    public static TextPaint PAINT;
+    public static TextPaint PAINT, PAINT_DUPLICATE;
 
     private static Paint ALPHA_PAINT;
 
@@ -85,6 +85,7 @@ public class AndroidDisplayer implements IDisplayer {
     static {
         PAINT = new TextPaint();
         PAINT.setStrokeWidth(3.5f);
+        PAINT_DUPLICATE = new TextPaint(PAINT);
         ALPHA_PAINT = new Paint();
         UNDERLINE_PAINT = new Paint();
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
@@ -234,7 +235,7 @@ public class AndroidDisplayer implements IDisplayer {
         } else {
             ANTI_ALIAS = CONFIG_ANTI_ALIAS;
         }
-        TextPaint paint = getPaint(danmaku);
+        TextPaint paint = getPaint(danmaku, quick);
         if (danmaku.lines != null) {
             String[] lines = danmaku.lines;
             if (lines.length == 1) {
@@ -276,17 +277,28 @@ public class AndroidDisplayer implements IDisplayer {
         UNDERLINE_PAINT.setColor(danmaku.underlineColor);
         return UNDERLINE_PAINT;
     }
+    
+    private static TextPaint getPaint(BaseDanmaku danmaku, boolean quick) {
+        TextPaint paint = null;
+        if (quick && HAS_SHADOW) {
+            paint = PAINT_DUPLICATE;
+            paint.set(PAINT);
+        } else {
+            paint = PAINT;
+        }
+        paint.setTextSize(danmaku.textSize);
+        applyTextScaleConfig(danmaku, paint);
+        if (HAS_SHADOW) {
+            paint.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
+        } else {
+            paint.clearShadowLayer();
+        }
+        paint.setAntiAlias(ANTI_ALIAS);
+        return paint;
+    }
 
     public static TextPaint getPaint(BaseDanmaku danmaku) {
-        PAINT.setTextSize(danmaku.textSize);
-        applyTextScaleConfig(danmaku, PAINT);
-        if (HAS_SHADOW) {
-            PAINT.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
-        } else {
-            PAINT.clearShadowLayer();
-        }
-        PAINT.setAntiAlias(ANTI_ALIAS);
-        return PAINT;
+        return getPaint(danmaku, false);
     }
     
     private static void applyPaintConfig(BaseDanmaku danmaku, Paint paint,boolean stroke) {
