@@ -383,7 +383,10 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
                     case DISPATCH_ACTIONS:
                         long delayed = dispatchAction();
-                        sendEmptyMessageDelayed(DISPATCH_ACTIONS,Math.max(delayed, DanmakuFactory.MAX_DANMAKU_DURATION));
+                        if (delayed == 0) {
+                            delayed = DanmakuFactory.MAX_DANMAKU_DURATION;
+                        }
+                        sendEmptyMessageDelayed(DISPATCH_ACTIONS, delayed);
                         break;
                     case BUILD_CACHES:
                         boolean repositioned = (mTaskListener != null || mSeekedFlag);
@@ -449,12 +452,20 @@ public class CacheManagingDrawTask extends DrawTask {
             private long dispatchAction() {
                 float level = getPoolPercent();
                 BaseDanmaku firstCache = mCaches.first();
-                if (level > 0.3f && firstCache != null && firstCache.isTimeOut()) {
+                //TODO 如果firstcache大于当前时间超过半屏并且水位在0.5f以下,
+                long gapTime = firstCache != null ? firstCache.time - mTimer.currMillisecond : 0;
+                if (level < 0.6f && gapTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
+                    mCacheTimer.update(mTimer.currMillisecond);
+                    removeMessages(BUILD_CACHES);
+                    sendEmptyMessage(BUILD_CACHES);
+                    return 0;
+                } else if (level > 0.3f && gapTime < -DanmakuFactory.MAX_DANMAKU_DURATION * 2) {
                     // clear timeout caches
                     removeMessages(CLEAR_TIMEOUT_CACHES);
                     sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
-                    return 0;
+                    return 1000;
                 }
+                
                 if (level >= 0.9f) {
                     return 0;
                 }
