@@ -246,13 +246,17 @@ public class AndroidDisplayer implements IDisplayer {
                 applyPaintConfig(danmaku, paint, false);
                 canvas.drawText(lines[0], left, top - paint.ascent(), paint);
             } else {
-                applyPaintConfig(danmaku, paint, false);
                 Float textHeight = getTextHeight(paint);
                 for (int t = 0; t < lines.length; t++) {
-                    if (lines[t].length() > 0) {
-                        canvas.drawText(lines[t], left,
-                                t * textHeight + top - paint.ascent(), paint);
+                    if (lines[t] == null || lines[t].length() == 0) {
+                        continue;
                     }
+                    if (HAS_STROKE){
+                        applyPaintConfig(danmaku, paint, true);
+                        canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
+                    }
+                    applyPaintConfig(danmaku, paint, false);
+                    canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
                 }
             }
         } else {
