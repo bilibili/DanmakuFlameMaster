@@ -3,7 +3,9 @@ package master.flame.danmaku.danmaku.model;
 
 public interface IDrawingCache<T> {
 
-    public void build(int w, int h, int density);
+    public void build(int w, int h, int density, boolean checkSizeEquals);
+    
+    public void erase();
 
     public T get();
 

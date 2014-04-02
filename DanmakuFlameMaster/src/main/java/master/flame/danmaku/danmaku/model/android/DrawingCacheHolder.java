@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
+import master.flame.danmaku.controller.DrawHelper;
+
 public class DrawingCacheHolder {
 
     public Canvas canvas;
@@ -28,12 +30,21 @@ public class DrawingCacheHolder {
     }
 
     public DrawingCacheHolder(int w, int h) {
-        buildCache(w, h, 0);
+        buildCache(w, h, 0, true);
+    }
+    
+    public DrawingCacheHolder(int w, int h, int density) {
+        mDensity = density;
+        buildCache(w, h, density, true);
     }
 
-    public void buildCache(int w, int h, int density) {
-        if (w == width && h == height && bitmap != null && !bitmap.isRecycled()) {
+    public void buildCache(int w, int h, int density, boolean checkSizeEquals) {
+        boolean reuse = checkSizeEquals ? (w == width && h == height) : (w <= width && h <= height);
+        if (reuse && bitmap != null && !bitmap.isRecycled()) {
+//            canvas.drawColor(Color.TRANSPARENT);
+            canvas.setBitmap(null);
             bitmap.eraseColor(Color.TRANSPARENT);
+            canvas.setBitmap(bitmap);            
             return;
         }
         if (bitmap != null) {
@@ -52,6 +63,13 @@ public class DrawingCacheHolder {
         }else
             canvas.setBitmap(bitmap);
     }
+    
+    public void erase() {
+        if (bitmap != null && !bitmap.isRecycled()) {
+            bitmap.eraseColor(Color.TRANSPARENT);
+            return;
+        }
+    }
 
     public void recycle() {
         width = height = 0;
@@ -65,9 +83,5 @@ public class DrawingCacheHolder {
         extra = null;
     }
 
-    public DrawingCacheHolder(int w, int h, int density) {
-        mDensity = density;
-        buildCache(w, h, density);
-    }
 
 }
