@@ -13,6 +13,10 @@ public interface IDrawingCache<T> {
 
     public int size();
     
+    public int width();
+    
+    public int height();
+    
     public boolean hasReferences();
     
     public void increaseReference();

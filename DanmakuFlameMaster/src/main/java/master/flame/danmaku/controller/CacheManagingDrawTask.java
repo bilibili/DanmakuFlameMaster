@@ -348,8 +348,8 @@ public class CacheManagingDrawTask extends DrawTask {
                 if (danmaku.cache.hasReferences()) {
                     continue;
                 }
-                float widthGap = danmaku.paintWidth - refDanmaku.paintWidth;
-                float heightGap = danmaku.paintHeight - refDanmaku.paintHeight;
+                float widthGap = danmaku.cache.width() - refDanmaku.paintWidth;
+                float heightGap = danmaku.cache.height() - refDanmaku.paintHeight;
                 int slopPixel = mDisp.getSlopPixel();
                 if (widthGap >= 0 && widthGap <= slopPixel &&  
                     heightGap >= 0 && heightGap <= slopPixel) {
@@ -632,7 +632,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     }
                     if (cache != null) {
                         danmaku.cache = null;
-//Log.e("count", danmaku.text+"DrawingCache hit!!:" + danmaku.paintWidth);
+//Log.e("count", danmaku.text+"DrawingCache hit!!:" + item.paintWidth + "," + danmaku.paintWidth);
                         cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache);  //redraw
                         item.cache = cache;
                         mCacheManager.push(item, 0);

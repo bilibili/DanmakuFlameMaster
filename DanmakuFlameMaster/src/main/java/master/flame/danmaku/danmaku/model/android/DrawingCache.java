@@ -101,4 +101,20 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
         referenceCount--;
     }
 
+    @Override
+    public int width() {
+        if (mHolder != null) {
+            return mHolder.width;
+        }
+        return 0;
+    }
+
+    @Override
+    public int height() {
+        if (mHolder != null) {
+            return mHolder.height;
+        }
+        return 0;
+    }
+
 }

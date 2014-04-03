@@ -92,7 +92,7 @@ public class DanmakuUtils {
         if (cache == null)
             cache = new DrawingCache();
 
-        cache.build((int) danmaku.paintWidth, (int) danmaku.paintHeight, disp.getDensityDpi(), false);
+        cache.build((int) Math.ceil(danmaku.paintWidth), (int) Math.ceil(danmaku.paintHeight), disp.getDensityDpi(), false);
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
             AndroidDisplayer.drawDanmaku(danmaku, holder.canvas, 0, 0, false);
