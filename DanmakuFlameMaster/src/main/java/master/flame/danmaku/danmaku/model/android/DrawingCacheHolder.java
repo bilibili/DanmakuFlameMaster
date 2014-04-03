@@ -1,12 +1,11 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import tv.cjump.jni.NativeBitmapFactory;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
-import master.flame.danmaku.controller.DrawHelper;
+import tv.cjump.jni.NativeBitmapFactory;
 
 public class DrawingCacheHolder {
 
