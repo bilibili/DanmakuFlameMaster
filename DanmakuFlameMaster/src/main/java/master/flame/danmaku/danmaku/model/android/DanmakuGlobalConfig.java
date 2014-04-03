@@ -156,10 +156,10 @@ public class DanmakuGlobalConfig {
      * @param visible
      */
     public DanmakuGlobalConfig setFTDanmakuVisibility(boolean visible) {
+        setDanmakuVisible(visible, BaseDanmaku.TYPE_FIX_TOP);
+        setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
         if (FTDanmakuVisibility != visible) {
             FTDanmakuVisibility = visible;
-            setDanmakuVisible(visible, BaseDanmaku.TYPE_FIX_TOP);
-            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
             notifyConfigureChanged(DanmakuConfigTag.FT_DANMAKU_VISIBILITY, visible);
         }
         return this;
@@ -191,10 +191,10 @@ public class DanmakuGlobalConfig {
      * @param visible
      */
     public DanmakuGlobalConfig setFBDanmakuVisibility(boolean visible) {
+        setDanmakuVisible(visible, BaseDanmaku.TYPE_FIX_BOTTOM);
+        setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
         if (FBDanmakuVisibility != visible) {
             FBDanmakuVisibility = visible;
-            setDanmakuVisible(visible, BaseDanmaku.TYPE_FIX_BOTTOM);
-            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
             notifyConfigureChanged(DanmakuConfigTag.FB_DANMAKU_VISIBILITY, visible);
         }
         return this;
@@ -213,10 +213,10 @@ public class DanmakuGlobalConfig {
      * @param visible
      */
     public DanmakuGlobalConfig setL2RDanmakuVisibility(boolean visible) {
-        if (L2RDanmakuVisibility != visible) {
+        setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_LR);
+        setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+        if(L2RDanmakuVisibility != visible){
             L2RDanmakuVisibility = visible;
-            setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_LR);
-            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
             notifyConfigureChanged(DanmakuConfigTag.L2R_DANMAKU_VISIBILITY, visible);
         }
         return this;
@@ -235,10 +235,10 @@ public class DanmakuGlobalConfig {
      * @param visible
      */
     public DanmakuGlobalConfig setR2LDanmakuVisibility(boolean visible) {
+        setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_RL);
+        setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
         if (R2LDanmakuVisibility != visible) {
             R2LDanmakuVisibility = visible;
-            setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_RL);
-            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
             notifyConfigureChanged(DanmakuConfigTag.R2L_DANMAKU_VISIBILIY, visible);
         }
         return this;
@@ -257,10 +257,10 @@ public class DanmakuGlobalConfig {
      * @param visible
      */
     public DanmakuGlobalConfig setSpecialDanmakuVisibility(boolean visible) {
+        setDanmakuVisible(visible, BaseDanmaku.TYPE_SPECIAL);
+        setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
         if (SecialDanmakuVisibility != visible) {
             SecialDanmakuVisibility = visible;
-            setDanmakuVisible(visible, BaseDanmaku.TYPE_SPECIAL);
-            setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
             notifyConfigureChanged(DanmakuConfigTag.SPECIAL_DANMAKU_VISIBILITY, visible);
         }
         return this;
