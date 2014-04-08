@@ -26,7 +26,7 @@ import android.text.TextPaint;
 
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 import java.util.HashMap;
@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * Created by ch on 13-7-5.
  */
-public class AndroidDisplayer implements IDisplayer {
+public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private Camera camera = new Camera();
 
@@ -107,19 +107,21 @@ public class AndroidDisplayer implements IDisplayer {
 
     public Canvas canvas;
 
-    public int width;
+    private int width;
 
-    public int height;
+    private int height;
 
-    public float density = 1;
+    private float density = 1;
 
-    public int densityDpi = 160;
+    private int densityDpi = 160;
 
-    public float scaledDensity = 1;
+    private float scaledDensity = 1;
 
-    public int slopPixel = 0;
+    private int slopPixel = 0;
+    
+    private long lastAverageRenderingTime = 16;
 
-    public void update(Canvas c) {
+    private void update(Canvas c) {
         canvas = c;
         if (c != null) {
             width = c.getWidth();
@@ -360,7 +362,7 @@ public class AndroidDisplayer implements IDisplayer {
         float w = 0;
         Float textHeight = getTextHeight(paint);
         if (danmaku.lines == null) {
-            w = paint.measureText(danmaku.text);
+            w = danmaku.text == null ? 0 : paint.measureText(danmaku.text);
             danmaku.paintWidth = w;
             danmaku.paintHeight = textHeight;
             return;
@@ -411,6 +413,39 @@ public class AndroidDisplayer implements IDisplayer {
     @Override
     public int getSlopPixel() {
         return slopPixel;
+    }
+
+    @Override
+    public void setDensities(float density, int densityDpi, float scaledDensity) {
+        this.density = density;
+        this.densityDpi = densityDpi;
+        this.scaledDensity = scaledDensity;
+    }
+
+    @Override
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public void setExtraData(Canvas data) {
+        update(data);
+    }
+
+    @Override
+    public Canvas getExtraData() {
+        return this.canvas;
+    }
+
+    @Override
+    public long getAverageRenderingTime() {
+        return this.lastAverageRenderingTime;
+    }
+
+    @Override
+    public void setAverageRenderingTime(long ms) {
+        this.lastAverageRenderingTime = ms;
     }
 
 }
