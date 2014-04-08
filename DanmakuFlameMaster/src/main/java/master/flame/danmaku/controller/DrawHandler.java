@@ -7,9 +7,15 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
 
+import java.util.LinkedList;
+
+import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.util.AndroidUtils;
 
@@ -54,6 +60,8 @@ public class DrawHandler extends Handler {
     private IDanmakuView mDanmakuView;
 
     private boolean mDanmakusVisible = true;
+
+    private AbsDisplayer<Canvas> mDisp;
 
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
@@ -155,7 +163,7 @@ public class DrawHandler extends Handler {
                     break;
                 }
                 
-                if (d <= 13) {
+                if (d <= 16) {
                     sendEmptyMessage(UPDATE);
                     SystemClock.sleep(16 - d);
                     break;
@@ -166,6 +174,7 @@ public class DrawHandler extends Handler {
             case QUIT:
                 removeCallbacksAndMessages(null);
                 quitFlag = true;
+                mDrawTimes.clear();
                 pausedPostion = timer.currMillisecond;
                 if (what == QUIT){
                     if (this.drawTask != null){
@@ -200,9 +209,16 @@ public class DrawHandler extends Handler {
 
     private IDrawTask createTask(boolean useDrwaingCache, DanmakuTimer timer, Context context,
             int width, int height, IDrawTask.TaskListener taskListener) {
-        IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, width, height,
+        mDisp = new AndroidDisplayer();
+        mDisp.setSize(width, height);
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        mDisp.setDensities(displayMetrics.density, displayMetrics.densityDpi,
+                displayMetrics.scaledDensity);
+        mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+        
+        IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, mDisp,
                 taskListener, 1024 * 1024 * AndroidUtils.getMemoryClass(context) / 3)
-                : new DrawTask(timer, context, width, height, taskListener);
+                : new DrawTask(timer, context, mDisp, taskListener);
         task.setParser(mParser);
         task.prepare();
         return task;
@@ -252,7 +268,32 @@ public class DrawHandler extends Handler {
     public void draw(Canvas canvas) {
         if (drawTask == null)
             return;
-        drawTask.draw(canvas);
+        mDisp.setAverageRenderingTime((Math.max(8, getAverageRenderingTime()) / 8) * 8);
+        mDisp.setExtraData(canvas);
+        drawTask.draw(mDisp);
+        recordRenderingTime();
+    }
+    
+    private long getAverageRenderingTime() {
+        long lastTime = System.currentTimeMillis();
+        int frames = mDrawTimes.size();
+        if(frames <= 0)
+            return 0;
+        long dtime = lastTime - mDrawTimes.getFirst();
+        return dtime / frames;
+    }
+
+    private static final int MAX_RECORD_SIZE = 50;
+    private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
+
+    private void recordRenderingTime() {
+        long lastTime = System.currentTimeMillis();
+        mDrawTimes.addLast(lastTime);
+        int frames = mDrawTimes.size();
+        if (frames > MAX_RECORD_SIZE) {
+            mDrawTimes.removeFirst();
+            frames = MAX_RECORD_SIZE;
+        }
     }
 
 }
