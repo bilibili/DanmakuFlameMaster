@@ -40,6 +40,12 @@
             android:layout_height="wrap_content"
             android:text="@string/resume_danmaku" />
         
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send_danmaku" />
+        
     </LinearLayout>
 
 </FrameLayout>

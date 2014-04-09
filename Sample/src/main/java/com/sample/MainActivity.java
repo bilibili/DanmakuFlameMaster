@@ -3,6 +3,7 @@ package com.sample;
 
 import java.io.InputStream;
 import android.app.Activity;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,9 +17,11 @@ import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
@@ -44,6 +47,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Button mBtnPauseDanmaku;
 
     private Button mBtnResumeDanmaku;
+
+    private Button mBtnSendDanmaku;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +79,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mBtnShowDanmaku = (Button) findViewById(R.id.btn_show);
         mBtnPauseDanmaku = (Button) findViewById(R.id.btn_pause);
         mBtnResumeDanmaku = (Button) findViewById(R.id.btn_resume);
+        mBtnSendDanmaku = (Button) findViewById(R.id.btn_send);
         mBtnHideDanmaku.setOnClickListener(this);
         mMediaController.setOnClickListener(this);
         mBtnShowDanmaku.setOnClickListener(this);
         mBtnPauseDanmaku.setOnClickListener(this);
         mBtnResumeDanmaku.setOnClickListener(this);
+        mBtnSendDanmaku.setOnClickListener(this);
 
         // VideoView
         mVideoView = (VideoView) findViewById(R.id.videoview);
@@ -154,6 +161,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
             mDanmakuView.pause();
         } else if (v == mBtnResumeDanmaku) {
             mDanmakuView.resume();
+        } else if (v == mBtnSendDanmaku) {
+            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mDanmakuView.getWidth());
+            danmaku.text = "这是一条弹幕";
+            danmaku.time = mParser.getTimer().currMillisecond + 100;
+            danmaku.textColor = Color.RED;
+            danmaku.textShadowColor = Color.WHITE;
+            danmaku.underlineColor = Color.GREEN;
+            mDanmakuView.addDanmaku(danmaku);
         }
     }
 

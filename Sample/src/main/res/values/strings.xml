@@ -10,6 +10,7 @@
     <string name="show_danmaku">show</string>
     <string name="pause_danmaku">pause</string>
     <string name="resume_danmaku">resume</string>
+    <string name="send_danmaku">发送一条弹幕</string>
 
     <string name="release">release</string>
 </resources>
