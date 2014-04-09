@@ -73,8 +73,8 @@ public class L2RDanmaku extends R2LDanmaku {
                 / (float) averageRenderingTime;
         float stepX = (displayer.getWidth() - (this.x + paintWidth)) / layoutCount;
 
-        if (stepX < mStepX * displayer.getAverageRenderingTime()) {
-            stepX = mStepX * displayer.getAverageRenderingTime();
+        if (stepX < mStepX * 16) {
+            stepX = mStepX * 16;
         }
 
         return this.x + stepX;

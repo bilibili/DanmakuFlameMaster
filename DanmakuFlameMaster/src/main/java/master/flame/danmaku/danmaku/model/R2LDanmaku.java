@@ -69,10 +69,10 @@ public class R2LDanmaku extends BaseDanmaku {
                 / (float) averageRenderingTime;
         float stepX = (this.x + paintWidth) / layoutCount;
 
-        if (stepX < mStepX * averageRenderingTime) {
-            stepX = mStepX * averageRenderingTime;
+        if (stepX < mStepX * 16) {
+            stepX = mStepX * 16;
         }
-
+        
         return this.x - stepX;
     }
 
