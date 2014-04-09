@@ -268,18 +268,17 @@ public class DrawHandler extends Handler {
     public void draw(Canvas canvas) {
         if (drawTask == null)
             return;
-        mDisp.setAverageRenderingTime((Math.max(8, getAverageRenderingTime()) / 8) * 8);
+        mDisp.setAverageRenderingTime((Math.max(16, getAverageRenderingTime()) / 8) * 8);
         mDisp.setExtraData(canvas);
         drawTask.draw(mDisp);
         recordRenderingTime();
     }
     
     private long getAverageRenderingTime() {
-        long lastTime = System.currentTimeMillis();
         int frames = mDrawTimes.size();
         if(frames <= 0)
             return 0;
-        long dtime = lastTime - mDrawTimes.getFirst();
+        long dtime = mDrawTimes.getLast() - mDrawTimes.getFirst();
         return dtime / frames;
     }
 
