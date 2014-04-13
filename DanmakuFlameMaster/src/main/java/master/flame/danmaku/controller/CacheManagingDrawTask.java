@@ -464,7 +464,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         evictAllNotInScreen(true);
                         reset();
                         mCacheTimer.update(mTimer.currMillisecond);
-                        requestCanvasClear();
+                        requestClear();
                         break;
                 }
             }
@@ -714,7 +714,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 return;
             }
             if (tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
-                requestCanvasClear();
+                requestClear();
                 return;
             }
             if (tag.isVisibilityRelatedTag()) {
@@ -727,7 +727,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
                     }
                 }
-                requestCanvasClear();
+                requestClear();
                 return;
             }
             if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {

@@ -35,6 +35,8 @@ public interface IDrawTask {
     public void quit();
 
     public void prepare();
+    
+    public void requestClear();
 
     public void setParser(BaseDanmakuParser parser);
 
