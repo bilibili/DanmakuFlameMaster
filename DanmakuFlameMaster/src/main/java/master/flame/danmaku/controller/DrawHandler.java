@@ -40,6 +40,10 @@ public class DrawHandler extends Handler {
     private static final int QUIT = 6;
 
     private static final int PAUSE = 7;
+    
+    private static final int SHOW_DANMAKUS = 8;
+    
+    private static final int HIDE_DANMAKUS = 9;
 
     private long pausedPostion = 0;
 
@@ -170,6 +174,13 @@ public class DrawHandler extends Handler {
                 }
                 sendEmptyMessage(UPDATE);
                 break;
+            case SHOW_DANMAKUS:
+                break;
+            case HIDE_DANMAKUS:
+                mDanmakusVisible = false;
+                if(mDanmakuView!=null)
+                    mDanmakuView.clear();
+                break;
             case PAUSE:
             case QUIT:
                 removeCallbacksAndMessages(null);
@@ -252,15 +263,14 @@ public class DrawHandler extends Handler {
     }
 
     public void showDanmakus() {
+        removeMessages(HIDE_DANMAKUS);
         if (drawTask != null)
             drawTask.requestClear();
         mDanmakusVisible = true;
     }
 
     public void hideDanmakus() {
-        mDanmakusVisible = false;
-        if (drawTask != null)
-            drawTask.requestClear();
+        sendEmptyMessage(HIDE_DANMAKUS);
     }
 
     public boolean getVisibility() {

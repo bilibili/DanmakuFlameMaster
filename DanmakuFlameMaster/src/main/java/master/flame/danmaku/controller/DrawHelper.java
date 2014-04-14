@@ -51,6 +51,10 @@ public class DrawHelper {
         RECT.set(0, 0, canvas.getWidth(), canvas.getHeight());
         clearCanvas(canvas, RECT);
     }
+    
+    public static void fillTransparent(Canvas canvas){
+        canvas.drawColor(0x00000000, PorterDuff.Mode.CLEAR);
+    }
 
     public static void clearCanvas(Canvas canvas, int left, int top, int right, int bottom) {
         RECT.set(left, top, right, bottom);
