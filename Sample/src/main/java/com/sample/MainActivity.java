@@ -84,7 +84,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // VideoView
         mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
-        mDanmakuView = (DanmakuTextureView) findViewById(R.id.sv_danmaku);
+        mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
