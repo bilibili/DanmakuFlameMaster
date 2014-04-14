@@ -12,6 +12,7 @@ import android.widget.PopupWindow;
 import android.widget.VideoView;
 
 import master.flame.danmaku.controller.DrawHandler.Callback;
+import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
@@ -21,12 +22,13 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
+import master.flame.danmaku.ui.widget.DanmakuTextureView;
 
 import com.sample.R;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    private DanmakuSurfaceView mDanmakuView;
+    private IDanmakuView mDanmakuView;
 
     private VideoView mVideoView;
 
@@ -82,7 +84,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // VideoView
         mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
-        mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
+        mDanmakuView = (DanmakuTextureView) findViewById(R.id.sv_danmaku);
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
@@ -102,7 +104,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
-            mDanmakuView.setOnClickListener(new View.OnClickListener() {
+            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
