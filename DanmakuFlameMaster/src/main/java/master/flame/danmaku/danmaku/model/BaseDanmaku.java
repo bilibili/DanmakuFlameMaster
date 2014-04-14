@@ -81,6 +81,16 @@ public abstract class BaseDanmaku {
      */
     public float textSize = -1;
 
+    public boolean hasStroke = false;
+    
+    public boolean hasShadow = false;
+    
+    /**
+     * 框的颜色,0表示无框
+     */
+    public int frameColor = 0;
+    
+    public int padding = 0;
     /**
      * 占位宽度
      */

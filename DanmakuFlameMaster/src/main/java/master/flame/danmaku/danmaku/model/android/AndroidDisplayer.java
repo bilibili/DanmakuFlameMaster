@@ -60,23 +60,29 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private static Paint UNDERLINE_PAINT;
     
+    private static Paint FRAME_PAINT;
     /**
      * 下划线高度
      */
     public static int UNDERLINE_HEIGHT = 4;
+    
+    /**
+     * 边框厚度
+     */
+    public static final int FRAME_THICKNESS = 4;
     
 
     /**
      * 开启阴影，可动态改变
      */
     public static boolean CONFIG_HAS_SHADOW = false;
-    private static boolean HAS_SHADOW = CONFIG_HAS_SHADOW;
+//    private static boolean HAS_SHADOW = CONFIG_HAS_SHADOW;
 
     /**
      * 开启描边，可动态改变
      */
     public static boolean CONFIG_HAS_STROKE = true;
-    private static boolean HAS_STROKE = CONFIG_HAS_STROKE;
+//    private static boolean HAS_STROKE = CONFIG_HAS_STROKE;
 
     /**
      * 开启抗锯齿，可动态改变
@@ -92,6 +98,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         UNDERLINE_PAINT = new Paint();
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
         UNDERLINE_PAINT.setStyle(Style.STROKE);
+        FRAME_PAINT = new Paint();
+        FRAME_PAINT.setStyle(Style.STROKE);
+        FRAME_PAINT.setStrokeWidth(4f);
     }
     
     public static void setTypeFace(Typeface font){
@@ -230,10 +239,15 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         return count;
     }
 
-    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
+    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float _left, float _top,
                                    boolean quick) {
-        HAS_STROKE = CONFIG_HAS_STROKE;
-        HAS_SHADOW = CONFIG_HAS_SHADOW;
+        boolean hasStroke = danmaku.hasStroke;
+        int left = (int)danmaku.getLeft() + danmaku.padding;
+        int top = (int)danmaku.getTop() + danmaku.padding;
+        if (danmaku.frameColor != 0) {
+            left += FRAME_THICKNESS;
+            top += FRAME_THICKNESS;
+        }
         if (quick) {
             ANTI_ALIAS = false;
         } else {
@@ -243,7 +257,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         if (danmaku.lines != null) {
             String[] lines = danmaku.lines;
             if (lines.length == 1) {
-                if (HAS_STROKE){
+                if (hasStroke){
                     applyPaintConfig(danmaku, paint, true);
                     canvas.drawText(lines[0], left, top - paint.ascent(), paint);
                 }
@@ -255,7 +269,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                     if (lines[t] == null || lines[t].length() == 0) {
                         continue;
                     }
-                    if (HAS_STROKE){
+                    if (hasStroke){
                         applyPaintConfig(danmaku, paint, true);
                         canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
                     }
@@ -264,7 +278,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                 }
             }
         } else {
-            if (HAS_STROKE){                
+            if (hasStroke){                
                 applyPaintConfig(danmaku, paint, true);
                 canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
             }
@@ -278,9 +292,21 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             float bottom = top + danmaku.paintHeight - UNDERLINE_HEIGHT;
             canvas.drawLine(left, bottom, left + danmaku.paintWidth, bottom, linePaint);
         }
+        
+        //draw frame
+        if (danmaku.frameColor != 0) {
+            Paint framePaint = getFramePaint(danmaku);
+            canvas.drawRect(danmaku.getLeft(), danmaku.getTop(), 
+                    danmaku.getLeft() + danmaku.paintWidth, danmaku.getTop() + danmaku.paintHeight, framePaint);
+        }
 
     }
 
+    public static Paint getFramePaint(BaseDanmaku danmaku) {
+        FRAME_PAINT.setColor(danmaku.frameColor);
+        return FRAME_PAINT;
+    }
+    
     public static Paint getUnderlinePaint(BaseDanmaku danmaku){
         UNDERLINE_PAINT.setColor(danmaku.underlineColor);
         return UNDERLINE_PAINT;
@@ -288,7 +314,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     
     private static TextPaint getPaint(BaseDanmaku danmaku, boolean quick) {
         TextPaint paint = null;
-        if (quick && HAS_SHADOW) {
+        if (quick && danmaku.hasShadow) {
             paint = PAINT_DUPLICATE;
             paint.set(PAINT);
         } else {
@@ -296,7 +322,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         }
         paint.setTextSize(danmaku.textSize);
         applyTextScaleConfig(danmaku, paint);
-        if (HAS_SHADOW) {
+        if (danmaku.hasShadow) {
             paint.setShadowLayer(3.0f, 0, 0, danmaku.textShadowColor);
         } else {
             paint.clearShadowLayer();
@@ -351,11 +377,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
-        if (HAS_STROKE) {
+        if (danmaku.hasStroke) {
             applyPaintConfig(danmaku, paint, true);
         }
         calcPaintWH(danmaku, paint);
-        if (HAS_STROKE) {
+        if (danmaku.hasStroke) {
             applyPaintConfig(danmaku, paint, false);
         }
     } 
@@ -365,8 +391,12 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         Float textHeight = getTextHeight(paint);
         if (danmaku.lines == null) {
             w = danmaku.text == null ? 0 : paint.measureText(danmaku.text);
-            danmaku.paintWidth = w;
-            danmaku.paintHeight = textHeight;
+            danmaku.paintWidth = w + 2 * danmaku.padding;
+            danmaku.paintHeight = textHeight + 2 * danmaku.padding;
+            if (danmaku.frameColor != 0) {
+                danmaku.paintWidth += 2 * FRAME_THICKNESS;
+                danmaku.paintHeight += 2 * FRAME_THICKNESS;
+            }
             return;
         }
 
@@ -377,8 +407,12 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             }
         }
 
-        danmaku.paintWidth = w;
-        danmaku.paintHeight = danmaku.lines.length * textHeight;
+        danmaku.paintWidth = w + 2 * danmaku.padding;
+        danmaku.paintHeight = danmaku.lines.length * textHeight + 2 * danmaku.padding;
+        if (danmaku.frameColor != 0) {
+            danmaku.paintWidth += 2 * FRAME_THICKNESS;
+            danmaku.paintHeight += 2 * FRAME_THICKNESS;
+        }
     }
 
     private static Float getTextHeight(TextPaint paint) {
