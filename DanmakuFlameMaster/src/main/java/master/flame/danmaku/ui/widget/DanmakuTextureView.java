@@ -255,7 +255,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public void pause() {
         if (handler != null)
-            handler.quit();
+            handler.pause();
     }
 
     @Override
