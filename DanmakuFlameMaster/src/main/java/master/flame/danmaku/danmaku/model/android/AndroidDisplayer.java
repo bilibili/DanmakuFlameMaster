@@ -239,11 +239,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         return count;
     }
 
-    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float _left, float _top,
+    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
                                    boolean quick) {
+        float _left = left;
+        float _top = top;
         boolean hasStroke = danmaku.hasStroke;
-        int left = (int)danmaku.getLeft() + danmaku.padding;
-        int top = (int)danmaku.getTop() + danmaku.padding;
+        left += danmaku.padding;
+        top += danmaku.padding;
         if (danmaku.frameColor != 0) {
             left += FRAME_THICKNESS;
             top += FRAME_THICKNESS;
@@ -289,15 +291,15 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         // draw underline
         if (danmaku.underlineColor != 0) {
             Paint linePaint = getUnderlinePaint(danmaku);
-            float bottom = top + danmaku.paintHeight - UNDERLINE_HEIGHT;
-            canvas.drawLine(left, bottom, left + danmaku.paintWidth, bottom, linePaint);
+            float bottom = _top + danmaku.paintHeight - UNDERLINE_HEIGHT;
+            canvas.drawLine(_left, bottom, _left + danmaku.paintWidth, bottom, linePaint);
         }
         
         //draw frame
         if (danmaku.frameColor != 0) {
             Paint framePaint = getFramePaint(danmaku);
-            canvas.drawRect(danmaku.getLeft(), danmaku.getTop(), 
-                    danmaku.getLeft() + danmaku.paintWidth, danmaku.getTop() + danmaku.paintHeight, framePaint);
+            canvas.drawRect(_left, _top, _left + danmaku.paintWidth, _top + danmaku.paintHeight,
+                    framePaint);
         }
 
     }
