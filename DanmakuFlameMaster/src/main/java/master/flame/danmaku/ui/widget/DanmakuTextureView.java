@@ -119,7 +119,8 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         isSurfaceCreated = false;
-        return false;
+        release();
+        return true;
     }
 
     @Override
@@ -255,7 +256,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public void pause() {
         if (handler != null)
-            handler.quit();
+            handler.pause();
     }
 
     @Override
@@ -341,12 +342,13 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     public void clear() {
         if (!isViewReady()) {
             return;
-        }
+        }        
         Canvas canvas = lockCanvas();
         if (canvas != null) {
             DrawHelper.clearCanvas(canvas);
             unlockCanvasAndPost(canvas);
         }
+
     }
 
     @Override

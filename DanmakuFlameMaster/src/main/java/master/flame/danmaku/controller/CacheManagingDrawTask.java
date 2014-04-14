@@ -17,7 +17,6 @@
 package master.flame.danmaku.controller;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -25,6 +24,7 @@ import android.os.Message;
 import java.util.Iterator;
 import java.util.Set;
 
+import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
@@ -52,9 +52,9 @@ public class CacheManagingDrawTask extends DrawTask {
 
     private Object mDrawingNotify = new Object();
 
-    public CacheManagingDrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
-                                 TaskListener taskListener, int maxCacheSize) {
-        super(timer, context, dispW, dispH, taskListener);
+    public CacheManagingDrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
+            TaskListener taskListener, int maxCacheSize) {
+        super(timer, context, disp, taskListener);
         mMaxCacheSize = maxCacheSize;
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
     }
@@ -74,9 +74,9 @@ public class CacheManagingDrawTask extends DrawTask {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(AbsDisplayer<?> displayer) {
         synchronized (danmakuList) {
-            super.draw(canvas);
+            super.draw(displayer);
         }
         synchronized(mDrawingNotify){
             mDrawingNotify.notify();
@@ -464,7 +464,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         evictAllNotInScreen(true);
                         reset();
                         mCacheTimer.update(mTimer.currMillisecond);
-                        requestCanvasClear();
+                        requestClear();
                         break;
                 }
             }
@@ -714,7 +714,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 return;
             }
             if (tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
-                requestCanvasClear();
+                requestClear();
                 return;
             }
             if (tag.isVisibilityRelatedTag()) {
@@ -727,7 +727,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
                     }
                 }
-                requestCanvasClear();
+                requestClear();
                 return;
             }
             if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {

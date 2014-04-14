@@ -18,14 +18,12 @@ package master.flame.danmaku.controller;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.util.DisplayMetrics;
 
+import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
-import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
@@ -35,7 +33,7 @@ import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 public class DrawTask implements IDrawTask {
 
-    protected AndroidDisplayer mDisp;
+    protected AbsDisplayer<?> mDisp;
 
     protected Danmakus danmakuList;
 
@@ -57,20 +55,13 @@ public class DrawTask implements IDrawTask {
 
     private long mStartRenderTime = 0;
 
-    public DrawTask(DanmakuTimer timer, Context context, int dispW, int dispH,
+    public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
         mTaskListener = taskListener;
         mCounter = new AndroidCounter();
         mContext = context;
         mRenderer = new DanmakuRenderer();
-        mDisp = new AndroidDisplayer();
-        mDisp.width = dispW;
-        mDisp.height = dispH;
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        mDisp.density = displayMetrics.density;
-        mDisp.densityDpi = displayMetrics.densityDpi;
-        mDisp.scaledDensity = displayMetrics.scaledDensity;
-        mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+        mDisp = disp;
         initTimer(timer);
     }
 
@@ -90,8 +81,8 @@ public class DrawTask implements IDrawTask {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        drawDanmakus(canvas, mTimer);
+    public void draw(AbsDisplayer<?> displayer) {
+        drawDanmakus(displayer,mTimer);
     }
 
     @Override
@@ -105,7 +96,7 @@ public class DrawTask implements IDrawTask {
     @Override
     public void seek(long mills) {
         reset();
-        requestCanvasClear();
+        requestClear();
         GlobalFlagValues.updateVisibleFlag();
         mStartRenderTime = mills < 1000 ? 0 : mills;
     }
@@ -138,29 +129,28 @@ public class DrawTask implements IDrawTask {
         mParser = parser;
     }
 
-    protected void drawDanmakus(Canvas canvas, DanmakuTimer timer) {
+    protected void drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
         if (danmakuList != null) {
+            Canvas canvas = (Canvas) disp.getExtraData();
             if (clearFlag > 0) {
                 DrawHelper.clearCanvas(canvas);
                 clearFlag--;
             } else {
                 int[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
-                DrawHelper.clearCanvas(canvas, Math.max(0, refreshRect[0] - mDisp.slopPixel),
-                        Math.max(0, refreshRect[1] - mDisp.slopPixel),
-                        Math.min(canvas.getWidth(), refreshRect[2] + mDisp.slopPixel),
-                        Math.min(canvas.getHeight(), refreshRect[3] + mDisp.slopPixel));
+                DrawHelper.clearCanvas(canvas, Math.max(0, refreshRect[0]),
+                        Math.max(0, refreshRect[1]), Math.min(canvas.getWidth(), refreshRect[2]),
+                        Math.min(canvas.getHeight(), refreshRect[3]));
             }
             long currMills = timer.currMillisecond;
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION - 100,
                     currMills);
             if (danmakus != null) {
-                mDisp.update(canvas);
                 mRenderer.draw(mDisp, danmakus, mStartRenderTime);
             }
         }
     }
     
-    protected void requestCanvasClear(){
+    public void requestClear(){
         clearFlag = 5;
     }
 

@@ -16,8 +16,7 @@
 
 package master.flame.danmaku.controller;
 
-import android.graphics.Canvas;
-
+import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
@@ -25,7 +24,7 @@ public interface IDrawTask {
 
     public void addDanmaku(BaseDanmaku item);
 
-    public void draw(Canvas canvas);
+    public void draw(AbsDisplayer<?> displayer);
 
     public void reset();
 
@@ -36,6 +35,8 @@ public interface IDrawTask {
     public void quit();
 
     public void prepare();
+    
+    public void requestClear();
 
     public void setParser(BaseDanmakuParser parser);
 

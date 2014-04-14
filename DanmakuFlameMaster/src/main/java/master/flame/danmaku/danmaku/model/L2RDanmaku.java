@@ -16,14 +16,65 @@
 
 package master.flame.danmaku.danmaku.model;
 
+
 public class L2RDanmaku extends R2LDanmaku {
 
     public L2RDanmaku(Duration duration) {
         super(duration); 
     }
-
+    
     @Override
-    protected float getLeft(IDisplayer displayer, long currTime) {
+    public void layout(IDisplayer displayer, float x, float y) {
+        if (mTimer != null) {
+            long currMS = mTimer.currMillisecond;
+            long deltaDuration = currMS - time;
+            if (deltaDuration > 0 && deltaDuration < duration.value) {
+                this.x = getAccurateLeft(displayer, currMS);
+                if (!this.isShown()) {
+                    this.y = y;
+                    this.setVisibility(true);
+                }
+                return;
+            }
+            this.setVisibility(false);
+        }
+        this.x = -paintWidth;
+    }
+    
+    @Override
+    public float[] getRectAtTime(IDisplayer displayer, long time) {
+        if (!isMeasured())
+            return null;
+        float left = getAccurateLeft(displayer, time);
+        if (RECT == null) {
+            RECT = new float[4];
+        }
+        RECT[0] = left;
+        RECT[1] = y;
+        RECT[2] = left + paintWidth;
+        RECT[3] = y + paintHeight;
+        return RECT;
+    }
+    
+    protected float getStableLeft(IDisplayer displayer, long currTime) {
+        long elapsedTime = currTime - time;
+        if (elapsedTime >= duration.value || this.x <= -paintWidth) {
+            return -paintWidth;
+        }
+
+        long averageRenderingTime = displayer.getAverageRenderingTime();
+        float layoutCount = (duration.value - elapsedTime)
+                / (float) averageRenderingTime;
+        float stepX = (displayer.getWidth() - (this.x + paintWidth)) / layoutCount;
+
+        if (stepX < mStepX * 16) {
+            stepX = mStepX * 16;
+        }
+
+        return this.x + stepX;
+    }
+
+    protected float getAccurateLeft(IDisplayer displayer, long currTime) {
         long elapsedTime = currTime - time;
         if (elapsedTime >= duration.value) {
             return displayer.getWidth();
@@ -54,6 +105,12 @@ public class L2RDanmaku extends R2LDanmaku {
     @Override
     public int getType() {
         return TYPE_SCROLL_LR;
+    }
+    
+    @Override
+    public void measure(IDisplayer displayer) {
+        super.measure(displayer);
+        this.x = -paintWidth;
     }
 
 }

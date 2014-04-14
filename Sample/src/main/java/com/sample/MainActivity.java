@@ -3,28 +3,34 @@ package com.sample;
 
 import java.io.InputStream;
 import android.app.Activity;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.*;
+import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.VideoView;
 
 import master.flame.danmaku.controller.DrawHandler.Callback;
+import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 
 import com.sample.R;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
-    private DanmakuSurfaceView mDanmakuView;
+    private IDanmakuView mDanmakuView;
 
     private VideoView mVideoView;
 
@@ -32,108 +38,102 @@ public class MainActivity extends Activity {
 
     public PopupWindow mPopupWindow;
 
+    private Button mBtnHideDanmaku;
+
+    private Button mBtnShowDanmaku;
+
+    private BaseDanmakuParser mParser;
+
+    private Button mBtnPauseDanmaku;
+
+    private Button mBtnResumeDanmaku;
+
+    private Button mBtnSendDanmaku;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViews();
     }
-    
-	private BaseDanmakuParser createParser(InputStream stream) {
-		ILoader loader = DanmakuLoaderFactory
-				.create(DanmakuLoaderFactory.TAG_BILI);
 
-		try {
-			loader.load(stream);
-		} catch (IllegalDataException e) {
-			e.printStackTrace();
-		}
-		BaseDanmakuParser parser = new BiliDanmukuParser();
-		IDataSource<?> dataSource = loader.getDataSource();
-		parser.load(dataSource);
-		return parser;
+    private BaseDanmakuParser createParser(InputStream stream) {
+        ILoader loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
 
-	}
+        try {
+            loader.load(stream);
+        } catch (IllegalDataException e) {
+            e.printStackTrace();
+        }
+        BaseDanmakuParser parser = new BiliDanmukuParser();
+        IDataSource<?> dataSource = loader.getDataSource();
+        parser.load(dataSource);
+        return parser;
+
+    }
 
     private void findViews() {
-        LayoutInflater mLayoutInflater = getLayoutInflater();
-        mMediaController = mLayoutInflater.inflate(R.layout.media_controller, null);
-        mMediaController.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mPopupWindow != null) {
-                    mPopupWindow.dismiss();
-                }
 
-                if (mVideoView != null) {
-                    mVideoView.start();
-                }
-            }
-        });
+        mMediaController = findViewById(R.id.media_controller);
+        mBtnHideDanmaku = (Button) findViewById(R.id.btn_hide);
+        mBtnShowDanmaku = (Button) findViewById(R.id.btn_show);
+        mBtnPauseDanmaku = (Button) findViewById(R.id.btn_pause);
+        mBtnResumeDanmaku = (Button) findViewById(R.id.btn_resume);
+        mBtnSendDanmaku = (Button) findViewById(R.id.btn_send);
+        mBtnHideDanmaku.setOnClickListener(this);
+        mMediaController.setOnClickListener(this);
+        mBtnShowDanmaku.setOnClickListener(this);
+        mBtnPauseDanmaku.setOnClickListener(this);
+        mBtnResumeDanmaku.setOnClickListener(this);
+        mBtnSendDanmaku.setOnClickListener(this);
 
         // VideoView
         mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
         if (mDanmakuView != null) {
-			BaseDanmakuParser parser = createParser(this.getResources()
-					.openRawResource(R.raw.comments));
-			mDanmakuView.setCallback(new Callback() {
-                
+            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
+            mDanmakuView.setCallback(new Callback() {
+
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
-                                        
+
                 }
-                
+
                 @Override
                 public void prepared() {
                     mDanmakuView.start();
                 }
             });
-			mDanmakuView.prepare(parser);
+            mDanmakuView.prepare(mParser);
 
             mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
-            mDanmakuView.setOnClickListener(new View.OnClickListener() {
+            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
-                    if (mPopupWindow == null) {
-                        mPopupWindow = new PopupWindow(mMediaController,
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.MATCH_PARENT);
-                    }
-
-                    if (mPopupWindow.isShowing()) {
-                        mPopupWindow.dismiss();
-                    } else{
-                        mPopupWindow.showAtLocation(mDanmakuView, Gravity.NO_GRAVITY, 0, 0);
-                    }
-
-                    if (mVideoView != null) {
-                        mVideoView.pause();
-                    }
+                    mMediaController.setVisibility(View.VISIBLE);
                 }
             });
         }
 
-
         if (mVideoView != null) {
-        	 mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                 @Override
-                 public void onPrepared(MediaPlayer mediaPlayer) {
-                     mediaPlayer.start();
-                 }
-             });
+            mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    mediaPlayer.start();
+                }
+            });
             mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
         }
-
 
     }
 
     @Override
     protected void onDestroy() {
-        if(mDanmakuView!=null){
+        if (mDanmakuView != null) {
             // dont forget release!
             mDanmakuView.release();
         }
@@ -144,6 +144,32 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == mMediaController) {
+            mMediaController.setVisibility(View.GONE);
+        }
+        if (mDanmakuView == null || !mDanmakuView.isPrepared())
+            return;
+        if (v == mBtnHideDanmaku) {
+            mDanmakuView.hide();
+        } else if (v == mBtnShowDanmaku) {
+            mDanmakuView.show(); // sync to the video time in your practice
+        } else if (v == mBtnPauseDanmaku) {
+            mDanmakuView.pause();
+        } else if (v == mBtnResumeDanmaku) {
+            mDanmakuView.resume();
+        } else if (v == mBtnSendDanmaku) {
+            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mDanmakuView.getWidth());
+            danmaku.text = "这是一条弹幕";
+            danmaku.time = mParser.getTimer().currMillisecond + 100;
+            danmaku.textColor = Color.RED;
+            danmaku.textShadowColor = Color.WHITE;
+            danmaku.underlineColor = Color.GREEN;
+            mDanmakuView.addDanmaku(danmaku);
+        }
     }
 
 }
