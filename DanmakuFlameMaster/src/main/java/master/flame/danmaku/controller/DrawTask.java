@@ -137,11 +137,9 @@ public class DrawTask implements IDrawTask {
                 clearFlag--;
             } else {
                 int[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
-                final int slopPixel = mDisp.getSlopPixel();
-                DrawHelper.clearCanvas(canvas, Math.max(0, refreshRect[0] - slopPixel),
-                        Math.max(0, refreshRect[1] - slopPixel),
-                        Math.min(canvas.getWidth(), refreshRect[2] + slopPixel),
-                        Math.min(canvas.getHeight(), refreshRect[3] + slopPixel));
+                DrawHelper.clearCanvas(canvas, Math.max(0, refreshRect[0]),
+                        Math.max(0, refreshRect[1]), Math.min(canvas.getWidth(), refreshRect[2]),
+                        Math.min(canvas.getHeight(), refreshRect[3]));
             }
             long currMills = timer.currMillisecond;
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION - 100,

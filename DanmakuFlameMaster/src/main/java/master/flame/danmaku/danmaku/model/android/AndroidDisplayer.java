@@ -41,10 +41,12 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private Matrix matrix = new Matrix();
     
-    private final static HashMap<Float,Float> TextHeightCache = new HashMap<Float,Float>(); // thread safe is not Necessary
+    private final static Map<Float,Float> sTextHeightCache = new HashMap<Float,Float>(); // thread safe is not Necessary
+    
+    private final static Map<Float,Integer> sSlopPixelCache = new HashMap<Float,Integer>();
     
     private static float sLastScaleTextSize;
-    private static Map<Float,Float> cachedScaleSize = new HashMap<Float, Float>(10);
+    private final static Map<Float,Float> sCachedScaleSize = new HashMap<Float, Float>(10);
 
     @SuppressWarnings("unused")
     private int HIT_CACHE_COUNT = 0;
@@ -117,7 +119,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private float scaledDensity = 1;
 
-    private int slopPixel = 0;
+    private int mSlopPixel = 0;
     
     private long lastAverageRenderingTime = 16;
 
@@ -337,11 +339,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         if (!DanmakuGlobalConfig.DEFAULT.isTextScaled) {
             return;
         }
-        Float size = cachedScaleSize.get(danmaku.textSize);
+        Float size = sCachedScaleSize.get(danmaku.textSize);
         if (size == null || sLastScaleTextSize != DanmakuGlobalConfig.DEFAULT.scaleTextSize) {
             sLastScaleTextSize = DanmakuGlobalConfig.DEFAULT.scaleTextSize;
             size = Float.valueOf(danmaku.textSize * DanmakuGlobalConfig.DEFAULT.scaleTextSize);
-            cachedScaleSize.put(danmaku.textSize, size);
+            sCachedScaleSize.put(danmaku.textSize, size);
         }
         paint.setTextSize(size.floatValue());
     }
@@ -381,18 +383,18 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private static Float getTextHeight(TextPaint paint) {
         Float textSize = paint.getTextSize();
-        Float textHeight = TextHeightCache.get(textSize);
+        Float textHeight = sTextHeightCache.get(textSize);
         if(textHeight == null){
             Paint.FontMetrics fontMetrics = paint.getFontMetrics();
             textHeight = fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading;
-            TextHeightCache.put(textSize, textHeight);
+            sTextHeightCache.put(textSize, textHeight);
         }  
         return textHeight;
     }
     
     public static void clearTextHeightCache(){
-        TextHeightCache.clear();
-        cachedScaleSize.clear();
+        sTextHeightCache.clear();
+        sCachedScaleSize.clear();
     }
 
     @Override
@@ -402,16 +404,33 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     @Override
     public void resetSlopPixel(float factor) {
+        sSlopPixelCache.clear();
         float d = Math.max(density, scaledDensity);
         d = Math.max(factor, getWidth() / (float) DanmakuFactory.BILI_PLAYER_WIDTH); //correct for low density and high resolution
         float slop = d * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE; 
-        slopPixel = (int) slop;
+        mSlopPixel = (int) slop;
         if (factor > 1f)
-            slopPixel = (int) (slop * factor);
+            mSlopPixel = (int) (slop * factor);
     }
 
     @Override
     public int getSlopPixel() {
+        return mSlopPixel;
+    }
+    
+    @Override
+    public int getSlopPixel(BaseDanmaku danmaku) {
+        Integer slopPixel = sSlopPixelCache.get(danmaku.textSize);
+        if (slopPixel == null) {
+            if (danmaku.paintHeight > 0) {
+                int lineCount = (danmaku.lines == null || danmaku.lines.length == 0) ? 1
+                        : danmaku.lines.length;
+                slopPixel = (int) Math.ceil(danmaku.paintHeight / lineCount);
+                sSlopPixelCache.put(danmaku.textSize, slopPixel);
+            } else {
+                slopPixel = mSlopPixel;
+            }
+        }
         return slopPixel;
     }
 

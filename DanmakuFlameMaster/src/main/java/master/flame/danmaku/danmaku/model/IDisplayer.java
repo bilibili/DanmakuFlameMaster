@@ -33,6 +33,8 @@ public interface IDisplayer {
 
     public abstract int getSlopPixel();
     
+    public abstract int getSlopPixel(BaseDanmaku danmaku);
+    
     public abstract void measure(BaseDanmaku danmaku);
     
     public abstract long getAverageRenderingTime();
