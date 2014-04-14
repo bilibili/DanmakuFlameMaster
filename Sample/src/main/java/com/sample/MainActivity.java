@@ -22,7 +22,6 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
-import master.flame.danmaku.ui.widget.DanmakuTextureView;
 
 import com.sample.R;
 
