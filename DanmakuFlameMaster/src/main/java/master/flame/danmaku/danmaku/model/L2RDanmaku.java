@@ -29,13 +29,7 @@ public class L2RDanmaku extends R2LDanmaku {
             long currMS = mTimer.currMillisecond;
             long deltaDuration = currMS - time;
             if (deltaDuration > 0 && deltaDuration < duration.value) {
-                if (this.x <= -paintWidth
-                        && deltaDuration > 50
-                        || (Math.abs((this.x + paintWidth / (float) mDistance)
-                                - (deltaDuration / (float) duration.value)) > 0.5f)) {
-                    this.x = getAccurateLeft(displayer, currMS);
-                } else
-                    this.x = getStableLeft(displayer, currMS);
+                this.x = getAccurateLeft(displayer, currMS);
                 if (!this.isShown()) {
                     this.y = y;
                     this.setVisibility(true);
