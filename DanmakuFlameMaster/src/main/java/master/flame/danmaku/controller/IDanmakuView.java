@@ -79,5 +79,19 @@ public interface IDanmakuView {
     public void hide();
     
     public void clear();
+    
+    /**
+     * show the danmakuview again if you called hideAndPauseDrawTask()
+     * @param position The position you want to resume
+     * @see #hideAndPauseDrawTask
+     */
+    public void showAndResumeDrawTask(Long position);
+    
+    /**
+     * hide the danmakuview and pause the drawtask
+     * @return the paused position
+     * @see #showAndResumeDrawTask
+     */
+    public long hideAndPauseDrawTask();
 
 }

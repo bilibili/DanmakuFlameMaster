@@ -117,9 +117,8 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     }
 
     @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+    public synchronized boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         isSurfaceCreated = false;
-        release();
         return true;
     }
 
@@ -217,7 +216,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     }
 
     @Override
-    public long drawDanmakus() {
+    public synchronized long drawDanmakus() {
         if (!isSurfaceCreated)
             return 0;
         long stime = System.currentTimeMillis();
@@ -322,24 +321,39 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     @Override
     public void show() {
-        mDanmakuVisibile  = true; 
+        showAndResumeDrawTask(null);
+    }
+    
+    @Override
+    public void showAndResumeDrawTask(Long position) {
         if (handler == null) {
             return;
         }
-        handler.showDanmakus();
+        handler.showDanmakus(position);
+        mDanmakuVisibile = true;
     }
 
     @Override
     public void hide() {
-        mDanmakuVisibile = false;
         if (handler == null) {
             return;
         }
-        handler.hideDanmakus();
+        handler.hideDanmakus(false);
+        mDanmakuVisibile = false;
+    }
+    
+    @Override
+    public long hideAndPauseDrawTask() {
+        if (handler == null) {
+            return 0;
+        }
+        long position = handler.hideDanmakus(true);
+        mDanmakuVisibile = false;
+        return position;
     }
 
     @Override
-    public void clear() {
+    public synchronized void clear() {
         if (!isViewReady()) {
             return;
         }        
