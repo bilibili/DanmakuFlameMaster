@@ -21,7 +21,7 @@ public class R2LDanmaku extends BaseDanmaku {
 
     protected float x = 0;
 
-    protected float y = -1;
+    protected float y = 0;
 
     protected int mDistance;
 
@@ -88,8 +88,8 @@ public class R2LDanmaku extends BaseDanmaku {
         }
         RECT[0] = left;
         RECT[1] = y;
-        RECT[2] = left + paintWidth;
-        RECT[3] = y + paintHeight;
+        RECT[2] = left + paintWidth + 2 *padding;
+        RECT[3] = y + paintHeight + 2 * padding;
         return RECT;
     }
 
