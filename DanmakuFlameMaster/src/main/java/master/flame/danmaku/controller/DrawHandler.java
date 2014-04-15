@@ -176,7 +176,9 @@ public class DrawHandler extends Handler {
                 break;
             case SHOW_DANMAKUS:
                 Long start = (Long) msg.obj;
-                if (start != null && drawTask != null) {
+                if (start == null && drawTask != null) {
+                    drawTask.requestClear();
+                } else if (start != null && drawTask != null) {
                     drawTask.start();
                     drawTask.seek(start);
                     drawTask.requestClear();
