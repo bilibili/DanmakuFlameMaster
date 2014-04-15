@@ -49,6 +49,23 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 
 - jni代码优化
 
+#### Gradle
+  ```groovy
+    repositories {
+      // ... your code
+      
+      maven {
+        url 'http://maven.oschina.net/content/repositories/thirdparty/'
+      }
+    }
+
+    dependencies {
+      compile 'me.neavo:danmakuflamemaster:x.x.x@aar'
+    }
+  ```  
+
+### Version
+  * x.x.x = version, or set '+' for lastest
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
