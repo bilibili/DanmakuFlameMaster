@@ -169,6 +169,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mDanmakuView.getWidth());
             danmaku.text = "这是一条弹幕";
             danmaku.time = mParser.getTimer().currMillisecond + 100;
+            danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
             danmaku.textColor = Color.RED;
             danmaku.textShadowColor = Color.WHITE;
             danmaku.underlineColor = Color.GREEN;
