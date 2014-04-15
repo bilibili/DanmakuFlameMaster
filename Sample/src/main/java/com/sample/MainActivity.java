@@ -156,11 +156,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (mDanmakuView == null || !mDanmakuView.isPrepared())
             return;
         if (v == mBtnHideDanmaku) {
-            //mDanmakuView.hide();
-            mPausedPosition = mDanmakuView.hideAndPauseDrawTask();
+            mDanmakuView.hide();
+            //mPausedPosition = mDanmakuView.hideAndPauseDrawTask();
         } else if (v == mBtnShowDanmaku) {
-            //mDanmakuView.show(); // sync to the video time in your practice
-            mDanmakuView.showAndResumeDrawTask(mPausedPosition);
+            mDanmakuView.show(); 
+            //mDanmakuView.showAndResumeDrawTask(mPausedPosition); // sync to the video time in your practice
         } else if (v == mBtnPauseDanmaku) {
             mDanmakuView.pause();
         } else if (v == mBtnResumeDanmaku) {
