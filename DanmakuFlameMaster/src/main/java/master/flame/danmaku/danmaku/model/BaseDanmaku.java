@@ -80,6 +80,11 @@ public abstract class BaseDanmaku {
      * 字体大小
      */
     public float textSize = -1;
+    
+    /**
+     * 框的颜色,0表示无框
+     */
+    public int borderColor = 0;
 
     /**
      * 占位宽度

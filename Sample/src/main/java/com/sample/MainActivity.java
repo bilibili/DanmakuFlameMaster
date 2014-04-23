@@ -106,9 +106,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setScrollSpeedFactor(1f);
+        //DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
         if (mDanmakuView != null) {
-            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
+            mParser = createParser(null);//this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
 
                 @Override
@@ -180,12 +180,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
             mDanmakuView.resume();
         } else if (v == mBtnSendDanmaku) {
             BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mDanmakuView.getWidth());
-            danmaku.text = "这是一条弹幕";
+            StringBuffer sb = new StringBuffer();
+            //for(int i=0;i<100;i++){
+                sb.append("这是一条弹幕");
+            //}
+            danmaku.text = sb.toString();
             danmaku.time = mParser.getTimer().currMillisecond + 100;
             danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
             danmaku.textColor = Color.RED;
             danmaku.textShadowColor = Color.WHITE;
-            danmaku.underlineColor = Color.GREEN;
+            //danmaku.underlineColor = Color.GREEN;
+            danmaku.borderColor = Color.GREEN;
             mDanmakuView.addDanmaku(danmaku);
         }
     }
