@@ -714,6 +714,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 return;
             }
             if (tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
+                mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
                 requestClear();
                 return;
             }

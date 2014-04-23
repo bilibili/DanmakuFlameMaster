@@ -422,14 +422,20 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     public int getSlopPixel(BaseDanmaku danmaku) {
         Integer slopPixel = sSlopPixelCache.get(danmaku.textSize);
         if (slopPixel == null) {
+            float f = (1 / DanmakuGlobalConfig.DEFAULT.scrollSpeedFactor);
+            f = Math.max(f, 1);
             if (danmaku.paintHeight > 0) {
                 int lineCount = (danmaku.lines == null || danmaku.lines.length == 0) ? 1
                         : danmaku.lines.length;
-                slopPixel = (int) Math.ceil(danmaku.paintHeight / lineCount);
+                slopPixel = (int) (f * (Math.ceil(danmaku.paintHeight / lineCount)));
                 sSlopPixelCache.put(danmaku.textSize, slopPixel);
             } else {
-                slopPixel = mSlopPixel;
+                slopPixel = (int) (mSlopPixel * f);
             }
+        }
+        int f = (int) (width > 0 ? danmaku.paintWidth / width : 1);
+        if (f >= 1) {
+            return slopPixel * f;
         }
         return slopPixel;
     }
