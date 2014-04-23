@@ -244,6 +244,8 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                                    boolean quick) {
         float _left = left;
         float _top = top;
+        left += danmaku.padding;
+        top += danmaku.padding;
         if (danmaku.borderColor != 0) {
             left += BORDER_WIDTH;
             top += BORDER_WIDTH;
@@ -394,12 +396,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         Float textHeight = getTextHeight(paint);
         if (danmaku.lines == null) {
             w = danmaku.text == null ? 0 : paint.measureText(danmaku.text);
-            danmaku.paintWidth = w;
-            danmaku.paintHeight = textHeight;
-            if (danmaku.borderColor != 0) {
-                danmaku.paintWidth += 2 * BORDER_WIDTH;
-                danmaku.paintHeight += 2 * BORDER_WIDTH;
-            }
+            setDanmakuPaintWidthAndHeight(danmaku,w,textHeight);
             return;
         }
 
@@ -410,15 +407,21 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             }
         }
 
-        danmaku.paintWidth = w;
-        danmaku.paintHeight = danmaku.lines.length * textHeight;
+        setDanmakuPaintWidthAndHeight(danmaku,w,danmaku.lines.length * textHeight);
+    }
+        
+    private void setDanmakuPaintWidthAndHeight(BaseDanmaku danmaku, float w, float h) {
+        float pw = w + 2 * danmaku.padding;
+        float ph = h + 2 * danmaku.padding;
         if (danmaku.borderColor != 0) {
-            danmaku.paintWidth += 2 * BORDER_WIDTH;
-            danmaku.paintHeight += 2 * BORDER_WIDTH;
+            pw += 2 * BORDER_WIDTH;
+            ph += 2 * BORDER_WIDTH;
         }
+        danmaku.paintWidth = pw;
+        danmaku.paintHeight = ph;
     }
 
-    private static Float getTextHeight(TextPaint paint) {
+    private static float getTextHeight(TextPaint paint) {
         Float textSize = paint.getTextSize();
         Float textHeight = sTextHeightCache.get(textSize);
         if(textHeight == null){

@@ -85,6 +85,11 @@ public abstract class BaseDanmaku {
      * 框的颜色,0表示无框
      */
     public int borderColor = 0;
+    
+    /**
+     * 内边距(像素)
+     */
+    public int padding = 0;
 
     /**
      * 占位宽度
