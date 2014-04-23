@@ -210,6 +210,10 @@ public class DrawHandler extends Handler {
                     }
                     if (this.getLooper() != Looper.getMainLooper())
                         this.getLooper().quit();
+                    
+                    if (mParser != null) {
+                        mParser.release();
+                    }
                 }
                 break;
         }

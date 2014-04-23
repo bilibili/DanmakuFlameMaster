@@ -68,11 +68,22 @@ public abstract class BaseDanmakuParser {
             return mDanmakus;
         DanmakuFactory.resetDurationsData();
         mDanmakus = parse();
+        releaseDataSource();
         if (mDanmakus != null)
             DanmakuFactory.updateMaxDanmakuDuration();
         return mDanmakus;
     }
+    
+    protected void releaseDataSource() {
+        if(mDataSource!=null)
+            mDataSource.release();
+        mDataSource = null;
+    }
 
     protected abstract Danmakus parse();
+
+    public void release() {
+        releaseDataSource();
+    }
 
 }
