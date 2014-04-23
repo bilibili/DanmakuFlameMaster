@@ -57,8 +57,8 @@ public class DanmakuRenderer extends Renderer {
             BaseDanmaku drawItem = itr.next();
 
             if (drawItem.time < startRenderTime
-                    || DanmakuFilters.getDefault().filter(drawItem, orderInScreen, sizeInScreen,
-                            mStartTimer)) {
+                    || (drawItem.priority == 0 && DanmakuFilters.getDefault().filter(drawItem,
+                            orderInScreen, sizeInScreen, mStartTimer))) {
                 continue;
             }
             

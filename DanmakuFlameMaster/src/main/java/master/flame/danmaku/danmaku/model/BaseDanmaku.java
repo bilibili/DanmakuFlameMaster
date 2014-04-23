@@ -90,6 +90,11 @@ public abstract class BaseDanmaku {
      * 内边距(像素)
      */
     public int padding = 0;
+    
+    /**
+     * 弹幕优先级,0为低优先级,>0为高优先级
+     */
+    public byte priority = 0;
 
     /**
      * 占位宽度
