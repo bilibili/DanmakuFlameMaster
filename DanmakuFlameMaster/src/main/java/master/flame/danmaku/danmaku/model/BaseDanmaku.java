@@ -80,6 +80,21 @@ public abstract class BaseDanmaku {
      * 字体大小
      */
     public float textSize = -1;
+    
+    /**
+     * 框的颜色,0表示无框
+     */
+    public int borderColor = 0;
+    
+    /**
+     * 内边距(像素)
+     */
+    public int padding = 0;
+    
+    /**
+     * 弹幕优先级,0为低优先级,>0为高优先级
+     */
+    public byte priority = 0;
 
     /**
      * 占位宽度

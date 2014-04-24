@@ -57,8 +57,8 @@ public class DanmakuRenderer extends Renderer {
             BaseDanmaku drawItem = itr.next();
 
             if (drawItem.time < startRenderTime
-                    || DanmakuFilters.getDefault().filter(drawItem, orderInScreen, sizeInScreen,
-                            mStartTimer)) {
+                    || (drawItem.priority == 0 && DanmakuFilters.getDefault().filter(drawItem,
+                            orderInScreen, sizeInScreen, mStartTimer))) {
                 continue;
             }
             
@@ -100,10 +100,10 @@ public class DanmakuRenderer extends Renderer {
             int dright = (int) (drawItem.getRight() + slopPixel);
             if (drawItem.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
                 dtop = (int) (disp.getHeight() - drawItem.paintHeight - drawItem.getTop());
-                dbottom = (int) (disp.getHeight() - drawItem.getTop());
+                dbottom = (int) Math.ceil(disp.getHeight() - drawItem.getTop());
             } else {
                 dtop = (int) (drawItem.getTop());
-                dbottom = (int) (drawItem.getBottom());
+                dbottom = (int) Math.ceil(drawItem.getBottom());
             }
             left = Math.min(dleft, left);
             top = Math.min(dtop, top);
