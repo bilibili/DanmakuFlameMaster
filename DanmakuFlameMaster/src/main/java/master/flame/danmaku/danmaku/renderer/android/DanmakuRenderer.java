@@ -99,7 +99,7 @@ public class DanmakuRenderer extends Renderer {
             int dleft = (int) (drawItem.getLeft() - slopPixel);
             int dright = (int) (drawItem.getRight() + slopPixel);
             if (drawItem.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
-                dtop = (int) (disp.getHeight() - drawItem.paintHeight);
+                dtop = (int) (disp.getHeight() - drawItem.paintHeight - drawItem.getTop());
                 dbottom = (int) (disp.getHeight() - drawItem.getTop());
             } else {
                 dtop = (int) (drawItem.getTop());
