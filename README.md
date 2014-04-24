@@ -14,7 +14,6 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 
 实际效果可安装以上app参看。
 
-
 ### Features
 
 - 使用SurfaceView高效绘制
@@ -51,16 +50,8 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 
 #### Gradle
   ```groovy
-    repositories {
-      // ... your code
-      
-      maven {
-        url 'http://maven.oschina.net/content/repositories/thirdparty/'
-      }
-    }
-
     dependencies {
-      compile 'me.neavo:danmakuflamemaster:x.x.x@aar'
+      compile 'me.neavo:danmakuflamemaster:x.x.x'
     }
   ```  
 
