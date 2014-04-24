@@ -106,9 +106,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
-        //DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
         if (mDanmakuView != null) {
-            mParser = createParser(null);//this.getResources().openRawResource(R.raw.comments));
+            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
 
                 @Override
@@ -179,7 +179,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         } else if (v == mBtnResumeDanmaku) {
             mDanmakuView.resume();
         } else if (v == mBtnSendDanmaku) {
-            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_FIX_BOTTOM, mDanmakuView.getWidth());
+            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mDanmakuView.getWidth());
             StringBuffer sb = new StringBuffer();
             //for(int i=0;i<100;i++){
                 sb.append("这是一条弹幕");
