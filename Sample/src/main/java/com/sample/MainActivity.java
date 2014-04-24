@@ -179,13 +179,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         } else if (v == mBtnResumeDanmaku) {
             mDanmakuView.resume();
         } else if (v == mBtnSendDanmaku) {
-            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mDanmakuView.getWidth());
+            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_FIX_BOTTOM, mDanmakuView.getWidth());
             StringBuffer sb = new StringBuffer();
-            for(int i=0;i<100;i++){
+            //for(int i=0;i<100;i++){
                 sb.append("这是一条弹幕");
-            }
+            //}
             danmaku.text = sb.toString();
             danmaku.padding = 5;
+            danmaku.priority = 1;
             danmaku.time = mParser.getTimer().currMillisecond + 100;
             danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
             danmaku.textColor = Color.RED;
