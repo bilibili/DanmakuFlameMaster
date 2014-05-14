@@ -11,6 +11,9 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 - AcFun视频民间版 https://play.google.com/store/apps/details?id=tv.ac.fun
 - AcFun视频官方版 https://play.google.com/store/apps/details?id=tv.acfundanmaku.video
 - 哔哩哔哩动画 https://play.google.com/store/apps/details?id=tv.danmaku.bili
+- 斗鱼直播客户端 http://www.douyu.tv/client
+- 猎豹浏览器 https://play.google.com/store/apps/details?id=com.ijinshan.browser
+- 小米电视/盒子视频弹幕
 
 实际效果可安装以上app参看。
 
