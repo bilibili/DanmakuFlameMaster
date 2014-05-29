@@ -197,7 +197,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             boolean cacheDrawn = false;
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
-                if (holder != null && holder.bitmap != null) {
+                if (holder != null && holder.bitmap != null && !holder.bitmap.isRecycled()) {
                     canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
                     cacheDrawn = true;
                 }
