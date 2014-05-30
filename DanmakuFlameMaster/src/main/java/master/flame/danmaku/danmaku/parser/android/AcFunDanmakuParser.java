@@ -20,13 +20,14 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
             JSONSource jsonSource = (JSONSource) mDataSource;
             return _parse(jsonSource.data());
         }
-        return null;
+        return new Danmakus();
     }
 
     private Danmakus _parse(JSONArray jsonArray) {
-        Danmakus danmakus = null;
-        if (jsonArray != null && jsonArray.length() > 0)
-            danmakus = new Danmakus();
+        Danmakus danmakus = new Danmakus();
+        if (jsonArray == null || jsonArray.length() == 0) {
+            return danmakus;
+        }
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject obj = jsonArray.getJSONObject(i);
@@ -41,7 +42,7 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                     long time = (long) (Float.parseFloat(values[0]) * 1000); // 出现时间
                     int color = Integer.parseInt(values[1]) | 0xFF000000; // 颜色
                     float textSize = Float.parseFloat(values[3]); // 字体大小
-                    BaseDanmaku item = DanmakuFactory.createDanmaku(type, mDispWidth/(mDispDensity - 0.6f));
+                    BaseDanmaku item = DanmakuFactory.createDanmaku(type, mDispWidth / (mDispDensity - 0.6f));
                     if (item != null) {
                         item.time = time;
                         item.textSize = textSize * (mDispDensity - 0.6f);
