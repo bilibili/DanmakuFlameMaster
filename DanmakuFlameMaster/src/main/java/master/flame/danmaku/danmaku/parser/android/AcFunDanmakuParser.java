@@ -55,7 +55,7 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                     }
                 }
 
-            } catch (JSONException e) {
+            } catch (Exception e) {
             }
         }
 
