@@ -204,35 +204,44 @@ public class Danmakus implements IDanmakus {
             setDatas(datas);
         }
         
-        public synchronized void reset(){
-            if(mData!=null || mSize > 0){
-                it = mData.iterator();
-            }else{
-                it = null;
+        public void reset(){
+            synchronized (this){
+                if(mData!=null || mSize > 0){
+                    it = mData.iterator();
+                }else{
+                    it = null;
+                }
             }
         }
 
-        public synchronized void setDatas(Set<BaseDanmaku> datas){
-            mData = datas;
-        }
-
-        @Override
-        public synchronized BaseDanmaku next() {
-            return it != null ? it.next() : null;
-        }
-
-        @Override
-        public synchronized boolean hasNext() {
-            return it != null && it.hasNext();
-        }
-
-        @Override
-        public synchronized void remove() {
-            if(it!=null){
-                it.remove();
+        public void setDatas(Set<BaseDanmaku> datas){
+            synchronized (this) {
+                mData = datas;
             }
         }
 
+        @Override
+        public BaseDanmaku next() {
+            synchronized (this) {
+                return it != null ? it.next() : null;
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            synchronized (this) {
+                return it != null && it.hasNext();
+            }
+        }
+
+        @Override
+        public void remove() {
+            synchronized (this) {
+                if (it != null) {
+                    it.remove();
+                }
+            }
+        }
     }
 
     private class TimeComparator implements Comparator<BaseDanmaku> {
