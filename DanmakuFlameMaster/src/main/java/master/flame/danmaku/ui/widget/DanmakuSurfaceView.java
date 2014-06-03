@@ -60,7 +60,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
 
     private boolean mDanmakuVisibile = true;
 
-    protected int mDrawingThreadType = THREAD_TYPE_NORMAL_PRIORITY;
+    protected int mDrawingThreadType = THREAD_TYPE_MAIN_THREAD;
 
     public DanmakuSurfaceView(Context context) {
         super(context);
