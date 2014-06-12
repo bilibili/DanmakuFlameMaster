@@ -69,10 +69,15 @@ public class DrawHandler extends Handler {
 
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
-        mDanmakusVisible = danmakuVisibile;
         if (timer == null) {
             timer = new DanmakuTimer();
         }
+        if(danmakuVisibile){
+            showDanmakus(null);
+        }else{
+            hideDanmakus(false);
+        }
+        mDanmakusVisible = danmakuVisibile;
         bindView(view);
     }
 

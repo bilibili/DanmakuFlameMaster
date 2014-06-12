@@ -335,29 +335,29 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     
     @Override
     public void showAndResumeDrawTask(Long position) {
+        mDanmakuVisibile = true;
         if (handler == null) {
             return;
         }
         handler.showDanmakus(position);
-        mDanmakuVisibile = true;
     }
 
     @Override
     public void hide() {
+        mDanmakuVisibile = false;
         if (handler == null) {
             return;
         }
         handler.hideDanmakus(false);
-        mDanmakuVisibile = false;
     }
     
     @Override
     public long hideAndPauseDrawTask() {
+        mDanmakuVisibile = false;
         if (handler == null) {
             return 0;
         }
         long position = handler.hideDanmakus(true);
-        mDanmakuVisibile = false;
         return position;
     }
 
