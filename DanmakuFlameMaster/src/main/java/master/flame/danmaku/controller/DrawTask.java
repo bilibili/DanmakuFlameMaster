@@ -19,12 +19,18 @@ package master.flame.danmaku.controller;
 import android.content.Context;
 import android.graphics.Canvas;
 
+import java.util.LinkedList;
+
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.model.objectpool.Pool;
+import master.flame.danmaku.danmaku.model.objectpool.Poolable;
+import master.flame.danmaku.danmaku.model.objectpool.PoolableManager;
+import master.flame.danmaku.danmaku.model.objectpool.Pools;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
@@ -32,6 +38,112 @@ import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 public class DrawTask implements IDrawTask {
+    
+    private static class RectPoolableCache implements Poolable<RectPoolableCache> {
+
+        private RectPoolableCache mNextElement;
+        private boolean mIsPooled;
+
+        public float[] mRect;
+
+        public RectPoolableCache(float[] rect) {
+            mRect = rect;
+        }
+
+        @Override
+        public void setNextPoolable(RectPoolableCache element) {
+            mNextElement = element;
+        }
+
+        @Override
+        public RectPoolableCache getNextPoolable() {
+            return mNextElement;
+        }
+
+        @Override
+        public boolean isPooled() {
+            return mIsPooled;
+        }
+
+        @Override
+        public void setPooled(boolean isPooled) {
+            mIsPooled = isPooled;
+        }
+
+        public void setRect(float[] rect) {
+            for (int j = 0; j < mRect.length; j++) {
+                mRect[j] = 0;
+            }
+            for (int i = 0; i < mRect.length && i < rect.length; i++) {
+                mRect[i] = rect[i];
+            }
+        }
+
+    }
+
+    public class RectCache {
+
+        private int mCapity;
+        private Pool<RectPoolableCache> mRectsCachePool;
+        private PoolableManager<RectPoolableCache> manager = new PoolableManager<DrawTask.RectPoolableCache>() {
+
+            @Override
+            public void onReleased(RectPoolableCache element) {
+
+            }
+
+            @Override
+            public void onAcquired(RectPoolableCache element) {
+
+            }
+
+            @Override
+            public RectPoolableCache newInstance() {
+                return null;
+            }
+        };
+        private LinkedList<RectPoolableCache> mRects = new LinkedList<RectPoolableCache>();
+        private float[] mRect = new float[4];
+
+        public RectCache(int capity) {
+            mCapity = capity;
+            mRectsCachePool = Pools.finitePool(manager, mCapity);
+            for (int i = 0; i < mCapity; i++) {
+                mRectsCachePool.release(new RectPoolableCache(new float[4]));
+            }
+        }
+
+        public void push(float[] rect) {
+            if (mRects.size() >= mCapity) {
+                RectPoolableCache rc = mRects.removeFirst();
+                mRectsCachePool.release(rc);
+            }
+            RectPoolableCache rc = mRectsCachePool.acquire();
+            if (rc != null) {
+                rc.setRect(rect);
+                mRects.add(rc);
+            }
+        }
+
+        private void resetRect() {
+            mRect[0] = Integer.MAX_VALUE;
+            mRect[1] = Integer.MAX_VALUE;
+            mRect[2] = Integer.MIN_VALUE;
+            mRect[3] = Integer.MIN_VALUE;
+        }
+
+        public float[] getRect() {
+            resetRect();
+            for (int i = 0; i < mRects.size(); i++) {
+                RectPoolableCache rc = mRects.get(i);
+                mRect[0] = Math.min(mRect[0], rc.mRect[0]);
+                mRect[1] = Math.min(mRect[1], rc.mRect[1]);
+                mRect[2] = Math.max(mRect[2], rc.mRect[2]);
+                mRect[3] = Math.max(mRect[3], rc.mRect[3]);
+            }
+            return mRect;
+        }
+    }
 
     protected AbsDisplayer<?> mDisp;
 
@@ -54,6 +166,8 @@ public class DrawTask implements IDrawTask {
     protected int clearFlag;
 
     private long mStartRenderTime = 0;
+    
+    RectCache mRectCache = new RectCache(3);
 
     public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
@@ -136,10 +250,11 @@ public class DrawTask implements IDrawTask {
                 DrawHelper.clearCanvas(canvas);
                 clearFlag--;
             } else {
-                int[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
-                DrawHelper.clearCanvas(canvas, Math.max(0, refreshRect[0]),
-                        Math.max(0, refreshRect[1]), Math.min(canvas.getWidth(), refreshRect[2]),
-                        Math.min(canvas.getHeight(), refreshRect[3]));
+                float[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
+                mRectCache.push(refreshRect);
+                float[] rect = mRectCache.getRect();
+                DrawHelper.clearCanvas(canvas, Math.max(0, rect[0]), Math.max(0, rect[1]),
+                        Math.min(disp.getWidth(), rect[2]), Math.min(disp.getHeight(), rect[3]));
             }
             long currMills = timer.currMillisecond;
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION - 100,
@@ -149,8 +264,8 @@ public class DrawTask implements IDrawTask {
             }
         }
     }
-    
-    public void requestClear(){
+
+    public void requestClear() {
         clearFlag = 5;
     }
 

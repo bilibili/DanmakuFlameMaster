@@ -23,7 +23,7 @@ public interface IRenderer {
 
     public class Area {
 
-        public final int[] mRefreshRect = new int[4];
+        public final float[] mRefreshRect = new float[4];
         private int mMaxHeight;
         private int mMaxWidth;
 
@@ -40,7 +40,7 @@ public interface IRenderer {
             set(0, 0, mMaxWidth, mMaxHeight);
         }
 
-        public void set(int left, int top, int right, int bottom) {
+        public void set(float left, float top, float right, float bottom) {
             mRefreshRect[0] = left;
             mRefreshRect[1] = top;
             mRefreshRect[2] = right;

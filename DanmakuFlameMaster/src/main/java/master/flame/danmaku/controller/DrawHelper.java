@@ -21,17 +21,17 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
+import android.graphics.RectF;
 
 public class DrawHelper {
 
     public static Paint PAINT, PAINT_FPS;
 
-    public static Rect RECT;
+    public static RectF RECT;
     static {
         PAINT = new Paint();
         PAINT.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        RECT = new Rect();
+        RECT = new RectF();
     }
 
     public static void drawFPS(Canvas canvas, String text) {
@@ -56,12 +56,12 @@ public class DrawHelper {
         canvas.drawColor(0x00000000, PorterDuff.Mode.CLEAR);
     }
 
-    public static void clearCanvas(Canvas canvas, int left, int top, int right, int bottom) {
+    public static void clearCanvas(Canvas canvas, float left, float top, float right, float bottom) {
         RECT.set(left, top, right, bottom);
         clearCanvas(canvas, RECT);
     }
 
-    private static void clearCanvas(Canvas canvas, Rect rect) {
+    private static void clearCanvas(Canvas canvas, RectF rect) {
         if (rect.width() <= 0 || rect.height() <= 0) {
             return;
         }

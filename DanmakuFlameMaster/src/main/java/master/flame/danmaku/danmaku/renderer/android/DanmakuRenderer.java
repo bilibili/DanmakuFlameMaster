@@ -44,7 +44,7 @@ public class DanmakuRenderer extends Renderer {
     @Override
     public void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
         
-        int left = disp.getWidth(),top = disp.getHeight(), right = 0 ,bottom = 0;
+        float left = disp.getWidth(),top = disp.getHeight(), right = 0 ,bottom = 0;
         boolean fullScreenRefreshing = false;
         
         IDanmakuIterator itr = danmakus.iterator();
@@ -94,16 +94,15 @@ public class DanmakuRenderer extends Renderer {
                 continue;
             }
             
-            int dtop = 0, dbottom = 0;
-            int slopPixel = disp.getSlopPixel(drawItem);
-            int dleft = (int) (drawItem.getLeft() - slopPixel);
-            int dright = (int) (drawItem.getRight() + slopPixel);
+            float dtop = 0, dbottom = 0;            
+            float dleft = drawItem.getLeft();
+            float dright = drawItem.getRight();
             if (drawItem.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
-                dtop = (int) (disp.getHeight() - drawItem.paintHeight - drawItem.getTop());
-                dbottom = (int) Math.ceil(disp.getHeight() - drawItem.getTop());
+                dtop = disp.getHeight() - drawItem.paintHeight - drawItem.getTop();
+                dbottom = disp.getHeight() - drawItem.getTop();
             } else {
-                dtop = (int) (drawItem.getTop());
-                dbottom = (int) Math.ceil(drawItem.getBottom());
+                dtop = drawItem.getTop();
+                dbottom = drawItem.getBottom();
             }
             left = Math.min(dleft, left);
             top = Math.min(dtop, top);

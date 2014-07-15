@@ -41,9 +41,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private Matrix matrix = new Matrix();
     
-    private final static Map<Float,Float> sTextHeightCache = new HashMap<Float,Float>(); // thread safe is not Necessary
-    
-    private final static Map<Float,Integer> sSlopPixelCache = new HashMap<Float,Integer>();
+    private final static Map<Float,Float> sTextHeightCache = new HashMap<Float,Float>();
     
     private static float sLastScaleTextSize;
     private final static Map<Float,Float> sCachedScaleSize = new HashMap<Float, Float>(10);
@@ -444,7 +442,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     @Override
     public void resetSlopPixel(float factor) {
-        sSlopPixelCache.clear();
         float d = Math.max(density, scaledDensity);
         d = Math.max(factor, getWidth() / (float) DanmakuFactory.BILI_PLAYER_WIDTH); //correct for low density and high resolution
         float slop = d * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE; 
@@ -456,28 +453,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     @Override
     public int getSlopPixel() {
         return mSlopPixel;
-    }
-    
-    @Override
-    public int getSlopPixel(BaseDanmaku danmaku) {
-        Integer slopPixel = sSlopPixelCache.get(danmaku.textSize);
-        if (slopPixel == null) {
-            float f = (1 / DanmakuGlobalConfig.DEFAULT.scrollSpeedFactor);
-            f = Math.max(f, 1);
-            if (danmaku.paintHeight > 0) {
-                int lineCount = (danmaku.lines == null || danmaku.lines.length == 0) ? 1
-                        : danmaku.lines.length;
-                slopPixel = (int) (f * (Math.ceil(danmaku.paintHeight / lineCount)));
-                sSlopPixelCache.put(danmaku.textSize, slopPixel);
-            } else {
-                slopPixel = (int) (mSlopPixel * f);
-            }
-        }
-        int f = (int) (width > 0 ? danmaku.paintWidth / width : 1);
-        if (f >= 1) {
-            return slopPixel * f;
-        }
-        return slopPixel;
     }
 
     @Override
