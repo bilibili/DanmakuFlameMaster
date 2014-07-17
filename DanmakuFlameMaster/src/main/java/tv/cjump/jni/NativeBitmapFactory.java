@@ -37,7 +37,15 @@ public class NativeBitmapFactory {
                 System.loadLibrary("ndkbitmap.18");
                 nativeLibLoaded = true;
             } else if (android.os.Build.VERSION.SDK_INT == 19) {
-                System.loadLibrary("ndkbitmap.19");
+                if (android.os.Build.VERSION.RELEASE.equals("4.4")
+                        || android.os.Build.VERSION.RELEASE.equals("4.4.0")
+                        || android.os.Build.VERSION.RELEASE.equals("4.4.1")
+                        || android.os.Build.VERSION.RELEASE.equals("4.4.2")
+                        || android.os.Build.VERSION.RELEASE.equals("4.4.3")) {
+                    System.loadLibrary("ndkbitmap.19");
+                } else {
+                    System.loadLibrary("ndkbitmap.19-2");
+                }
                 nativeLibLoaded = true;
             }
         } catch (Exception e) {
