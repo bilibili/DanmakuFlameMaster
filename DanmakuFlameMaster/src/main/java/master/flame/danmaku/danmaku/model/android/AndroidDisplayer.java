@@ -317,7 +317,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     
     private static TextPaint getPaint(BaseDanmaku danmaku, boolean quick) {
         TextPaint paint = null;
-        if (quick && HAS_SHADOW) {
+        if (quick) {
             paint = PAINT_DUPLICATE;
             paint.set(PAINT);
         } else {
