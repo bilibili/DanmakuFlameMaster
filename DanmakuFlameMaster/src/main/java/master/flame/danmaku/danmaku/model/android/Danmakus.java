@@ -89,13 +89,14 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public void removeItem(BaseDanmaku item) {
+        if (item == null) {
+            return;
+        }
         if (item.isOutside()) {
             item.setVisibility(false);
         }
-        if (items != null) {
-            if (items.remove(item))
-                mSize--;
-        }
+        if (items.remove(item))
+            mSize--;
     }
 
     public Set<BaseDanmaku> subset(long startTime, long endTime) {

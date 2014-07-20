@@ -27,6 +27,12 @@ public class FTDanmaku extends BaseDanmaku {
 
     private float[] RECT = null;
 
+    private float mLastLeft;
+
+    private float mLastPaintWidth;
+
+    private int mLastDispWidth;
+
     public FTDanmaku(Duration duration) {
         this.duration = duration;
     }
@@ -42,16 +48,23 @@ public class FTDanmaku extends BaseDanmaku {
                     this.setVisibility(true);
                 }
                 return;
-            } 
+            }
 
             this.setVisibility(false);
-            this.y = -paintHeight;
+            this.y = -1;
+            this.x = displayer.getWidth();
         }
 
     }
 
     protected float getLeft(IDisplayer displayer) {
+        if (mLastDispWidth == displayer.getWidth() && mLastPaintWidth == paintWidth) {
+            return mLastLeft;
+        }
         float left = (displayer.getWidth() - paintWidth) / 2;
+        mLastDispWidth = displayer.getWidth();
+        mLastPaintWidth = paintWidth;
+        mLastLeft = left;
         return left;
     }
 
@@ -66,7 +79,7 @@ public class FTDanmaku extends BaseDanmaku {
         RECT[0] = left;
         RECT[1] = y;
         RECT[2] = left + paintWidth;
-        RECT[3] = y + paintHeight; 
+        RECT[3] = y + paintHeight;
         return RECT;
     }
 
