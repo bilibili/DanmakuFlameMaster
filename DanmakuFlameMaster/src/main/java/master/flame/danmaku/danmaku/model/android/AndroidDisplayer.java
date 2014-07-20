@@ -163,10 +163,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     public void draw(BaseDanmaku danmaku) {
         float top = danmaku.getTop();
         float left = danmaku.getLeft();
-        int paintHeight = (int)danmaku.paintHeight;
-        if (danmaku.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
-            top = height - top - paintHeight;
-        }
         if (canvas != null) {
 
             Paint alphaPaint = null;
