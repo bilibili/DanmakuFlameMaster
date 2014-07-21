@@ -276,6 +276,9 @@ public class DanmakusRetainer {
                     topPos = item.getTop() - drawItem.paintHeight;
 
                 }
+                
+                topPos = checkVerticalEdge(false, drawItem, disp, topPos, firstItem,
+                        null);
 
             }
 
