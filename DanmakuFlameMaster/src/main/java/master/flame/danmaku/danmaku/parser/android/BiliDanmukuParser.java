@@ -106,7 +106,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         item.time = time;
                         item.textSize = textSize * (mDispDensity - 0.6f);
                         item.textColor = color;
-                        item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
+                        item.textShadowColor = Color.YELLOW;
                     }
                 }
             }
