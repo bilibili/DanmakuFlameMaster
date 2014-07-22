@@ -426,7 +426,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             pw += 2 * BORDER_WIDTH;
             ph += 2 * BORDER_WIDTH;
         }
-        danmaku.paintWidth = pw;
+        danmaku.paintWidth = pw + getStrokeWidth();
         danmaku.paintHeight = ph;
     }
 
@@ -500,8 +500,17 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     }
 
     @Override
-    public float getStrokeWidth() {        
-        return Math.max(SHADOW_RADIUS, STROKE_WIDTH);
+    public float getStrokeWidth() {
+        if (HAS_SHADOW && HAS_STROKE) {
+            return Math.max(SHADOW_RADIUS, STROKE_WIDTH);
+        }
+        if (HAS_SHADOW) {
+            return SHADOW_RADIUS;
+        }
+        if (HAS_STROKE) {
+            return STROKE_WIDTH;
+        }
+        return 0f;
     }
 
 }
