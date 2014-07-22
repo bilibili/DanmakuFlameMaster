@@ -173,8 +173,7 @@ public class DrawHandler extends Handler {
                 }
                 
                 if (d <= 16) {
-                    sendEmptyMessage(UPDATE);
-                    SystemClock.sleep(16 - d);
+                    sendEmptyMessageDelayed(UPDATE, 16 - d);
                     break;
                 }
                 sendEmptyMessage(UPDATE);
