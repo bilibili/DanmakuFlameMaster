@@ -228,11 +228,9 @@ public class DanmakusRetainer {
 
         @Override
         public void fix(BaseDanmaku drawItem, IDisplayer disp) {
-
             if (drawItem.isOutside())
                 return;
             boolean shown = drawItem.isShown();
-            boolean removeAll = false;
             float topPos = drawItem.getTop();
             if (topPos < 0) {
                 topPos = disp.getHeight() - drawItem.paintHeight;
@@ -242,51 +240,42 @@ public class DanmakusRetainer {
                 IDanmakuIterator it = mVisibleDanmakus.iterator();
                 while (it.hasNext()) {
                     BaseDanmaku item = it.next();
-                    if (firstItem == null)
-                        firstItem = item;
 
                     if (item == drawItem) {
                         removeItem = null;
                         break;
                     }
 
-                    if(firstItem.getBottom() != disp.getHeight()) {
-                        removeItem = firstItem;
-                        topPos = disp.getHeight() - drawItem.paintHeight;
-                        break;
-                    }
-                    
-                    if (topPos < 0) {
-                        removeItem = null;
-                        topPos = disp.getHeight() - drawItem.paintHeight;
-                        removeAll = true;
-                        break;
+                    if (firstItem == null) {
+                        firstItem = item;
+                        if (firstItem.getBottom() != disp.getHeight()) {
+                            break;
+                        }
                     }
 
+                    if (topPos < 0) {
+                        removeItem = null;
+                        break;
+                    }
 
                     // 检查碰撞
                     boolean willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
                             drawItem.getDuration(), drawItem.getTimer().currMillisecond);
                     if (!willHit) {
                         removeItem = item;
-                        //topPos = item.getBottom() - drawItem.paintHeight;
+                        // topPos = item.getBottom() - drawItem.paintHeight;
                         break;
                     }
 
                     topPos = item.getTop() - drawItem.paintHeight;
 
                 }
-                
-                topPos = checkVerticalEdge(false, drawItem, disp, topPos, firstItem,
-                        null);
+
+                topPos = checkVerticalEdge(false, drawItem, disp, topPos, firstItem, null);
 
             }
 
             drawItem.layout(disp, drawItem.getLeft(), topPos);
-
-            if (removeAll) {
-                clear();
-            }
 
             if (!shown) {
                 mVisibleDanmakus.removeItem(removeItem);
@@ -297,18 +286,17 @@ public class DanmakusRetainer {
 
         protected float checkVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
                 IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
-            
-            if (topPos < 0) {
+            if (topPos < 0 || (firstItem != null && firstItem.getBottom() != disp.getHeight())) {
                 topPos = disp.getHeight() - drawItem.paintHeight;
                 clear();
             }
             return topPos;
         }
-        
+
         @Override
         public void clear() {
             mVisibleDanmakus.clear();
-        }        
+        }
 
     }
 
