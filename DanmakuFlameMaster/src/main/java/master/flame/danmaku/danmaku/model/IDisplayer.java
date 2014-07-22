@@ -36,6 +36,8 @@ public interface IDisplayer {
     public abstract void measure(BaseDanmaku danmaku);
     
     public abstract long getAverageRenderingTime();
+    
+    public abstract float getStrokeWidth();
 
 
     ////////////////// setter ///////////////////////////

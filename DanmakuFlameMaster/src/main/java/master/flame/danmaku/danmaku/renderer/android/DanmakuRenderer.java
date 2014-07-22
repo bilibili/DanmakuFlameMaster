@@ -105,8 +105,8 @@ public class DanmakuRenderer extends Renderer {
             bottom = Math.max(dbottom, bottom);
 
         }
-        
-        mRefreshArea.set(left, top, right, bottom);
+        float borderWidth = disp.getStrokeWidth() * 2;
+        mRefreshArea.set(left, top, right + borderWidth, bottom + borderWidth);
     }
 
     @Override

@@ -391,24 +391,21 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
-        float strokeWidth = 0;
         if (HAS_STROKE) {
             applyPaintConfig(danmaku, paint, true);
-            strokeWidth = STROKE_WIDTH;
         }
-        float shadowRadius = HAS_SHADOW ? SHADOW_RADIUS : 0;
-        calcPaintWH(danmaku, paint, Math.max(shadowRadius, strokeWidth));
+        calcPaintWH(danmaku, paint);
         if (HAS_STROKE) {
             applyPaintConfig(danmaku, paint, false);
         }
     }
     
-    private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint, float strokeWidth) {
+    private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
         float w = 0;
         Float textHeight = getTextHeight(paint);
         if (danmaku.lines == null) {
             w = danmaku.text == null ? 0 : paint.measureText(danmaku.text);
-            setDanmakuPaintWidthAndHeight(danmaku,w,textHeight + strokeWidth);
+            setDanmakuPaintWidthAndHeight(danmaku,w,textHeight);
             return;
         }
 
@@ -419,7 +416,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             }
         }
 
-        setDanmakuPaintWidthAndHeight(danmaku,w,danmaku.lines.length * textHeight + strokeWidth);
+        setDanmakuPaintWidthAndHeight(danmaku,w,danmaku.lines.length * textHeight);
     }
         
     private void setDanmakuPaintWidthAndHeight(BaseDanmaku danmaku, float w, float h) {
@@ -500,6 +497,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     @Override
     public void setAverageRenderingTime(long ms) {
         this.lastAverageRenderingTime = ms;
+    }
+
+    @Override
+    public float getStrokeWidth() {        
+        return Math.max(SHADOW_RADIUS, STROKE_WIDTH);
     }
 
 }
