@@ -146,6 +146,8 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     
     private long lastAverageRenderingTime = 16;
 
+    private long lastFrameRenderingTime;
+
     private void update(Canvas c) {
         canvas = c;
         if (c != null) {
@@ -511,6 +513,16 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             return STROKE_WIDTH;
         }
         return 0f;
+    }
+
+    @Override
+    public long getLastFrameRenderingTime() {
+        return this.lastFrameRenderingTime;
+    }
+
+    @Override
+    public void setLastFrameRenderingTime(long ms) {
+        this.lastFrameRenderingTime = ms;
     }
 
 }

@@ -19,6 +19,8 @@ package master.flame.danmaku.danmaku.model;
 
 public class R2LDanmaku extends BaseDanmaku {
 
+    protected static final long MAX_RENDERING_TIME = 20;
+
     protected float x = 0;
 
     protected float y = -1;
@@ -39,7 +41,7 @@ public class R2LDanmaku extends BaseDanmaku {
             long currMS = mTimer.currMillisecond;
             long deltaDuration = currMS - time;
             if (deltaDuration > 0 && deltaDuration < duration.value) {
-                this.x = getAccurateLeft(displayer, currMS);
+                this.x = getStableLeft(displayer, currMS);
                 if (!this.isShown()) {
                     this.y = y;
                     this.setVisibility(true);
@@ -50,22 +52,25 @@ public class R2LDanmaku extends BaseDanmaku {
         }
         this.x = displayer.getWidth();
     }
-    
+
     protected float getStableLeft(IDisplayer displayer, long currTime) {
         long elapsedTime = currTime - time;
         if (elapsedTime >= duration.value || this.x <= -paintWidth) {
             return displayer.getWidth();
         }
 
+        long lastFrameRenderingTime = displayer.getLastFrameRenderingTime();
+        if (lastFrameRenderingTime > MAX_RENDERING_TIME) {
+            return getAccurateLeft(displayer, currTime);
+        }
         long averageRenderingTime = displayer.getAverageRenderingTime();
-        float layoutCount = (duration.value - elapsedTime)
-                / (float) averageRenderingTime;
+        float layoutCount = (duration.value - elapsedTime) / (float) averageRenderingTime;
         float stepX = (this.x + paintWidth) / layoutCount;
 
         if (stepX < mStepX * 16) {
             stepX = mStepX * 16;
         }
-        
+
         return this.x - stepX;
     }
 

@@ -37,6 +37,8 @@ public interface IDisplayer {
     
     public abstract long getAverageRenderingTime();
     
+    public abstract long getLastFrameRenderingTime();
+    
     public abstract float getStrokeWidth();
 
 
@@ -49,5 +51,7 @@ public interface IDisplayer {
     public abstract void setSize(int width, int height);
 
     public abstract void setAverageRenderingTime(long ms);
+    
+    public abstract void setLastFrameRenderingTime(long ms);
 
 }

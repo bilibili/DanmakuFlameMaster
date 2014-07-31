@@ -310,13 +310,13 @@ public class DrawHandler extends Handler {
     public void draw(Canvas canvas) {
         if (drawTask == null)
             return;
-//        mDisp.setAverageRenderingTime((Math.max(16, getAverageRenderingTime()) / 8) * 8);
+        mDisp.setAverageRenderingTime(Math.max(16, getAverageRenderingTime()));
+        mDisp.setLastFrameRenderingTime(mDrawTimes.isEmpty() ? 16 : mDrawTimes.getLast());
         mDisp.setExtraData(canvas);
         drawTask.draw(mDisp);
-//        recordRenderingTime();
+        recordRenderingTime();
     }
-    
-    @SuppressWarnings("unused")
+        
     private long getAverageRenderingTime() {
         int frames = mDrawTimes.size();
         if(frames <= 0)
@@ -328,7 +328,6 @@ public class DrawHandler extends Handler {
     private static final int MAX_RECORD_SIZE = 50;
     private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
 
-    @SuppressWarnings("unused")
     private void recordRenderingTime() {
         long lastTime = System.currentTimeMillis();
         mDrawTimes.addLast(lastTime);
