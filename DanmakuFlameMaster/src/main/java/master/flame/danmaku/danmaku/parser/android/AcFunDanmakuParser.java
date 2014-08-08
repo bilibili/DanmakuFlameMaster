@@ -18,13 +18,37 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
     public Danmakus parse() {
         if (mDataSource != null && mDataSource instanceof JSONSource) {
             JSONSource jsonSource = (JSONSource) mDataSource;
-            return _parse(jsonSource.data());
+            return doParse(jsonSource.data());
         }
         return new Danmakus();
     }
 
-    private Danmakus _parse(JSONArray jsonArray) {
+    /**
+     * @param danmakuListData 弹幕数据
+     *                        传入的数组内包含普通弹幕，会员弹幕，锁定弹幕。
+     * @return 转换后的Danmakus
+     */
+    private Danmakus doParse(JSONArray danmakuListData) {
         Danmakus danmakus = new Danmakus();
+        if (danmakuListData == null || danmakuListData.length() == 0) {
+            return danmakus;
+        }
+        for (int i = 0; i < danmakuListData.length(); i++) {
+            try {
+                JSONArray danmakuArray = danmakuListData.getJSONArray(i);
+                if (danmakuArray != null) {
+                    danmakus = _parse(danmakuArray, danmakus);
+                }
+            } catch (JSONException e) {
+            }
+        }
+        return danmakus;
+    }
+
+    private Danmakus _parse(JSONArray jsonArray, Danmakus danmakus) {
+        if (danmakus == null) {
+            danmakus = new Danmakus();
+        }
         if (jsonArray == null || jsonArray.length() == 0) {
             return danmakus;
         }
@@ -54,11 +78,10 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                         danmakus.addItem(item);
                     }
                 }
-
             } catch (JSONException e) {
+            } catch (NumberFormatException e) {
             }
         }
-
         return danmakus;
     }
 }
