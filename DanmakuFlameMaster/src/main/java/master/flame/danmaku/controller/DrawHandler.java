@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.ICanvas;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
@@ -65,7 +66,7 @@ public class DrawHandler extends Handler {
 
     private boolean mDanmakusVisible = true;
 
-    private AbsDisplayer<Canvas> mDisp;
+    private AbsDisplayer<ICanvas<?>> mDisp;
 
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
@@ -307,7 +308,7 @@ public class DrawHandler extends Handler {
         return mDanmakusVisible;
     }
 
-    public void draw(Canvas canvas) {
+    public void draw(ICanvas<?> canvas) {
         if (drawTask == null)
             return;
         mDisp.setAverageRenderingTime(Math.max(16, getAverageRenderingTime()));

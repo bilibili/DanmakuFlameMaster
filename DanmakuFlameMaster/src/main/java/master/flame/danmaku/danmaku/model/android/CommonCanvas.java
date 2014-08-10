@@ -21,12 +21,22 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 
+import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.danmaku.model.ICanvas;
 
 public class CommonCanvas implements ICanvas<Canvas> {
 
     Matrix mMatrix = new Matrix();
     Canvas mCanvas;
+
+    public CommonCanvas() {
+
+    }
+
+    public CommonCanvas(IBitmapHolder<?> bitmap) {
+        mCanvas = new Canvas();
+        setBitmap(bitmap);
+    }
 
     public CommonCanvas(Canvas canvas) {
         if (canvas == null) {
@@ -35,19 +45,19 @@ public class CommonCanvas implements ICanvas<Canvas> {
             mCanvas = canvas;
         }
     }
-    
+
     public void attach(Canvas data) {
         mCanvas = data;
     }
 
     @Override
-    public synchronized void contact(float[] matrix) {
+    public synchronized void concat(float[] matrix) {
         mMatrix.setValues(matrix);
         mCanvas.concat(mMatrix);
     }
 
     @Override
-    public synchronized void setBitmap(IBitmap<?> bitmap) {
+    public synchronized void setBitmap(IBitmapHolder<?> bitmap) {
         mCanvas.setBitmap((Bitmap) bitmap.data());
     }
 
@@ -72,8 +82,9 @@ public class CommonCanvas implements ICanvas<Canvas> {
     }
 
     @Override
-    public void drawBitmap(IBitmap<?> bitmap, float left, float top, IPaint<?> paint) {
-        mCanvas.drawBitmap((Bitmap) bitmap.data(), left, top, (Paint) paint.data());
+    public void drawBitmap(IBitmapHolder<?> bitmap, float left, float top, IPaint<?> paint) {
+        mCanvas.drawBitmap((Bitmap) bitmap.data(), left, top,
+                paint == null ? null : (Paint) paint.data());
     }
 
     @Override
@@ -99,6 +110,27 @@ public class CommonCanvas implements ICanvas<Canvas> {
     @Override
     public boolean isHardwareAccelerated() {
         return mCanvas.isHardwareAccelerated();
+    }
+
+    @Override
+    public void setDensity(int density) {
+        mCanvas.setDensity(density);
+    }
+
+    @Override
+    public void clear() {
+        if (mCanvas == null) {
+            return;
+        }
+        DrawHelper.clearCanvas(mCanvas);
+    }
+
+    @Override
+    public void clear(float left, float top, float right, float bottom) {
+        if (mCanvas == null) {
+            return;
+        }
+        DrawHelper.clearCanvas(mCanvas, left, top, right, bottom);
     }
 
 }

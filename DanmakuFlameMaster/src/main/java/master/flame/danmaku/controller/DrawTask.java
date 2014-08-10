@@ -17,7 +17,6 @@
 package master.flame.danmaku.controller;
 
 import android.content.Context;
-import android.graphics.Canvas;
 
 import java.util.LinkedList;
 
@@ -245,15 +244,14 @@ public class DrawTask implements IDrawTask {
 
     protected void drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
         if (danmakuList != null) {
-            Canvas canvas = (Canvas) disp.getExtraData();
             if (clearFlag > 0) {
-                DrawHelper.clearCanvas(canvas);
+                disp.clearCanvas();
                 clearFlag--;
             } else {
                 float[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
                 mRectCache.push(refreshRect);
                 float[] rect = mRectCache.getRect();
-                DrawHelper.clearCanvas(canvas, Math.max(0, rect[0]), Math.max(0, rect[1]),
+                disp.clearCanvas(Math.max(0, rect[0]), Math.max(0, rect[1]),
                         Math.min(disp.getWidth(), rect[2]), Math.min(disp.getHeight(), rect[3]));
             }
             long currMills = timer.currMillisecond;
