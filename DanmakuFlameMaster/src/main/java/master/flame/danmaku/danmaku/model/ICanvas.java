@@ -18,9 +18,13 @@ package master.flame.danmaku.danmaku.model;
 
 public interface ICanvas<T> {
 
-    public static interface IBitmap<T> {
+    public static interface IBitmapHolder<T> {
+        
+        public abstract void attach(T t);
 
         public abstract T data();
+        
+        public abstract void detach();
 
     }
 
@@ -50,9 +54,9 @@ public interface ICanvas<T> {
 
     public abstract void restore();
 
-    public abstract void contact(float[] matrix);
+    public abstract void concat(float[] matrix);
 
-    public void setBitmap(IBitmap<?> bitmap);
+    public void setBitmap(IBitmapHolder<?> bitmap);
 
     public abstract void drawColor(int color, IMode<?> mode);
 
@@ -63,12 +67,18 @@ public interface ICanvas<T> {
 
     public abstract void drawText(String text, float x, float y, IPaint<?> paint);
 
-    public abstract void drawBitmap(IBitmap<?> bitmap, float left, float top, IPaint<?> paint);
+    public abstract void drawBitmap(IBitmapHolder<?> bitmap, float left, float top, IPaint<?> paint);
 
     public abstract int getWidth();
 
     public abstract int getHeight();
 
     public abstract boolean isHardwareAccelerated();
+
+    public abstract void setDensity(int density);
+    
+    public abstract void clear();
+
+    public abstract void clear(float left, float top, float right, float bottom);
 
 }

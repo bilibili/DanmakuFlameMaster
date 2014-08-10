@@ -2,16 +2,18 @@
 package master.flame.danmaku.danmaku.model.android;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 
+import master.flame.danmaku.danmaku.model.ICanvas;
 import tv.cjump.jni.NativeBitmapFactory;
 
 public class DrawingCacheHolder {
 
-    public Canvas canvas;
+    public ICanvas<?> canvas;
 
     public Bitmap bitmap;
+
+    public BitmapHolder bitmapHolder;
 
     public Object extra;
 
@@ -31,19 +33,23 @@ public class DrawingCacheHolder {
     public DrawingCacheHolder(int w, int h) {
         buildCache(w, h, 0, true);
     }
-    
+
     public DrawingCacheHolder(int w, int h, int density) {
         mDensity = density;
         buildCache(w, h, density, true);
     }
 
     public void buildCache(int w, int h, int density, boolean checkSizeEquals) {
+        if (bitmapHolder == null) {
+            bitmapHolder = new BitmapHolder();
+        }
         boolean reuse = checkSizeEquals ? (w == width && h == height) : (w <= width && h <= height);
         if (reuse && bitmap != null && !bitmap.isRecycled()) {
-//            canvas.drawColor(Color.TRANSPARENT);
+            // canvas.drawColor(Color.TRANSPARENT);
             canvas.setBitmap(null);
             bitmap.eraseColor(Color.TRANSPARENT);
-            canvas.setBitmap(bitmap);            
+            bitmapHolder.attach(bitmap);
+            canvas.setBitmap(bitmapHolder);
             return;
         }
         if (bitmap != null) {
@@ -56,13 +62,15 @@ public class DrawingCacheHolder {
             mDensity = density;
             bitmap.setDensity(density);
         }
-        if (canvas == null){
-            canvas = new Canvas(bitmap);
+        bitmapHolder.attach(bitmap);
+        if (canvas == null) {
+            canvas = new CommonCanvas(bitmapHolder);
             canvas.setDensity(density);
-        }else
-            canvas.setBitmap(bitmap);
+        } else {
+            canvas.setBitmap(bitmapHolder);
+        }
     }
-    
+
     public void erase() {
         if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.eraseColor(Color.TRANSPARENT);
@@ -71,15 +79,17 @@ public class DrawingCacheHolder {
 
     public void recycle() {
         width = height = 0;
-//        if (canvas != null) {
-//            canvas = null;
-//        }
+        // if (canvas != null) {
+        // canvas = null;
+        // }
         if (bitmap != null) {
             bitmap.recycle();
             bitmap = null;
         }
         extra = null;
+        if (bitmapHolder != null) {
+            bitmapHolder.detach();
+        }
     }
-
 
 }

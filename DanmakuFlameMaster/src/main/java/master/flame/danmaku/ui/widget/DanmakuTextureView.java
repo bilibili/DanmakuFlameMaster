@@ -34,6 +34,7 @@ import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.android.CommonCanvas;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 import java.util.LinkedList;
@@ -56,6 +57,8 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     private HandlerThread mDrawThread;
 
     private DrawHandler handler;
+    
+    private CommonCanvas mCanvas = new CommonCanvas();
 
     private boolean isSurfaceCreated;
 
@@ -254,7 +257,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         Canvas canvas = lockCanvas();
         if (canvas != null) {
             if (handler != null) {
-                handler.draw(canvas);
+                mCanvas.attach(canvas);
                 if (mShowFps) {
                     if(mDrawTimes == null) mDrawTimes = new LinkedList<Long>();
                     dtime = System.currentTimeMillis() - stime;  //not so accurate

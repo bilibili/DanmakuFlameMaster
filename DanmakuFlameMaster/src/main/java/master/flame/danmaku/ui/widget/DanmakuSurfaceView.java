@@ -32,6 +32,7 @@ import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.android.CommonCanvas;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 import java.util.LinkedList;
@@ -43,6 +44,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     public static final String TAG = "DanmakuSurfaceView";
 
     private Callback mCallback;
+    
+    private CommonCanvas mCanvas = new CommonCanvas();
 
     private SurfaceHolder mSurfaceHolder;
 
@@ -235,6 +238,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         }
         return dtime > 0 ? mDrawTimes.size() * ONE_SECOND / dtime : 0.0f;
     }
+    
     @Override
     public long drawDanmakus() {
         if (!isSurfaceCreated)
@@ -246,7 +250,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null){
             if(handler != null){
-                handler.draw(canvas);
+                mCanvas.attach(canvas);
+                handler.draw(mCanvas);
                 if (mShowFps) {
                     if(mDrawTimes == null) mDrawTimes = new LinkedList<Long>();
                     dtime = System.currentTimeMillis() - stime;  //not so accurate

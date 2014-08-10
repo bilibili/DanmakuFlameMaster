@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.danmaku.model;
 
-
 public interface IDisplayer {
 
     public abstract int getWidth();
@@ -29,29 +28,35 @@ public interface IDisplayer {
 
     public abstract void draw(BaseDanmaku danmaku);
 
+    public abstract void drawCache(BaseDanmaku danmaku, IDrawingCache<?> cache, int left, int top,
+            boolean quick);
+
     public abstract float getScaledDensity();
 
     public abstract int getSlopPixel();
-    
+
     public abstract void measure(BaseDanmaku danmaku);
-    
+
     public abstract long getAverageRenderingTime();
-    
+
     public abstract long getLastFrameRenderingTime();
-    
+
     public abstract float getStrokeWidth();
 
+    public abstract void clearCanvas();
 
-    ////////////////// setter ///////////////////////////
-    
+    public abstract void clearCanvas(float left, float top, float right, float bottom);
+
+    // //////////////// setter ///////////////////////////
+
     public abstract void resetSlopPixel(float factor);
-    
+
     public abstract void setDensities(float density, int densityDpi, float scaledDensity);
-    
+
     public abstract void setSize(int width, int height);
 
     public abstract void setAverageRenderingTime(long ms);
-    
+
     public abstract void setLastFrameRenderingTime(long ms);
 
 }

@@ -24,18 +24,19 @@ import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
+import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
+import master.flame.danmaku.danmaku.model.ICanvas;
+import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by MoiTempete.
- */
-public class AndroidDisplayer extends AbsDisplayer<Canvas> {
+
+public class AndroidDisplayer extends AbsDisplayer<ICanvas<?>> {
 
     private Camera camera = new Camera();
 
@@ -52,13 +53,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     @SuppressWarnings("unused")
     private int NO_CACHE_COUNT = 0;
 
-    public static TextPaint PAINT, PAINT_DUPLICATE;
+    public static SimplePaint PAINT, PAINT_DUPLICATE;
 
-    private static Paint ALPHA_PAINT;
+    private static SimplePaint ALPHA_PAINT;
 
-    private static Paint UNDERLINE_PAINT;
+    private static SimplePaint UNDERLINE_PAINT;
     
-    private static Paint BORDER_PAINT;
+    private static SimplePaint BORDER_PAINT;
     
     /**
      * 下划线高度
@@ -100,14 +101,16 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     private static boolean ANTI_ALIAS = CONFIG_ANTI_ALIAS;
 
     static {
-        PAINT = new TextPaint();
+        PAINT = new SimplePaint();
         PAINT.setStrokeWidth(STROKE_WIDTH);
-        PAINT_DUPLICATE = new TextPaint(PAINT);
-        ALPHA_PAINT = new Paint();
-        UNDERLINE_PAINT = new Paint();
+        PAINT.setStrokeJoin(Paint.Join.ROUND);
+        PAINT.setStrokeCap(Paint.Cap.ROUND);
+        PAINT_DUPLICATE = new SimplePaint(PAINT);
+        ALPHA_PAINT = new SimplePaint();
+        UNDERLINE_PAINT = new SimplePaint();
         UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
         UNDERLINE_PAINT.setStyle(Style.STROKE);
-        BORDER_PAINT = new Paint();
+        BORDER_PAINT = new SimplePaint();
         BORDER_PAINT.setStyle(Style.STROKE);
         BORDER_PAINT.setStrokeWidth(BORDER_WIDTH);
     }
@@ -130,7 +133,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         PAINT.setFakeBoldText(fakeBoldText);
     }
 
-    public Canvas canvas;
+    public ICanvas<?> canvas;
 
     private int width;
 
@@ -147,8 +150,10 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     private long lastAverageRenderingTime = 16;
 
     private long lastFrameRenderingTime;
+    
+    private float[] tmpValues = new float[9];
 
-    private void update(Canvas c) {
+    private void update(ICanvas<?> c) {
         canvas = c;
         if (c != null) {
             width = c.getWidth();
@@ -182,7 +187,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         float left = danmaku.getLeft();
         if (canvas != null) {
 
-            Paint alphaPaint = null;
+            SimplePaint alphaPaint = null;
             boolean needRestore = false;
             if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
                 if (danmaku.getAlpha() == AlphaValue.TRANSPARENT) {
@@ -209,7 +214,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null && !holder.bitmap.isRecycled()) {
-                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
+                    canvas.drawBitmap(holder.bitmapHolder, left, top, alphaPaint);                    
                     cacheDrawn = true;
                 }
             }
@@ -234,11 +239,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         }
     }
 
-    private void restoreCanvas(Canvas canvas) {
+    private void restoreCanvas(ICanvas<?> canvas) {
         canvas.restore();
     }
 
-    private int saveCanvas(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
+    private int saveCanvas(BaseDanmaku danmaku, ICanvas<?> canvas, float left, float top) {
         camera.save();
         camera.rotateY(-danmaku.rotationY);
         camera.rotateZ(-danmaku.rotationZ);
@@ -247,11 +252,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         matrix.postTranslate(left, top);
         camera.restore();
         int count = canvas.save();
-        canvas.concat(matrix);
+        
+        matrix.getValues(tmpValues);
+        canvas.concat(tmpValues);
         return count;
     }
 
-    public static void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
+    public static void drawDanmaku(BaseDanmaku danmaku, ICanvas<?> canvas, float left, float top,
                                    boolean quick) {
         float _left = left;
         float _top = top;
@@ -265,7 +272,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         HAS_STROKE = CONFIG_HAS_STROKE;
         HAS_SHADOW = CONFIG_HAS_SHADOW;
         ANTI_ALIAS = !quick && CONFIG_ANTI_ALIAS;
-        TextPaint paint = getPaint(danmaku, quick);
+        SimplePaint paint = getPaint(danmaku, quick);
         if (danmaku.lines != null) {
             String[] lines = danmaku.lines;
             if (lines.length == 1) {
@@ -300,14 +307,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
         // draw underline
         if (danmaku.underlineColor != 0) {
-            Paint linePaint = getUnderlinePaint(danmaku);
+            SimplePaint linePaint = getUnderlinePaint(danmaku);
             float bottom = _top + danmaku.paintHeight - UNDERLINE_HEIGHT;
             canvas.drawLine(_left, bottom, _left + danmaku.paintWidth, bottom, linePaint);
         }
         
         //draw border
         if (danmaku.borderColor != 0) {
-            Paint borderPaint = getBorderPaint(danmaku);
+            SimplePaint borderPaint = getBorderPaint(danmaku);
             canvas.drawRect(_left, _top, _left + danmaku.paintWidth, _top + danmaku.paintHeight,
                     borderPaint);
         }
@@ -318,18 +325,18 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         return HAS_STROKE && STROKE_WIDTH > 0 && danmaku.textShadowColor != 0;
     }
 
-    public static Paint getBorderPaint(BaseDanmaku danmaku) {
+    public static SimplePaint getBorderPaint(BaseDanmaku danmaku) {
         BORDER_PAINT.setColor(danmaku.borderColor);
         return BORDER_PAINT;
     }
 
-    public static Paint getUnderlinePaint(BaseDanmaku danmaku){
+    public static SimplePaint getUnderlinePaint(BaseDanmaku danmaku){
         UNDERLINE_PAINT.setColor(danmaku.underlineColor);
         return UNDERLINE_PAINT;
     }
     
-    private static TextPaint getPaint(BaseDanmaku danmaku, boolean quick) {
-        TextPaint paint;
+    private static SimplePaint getPaint(BaseDanmaku danmaku, boolean quick) {
+        SimplePaint paint;
         if (quick) {
             paint = PAINT_DUPLICATE;
             paint.set(PAINT);
@@ -484,12 +491,12 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     }
 
     @Override
-    public void setExtraData(Canvas data) {
+    public void setExtraData(ICanvas<?> data) {
         update(data);
     }
 
     @Override
-    public Canvas getExtraData() {
+    public ICanvas<?> getExtraData() {
         return this.canvas;
     }
 
@@ -525,6 +532,27 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     @Override
     public void setLastFrameRenderingTime(long ms) {
         this.lastFrameRenderingTime = ms;
+    }
+
+    @Override
+    public void clearCanvas() {
+        //TODO: fix
+        canvas.clear();
+    }
+
+    @Override
+    public void clearCanvas(float left, float top, float right, float bottom) {
+        //TODO: fix
+        canvas.clear(left, top, right, bottom);
+    }
+
+    @Override
+    public void drawCache(BaseDanmaku danmaku, IDrawingCache<?> cache, int left, int top,
+            boolean quick) {
+        DrawingCacheHolder holder = (DrawingCacheHolder) cache.get();
+        if (holder != null) {
+            drawDanmaku(danmaku, holder.canvas, 0, 0, false);
+        }
     }
 
 }

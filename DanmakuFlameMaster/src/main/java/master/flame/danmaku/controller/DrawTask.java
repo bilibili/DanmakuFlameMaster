@@ -17,7 +17,6 @@
 package master.flame.danmaku.controller;
 
 import android.content.Context;
-import android.graphics.Canvas;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -199,8 +198,7 @@ public class DrawTask implements IDrawTask {
 
     protected RenderingState drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
         if (danmakuList != null) {
-            Canvas canvas = (Canvas) disp.getExtraData();
-            DrawHelper.clearCanvas(canvas);
+            disp.clearCanvas();
             long beginMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
             long endMills = timer.currMillisecond + DanmakuFactory.MAX_DANMAKU_DURATION;
             if(mLastBeginMills > beginMills || timer.currMillisecond > mLastEndMills) {
