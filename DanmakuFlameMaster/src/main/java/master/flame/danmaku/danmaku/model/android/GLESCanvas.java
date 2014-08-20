@@ -60,12 +60,12 @@ public class GLESCanvas implements ICanvas<GL11> {
     }
 
     @Override
-    public void contact(float[] matrix) {
+    public void concat(float[] matrix) {
         mGLCanvas.multiplyMatrix(matrix, 0);
     }
 
     @Override
-    public void setBitmap(master.flame.danmaku.danmaku.model.ICanvas.IBitmap<?> bitmap) {
+    public void setBitmap(master.flame.danmaku.danmaku.model.ICanvas.IBitmapHolder<?> bitmap) {
         mBitmapTexture = new BitmapTexture((Bitmap) bitmap.data());
         mBitmapTexture.setOpaque(false);
         mWidth = mBitmapTexture.getWidth();
@@ -76,9 +76,9 @@ public class GLESCanvas implements ICanvas<GL11> {
 
     @Override
     public void drawColor(int color, master.flame.danmaku.danmaku.model.ICanvas.IMode<?> mode) {
-        int a = (color >> 24) & 0xff;
-        int r = (color >> 16) & 0xff;
-        int g = (color >> 8) & 0xff;
+        int a = (color >>> 24) & 0xff;
+        int r = (color >>> 16) & 0xff;
+        int g = (color >>> 8) & 0xff;
         int b = color & 0xff;
         argb[0] = a / 255f;
         argb[1] = r / 255f;
@@ -121,6 +121,9 @@ public class GLESCanvas implements ICanvas<GL11> {
     @Override
     public synchronized void drawText(String text, float x, float y,
             master.flame.danmaku.danmaku.model.ICanvas.IPaint<?> paint) {
+        if (paint == null) {
+            return;
+        }
 
         if (mLastText == null || mLastText.equals(text) == false || mLastPaint == null
                 || mLastPaint != paint || mLastPaint.getColor() != paint.getColor()) {
@@ -135,8 +138,9 @@ public class GLESCanvas implements ICanvas<GL11> {
     }
 
     @Override
-    public synchronized void drawBitmap(master.flame.danmaku.danmaku.model.ICanvas.IBitmap<?> bitmap,
-            float left, float top, master.flame.danmaku.danmaku.model.ICanvas.IPaint<?> paint) {
+    public synchronized void drawBitmap(
+            master.flame.danmaku.danmaku.model.ICanvas.IBitmapHolder<?> bitmap, float left,
+            float top, master.flame.danmaku.danmaku.model.ICanvas.IPaint<?> paint) {
         if (mBitmapTexture == null) {
             mBitmapTexture = new BitmapTexture((Bitmap) bitmap.data());
         } else {
@@ -158,6 +162,26 @@ public class GLESCanvas implements ICanvas<GL11> {
     @Override
     public boolean isHardwareAccelerated() {
         return true;
+    }
+
+    @Override
+    public void setDensity(int density) {
+        if (mBitmapTexture != null) {
+            Bitmap bitmap = mBitmapTexture.getBitmap();
+            if (bitmap != null) {
+                bitmap.setDensity(density);
+            }
+        }
+    }
+
+    @Override
+    public void clear() {
+        mGLCanvas.clearBuffer();
+    }
+
+    @Override
+    public void clear(float left, float top, float right, float bottom) {
+        mGLCanvas.fillRect(left, top, right, bottom, 0x00ffff00);
     }
 
 }
