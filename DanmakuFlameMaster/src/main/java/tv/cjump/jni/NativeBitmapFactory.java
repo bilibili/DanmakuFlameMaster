@@ -7,6 +7,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.lang.reflect.Field;
 
@@ -52,7 +53,7 @@ public class NativeBitmapFactory {
             }
         }
 
-        // Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
+        Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
     }
 
     public static void releaseLibs() {
@@ -85,6 +86,9 @@ public class NativeBitmapFactory {
             bitmap = createNativeBitmap(2, 2, Bitmap.Config.ARGB_8888, true);
             boolean result = (bitmap != null && bitmap.getWidth() == 2 && bitmap.getHeight() == 2);
             if (result) {
+                if (android.os.Build.VERSION.SDK_INT >= 19 && !bitmap.isPremultiplied()) {
+                    bitmap.setPremultiplied(true);
+                }
                 canvas = new Canvas(bitmap);
                 Paint paint = new Paint();
                 paint.setColor(Color.RED);
@@ -132,7 +136,7 @@ public class NativeBitmapFactory {
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
         if (nativeLibLoaded == false || nativeIntField == null) {
-            //Log.e("NativeBitmapFactory", "ndk bitmap create failed");
+            // Log.e("NativeBitmapFactory", "ndk bitmap create failed");
             return Bitmap.createBitmap(width, height, config);
         }
         return createNativeBitmap(width, height, config, hasAlpha);
@@ -143,7 +147,7 @@ public class NativeBitmapFactory {
         // Log.e("NativeBitmapFactory", "nativeConfig:" + nativeConfig);
         Bitmap bitmap = android.os.Build.VERSION.SDK_INT == 19 ? createBitmap19(width, height,
                 nativeConfig, hasAlpha) : createBitmap(width, height, nativeConfig, hasAlpha);
-        //Log.e("NativeBitmapFactory", "create bitmap:" + bitmap);
+        // Log.e("NativeBitmapFactory", "create bitmap:" + bitmap);
         return bitmap;
     }
 
