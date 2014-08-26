@@ -21,6 +21,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 
+import tv.cjump.jni.NativeBitmapFactory;
+
 import java.util.Iterator;
 import java.util.Set;
 
@@ -55,6 +57,7 @@ public class CacheManagingDrawTask extends DrawTask {
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener, int maxCacheSize) {
         super(timer, context, disp, taskListener);
+        NativeBitmapFactory.loadLibs();
         mMaxCacheSize = maxCacheSize;
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
     }
@@ -98,6 +101,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void start() {
+        NativeBitmapFactory.loadLibs();
         if (mCacheManager == null) {
             mCacheManager = new CacheManager(mMaxCacheSize, MAX_CACHE_SCREEN_SIZE);
             mCacheManager.begin();
@@ -114,6 +118,7 @@ public class CacheManagingDrawTask extends DrawTask {
             mCacheManager.end();
             mCacheManager = null;
         }
+        NativeBitmapFactory.releaseLibs();
     }
 
     @Override

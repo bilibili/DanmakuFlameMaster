@@ -1,70 +1,67 @@
 
 package tv.cjump.jni;
 
-import java.lang.reflect.Field;
-
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import java.lang.reflect.Field;
+
 public class NativeBitmapFactory {
 
-    static Field nativeIntField = null;    
+    static Field nativeIntField = null;
 
     static boolean nativeLibLoaded = false;
 
-    static {
+    public static void loadLibs() {
+        if (nativeLibLoaded) {
+            return;
+        }
         try {
-            int sdkInt = android.os.Build.VERSION.SDK_INT;
-            if (sdkInt >= 11 && sdkInt <= 13) {
-                System.loadLibrary("ndkbitmap.11");
+            if (android.os.Build.VERSION.SDK_INT >= 19) {
+                System.loadLibrary("ndkbitmap.19");
                 nativeLibLoaded = true;
-            } else if (android.os.Build.VERSION.SDK_INT == 14) {
-                System.loadLibrary("ndkbitmap.14");
-                nativeLibLoaded = true;
-            } else if (android.os.Build.VERSION.SDK_INT == 15) {
-                System.loadLibrary("ndkbitmap.15");
-                nativeLibLoaded = true;
-            } else if (android.os.Build.VERSION.SDK_INT == 16) {
-                System.loadLibrary("ndkbitmap.16");
-                nativeLibLoaded = true;
-            } else if (android.os.Build.VERSION.SDK_INT == 17) {
-                System.loadLibrary("ndkbitmap.17");
-                nativeLibLoaded = true;
-            } else if (android.os.Build.VERSION.SDK_INT == 18) {
+            } else if (android.os.Build.VERSION.SDK_INT >= 11) {
                 System.loadLibrary("ndkbitmap.18");
                 nativeLibLoaded = true;
-            } else if (android.os.Build.VERSION.SDK_INT == 19) {
-                if (android.os.Build.VERSION.RELEASE.equals("4.4")
-                        || android.os.Build.VERSION.RELEASE.equals("4.4.0")
-                        || android.os.Build.VERSION.RELEASE.equals("4.4.1")
-                        || android.os.Build.VERSION.RELEASE.equals("4.4.2")
-                        || android.os.Build.VERSION.RELEASE.equals("4.4.3")) {
-                    System.loadLibrary("ndkbitmap.19");
-                } else {
-                    System.loadLibrary("ndkbitmap.19-2");
-                }
-                nativeLibLoaded = true;
+            } else {
+                nativeLibLoaded = false;
             }
         } catch (Exception e) {
             e.printStackTrace();
             nativeLibLoaded = false;
-        } catch (Error e){
+        } catch (Error e) {
             e.printStackTrace();
             nativeLibLoaded = false;
         }
         if (nativeLibLoaded) {
-            initField();
-            boolean confirm = testLib();
-            if (!confirm) {
-                // 测试so文件函数调用失败
+            boolean libInit = init();
+            if (!libInit) {
+                release();
                 nativeLibLoaded = false;
+            } else {
+                initField();
+                boolean confirm = testLib();
+                if (!confirm) {
+                    // 测试so文件函数是否调用失败
+                    nativeLibLoaded = false;
+                }
             }
-        }  
-        
-//Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
+        }
+
+        // Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
+    }
+
+    public static void releaseLibs() {
+        if (!nativeLibLoaded) {
+            release();
+        }
+        nativeIntField = null;
+        nativeLibLoaded = false;
+        // Log.e("NativeBitmapFactory", "released");
     }
 
     static void initField() {
@@ -85,20 +82,23 @@ public class NativeBitmapFactory {
         Bitmap bitmap = null;
         Canvas canvas = null;
         try {
-            bitmap = createBitmap(2, 2, Bitmap.Config.ARGB_8888);
+            bitmap = createNativeBitmap(2, 2, Bitmap.Config.ARGB_8888, true);
             boolean result = (bitmap != null && bitmap.getWidth() == 2 && bitmap.getHeight() == 2);
-            canvas = new Canvas(bitmap);
-            Paint paint = new Paint();
-            paint.setColor(Color.RED);
-            canvas.drawRect(0f, 0f, (float)bitmap.getWidth(), (float)bitmap.getHeight(), paint);
-            if(result && android.os.Build.VERSION.SDK_INT>=17){
-                result = bitmap.isPremultiplied();
+            if (result) {
+                canvas = new Canvas(bitmap);
+                Paint paint = new Paint();
+                paint.setColor(Color.RED);
+                canvas.drawRect(0f, 0f, (float) bitmap.getWidth(), (float) bitmap.getHeight(),
+                        paint);
+                if (result && android.os.Build.VERSION.SDK_INT >= 17) {
+                    result = bitmap.isPremultiplied();
+                }
             }
             return result;
         } catch (Exception e) {
             return false;
-        } catch (Error e){
-            return false; 
+        } catch (Error e) {
+            return false;
         } finally {
             if (bitmap != null) {
                 bitmap.recycle();
@@ -132,15 +132,26 @@ public class NativeBitmapFactory {
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
         if (nativeLibLoaded == false || nativeIntField == null) {
-//Log.e("NativeBitmapFactory", "ndk bitmap create failed");
+            //Log.e("NativeBitmapFactory", "ndk bitmap create failed");
             return Bitmap.createBitmap(width, height, config);
         }
+        return createNativeBitmap(width, height, config, hasAlpha);
+    }
+
+    private static Bitmap createNativeBitmap(int width, int height, Config config, boolean hasAlpha) {
         int nativeConfig = getNativeConfig(config);
-//Log.e("NativeBitmapFactory", "nativeConfig:"+nativeConfig);
-        return android.os.Build.VERSION.SDK_INT == 19 ? createBitmap19(width, height, nativeConfig, hasAlpha) : createBitmap(width, height, nativeConfig, hasAlpha);
+        // Log.e("NativeBitmapFactory", "nativeConfig:" + nativeConfig);
+        Bitmap bitmap = android.os.Build.VERSION.SDK_INT == 19 ? createBitmap19(width, height,
+                nativeConfig, hasAlpha) : createBitmap(width, height, nativeConfig, hasAlpha);
+        //Log.e("NativeBitmapFactory", "create bitmap:" + bitmap);
+        return bitmap;
     }
 
     // ///////////native methods//////////
+
+    private static native boolean init();
+
+    private static native boolean release();
 
     private static native Bitmap createBitmap(int width, int height, int nativeConfig,
             boolean hasAlpha);
