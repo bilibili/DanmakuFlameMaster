@@ -18,6 +18,10 @@ public class NativeBitmapFactory {
     static boolean nativeLibLoaded = false;
 
     public static void loadLibs() {
+        if (CpuInfo.isARMSimulatedByX86()) {
+            nativeLibLoaded = false;
+            return;
+        }
         if (nativeLibLoaded) {
             return;
         }
@@ -48,6 +52,7 @@ public class NativeBitmapFactory {
                 boolean confirm = testLib();
                 if (!confirm) {
                     // 测试so文件函数是否调用失败
+                    release();
                     nativeLibLoaded = false;
                 }
             }
@@ -57,7 +62,7 @@ public class NativeBitmapFactory {
     }
 
     public static void releaseLibs() {
-        if (!nativeLibLoaded) {
+        if (nativeLibLoaded) {
             release();
         }
         nativeIntField = null;
@@ -86,20 +91,23 @@ public class NativeBitmapFactory {
             bitmap = createNativeBitmap(2, 2, Bitmap.Config.ARGB_8888, true);
             boolean result = (bitmap != null && bitmap.getWidth() == 2 && bitmap.getHeight() == 2);
             if (result) {
-                if (android.os.Build.VERSION.SDK_INT >= 19 && !bitmap.isPremultiplied()) {
+                if (android.os.Build.VERSION.SDK_INT >= 17 && !bitmap.isPremultiplied()) {
                     bitmap.setPremultiplied(true);
                 }
                 canvas = new Canvas(bitmap);
                 Paint paint = new Paint();
                 paint.setColor(Color.RED);
+                paint.setTextSize(20f);
                 canvas.drawRect(0f, 0f, (float) bitmap.getWidth(), (float) bitmap.getHeight(),
                         paint);
+                canvas.drawText("TestLib", 0, 0, paint);
                 if (result && android.os.Build.VERSION.SDK_INT >= 17) {
                     result = bitmap.isPremultiplied();
                 }
             }
             return result;
         } catch (Exception e) {
+            Log.e("NativeBitmapFactory", "exception:" + e.toString());
             return false;
         } catch (Error e) {
             return false;
@@ -135,11 +143,11 @@ public class NativeBitmapFactory {
     }
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
-        if (nativeLibLoaded == false || nativeIntField == null) {
-            // Log.e("NativeBitmapFactory", "ndk bitmap create failed");
-            return Bitmap.createBitmap(width, height, config);
-        }
-        return createNativeBitmap(width, height, config, hasAlpha);
+        // if (nativeLibLoaded == false || nativeIntField == null) {
+        // Log.e("NativeBitmapFactory", "ndk bitmap create failed");
+        return Bitmap.createBitmap(width, height, config);
+        // }
+        // return createNativeBitmap(width, height, config, hasAlpha);
     }
 
     private static Bitmap createNativeBitmap(int width, int height, Config config, boolean hasAlpha) {
