@@ -143,11 +143,11 @@ public class NativeBitmapFactory {
     }
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
-        // if (nativeLibLoaded == false || nativeIntField == null) {
-        // Log.e("NativeBitmapFactory", "ndk bitmap create failed");
-        return Bitmap.createBitmap(width, height, config);
-        // }
-        // return createNativeBitmap(width, height, config, hasAlpha);
+        if (nativeLibLoaded == false || nativeIntField == null) {
+            // Log.e("NativeBitmapFactory", "ndk bitmap create failed");
+            return Bitmap.createBitmap(width, height, config);
+        }
+        return createNativeBitmap(width, height, config, hasAlpha);
     }
 
     private static Bitmap createNativeBitmap(int width, int height, Config config, boolean hasAlpha) {
