@@ -120,8 +120,8 @@ public class DanmakuFactory {
         if (TextUtils.isEmpty(text) || text.indexOf(BaseDanmaku.DANMAKU_BR_CHAR) == -1) {
             return;
         }
-
-        String[] lines = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR);
+        
+        String[] lines = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
         if (lines.length > 1) {
             danmaku.lines = lines;
         }
