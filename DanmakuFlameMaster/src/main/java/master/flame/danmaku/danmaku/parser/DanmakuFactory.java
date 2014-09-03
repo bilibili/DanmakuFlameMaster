@@ -152,7 +152,7 @@ public class DanmakuFactory {
         updateSpecicalDanmakuDuration(item);
     }
     
-    public static void fiilLinePathData(BaseDanmaku item, int dispWidth, int dispHeight,
+    public static void fillLinePathData(BaseDanmaku item, int dispWidth, int dispHeight,
             float[][] points) {
         if (item.getType() != BaseDanmaku.TYPE_SPECIAL || points.length == 0
                 || points[0].length != 2)

@@ -211,7 +211,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                                     points[i][0] = Float.parseFloat(pointArray[0]);
                                     points[i][1] = Float.parseFloat(pointArray[1]);
                                 }
-                                DanmakuFactory.fiilLinePathData(item, mDispWidth, mDispHeight,
+                                DanmakuFactory.fillLinePathData(item, mDispWidth, mDispHeight,
                                         points);
                             }
                         }
