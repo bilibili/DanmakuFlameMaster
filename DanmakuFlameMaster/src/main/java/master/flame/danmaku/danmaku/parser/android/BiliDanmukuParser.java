@@ -24,6 +24,8 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -115,17 +117,19 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             if (item != null) {
-                String tagName = localName.length() != 0 ? localName : qName;
-                if (tagName.equalsIgnoreCase("d")) {
-                    item.setTimer(mTimer);
-                    result.addItem(item);
+                if (item.duration != null) {
+                    String tagName = localName.length() != 0 ? localName : qName;
+                    if (tagName.equalsIgnoreCase("d")) {
+                        item.setTimer(mTimer);
+                        result.addItem(item);
+                    }
                 }
                 item = null;
             }
         }
 
         @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
+        public void characters(char[] ch, int start, int length)  {
             if (item != null) {
                 DanmakuFactory.fillText(item, decodeXmlString(new String(ch, start, length)));
                 item.index = index++;
@@ -134,10 +138,22 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                 String text = item.text.trim();
                 if (item.getType() == BaseDanmaku.TYPE_SPECIAL && text.startsWith("[")
                         && text.endsWith("]")) {
-                    text = text.substring(2, text.length() - 2);
-                    String[] textArr = text.split("\",\"");
-                    if (textArr == null || textArr.length < 5)
+                    //text = text.substring(1, text.length() - 1);
+                    String[] textArr = null;//text.split(",", -1);
+                    try {
+                        JSONArray jsonArray = new JSONArray(text);
+                        textArr = new String[jsonArray.length()];
+                        for(int i=0;i<textArr.length;i++){
+                            textArr[i] = jsonArray.getString(i);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    
+                    if (textArr == null || textArr.length < 5) {
+                        item = null;
                         return;
+                    }
                     item.text = textArr[4];
                     float beginX = Float.parseFloat(textArr[0]);
                     float beginY = Float.parseFloat(textArr[1]);
@@ -153,15 +169,19 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     long translationDuration = alphaDuraion;
                     long translationStartDelay = 0;
                     float rotateY = 0, rotateZ = 0;
-                    if (textArr.length > 5) {
+                    if (textArr.length >= 7) {
                         rotateZ = Float.parseFloat(textArr[5]);
                         rotateY = Float.parseFloat(textArr[6]);
                     }
-                    if (textArr.length > 7) {
+                    if (textArr.length >= 11) {
                         endX = Float.parseFloat(textArr[7]);
                         endY = Float.parseFloat(textArr[8]);
-                        translationDuration = Integer.parseInt(textArr[9]);
-                        translationStartDelay = (long) (Float.parseFloat(textArr[10]));
+                        if(textArr[9] != ""){
+                            translationDuration = Integer.parseInt(textArr[9]);
+                        }
+                        if(textArr[10] != ""){
+                            translationStartDelay = (long) (Float.parseFloat(textArr[10]));
+                        }
                     }
                     item.duration = new Duration(alphaDuraion);
                     item.rotationZ = rotateZ;
@@ -169,6 +189,33 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     DanmakuFactory.fillTranslationData(item, mDispWidth, mDispHeight, beginX,
                             beginY, endX, endY, translationDuration, translationStartDelay);
                     DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
+                    
+                    if (textArr.length >= 12) {
+                        //TODO 是否有描边 textArr[11]
+                    }
+                    if (textArr.length >= 13) {
+                        //TODO 字体 textArr[12]
+                    }
+                    if (textArr.length >= 14) {
+                        //TODO 是否有加速
+                    }
+                    if (textArr.length >= 15) {
+                        // 路径数据
+                        if (textArr[14] != "") {
+                            String motionPathString = textArr[14].substring(1);
+                            String[] pointStrArray = motionPathString.split("L");
+                            if (pointStrArray != null && pointStrArray.length > 0) {
+                                float[][] points = new float[pointStrArray.length][2];
+                                for (int i = 0; i < pointStrArray.length; i++) {
+                                    String[] pointArray = pointStrArray[i].split(",");
+                                    points[i][0] = Float.parseFloat(pointArray[0]);
+                                    points[i][1] = Float.parseFloat(pointArray[1]);
+                                }
+                                DanmakuFactory.fiilLinePathData(item, mDispWidth, mDispHeight,
+                                        points);
+                            }
+                        }
+                    }
                 }
 
             }

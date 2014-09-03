@@ -151,6 +151,20 @@ public class DanmakuFactory {
                 endY * scaleY, translationDuration, translationStartDelay);
         updateSpecicalDanmakuDuration(item);
     }
+    
+    public static void fiilLinePathData(BaseDanmaku item, int dispWidth, int dispHeight,
+            float[][] points) {
+        if (item.getType() != BaseDanmaku.TYPE_SPECIAL || points.length == 0
+                || points[0].length != 2)
+            return;
+        float scaleX = dispWidth / BILI_PLAYER_WIDTH;
+        float scaleY = dispHeight / BILI_PLAYER_HEIGHT;
+        for (int i = 0; i < points.length; i++) {
+            points[i][0] *= scaleX;
+            points[i][1] *= scaleY;
+        }
+        ((SpecialDanmaku) item).setLinePathData(points);
+    }
 
     /**
      * Initial alpha data of the special danmaku
@@ -174,4 +188,5 @@ public class DanmakuFactory {
             updateMaxDanmakuDuration();
         }
     }
+    
 }

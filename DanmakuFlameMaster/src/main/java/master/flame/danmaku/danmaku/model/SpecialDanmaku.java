@@ -2,6 +2,38 @@
 package master.flame.danmaku.danmaku.model;
 
 public class SpecialDanmaku extends BaseDanmaku {
+    
+    private class Point {
+        float x, y;
+
+        public Point(float x, float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public float getDistance(Point p) {
+            float _x = Math.abs(this.x - p.x);
+            float _y = Math.abs(this.y - p.y);
+            return (float) Math.sqrt(_x * _x + _y * _y);
+        }
+    }
+
+    private class LinePath {
+        Point pBegin, pEnd;
+        public long duration,beginTime,endTime;
+        float delatX, deltaY;        
+
+        public void setPoints(Point pBegin, Point pEnd) {
+            this.pBegin = pBegin;
+            this.pEnd = pEnd;
+            this.delatX = pEnd.x - pBegin.x;
+            this.deltaY = pEnd.y - pBegin.y;
+        }
+
+        public float getDistance() {
+            return pEnd.getDistance(pBegin);
+        }
+    }
 
     public float beginX, beginY;
 
@@ -26,6 +58,9 @@ public class SpecialDanmaku extends BaseDanmaku {
     public float pivotX, pivotY;
 
     private float[] currStateValues = new float[4];
+
+    private LinePath[] linePaths;
+
 
     @Override
     public void layout(IDisplayer displayer, float x, float y) {
@@ -57,13 +92,42 @@ public class SpecialDanmaku extends BaseDanmaku {
         long dtime = deltaTime - translationStartDelay;
         if (translationDuration > 0 && dtime >= 0 && dtime <= translationDuration) {
             float tranalationProgress = dtime / (float) translationDuration;
-            if (deltaX != 0) {
-                float vectorX = deltaX * tranalationProgress;
-                currX = beginX + vectorX;
-            }
-            if (deltaY != 0) {
-                float vectorY = deltaY * tranalationProgress;
-                currY = beginY + vectorY;
+            if (linePaths != null) {
+                LinePath currentLinePath = null;
+                for (LinePath line : linePaths) {
+                    if (dtime >= line.beginTime && dtime < line.endTime) {
+                        currentLinePath = line;
+                        break;
+                    } else {
+                        currX = line.pEnd.x;
+                        currY = line.pEnd.y;
+                    }
+                }
+                if (currentLinePath != null) {
+                    float deltaX = currentLinePath.delatX;
+                    float deltaY = currentLinePath.deltaY;
+                    tranalationProgress = (deltaTime - currentLinePath.beginTime)
+                            / (float) currentLinePath.duration;
+                    float beginX = currentLinePath.pBegin.x;
+                    float beginY = currentLinePath.pBegin.y;
+                    if (deltaX != 0) {
+                        float vectorX = deltaX * tranalationProgress;
+                        currX = beginX + vectorX;
+                    }
+                    if (deltaY != 0) {
+                        float vectorY = deltaY * tranalationProgress;
+                        currY = beginY + vectorY;
+                    }
+                }
+            } else {
+                if (deltaX != 0) {
+                    float vectorX = deltaX * tranalationProgress;
+                    currX = beginX + vectorX;
+                }
+                if (deltaY != 0) {
+                    float vectorY = deltaY * tranalationProgress;
+                    currY = beginY + vectorY;
+                }
             }
         } else if(dtime > translationDuration){
             currX = endX;
@@ -124,6 +188,36 @@ public class SpecialDanmaku extends BaseDanmaku {
         this.alphaDuration = alphaDuration;
         if(deltaAlpha != 0 && beginAlpha != AlphaValue.MAX){
             alpha = beginAlpha;
+        }
+    }
+
+    public void setLinePathData(float[][] points) {
+        if (points != null) {
+            int length = points.length;
+            this.beginX = points[0][0];
+            this.beginY = points[0][1];
+            this.endX = points[length - 1][0];
+            this.endY = points[length - 1][1];
+            if (points.length > 1) {
+                linePaths = new LinePath[points.length - 1];
+                for (int i = 0; i < linePaths.length; i++) {
+                    linePaths[i] = new LinePath();
+                    linePaths[i].setPoints(new Point(points[i][0], points[i][1]), new Point(
+                            points[i + 1][0], points[i + 1][1]));
+                }
+                float totalDistance = 0;
+                for (LinePath line : linePaths) {
+                    totalDistance += line.getDistance();
+                }
+                LinePath lastLine = null;
+                for (LinePath line : linePaths) {
+                    line.duration = (long) ((line.getDistance() / totalDistance) * translationDuration);
+                    line.beginTime = (lastLine == null ? 0 : lastLine.endTime);
+                    line.endTime = line.beginTime + line.duration;
+                    lastLine = line;
+                }
+                
+            }
         }
     }
 
