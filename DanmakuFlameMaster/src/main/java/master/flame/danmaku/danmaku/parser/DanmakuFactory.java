@@ -22,11 +22,15 @@ import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 
 public class DanmakuFactory {
 
-    public final static float BILI_PLAYER_WIDTH = 539;
+    public final static float OLD_BILI_PLAYER_WIDTH = 539;
+    
+    public final static float BILI_PLAYER_WIDTH = 682;
     
     public static int CURRENT_DISP_WIDTH = 0;
 
-    public final static float BILI_PLAYER_HEIGHT = 385;
+    public final static float OLD_BILI_PLAYER_HEIGHT = 385;
+    
+    public final static float BILI_PLAYER_HEIGHT = 438;
 
     public final static long COMMON_DANMAKU_DURATION = 3800; // B站原始分辨率下弹幕存活时间
     
