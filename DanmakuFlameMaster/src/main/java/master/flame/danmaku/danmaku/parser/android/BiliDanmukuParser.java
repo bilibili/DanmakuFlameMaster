@@ -17,6 +17,8 @@
 package master.flame.danmaku.danmaku.parser.android;
 
 import android.graphics.Color;
+import android.text.TextUtils;
+
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
@@ -65,6 +67,8 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
     }
 
     public class XmlContentHandler extends DefaultHandler {
+
+        private static final String TRUE_STRING = "true";
 
         public Danmakus result = null;
 
@@ -191,7 +195,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
                     
                     if (textArr.length >= 12) {
-                        //TODO 是否有描边 textArr[11]
+                        // 是否有描边
+                        if (!TextUtils.isEmpty(textArr[11]) && TRUE_STRING.equals(textArr[11])) {
+                            item.textShadowColor = Color.TRANSPARENT;
+                        }
                     }
                     if (textArr.length >= 13) {
                         //TODO 字体 textArr[12]
