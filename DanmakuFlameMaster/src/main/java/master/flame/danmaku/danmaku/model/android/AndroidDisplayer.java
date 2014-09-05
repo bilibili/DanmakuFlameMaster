@@ -273,7 +273,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         if (danmaku.lines != null) {
             String[] lines = danmaku.lines;
             if (lines.length == 1) {
-                if (HAS_STROKE){
+                if (hasStroke(danmaku)) {
                     applyPaintConfig(danmaku, paint, true);
                     canvas.drawText(lines[0], left, top - paint.ascent(), paint);
                 }
@@ -285,7 +285,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                     if (lines[t] == null || lines[t].length() == 0) {
                         continue;
                     }
-                    if (HAS_STROKE){
+                    if (hasStroke(danmaku)) {
                         applyPaintConfig(danmaku, paint, true);
                         canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
                     }
@@ -294,7 +294,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                 }
             }
         } else {
-            if (HAS_STROKE){                
+            if (hasStroke(danmaku)) {                
                 applyPaintConfig(danmaku, paint, true);
                 canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
             }
@@ -318,6 +318,10 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     }
     
+    private static boolean hasStroke(BaseDanmaku danmaku) {
+        return HAS_STROKE && STROKE_WIDTH > 0 && danmaku.textShadowColor != 0;
+    }
+
     public static Paint getBorderPaint(BaseDanmaku danmaku) {
         BORDER_PAINT.setColor(danmaku.borderColor);
         return BORDER_PAINT;
@@ -338,10 +342,12 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         }
         paint.setTextSize(danmaku.textSize);
         applyTextScaleConfig(danmaku, paint);
-        if (HAS_SHADOW) {
-            paint.setShadowLayer(SHADOW_RADIUS, 0, 0, danmaku.textShadowColor);
-        } else {
+        
+        //ignore the transparent textShadowColor
+        if (!HAS_SHADOW || SHADOW_RADIUS <= 0 || danmaku.textShadowColor == 0) {
             paint.clearShadowLayer();
+        } else {
+            paint.setShadowLayer(SHADOW_RADIUS, 0, 0, danmaku.textShadowColor);
         }
         paint.setAntiAlias(ANTI_ALIAS);
         return paint;
