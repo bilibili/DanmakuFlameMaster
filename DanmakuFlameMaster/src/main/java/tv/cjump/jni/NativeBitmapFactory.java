@@ -18,7 +18,7 @@ public class NativeBitmapFactory {
     static boolean nativeLibLoaded = false;
 
     public static void loadLibs() {
-        if (CpuInfo.isARMSimulatedByX86()) {
+        if (CpuInfo.isARMSimulatedByX86() || CpuInfo.supportX86() || CpuInfo.supportMips()) {
             nativeLibLoaded = false;
             return;
         }

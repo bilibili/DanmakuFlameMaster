@@ -14,6 +14,8 @@ import java.lang.reflect.Field;
 public class CpuInfo {
 
     public static final String ABI_X86 = "x86";
+    
+    public static final String ABI_MIPS = "mips";
 
     public static enum ARCH {
         Unknown, ARM, X86, MIPS, ARM64,
@@ -108,6 +110,10 @@ public class CpuInfo {
 
     public static boolean supportX86() {
         return supportABI(ABI_X86);
+    }
+    
+    public static boolean supportMips() {
+        return supportABI(ABI_MIPS);
     }
 
     public static boolean isARMSimulatedByX86() {
