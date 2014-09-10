@@ -8,7 +8,7 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 [![acfun](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/acfun.png?raw=true)](https://play.google.com/store/apps/details?id=tv.acfundanmaku.video)
 [![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
 
-- AcFun视频民间版 https://play.google.com/store/apps/details?id=tv.ac.fun
+- AcFun视频民间版 https://github.com/yrom/acfunm
 - AcFun视频官方版 https://play.google.com/store/apps/details?id=tv.acfundanmaku.video
 - 哔哩哔哩动画 https://play.google.com/store/apps/details?id=tv.danmaku.bili
 - 斗鱼直播客户端 http://www.douyu.tv/client
