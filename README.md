@@ -14,8 +14,10 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 - 斗鱼直播客户端 http://www.douyu.tv/client
 - 猎豹浏览器 https://play.google.com/store/apps/details?id=com.ijinshan.browser
 - 小米电视/盒子视频弹幕
+- Ac动画 http://www.acfun.tv/app/
+- 网易新闻客户端 http://www.163.com/newsapp/
 
-实际效果可安装以上app参看。
+以上客户端均使用DFM弹幕引擎,实际效果可安装以上app参看。
 
 ### Features
 
