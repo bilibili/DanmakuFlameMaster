@@ -165,8 +165,9 @@ public class DanmakuGlobalConfig {
         return this;
     }
 
-    private void setFilterData(String tag, Object data) {
-        IDanmakuFilter filter = DanmakuFilters.getDefault().get(tag);
+    private <T> void setFilterData(String tag, T data) {
+        @SuppressWarnings("unchecked")
+        IDanmakuFilter<T> filter = (IDanmakuFilter<T>) DanmakuFilters.getDefault().get(tag);
         filter.setData(data);
     }
 
@@ -287,7 +288,7 @@ public class DanmakuGlobalConfig {
             DanmakuFilters.getDefault()
                     .unregisterFilter(DanmakuFilters.TAG_QUANTITY_DANMAKU_FILTER);
             DanmakuFilters.getDefault()
-                    .registerFilter(DanmakuFilters.TAG_ELAPSED_TIME_FILTER, null);
+                    .registerFilter(DanmakuFilters.TAG_ELAPSED_TIME_FILTER);
             notifyConfigureChanged(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN, maxSize);
             return this;
         }
@@ -359,6 +360,10 @@ public class DanmakuGlobalConfig {
         return this;
     }
     
+    public List<Integer> getColorValueWhiteList(){
+        return mColorValueWhiteList;
+    }
+    
     /**
      * 设置屏蔽弹幕用户id , 0 表示游客弹幕
      * @param ids 
@@ -377,6 +382,38 @@ public class DanmakuGlobalConfig {
         }
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
+    }
+    
+    public DanmakuGlobalConfig removeUserIdBlackList(Integer... ids){
+        if(ids == null || ids.length == 0) {
+            return this;
+        }
+        for (Integer id : ids) {
+            mUserIdBlackList.remove(id);
+        }
+        setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
+        notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
+        return this;
+    }
+    /**
+     * 添加屏蔽用户
+     * @param ids
+     * @return
+     */
+    public DanmakuGlobalConfig addUserIdBlackList(Integer... ids){
+        if(ids == null || ids.length == 0) {
+            return this;
+        }
+        for (Integer id : ids) {
+            mUserIdBlackList.add(id);
+        }
+        setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
+        notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
+        return this;
+    }
+    
+    public List<Integer> getUserIdBlackList(){
+        return mUserIdBlackList;
     }
     
     /**

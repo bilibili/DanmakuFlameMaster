@@ -14,14 +14,14 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
 
 public class DanmakuFilters {
 
-    public static interface IDanmakuFilter {
+    public static interface IDanmakuFilter<T> {
         /*
          * 是否过滤
          */
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
                 DanmakuTimer timer);
 
-        public void setData(Object data);
+        public void setData(T data);
 
         public void reset();
 
@@ -32,7 +32,7 @@ public class DanmakuFilters {
      * 
      * @author ch
      */
-    public static class TypeDanmakuFilter implements IDanmakuFilter {
+    public static class TypeDanmakuFilter implements IDanmakuFilter<List<Integer>> {
 
         final List<Integer> mFilterTypes = Collections.synchronizedList(new ArrayList<Integer>());
 
@@ -55,15 +55,12 @@ public class DanmakuFilters {
         }
 
         @Override
-        public void setData(Object data) {
+        public void setData(List<Integer> data) {
             reset();
-            if (data == null || data instanceof List<?>) {
-                if (data != null) {
-                    @SuppressWarnings("unchecked")
-                    List<Integer> list = (List<Integer>) data;
-                    for (Integer i : list) {
-                        enableType(i);
-                    }
+            if (data != null) {
+                List<Integer> list = data;
+                for (Integer i : list) {
+                    enableType(i);
                 }
             }
         }
@@ -80,7 +77,7 @@ public class DanmakuFilters {
      * 
      * @author ch
      */
-    public static class QuantityDanmakuFilter implements IDanmakuFilter {
+    public static class QuantityDanmakuFilter implements IDanmakuFilter<Integer> {
 
         protected int mMaximumSize = -1;
 
@@ -120,13 +117,12 @@ public class DanmakuFilters {
         }
 
         @Override
-        public void setData(Object data) {
+        public void setData(Integer data) {
             reset();
-            if (data instanceof Integer) {
-                Integer maximumSize = (Integer) data;
-                if (maximumSize != mMaximumSize) {
-                    mMaximumSize = maximumSize;
-                }
+            if(data == null) return;
+            Integer maximumSize = data;
+            if (maximumSize != mMaximumSize) {
+                mMaximumSize = maximumSize;
             }
         }
 
@@ -141,7 +137,7 @@ public class DanmakuFilters {
      * 
      * @author ch
      */
-    public static class ElapsedTimeFilter implements IDanmakuFilter {
+    public static class ElapsedTimeFilter implements IDanmakuFilter<Object> {
 
         long mMaxTime = 20; // 绘制超过20ms就跳过 ，默认保持接近50fps
 
@@ -188,7 +184,7 @@ public class DanmakuFilters {
      * @author ch
      *
      */
-    public static class TextColorFilter  implements IDanmakuFilter {
+    public static class TextColorFilter  implements IDanmakuFilter<List<Integer>> {
         
         public List<Integer> mWhiteList = new ArrayList<Integer>(); 
         
@@ -207,15 +203,12 @@ public class DanmakuFilters {
         }
 
         @Override
-        public void setData(Object data) {
+        public void setData(List<Integer> data) {
             reset();
-            if (data == null || data instanceof List<?>) {
-                if (data != null) {
-                    @SuppressWarnings("unchecked")
-                    List<Integer> list = (List<Integer>) data;
-                    for (Integer i : list) {
-                        addToWhiteList(i);
-                    }
+            if (data != null) {
+                List<Integer> list = data;
+                for (Integer i : list) {
+                    addToWhiteList(i);
                 }
             }
         }
@@ -232,34 +225,31 @@ public class DanmakuFilters {
      * @author ch
      *
      */
-    public static class UserIdFilter  implements IDanmakuFilter {
+    public static class UserIdFilter  implements IDanmakuFilter<List<Integer>> {
         
         public List<Integer> mBlackList = new ArrayList<Integer>(); 
         
-        private void addToWhiteList(Integer color){
-            if(!mBlackList.contains(color)){
-                mBlackList.add(color);
+        private void addToBlackList(Integer id){
+            if(!mBlackList.contains(id)){
+                mBlackList.add(id);
             }
         }
         
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
                 DanmakuTimer timer) {
-            if (danmaku != null && !mBlackList.contains(danmaku.userId))
+            if (danmaku != null && mBlackList.contains(danmaku.userId))
                 return true;
             return false;
         }
 
         @Override
-        public void setData(Object data) {
+        public void setData(List<Integer> data) {
             reset();
-            if (data == null || data instanceof List<?>) {
-                if (data != null) {
-                    @SuppressWarnings("unchecked")
-                    List<Integer> list = (List<Integer>) data;
-                    for (Integer i : list) {
-                        addToWhiteList(i);
-                    }
+            if (data != null) {
+                List<Integer> list = data;
+                for (Integer i : list) {
+                    addToBlackList(i);
                 }
             }
         }
@@ -287,7 +277,7 @@ public class DanmakuFilters {
 
     public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
             DanmakuTimer timer) {
-        for (IDanmakuFilter f : mFilterArray) {
+        for (IDanmakuFilter<?> f : mFilterArray) {
             if (f != null && f.filter(danmaku, index, totalsizeInScreen, timer)) {
                 return true;
             }
@@ -295,25 +285,25 @@ public class DanmakuFilters {
         return false;
     }
 
-    private final static Map<String, IDanmakuFilter> filters = Collections
-            .synchronizedSortedMap(new TreeMap<String, IDanmakuFilter>());
+    private final static Map<String, IDanmakuFilter<?>> filters = Collections
+            .synchronizedSortedMap(new TreeMap<String, IDanmakuFilter<?>>());
 
-    public IDanmakuFilter get(String tag) {
-        IDanmakuFilter f = filters.get(tag);
+    public IDanmakuFilter<?> get(String tag) {
+        IDanmakuFilter<?> f = filters.get(tag);
         if (f == null) {
-            f = registerFilter(tag, null);
+            f = registerFilter(tag);
         }
         return f;
     }
 
-    IDanmakuFilter[] mFilterArray = new IDanmakuFilter[0];
+    IDanmakuFilter<?>[] mFilterArray = new IDanmakuFilter[0];
 
-    public IDanmakuFilter registerFilter(String tag, Object data) {
+    public IDanmakuFilter<?> registerFilter(String tag) {
         if (tag == null) {
             throwFilterException();
             return null;
         }
-        IDanmakuFilter filter = filters.get(tag);
+        IDanmakuFilter<?> filter = filters.get(tag);
         if (filter == null) {
             if (TAG_TYPE_DANMAKU_FILTER.equals(tag)) {
                 filter = new TypeDanmakuFilter();
@@ -332,14 +322,14 @@ public class DanmakuFilters {
             throwFilterException();
             return null;
         }
-        filter.setData(data);
+        filter.setData(null);
         filters.put(tag, filter);
         mFilterArray = filters.values().toArray(mFilterArray);
         return filter;
     }
 
     public void unregisterFilter(String tag) {
-        IDanmakuFilter f = filters.remove(tag);
+        IDanmakuFilter<?> f = filters.remove(tag);
         if (f != null) {
             f.reset();
             f = null;
@@ -353,7 +343,7 @@ public class DanmakuFilters {
     }
 
     public void reset() {
-        for (IDanmakuFilter f : mFilterArray) {
+        for (IDanmakuFilter<?> f : mFilterArray) {
             if (f != null)
                 f.reset();
         }
