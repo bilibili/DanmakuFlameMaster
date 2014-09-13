@@ -48,21 +48,22 @@ public class R2LDanmaku extends BaseDanmaku {
                     this.y = y;
                     this.setVisibility(true);
                 }
+                mLastTime = currMS;
                 return;
             }
             this.setVisibility(false);
+            mLastTime = currMS;
         }
         this.x = displayer.getWidth();
     }
 
     protected float getStableLeft(IDisplayer displayer, long currTime) {
         long elapsedTime = currTime - time;
-        if (elapsedTime >= duration.value || this.x <= -paintWidth) {
-            return displayer.getWidth();
+        if (elapsedTime >= duration.value) {
+            return -paintWidth;
         }
         
         if (Math.abs(mLastTime - currTime) > MAX_RENDERING_TIME){
-            mLastTime = currTime;
             return getAccurateLeft(displayer, currTime);
         }
         
@@ -73,7 +74,6 @@ public class R2LDanmaku extends BaseDanmaku {
         if (stepX < mStepX * 16) {
             stepX = mStepX * 16;
         }
-        mLastTime = currTime;
         return this.x - stepX;
     }
 
