@@ -73,18 +73,18 @@ public class CpuInfo {
         return sArch;
     }
 
-    public static final String get_CPU_ABI() {
+    public static String get_CPU_ABI() {
         return Build.CPU_ABI;
     }
 
-    public static final String get_CPU_ABI2() {
+    public static String get_CPU_ABI2() {
         try {
             Field field = Build.class.getDeclaredField("CPU_ABI2");
             if (field == null)
                 return null;
 
             Object fieldValue = field.get(null);
-            if (field == null || !(fieldValue instanceof String)) {
+            if (!(fieldValue instanceof String)) {
                 return null;
             }
 
@@ -102,10 +102,8 @@ public class CpuInfo {
             return true;
 
         String abi2 = get_CPU_ABI2();
-        if (!TextUtils.isEmpty(abi2) && abi.equalsIgnoreCase(requestAbi))
-            return true;
+        return !TextUtils.isEmpty(abi2) && abi.equalsIgnoreCase(requestAbi);
 
-        return false;
     }
 
     public static boolean supportX86() {

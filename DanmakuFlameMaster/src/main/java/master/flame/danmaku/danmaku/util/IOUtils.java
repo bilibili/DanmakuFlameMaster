@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Created by Yrom on 13-8-11.
+ * Created by MoiTempete.
  */
 public class IOUtils {
     public static String getString(InputStream in){

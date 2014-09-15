@@ -121,7 +121,7 @@ public class DanmakuFactory {
     
     public static void fillText(BaseDanmaku danmaku, String text) {
         danmaku.text = text;
-        if (TextUtils.isEmpty(text) || text.indexOf(BaseDanmaku.DANMAKU_BR_CHAR) == -1) {
+        if (TextUtils.isEmpty(text) || !text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
             return;
         }
         

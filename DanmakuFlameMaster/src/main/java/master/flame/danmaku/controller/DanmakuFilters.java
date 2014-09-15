@@ -49,17 +49,14 @@ public class DanmakuFilters {
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
                 DanmakuTimer timer) {
-            if (danmaku != null && mFilterTypes.contains(danmaku.getType()))
-                return true;
-            return false;
+            return danmaku != null && mFilterTypes.contains(danmaku.getType());
         }
 
         @Override
         public void setData(List<Integer> data) {
             reset();
             if (data != null) {
-                List<Integer> list = data;
-                for (Integer i : list) {
+                for (Integer i : data) {
                     enableType(i);
                 }
             }
@@ -120,9 +117,8 @@ public class DanmakuFilters {
         public void setData(Integer data) {
             reset();
             if(data == null) return;
-            Integer maximumSize = data;
-            if (maximumSize != mMaximumSize) {
-                mMaximumSize = maximumSize;
+            if (data != mMaximumSize) {
+                mMaximumSize = data;
             }
         }
 
@@ -197,17 +193,14 @@ public class DanmakuFilters {
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
                 DanmakuTimer timer) {
-            if (danmaku != null && !mWhiteList.contains(danmaku.textColor))
-                return true;
-            return false;
+            return danmaku != null && !mWhiteList.contains(danmaku.textColor);
         }
 
         @Override
         public void setData(List<Integer> data) {
             reset();
             if (data != null) {
-                List<Integer> list = data;
-                for (Integer i : list) {
+                for (Integer i : data) {
                     addToWhiteList(i);
                 }
             }
@@ -238,17 +231,14 @@ public class DanmakuFilters {
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
                 DanmakuTimer timer) {
-            if (danmaku != null && mBlackList.contains(danmaku.userId))
-                return true;
-            return false;
+            return danmaku != null && mBlackList.contains(danmaku.userId);
         }
 
         @Override
         public void setData(List<Integer> data) {
             reset();
             if (data != null) {
-                List<Integer> list = data;
-                for (Integer i : list) {
+                for (Integer i : data) {
                     addToBlackList(i);
                 }
             }

@@ -101,7 +101,7 @@ public class NativeBitmapFactory {
                 canvas.drawRect(0f, 0f, (float) bitmap.getWidth(), (float) bitmap.getHeight(),
                         paint);
                 canvas.drawText("TestLib", 0, 0, paint);
-                if (result && android.os.Build.VERSION.SDK_INT >= 17) {
+                if (android.os.Build.VERSION.SDK_INT >= 17) {
                     result = bitmap.isPremultiplied();
                 }
             }
@@ -124,8 +124,7 @@ public class NativeBitmapFactory {
             if (nativeIntField == null) {
                 return 0;
             }
-            int nativeInt = nativeIntField.getInt(config);
-            return nativeInt;
+            return nativeIntField.getInt(config);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -143,7 +142,7 @@ public class NativeBitmapFactory {
     }
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
-        if (nativeLibLoaded == false || nativeIntField == null) {
+        if (!nativeLibLoaded || nativeIntField == null) {
             // Log.e("NativeBitmapFactory", "ndk bitmap create failed");
             return Bitmap.createBitmap(width, height, config);
         }
@@ -153,10 +152,9 @@ public class NativeBitmapFactory {
     private static Bitmap createNativeBitmap(int width, int height, Config config, boolean hasAlpha) {
         int nativeConfig = getNativeConfig(config);
         // Log.e("NativeBitmapFactory", "nativeConfig:" + nativeConfig);
-        Bitmap bitmap = android.os.Build.VERSION.SDK_INT == 19 ? createBitmap19(width, height,
-                nativeConfig, hasAlpha) : createBitmap(width, height, nativeConfig, hasAlpha);
         // Log.e("NativeBitmapFactory", "create bitmap:" + bitmap);
-        return bitmap;
+        return android.os.Build.VERSION.SDK_INT == 19 ? createBitmap19(width, height,
+                nativeConfig, hasAlpha) : createBitmap(width, height, nativeConfig, hasAlpha);
     }
 
     // ///////////native methods//////////

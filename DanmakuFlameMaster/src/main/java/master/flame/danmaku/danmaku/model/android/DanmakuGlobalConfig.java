@@ -2,6 +2,7 @@
 package master.flame.danmaku.danmaku.model.android;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import master.flame.danmaku.controller.DanmakuFilters;
@@ -97,10 +98,7 @@ public class DanmakuGlobalConfig {
     public BorderType shadowType = BorderType.SHADOW;
 
     public int shadowRadius = 3;
-    
-    @SuppressWarnings("unused")
-    private int mDanmakuStyle;
-    
+
     List<Integer> mColorValueWhiteList = new ArrayList<Integer>();
     
     List<Integer> mUserIdBlackList = new ArrayList<Integer>(); 
@@ -175,7 +173,7 @@ public class DanmakuGlobalConfig {
         if (visible) {
             mFilterTypes.remove(Integer.valueOf(type));
         } else if (!mFilterTypes.contains(Integer.valueOf(type))) {
-            mFilterTypes.add(Integer.valueOf(type));
+            mFilterTypes.add(type);
         }
     }
 
@@ -306,7 +304,6 @@ public class DanmakuGlobalConfig {
      * @return
      */
     public DanmakuGlobalConfig setDanmakuStyle(int style, float size) {
-        mDanmakuStyle = style;
         switch (style) {
             case DANMAKU_STYLE_NONE:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = false;
@@ -351,9 +348,7 @@ public class DanmakuGlobalConfig {
             DanmakuFilters.getDefault().unregisterFilter(
                     DanmakuFilters.TAG_TEXT_COLOR_DANMAKU_FILTER);
         } else {
-            for (Integer color : colors) {
-                mColorValueWhiteList.add(color);
-            }
+            Collections.addAll(mColorValueWhiteList, colors);
             setFilterData(DanmakuFilters.TAG_TEXT_COLOR_DANMAKU_FILTER, mColorValueWhiteList);
         }
         notifyConfigureChanged(DanmakuConfigTag.COLOR_VALUE_WHITE_LIST, mColorValueWhiteList);
@@ -375,9 +370,7 @@ public class DanmakuGlobalConfig {
             DanmakuFilters.getDefault().unregisterFilter(
                     DanmakuFilters.TAG_USER_ID_FILTER);
         } else {
-            for (Integer id : ids) {
-                mUserIdBlackList.add(id);
-            }
+            Collections.addAll(mUserIdBlackList, ids);
             setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
         }
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
@@ -404,9 +397,7 @@ public class DanmakuGlobalConfig {
         if(ids == null || ids.length == 0) {
             return this;
         }
-        for (Integer id : ids) {
-            mUserIdBlackList.add(id);
-        }
+        Collections.addAll(mUserIdBlackList, ids);
         setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;

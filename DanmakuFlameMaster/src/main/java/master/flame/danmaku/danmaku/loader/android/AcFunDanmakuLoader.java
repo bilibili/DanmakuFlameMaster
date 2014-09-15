@@ -12,7 +12,7 @@ import android.net.Uri;
  *
  */
 public class AcFunDanmakuLoader implements ILoader{
-	private AcFunDanmakuLoader(){};
+	private AcFunDanmakuLoader(){}
 	private static volatile AcFunDanmakuLoader instance;
 	private JSONSource dataSource;
 	
