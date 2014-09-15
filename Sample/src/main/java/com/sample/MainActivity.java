@@ -27,13 +27,10 @@ import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 
-import com.sample.R;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
     private IDanmakuView mDanmakuView;
-
-    private VideoView mVideoView;
 
     private View mMediaController;
 
@@ -103,7 +100,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mBtnSendDanmaku.setOnClickListener(this);
 
         // VideoView
-        mVideoView = (VideoView) findViewById(R.id.videoview);
+        VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
@@ -180,11 +177,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
             mDanmakuView.resume();
         } else if (v == mBtnSendDanmaku) {
             BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mDanmakuView.getWidth());
-            StringBuffer sb = new StringBuffer();
             //for(int i=0;i<100;i++){
-                sb.append("这是一条弹幕");
             //}
-            danmaku.text = sb.toString();
+            danmaku.text = "这是一条弹幕";
             danmaku.padding = 5;
             danmaku.priority = 1;
             danmaku.time = mParser.getTimer().currMillisecond + 100;

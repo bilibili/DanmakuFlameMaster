@@ -348,8 +348,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         if (handler == null) {
             return 0;
         }
-        long position = handler.hideDanmakus(true);
-        return position;
+        return handler.hideDanmakus(true);
     }
 
     @Override
@@ -367,10 +366,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     @Override
     public boolean isShown() {
-        if (handler == null || !isViewReady()) {
-            return false;
-        }
-        return handler.getVisibility();
+        return !(handler == null || !isViewReady()) && handler.getVisibility();
     }
 
     @Override
