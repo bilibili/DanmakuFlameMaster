@@ -27,6 +27,7 @@ import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 
+import com.sample.R;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
