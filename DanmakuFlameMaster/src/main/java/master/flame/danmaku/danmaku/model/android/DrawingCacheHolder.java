@@ -66,7 +66,6 @@ public class DrawingCacheHolder {
     public void erase() {
         if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.eraseColor(Color.TRANSPARENT);
-            return;
         }
     }
 

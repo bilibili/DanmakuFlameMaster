@@ -76,7 +76,7 @@ public class DanmakuRenderer extends Renderer {
             DanmakusRetainer.fix(drawItem, disp);
 
             // draw
-            if (drawItem.isOutside()==false && drawItem.isShown()) {
+            if (!drawItem.isOutside() && drawItem.isShown()) {
                 drawItem.draw(disp);
             }
             

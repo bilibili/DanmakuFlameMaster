@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by ch on 13-7-5.
+ * Created by MoiTempete.
  */
 public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
@@ -264,11 +264,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         
         HAS_STROKE = CONFIG_HAS_STROKE;
         HAS_SHADOW = CONFIG_HAS_SHADOW;
-        if (quick) {
-            ANTI_ALIAS = false;
-        } else {
-            ANTI_ALIAS = CONFIG_ANTI_ALIAS;
-        }
+        ANTI_ALIAS = !quick && CONFIG_ANTI_ALIAS;
         TextPaint paint = getPaint(danmaku, quick);
         if (danmaku.lines != null) {
             String[] lines = danmaku.lines;
@@ -333,7 +329,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     }
     
     private static TextPaint getPaint(BaseDanmaku danmaku, boolean quick) {
-        TextPaint paint = null;
+        TextPaint paint;
         if (quick) {
             paint = PAINT_DUPLICATE;
             paint.set(PAINT);
@@ -390,10 +386,10 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         Float size = sCachedScaleSize.get(danmaku.textSize);
         if (size == null || sLastScaleTextSize != DanmakuGlobalConfig.DEFAULT.scaleTextSize) {
             sLastScaleTextSize = DanmakuGlobalConfig.DEFAULT.scaleTextSize;
-            size = Float.valueOf(danmaku.textSize * DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+            size = danmaku.textSize * DanmakuGlobalConfig.DEFAULT.scaleTextSize;
             sCachedScaleSize.put(danmaku.textSize, size);
         }
-        paint.setTextSize(size.floatValue());
+        paint.setTextSize(size);
     }
     
     @Override

@@ -52,7 +52,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
     private DanmakuTimer mCacheTimer;
 
-    private Object mDrawingNotify = new Object();
+    private final Object mDrawingNotify = new Object();
 
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener, int maxCacheSize) {

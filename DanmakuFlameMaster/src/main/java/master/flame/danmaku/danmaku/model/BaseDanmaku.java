@@ -188,10 +188,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isTimeOut() {
-        if (mTimer != null) {
-            return isTimeOut(mTimer.currMillisecond);
-        }
-        return true;
+        return mTimer == null || isTimeOut(mTimer.currMillisecond);
     }
 
     public boolean isTimeOut(long ctime) {
@@ -199,10 +196,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isOutside() {
-        if (mTimer != null) {
-            return isOutside(mTimer.currMillisecond);
-        }
-        return true;
+        return mTimer == null || isOutside(mTimer.currMillisecond);
     }
 
     public boolean isOutside(long ctime) {

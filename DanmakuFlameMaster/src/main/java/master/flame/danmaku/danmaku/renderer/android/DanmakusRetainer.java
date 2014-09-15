@@ -167,13 +167,13 @@ public class DanmakusRetainer {
                             shown = false;
                         }
                     }
-                } else if (lastItem != null && insertItem == null) {
+                } else if (lastItem != null) {
                     topPos = lastItem.getBottom();
-                } else if (topPos == 0 && firstItem != null) {
+                } else if (firstItem != null) {
                     topPos = firstItem.getTop();
                     mVisibleDanmakus.removeItem(firstItem);
                     shown = false;
-                } else if (firstItem == null) {
+                } else {
                     topPos = 0;
                 }
 

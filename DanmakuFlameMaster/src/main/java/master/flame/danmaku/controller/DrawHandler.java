@@ -124,7 +124,7 @@ public class DrawHandler extends Handler {
             case START:
                 Long startTime = (Long) msg.obj;
                 if (startTime != null) {
-                    pausedPostion = startTime.longValue();
+                    pausedPostion = startTime;
                 } else {
                     pausedPostion = 0;
                 }
@@ -196,7 +196,7 @@ public class DrawHandler extends Handler {
                     mDanmakuView.clear();
                 }
                 Boolean quitDrawTask = (Boolean) msg.obj;
-                if (quitDrawTask.booleanValue() && this.drawTask != null) {
+                if (quitDrawTask && this.drawTask != null) {
                     this.drawTask.quit();
                 }
                 mDanmakusVisible = false;

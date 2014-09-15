@@ -134,8 +134,7 @@ public class DrawTask implements IDrawTask {
 
         public float[] getRect() {
             resetRect();
-            for (int i = 0; i < mRects.size(); i++) {
-                RectPoolableCache rc = mRects.get(i);
+            for (RectPoolableCache rc : mRects) {
                 mRect[0] = Math.min(mRect[0], rc.mRect[0]);
                 mRect[1] = Math.min(mRect[1], rc.mRect[1]);
                 mRect[2] = Math.max(mRect[2], rc.mRect[2]);

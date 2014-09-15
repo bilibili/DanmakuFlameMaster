@@ -180,10 +180,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     if (textArr.length >= 11) {
                         endX = Float.parseFloat(textArr[7]);
                         endY = Float.parseFloat(textArr[8]);
-                        if(textArr[9] != ""){
+                        if("".equals(textArr[9])){
                             translationDuration = Integer.parseInt(textArr[9]);
                         }
-                        if(textArr[10] != ""){
+                        if("".equals(textArr[10])){
                             translationStartDelay = (long) (Float.parseFloat(textArr[10]));
                         }
                     }
@@ -208,7 +208,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     }
                     if (textArr.length >= 15) {
                         // 路径数据
-                        if (textArr[14] != "") {
+                        if (!"".equals(textArr[14])) {
                             String motionPathString = textArr[14].substring(1);
                             String[] pointStrArray = motionPathString.split("L");
                             if (pointStrArray != null && pointStrArray.length > 0) {
@@ -229,10 +229,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         }
 
         private String decodeXmlString(String title) {
-            if (title.indexOf("&amp;") > -1) {
+            if (title.contains("&amp;")) {
                 title = title.replace("&amp;", "&");
             }
-            if (title.indexOf("&quot;") > -1) {
+            if (title.contains("&quot;")) {
                 title = title.replace("&quot;", "\"");
             }
             if (title.contains("&gt;")) {
