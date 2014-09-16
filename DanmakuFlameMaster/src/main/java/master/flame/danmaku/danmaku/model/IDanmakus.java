@@ -36,4 +36,6 @@ public interface IDanmakus {
     
     public boolean contains(BaseDanmaku item);
 
+    public boolean isEmpty();
+
 }

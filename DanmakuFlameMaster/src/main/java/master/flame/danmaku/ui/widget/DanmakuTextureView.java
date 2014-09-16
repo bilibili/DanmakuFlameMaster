@@ -36,7 +36,9 @@ import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 /**
  * DanmakuTextureView需要开启GPU加速才能显示弹幕
@@ -125,6 +127,13 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
         isSurfaceCreated = true;
+        if (handler != null && handler.getDisplayer() != null) {
+            IDisplayer disp = handler.getDisplayer();
+            if (disp.getWidth() != width || disp.getHeight() != height) {
+                disp.setSize(width, height);
+                DanmakuFactory.notifyDispSizeChanged(disp);
+            }
+        }
     }
 
     @Override

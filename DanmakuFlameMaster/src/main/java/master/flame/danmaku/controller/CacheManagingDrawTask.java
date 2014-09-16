@@ -30,6 +30,7 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
+import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.ConfigChangedCallback;
@@ -530,13 +531,13 @@ public class CacheManagingDrawTask extends DrawTask {
                 long curr = mCacheTimer.currMillisecond;
                 long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
                 Long startTime =  Long.valueOf(System.currentTimeMillis());
-                Set<BaseDanmaku> danmakus = null;
-                danmakus = danmakuList.subset(curr, curr
+                IDanmakus danmakus = null;
+                danmakus = danmakuList.sub(curr, curr
                         + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
 
                 if (danmakus == null || danmakus.size() == 0)
                     return 0;
-                Iterator<BaseDanmaku> itr = danmakus.iterator();
+                IDanmakuIterator itr = danmakus.iterator();
 
                 BaseDanmaku item = null;
                 long consumingTime = 0;

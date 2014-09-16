@@ -257,5 +257,9 @@ public class Danmakus implements IDanmakus {
         return this.items != null && this.items.contains(item);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return this.items == null || this.items.isEmpty();
+    }
 
 }

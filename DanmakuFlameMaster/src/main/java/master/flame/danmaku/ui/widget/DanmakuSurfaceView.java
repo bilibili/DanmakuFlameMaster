@@ -26,16 +26,18 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-import java.util.LinkedList;
-import java.util.Locale;
-
+import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
-import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+
+import java.util.LinkedList;
+import java.util.Locale;
 
 public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, SurfaceHolder.Callback,
         View.OnClickListener {
@@ -108,17 +110,24 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-    	isSurfaceCreated = true;
-    	Canvas canvas = surfaceHolder.lockCanvas();
-    	if(canvas!=null){
-    	    DrawHelper.clearCanvas(canvas);
-    	    surfaceHolder.unlockCanvasAndPost(canvas);
-    	}
+        isSurfaceCreated = true;
+        Canvas canvas = surfaceHolder.lockCanvas();
+        if (canvas != null) {
+            DrawHelper.clearCanvas(canvas);
+            surfaceHolder.unlockCanvasAndPost(canvas);
+        }
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         isSurfaceCreated = true;
+        if (handler != null && handler.getDisplayer() != null) {
+            IDisplayer disp = handler.getDisplayer();
+            if (disp.getWidth() != width || disp.getHeight() != height) {
+                disp.setSize(width, height);
+                DanmakuFactory.notifyDispSizeChanged(disp);
+            }
+        }
     }
 
     @Override

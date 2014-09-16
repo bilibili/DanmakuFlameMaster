@@ -19,14 +19,11 @@ package master.flame.danmaku.controller;
 import android.content.Context;
 import android.graphics.Canvas;
 
-import java.util.LinkedList;
-
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Poolable;
 import master.flame.danmaku.danmaku.model.objectpool.PoolableManager;
@@ -36,6 +33,8 @@ import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
+
+import java.util.LinkedList;
 
 public class DrawTask implements IDrawTask {
     
@@ -146,7 +145,7 @@ public class DrawTask implements IDrawTask {
 
     protected AbsDisplayer<?> mDisp;
 
-    protected Danmakus danmakuList;
+    protected IDanmakus danmakuList;
 
     protected BaseDanmakuParser mParser;
 

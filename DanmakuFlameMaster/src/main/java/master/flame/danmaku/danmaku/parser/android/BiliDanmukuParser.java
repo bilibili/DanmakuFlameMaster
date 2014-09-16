@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
@@ -43,6 +44,9 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
     static {
         System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
     }
+
+    private float mDispScaleX;
+    private float mDispScaleY;
 
     @Override
     public Danmakus parse() {
@@ -107,7 +111,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     float textSize = Float.parseFloat(values[2]); // 字体大小
                     int color = Integer.parseInt(values[3]) | 0xFF000000; // 颜色
                     // int poolType = Integer.parseInt(values[5]); // 弹幕池类型（忽略
-                    item = DanmakuFactory.createDanmaku(type, mDispWidth / (mDispDensity - 0.6f));
+                    item = DanmakuFactory.createDanmaku(type, mDisp);
                     if (item != null) {
                         item.time = time;
                         item.textSize = textSize * (mDispDensity - 0.6f);
@@ -190,8 +194,8 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     item.duration = new Duration(alphaDuraion);
                     item.rotationZ = rotateZ;
                     item.rotationY = rotateY;
-                    DanmakuFactory.fillTranslationData(item, mDispWidth, mDispHeight, beginX,
-                            beginY, endX, endY, translationDuration, translationStartDelay);
+                    DanmakuFactory.fillTranslationData(item, beginX,
+                            beginY, endX, endY, translationDuration, translationStartDelay, mDispScaleX, mDispScaleY);
                     DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
                     
                     if (textArr.length >= 12) {
@@ -218,8 +222,8 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                                     points[i][0] = Float.parseFloat(pointArray[0]);
                                     points[i][1] = Float.parseFloat(pointArray[1]);
                                 }
-                                DanmakuFactory.fillLinePathData(item, mDispWidth, mDispHeight,
-                                        points);
+                                DanmakuFactory.fillLinePathData(item, points, mDispScaleX,
+                                        mDispScaleY);
                             }
                         }
                     }
@@ -244,5 +248,13 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
             return title;
         }
 
+    }
+    
+    @Override
+    public BaseDanmakuParser setDisplayer(IDisplayer disp) {
+        super.setDisplayer(disp);
+        mDispScaleX = mDispWidth / DanmakuFactory.BILI_PLAYER_WIDTH;
+        mDispScaleY = mDispHeight / DanmakuFactory.BILI_PLAYER_HEIGHT;
+        return this;
     }
 }
