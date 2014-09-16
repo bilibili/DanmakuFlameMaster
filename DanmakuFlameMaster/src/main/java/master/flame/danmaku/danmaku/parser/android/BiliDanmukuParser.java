@@ -180,10 +180,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     if (textArr.length >= 11) {
                         endX = Float.parseFloat(textArr[7]);
                         endY = Float.parseFloat(textArr[8]);
-                        if("".equals(textArr[9])){
+                        if(!"".equals(textArr[9])){
                             translationDuration = Integer.parseInt(textArr[9]);
                         }
-                        if("".equals(textArr[10])){
+                        if(!"".equals(textArr[10])){
                             translationStartDelay = (long) (Float.parseFloat(textArr[10]));
                         }
                     }
