@@ -13,4 +13,5 @@
     <string name="send_danmaku">发送一条弹幕</string>
 
     <string name="release">release</string>
+    <string name="rotate">旋转屏幕</string>
 </resources>

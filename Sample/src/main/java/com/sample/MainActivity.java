@@ -3,6 +3,7 @@ package com.sample;
 
 import java.io.InputStream;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -36,6 +37,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private View mMediaController;
 
     public PopupWindow mPopupWindow;
+    
+    private Button mBtnRotate;
 
     private Button mBtnHideDanmaku;
 
@@ -88,11 +91,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void findViews() {
 
         mMediaController = findViewById(R.id.media_controller);
+        mBtnRotate = (Button) findViewById(R.id.rotate);
         mBtnHideDanmaku = (Button) findViewById(R.id.btn_hide);
         mBtnShowDanmaku = (Button) findViewById(R.id.btn_show);
         mBtnPauseDanmaku = (Button) findViewById(R.id.btn_pause);
         mBtnResumeDanmaku = (Button) findViewById(R.id.btn_resume);
         mBtnSendDanmaku = (Button) findViewById(R.id.btn_send);
+        mBtnRotate.setOnClickListener(this);
         mBtnHideDanmaku.setOnClickListener(this);
         mMediaController.setOnClickListener(this);
         mBtnShowDanmaku.setOnClickListener(this);
@@ -166,7 +171,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         if (mDanmakuView == null || !mDanmakuView.isPrepared())
             return;
-        if (v == mBtnHideDanmaku) {
+        if (v == mBtnRotate) {
+            setRequestedOrientation(getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else if (v == mBtnHideDanmaku) {
             mDanmakuView.hide();
             //mPausedPosition = mDanmakuView.hideAndPauseDrawTask();
         } else if (v == mBtnShowDanmaku) {
@@ -177,7 +185,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         } else if (v == mBtnResumeDanmaku) {
             mDanmakuView.resume();
         } else if (v == mBtnSendDanmaku) {
-            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mDanmakuView.getWidth());
+            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
             //for(int i=0;i<100;i++){
             //}
             danmaku.text = "这是一条弹幕";

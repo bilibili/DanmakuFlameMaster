@@ -17,6 +17,12 @@
         android:background="#8acc0000" >
 
         <Button
+            android:id="@+id/rotate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rotate" />
+
+        <Button
             android:id="@+id/btn_hide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,19 +39,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pause_danmaku" />
-        
+
         <Button
             android:id="@+id/btn_resume"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/resume_danmaku" />
-        
+
         <Button
             android:id="@+id/btn_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/send_danmaku" />
-        
     </LinearLayout>
 
 </FrameLayout>
