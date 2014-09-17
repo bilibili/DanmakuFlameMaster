@@ -131,7 +131,8 @@ public class R2LDanmaku extends BaseDanmaku {
         super.measure(displayer);
         mDistance = (int) (displayer.getWidth() + paintWidth);
         mStepX = mDistance / (float) duration.value;
-        this.x = displayer.getWidth();
+        this.x = (mTimer != null ? getAccurateLeft(displayer, mTimer.currMillisecond) : displayer
+                .getWidth());
     }
 
 }

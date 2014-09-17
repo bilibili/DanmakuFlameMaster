@@ -13,6 +13,11 @@ public class Duration {
         mInitialDuration = initialDuration;
         value = initialDuration;
     }
+    
+    public void setValue(long initialDuration) {
+        mInitialDuration = initialDuration;
+        value = (long) (mInitialDuration * factor);
+    }
 
     public void setFactor(float f) {
         if (factor != f) {

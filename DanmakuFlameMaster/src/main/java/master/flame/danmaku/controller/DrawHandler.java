@@ -27,6 +27,7 @@ import android.util.DisplayMetrics;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
@@ -200,6 +201,10 @@ public class DrawHandler extends Handler {
                 break;
             case NOTIFY_DISP_SIZE_CHANGED:
                 DanmakuFactory.notifyDispSizeChanged(mDisp);
+                Boolean updateFlag = (Boolean) msg.obj;
+                if(updateFlag != null && updateFlag){
+                    GlobalFlagValues.updateMeasureFlag();
+                }
                 break;
             case SHOW_DANMAKUS:
                 Long start = (Long) msg.obj;
@@ -274,7 +279,7 @@ public class DrawHandler extends Handler {
         mDisp.setDensities(displayMetrics.density, displayMetrics.densityDpi,
                 displayMetrics.scaledDensity);
         mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
-        sendEmptyMessage(NOTIFY_DISP_SIZE_CHANGED);
+        obtainMessage(NOTIFY_DISP_SIZE_CHANGED, false).sendToTarget();
         
         IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, mDisp,
                 taskListener, 1024 * 1024 * AndroidUtils.getMemoryClass(context) / 3)
@@ -371,7 +376,7 @@ public class DrawHandler extends Handler {
         }
         if (mDisp.getWidth() != width || mDisp.getHeight() != height) {
             mDisp.setSize(width, height);
-            sendEmptyMessage(NOTIFY_DISP_SIZE_CHANGED);
+            obtainMessage(NOTIFY_DISP_SIZE_CHANGED, true).sendToTarget();
         }
     }
 

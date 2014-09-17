@@ -125,11 +125,14 @@ public class DanmakuFactory {
             REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
         }
 
-        if(MAX_Duration_Scroll_Danmaku == null){
+        if (MAX_Duration_Scroll_Danmaku == null) {
             MAX_Duration_Scroll_Danmaku = new Duration(REAL_DANMAKU_DURATION);
             MAX_Duration_Scroll_Danmaku.setFactor(DanmakuGlobalConfig.DEFAULT.scrollSpeedFactor);
+        } else if (sizeChanged) {
+            MAX_Duration_Scroll_Danmaku.setValue(REAL_DANMAKU_DURATION);
         }
-        if(MAX_Duration_Fix_Danmaku == null){
+        
+        if (MAX_Duration_Fix_Danmaku == null) {
             MAX_Duration_Fix_Danmaku = new Duration(COMMON_DANMAKU_DURATION);
         }
 
