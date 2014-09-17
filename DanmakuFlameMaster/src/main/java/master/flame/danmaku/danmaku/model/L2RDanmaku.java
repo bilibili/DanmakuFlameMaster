@@ -68,13 +68,15 @@ public class L2RDanmaku extends R2LDanmaku {
             return getAccurateLeft(displayer, currTime);
         }
 
+        float stepX = mOneFrameStepX;
         long averageRenderingTime = displayer.getAverageRenderingTime();
-        float layoutCount = (duration.value - elapsedTime)
-                / (float) averageRenderingTime;
-        float stepX = (displayer.getWidth() - (this.x + paintWidth)) / layoutCount;
-
-        if (stepX < mStepX * 16) {
-            stepX = mStepX * 16;
+        if(averageRenderingTime > 0) {
+            float layoutCount = (duration.value - elapsedTime)
+                    / (float) averageRenderingTime;
+            stepX = (displayer.getWidth() - (this.x + paintWidth)) / layoutCount;
+            if (stepX < mOneFrameStepX) {
+                stepX = mOneFrameStepX;
+            }
         }
 
         return this.x + stepX;

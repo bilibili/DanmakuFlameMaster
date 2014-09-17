@@ -29,7 +29,7 @@ public class R2LDanmaku extends BaseDanmaku {
 
     protected float[] RECT = null;
 
-    protected float mStepX;
+    protected float mStepX, mOneFrameStepX;
 
     protected long mLastTime;
 
@@ -67,12 +67,14 @@ public class R2LDanmaku extends BaseDanmaku {
             return getAccurateLeft(displayer, currTime);
         }
         
+        float stepX = mOneFrameStepX;
         long averageRenderingTime = displayer.getAverageRenderingTime();
-        float layoutCount = (duration.value - elapsedTime) / (float) averageRenderingTime;
-        float stepX = (this.x + paintWidth) / layoutCount;
-
-        if (stepX < mStepX * 16) {
-            stepX = mStepX * 16;
+        if (averageRenderingTime > 0) {
+            float layoutCount = (duration.value - elapsedTime) / (float) averageRenderingTime;
+            stepX = (this.x + paintWidth) / layoutCount;
+            if (stepX < mOneFrameStepX) {
+                stepX = mOneFrameStepX;
+            }
         }
         return this.x - stepX;
     }
@@ -131,6 +133,7 @@ public class R2LDanmaku extends BaseDanmaku {
         super.measure(displayer);
         mDistance = (int) (displayer.getWidth() + paintWidth);
         mStepX = mDistance / (float) duration.value;
+        mOneFrameStepX = mStepX * 16;
         this.x = (mTimer != null ? getAccurateLeft(displayer, mTimer.currMillisecond) : displayer
                 .getWidth());
     }
