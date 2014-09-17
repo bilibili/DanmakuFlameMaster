@@ -24,8 +24,6 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 
-import java.util.LinkedList;
-
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
@@ -33,7 +31,10 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.util.AndroidUtils;
+
+import java.util.LinkedList;
 
 public class DrawHandler extends Handler {
 
@@ -60,6 +61,8 @@ public class DrawHandler extends Handler {
     private static final int SHOW_DANMAKUS = 8;
     
     private static final int HIDE_DANMAKUS = 9;
+
+    private static final int NOTIFY_DISP_SIZE_CHANGED = 10;
 
     private long pausedPostion = 0;
 
@@ -195,6 +198,9 @@ public class DrawHandler extends Handler {
                 }
                 sendEmptyMessage(UPDATE);
                 break;
+            case NOTIFY_DISP_SIZE_CHANGED:
+                DanmakuFactory.notifyDispSizeChanged(mDisp);
+                break;
             case SHOW_DANMAKUS:
                 Long start = (Long) msg.obj;
                 if (start == null && drawTask != null) {
@@ -268,6 +274,7 @@ public class DrawHandler extends Handler {
         mDisp.setDensities(displayMetrics.density, displayMetrics.densityDpi,
                 displayMetrics.scaledDensity);
         mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+        sendEmptyMessage(NOTIFY_DISP_SIZE_CHANGED);
         
         IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, mDisp,
                 taskListener, 1024 * 1024 * AndroidUtils.getMemoryClass(context) / 3)
@@ -356,6 +363,16 @@ public class DrawHandler extends Handler {
     
     public IDisplayer getDisplayer(){
         return mDisp;
+    }
+
+    public void notifyDispSizeChanged(int width, int height) {
+        if (mDisp == null) {
+            return;
+        }
+        if (mDisp.getWidth() != width || mDisp.getHeight() != height) {
+            mDisp.setSize(width, height);
+            sendEmptyMessage(NOTIFY_DISP_SIZE_CHANGED);
+        }
     }
 
 }

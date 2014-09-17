@@ -32,9 +32,7 @@ import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 import java.util.LinkedList;
 import java.util.Locale;
@@ -121,12 +119,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         isSurfaceCreated = true;
-        if (handler != null && handler.getDisplayer() != null) {
-            IDisplayer disp = handler.getDisplayer();
-            if (disp.getWidth() != width || disp.getHeight() != height) {
-                disp.setSize(width, height);
-                DanmakuFactory.notifyDispSizeChanged(disp);
-            }
+        if (handler != null) {
+            handler.notifyDispSizeChanged(width, height);
         }
     }
 

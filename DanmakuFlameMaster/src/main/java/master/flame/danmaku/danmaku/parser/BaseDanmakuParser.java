@@ -38,7 +38,6 @@ public abstract class BaseDanmakuParser {
     
     public BaseDanmakuParser setDisplayer(IDisplayer disp){
         mDisp = disp;
-        DanmakuFactory.notifyDispSizeChanged(disp);
     	mDispWidth = disp.getWidth();
         mDispHeight = disp.getHeight();
         mDispDensity = disp.getDensity();
