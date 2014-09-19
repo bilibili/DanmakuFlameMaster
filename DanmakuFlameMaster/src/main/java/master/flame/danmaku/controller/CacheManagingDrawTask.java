@@ -476,7 +476,8 @@ public class CacheManagingDrawTask extends DrawTask {
             
             private long dispatchAction() {
                 float level = getPoolPercent();
-                if (mCacheTimer.currMillisecond - mTimer.currMillisecond < 0 && level > 0.6f) {
+                if (mCacheTimer.currMillisecond < mTimer.currMillisecond && level > 0.6f) {
+                    removeMessages(CLEAR_OUTSIDE_CACHES_AND_RESET);
                     sendEmptyMessage(CLEAR_OUTSIDE_CACHES_AND_RESET);
                 }
                 BaseDanmaku firstCache = mCaches.first();
@@ -488,7 +489,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 removeMessages(BUILD_CACHES);
                 sendEmptyMessage(BUILD_CACHES);
                 if (cachedTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
-                    
                     return mCacheTimer.currMillisecond - mTimer.currMillisecond;
                 }
                 return 200;
@@ -529,12 +529,12 @@ public class CacheManagingDrawTask extends DrawTask {
                 int sizeInScreen = danmakus.size();
                 while (itr.hasNext() && !mPause) {
                     
-                    if (last.time < mTimer.currMillisecond) {
-                        break;
-                    }
-                    
                     item = itr.next();
                     count++;
+                    
+                    if (last != null && last.time < mTimer.currMillisecond) {
+                        break;
+                    }
                     
                     if(item.hasDrawingCache()){
                         continue;
