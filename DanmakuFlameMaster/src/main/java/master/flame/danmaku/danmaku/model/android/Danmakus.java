@@ -71,7 +71,8 @@ public class Danmakus implements IDanmakus {
     public void setItems(Set<BaseDanmaku> items) {        
         this.items = items;
         mSize = (items == null ? 0 : items.size());
-        iterator.setDatas(items);
+        //iterator.setDatas(items);
+        iterator = new DanmakuIterator(this.items);
     }
 
     public IDanmakuIterator iterator() {
@@ -191,15 +192,16 @@ public class Danmakus implements IDanmakus {
         }
         
         public synchronized void reset(){
-            if(mData!=null || mSize > 0){
-                it = mData != null ? mData.iterator() : null;
-            }else{
+            if (mData != null && mSize > 0) {
+                it = mData.iterator();
+            } else {
                 it = null;
             }
         }
 
         public synchronized void setDatas(Set<BaseDanmaku> datas){
             mData = datas;
+            reset();
         }
 
         @Override
@@ -214,7 +216,7 @@ public class Danmakus implements IDanmakus {
 
         @Override
         public synchronized void remove() {
-            if(it!=null){
+            if (it != null) {
                 it.remove();
             }
         }
