@@ -21,6 +21,8 @@ public interface IDanmakus {
     public void addItem(BaseDanmaku item);
 
     public void removeItem(BaseDanmaku item);
+    
+    public IDanmakus subnew(long startTime, long endTime);
 
     public IDanmakus sub(long startTime, long endTime);
 

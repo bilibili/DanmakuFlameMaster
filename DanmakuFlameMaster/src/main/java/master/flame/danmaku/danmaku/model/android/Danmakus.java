@@ -100,7 +100,7 @@ public class Danmakus implements IDanmakus {
             mSize--;
     }
 
-    public Set<BaseDanmaku> subset(long startTime, long endTime) {
+    private Set<BaseDanmaku> subset(long startTime, long endTime) {
         if (items == null || items.size() == 0) {
             return null;
         }
@@ -117,6 +117,12 @@ public class Danmakus implements IDanmakus {
         startSubItem.time = startTime;
         endSubItem.time = endTime;
         return ((SortedSet<BaseDanmaku>) items).subSet(startSubItem, endSubItem);
+    }
+    
+    @Override
+    public IDanmakus subnew(long startTime, long endTime) {
+        Set<BaseDanmaku> subset = subset(startTime, endTime);
+        return new Danmakus(subset);
     }
 
     @Override
