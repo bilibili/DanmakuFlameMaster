@@ -408,8 +408,8 @@ public class DanmakuGlobalConfig {
     }
     
     /**
-     * 设置弹幕滚动速度,只对滚动弹幕有效
-     * @param p 0 ~ 1.0f
+     * 设置弹幕滚动速度系数,只对滚动弹幕有效
+     * @param p
      * @return
      */
     public DanmakuGlobalConfig setScrollSpeedFactor(float p){

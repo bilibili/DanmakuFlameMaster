@@ -67,6 +67,9 @@ public class DanmakuFactory {
     public static IDisplayer sLastDisp;
     
     public static void resetDurationsData() {
+        sLastDisp = null;
+        CURRENT_DISP_WIDTH = CURRENT_DISP_HEIGHT = 0;
+        sSpecialDanmakus.clear();
         MAX_Duration_Scroll_Danmaku = null;
         MAX_Duration_Fix_Danmaku = null;
         MAX_Duration_Special_Danmaku = null;
@@ -90,6 +93,13 @@ public class DanmakuFactory {
         return createDanmaku(type, disp.getWidth(), disp.getHeight(),
                 1 / (disp.getDensity() - 0.6f));
     }
+    
+    public static BaseDanmaku createDanmaku(int type, IDisplayer disp, float viewportScale) {
+        if (disp == null)
+            return null;
+        sLastDisp = disp;
+        return createDanmaku(type, disp.getWidth(), disp.getHeight(), viewportScale);
+    } 
     
     /**
      * 创建弹幕数据请尽量使用此方法,参考BiliDanmakuParser或AcfunDanmakuParser
