@@ -17,7 +17,7 @@ import android.graphics.Typeface;
 public class DanmakuGlobalConfig {
 
     public enum DanmakuConfigTag {
-        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, SCROLL_SPEED_FACTOR;
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU;
 
         public boolean isVisibilityRelatedTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
@@ -102,8 +102,12 @@ public class DanmakuGlobalConfig {
     List<Integer> mColorValueWhiteList = new ArrayList<Integer>();
     
     List<Integer> mUserIdBlackList = new ArrayList<Integer>(); 
+    
+    List<String> mUserHashBlackList = new ArrayList<String>();
 
     private ArrayList<ConfigChangedCallback> mCallbackList;
+
+    private boolean mBlockGuestDanmaku = false;
 
     /**
      * set typeface
@@ -360,6 +364,56 @@ public class DanmakuGlobalConfig {
     }
     
     /**
+     * 设置屏蔽弹幕用户hash
+     * @param hashes 
+     * @return
+     */
+    public DanmakuGlobalConfig setUserHashBlackList(String... hashes) {
+        mUserHashBlackList.clear();
+        if (hashes == null || hashes.length == 0) {
+            DanmakuFilters.getDefault().unregisterFilter(
+                    DanmakuFilters.TAG_USER_HASH_FILTER);
+        } else {
+            Collections.addAll(mUserHashBlackList, hashes);
+            setFilterData(DanmakuFilters.TAG_USER_HASH_FILTER, mUserHashBlackList);
+        }
+        notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
+        return this;
+    }
+    
+    public DanmakuGlobalConfig removeUserHashBlackList(String... hashes){
+        if(hashes == null || hashes.length == 0) {
+            return this;
+        }
+        for (String hash : hashes) {
+            mUserHashBlackList.remove(hash);
+        }
+        setFilterData(DanmakuFilters.TAG_USER_HASH_FILTER, mUserHashBlackList);
+        notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
+        return this;
+    }
+    
+    /**
+     * 添加屏蔽用户
+     * @param hashes
+     * @return
+     */
+    public DanmakuGlobalConfig addUserHashBlackList(String... hashes){
+        if(hashes == null || hashes.length == 0) {
+            return this;
+        }
+        Collections.addAll(mUserHashBlackList, hashes);
+        setFilterData(DanmakuFilters.TAG_USER_HASH_FILTER, mUserHashBlackList);
+        notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
+        return this;
+    }
+    
+    public List<String> getUserHashBlackList(){
+        return mUserHashBlackList;
+    }
+    
+    
+    /**
      * 设置屏蔽弹幕用户id , 0 表示游客弹幕
      * @param ids 
      * @return
@@ -388,6 +442,7 @@ public class DanmakuGlobalConfig {
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
     }
+    
     /**
      * 添加屏蔽用户
      * @param ids
@@ -406,6 +461,23 @@ public class DanmakuGlobalConfig {
     public List<Integer> getUserIdBlackList(){
         return mUserIdBlackList;
     }
+    
+    /**
+     * 设置是否屏蔽游客弹幕
+     * @param block true屏蔽，false不屏蔽
+     * @return
+     */
+    public DanmakuGlobalConfig blockGuestDanmaku(boolean block) {
+        mBlockGuestDanmaku = block;
+        if (block) {
+            setFilterData(DanmakuFilters.TAG_GUEST_FILTER, block);
+        } else {
+            DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_GUEST_FILTER);
+        }
+        notifyConfigureChanged(DanmakuConfigTag.BLOCK_GUEST_DANMAKU, block);
+        return this;
+    }
+    
     
     /**
      * 设置弹幕滚动速度系数,只对滚动弹幕有效

@@ -212,33 +212,31 @@ public class DanmakuFilters {
         }
         
     }
-    
+
     /**
-     * 根据用户Id黑名单过滤
+     * 根据用户标识黑名单过滤
      * @author ch
      *
      */
-    public static class UserIdFilter  implements IDanmakuFilter<List<Integer>> {
+    public static abstract class UserFilter<T>  implements IDanmakuFilter<List<T>> {
         
-        public List<Integer> mBlackList = new ArrayList<Integer>(); 
+        public List<T> mBlackList = new ArrayList<T>(); 
         
-        private void addToBlackList(Integer id){
+        private void addToBlackList(T id){
             if(!mBlackList.contains(id)){
                 mBlackList.add(id);
             }
         }
         
         @Override
-        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                DanmakuTimer timer) {
-            return danmaku != null && mBlackList.contains(danmaku.userId);
-        }
+        public abstract boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                DanmakuTimer timer);
 
         @Override
-        public void setData(List<Integer> data) {
+        public void setData(List<T> data) {
             reset();
             if (data != null) {
-                for (Integer i : data) {
+                for (T i : data) {
                     addToBlackList(i);
                 }
             }
@@ -250,7 +248,67 @@ public class DanmakuFilters {
         }
         
     }
+    
+    /**
+     * 根据用户Id黑名单过滤
+     * @author ch
+     *
+     */
+    public static class UserIdFilter extends UserFilter<Integer> {
 
+        @Override
+        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                DanmakuTimer timer) {
+            return danmaku != null && mBlackList.contains(danmaku.userId);
+        }
+        
+    }
+
+    /**
+     * 根据用户hash黑名单过滤
+     * @author ch
+     *
+     */
+    public static class UserHashFilter extends UserFilter<String> {
+
+        @Override
+        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                DanmakuTimer timer) {
+            return danmaku != null && mBlackList.contains(danmaku.userHash);
+        }
+
+    }
+    
+    /**
+     * 屏蔽游客弹幕
+     * @author ch
+     * 
+     */
+    public static class GuestFilter implements IDanmakuFilter<Boolean> {
+
+        private Boolean mBlock = false;
+
+        @Override
+        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                DanmakuTimer timer) {
+            if (!mBlock) {
+                return false;
+            }
+            return danmaku.isGuest;
+        }
+
+        @Override
+        public void setData(Boolean data) {
+            mBlock = data;
+        }
+
+        @Override
+        public void reset() {
+            mBlock = false;
+        }
+
+    }
+    
     public final static String TAG_TYPE_DANMAKU_FILTER = "1010_Filter";
 
     public final static String TAG_QUANTITY_DANMAKU_FILTER = "1011_Filter";
@@ -260,6 +318,10 @@ public class DanmakuFilters {
     public final static String TAG_TEXT_COLOR_DANMAKU_FILTER = "1013_Filter";
     
     public final static String TAG_USER_ID_FILTER = "1014_Filter";
+    
+    public final static String TAG_USER_HASH_FILTER = "1015_Filter";
+    
+    public static final String TAG_GUEST_FILTER = "1016_Filter";
 
     private static DanmakuFilters instance = null;
 
@@ -277,6 +339,7 @@ public class DanmakuFilters {
 
     private final static Map<String, IDanmakuFilter<?>> filters = Collections
             .synchronizedSortedMap(new TreeMap<String, IDanmakuFilter<?>>());
+
 
     public IDanmakuFilter<?> get(String tag) {
         IDanmakuFilter<?> f = filters.get(tag);
@@ -305,6 +368,10 @@ public class DanmakuFilters {
                 filter = new TextColorFilter();
             } else if (TAG_USER_ID_FILTER.equals(tag)) {
                 filter = new UserIdFilter();
+            } else if (TAG_USER_HASH_FILTER.equals(tag)) {
+                filter = new UserHashFilter();
+            } else if (TAG_GUEST_FILTER.equals(tag)) {
+                filter = new GuestFilter();
             }
             // add more filter
         }

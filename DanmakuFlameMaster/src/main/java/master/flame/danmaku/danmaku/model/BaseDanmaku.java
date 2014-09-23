@@ -145,6 +145,16 @@ public abstract class BaseDanmaku {
      * 弹幕发布者id, 0表示游客
      */
     public int userId = 0;
+    
+    /**
+     * 弹幕发布者id
+     */
+    public String userHash;
+    
+    /**
+     * 是否游客
+     */
+    public boolean isGuest;
 
     /**
      * 计时
