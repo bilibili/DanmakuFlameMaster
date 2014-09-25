@@ -346,7 +346,8 @@ public class DrawHandler extends Handler {
         if (drawTask == null)
             return;
         mDisp.setAverageRenderingTime(Math.max(16, getAverageRenderingTime()));
-        mDisp.setLastFrameRenderingTime(mDrawTimes.isEmpty() ? 16 : mDrawTimes.getLast());
+        mDisp.setLastFrameRenderingTime(mDrawTimes.size() < 2 ? 16 : mDrawTimes.getLast()
+                - mDrawTimes.get(mDrawTimes.size() - 2));
         mDisp.setExtraData(canvas);
         drawTask.draw(mDisp);
         recordRenderingTime();

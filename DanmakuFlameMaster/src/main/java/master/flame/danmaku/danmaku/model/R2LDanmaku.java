@@ -17,9 +17,12 @@
 package master.flame.danmaku.danmaku.model;
 
 
+
 public class R2LDanmaku extends BaseDanmaku {
     
     protected static final long MAX_RENDERING_TIME = 100;
+    
+    protected static final long CORDON_RENDERING_TIME = 40;
 
     protected float x = 0;
 
@@ -63,12 +66,13 @@ public class R2LDanmaku extends BaseDanmaku {
             return -paintWidth;
         }
         
-        if (Math.abs(mLastTime - currTime) > MAX_RENDERING_TIME){
+        long averageRenderingTime = displayer.getAverageRenderingTime();
+        if (averageRenderingTime > CORDON_RENDERING_TIME || Math.abs(mLastTime - currTime) > MAX_RENDERING_TIME){
             return getAccurateLeft(displayer, currTime);
         }
         
         float stepX = mOneFrameStepX;
-        long averageRenderingTime = displayer.getAverageRenderingTime();
+        
         if (averageRenderingTime > 0) {
             float layoutCount = (duration.value - elapsedTime) / (float) averageRenderingTime;
             stepX = (this.x + paintWidth) / layoutCount;
