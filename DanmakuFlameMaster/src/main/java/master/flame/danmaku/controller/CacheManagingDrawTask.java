@@ -476,27 +476,41 @@ public class CacheManagingDrawTask extends DrawTask {
             
             private long dispatchAction() {
                 float level = getPoolPercent();
-                if(mCacheTimer.currMillisecond > mTimer.currMillisecond && level < 0.5f){
+                BaseDanmaku firstCache = mCaches.first();
+                //TODO 如果firstcache大于当前时间超过半屏并且水位在0.5f以下,
+                long gapTime = firstCache != null ? firstCache.time - mTimer.currMillisecond : 0;
+                long twoScreenDuration = DanmakuFactory.MAX_DANMAKU_DURATION * 2;
+                if (level < 0.6f && gapTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
+                    mCacheTimer.update(mTimer.currMillisecond);
                     removeMessages(BUILD_CACHES);
                     sendEmptyMessage(BUILD_CACHES);
-                    return Math.abs(mCacheTimer.currMillisecond - mTimer.currMillisecond - 100);
-                }
-                if (mCacheTimer.currMillisecond < mTimer.currMillisecond && level > 0.6f) {
-                    removeMessages(CLEAR_OUTSIDE_CACHES_AND_RESET);
-                    sendEmptyMessage(CLEAR_OUTSIDE_CACHES_AND_RESET);
-                }
-                BaseDanmaku firstCache = mCaches.first();
-                if (firstCache != null && firstCache.time < mTimer.currMillisecond) {
+                    return 0;
+                } else if (level > 0.4f && gapTime < -twoScreenDuration) {
+                    // clear timeout caches
+                    removeMessages(CLEAR_TIMEOUT_CACHES);
                     sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
+                    return 1000;
                 }
-                long cachedTime = firstCache == null ? 0 : mCacheTimer.currMillisecond
-                        - firstCache.time;
+                
+                if (level >= 0.9f) {
+                    return 0;
+                }
+                // check cache time
+                long deltaTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
+                if (deltaTime < 0) {
+                    removeMessages(CLEAR_OUTSIDE_CACHES);
+                    sendEmptyMessage(CLEAR_OUTSIDE_CACHES);
+                    sendEmptyMessage(BUILD_CACHES);
+                    return 0;
+                } else if (deltaTime > twoScreenDuration) {
+                    removeMessages(CLEAR_TIMEOUT_CACHES);
+                    sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
+                    return deltaTime;
+                }
+                
                 removeMessages(BUILD_CACHES);
                 sendEmptyMessage(BUILD_CACHES);
-                if (cachedTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
-                    return DanmakuFactory.MAX_DANMAKU_DURATION;
-                }
-                return 200;
+                return 0;
             }
 
             private void releaseDanmakuCache(BaseDanmaku item, DrawingCache cache) {
@@ -576,7 +590,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     if (!repositioned) {
                         try {
                             synchronized (mDrawingNotify) {
-                                mDrawingNotify.wait(15);
+                                mDrawingNotify.wait(50);
                             }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
