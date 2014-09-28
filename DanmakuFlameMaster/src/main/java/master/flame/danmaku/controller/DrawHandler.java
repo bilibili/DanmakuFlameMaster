@@ -207,6 +207,7 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case SHOW_DANMAKUS:
+                GlobalFlagValues.updateVisibleFlag();
                 Long start = (Long) msg.obj;
                 if(drawTask != null) {
                     if (start == null) {

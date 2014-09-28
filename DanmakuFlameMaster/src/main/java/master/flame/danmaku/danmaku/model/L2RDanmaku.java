@@ -29,18 +29,19 @@ public class L2RDanmaku extends R2LDanmaku {
             long currMS = mTimer.currMillisecond;
             long deltaDuration = currMS - time;
             if (deltaDuration > 0 && deltaDuration < duration.value) {
-                this.x = getAccurateLeft(displayer, currMS);
                 if (!this.isShown()) {
+                    this.x = getAccurateLeft(displayer, currMS);
                     this.y = y;
                     this.setVisibility(true);
+                } else{
+                    this.x = getStableLeft(displayer, currMS);
                 }
                 mLastTime = currMS;
                 return;
             }
-            this.setVisibility(false);
             mLastTime = currMS;
         }
-        this.x = -paintWidth;
+        this.setVisibility(false);
     }
     
     @Override
@@ -70,13 +71,15 @@ public class L2RDanmaku extends R2LDanmaku {
             return getAccurateLeft(displayer, currTime);
         }
 
-        float stepX = mOneFrameStepX;
+        float stepX = m60FPSStepX;
         if(averageRenderingTime > 0) {
             float layoutCount = (duration.value - elapsedTime)
                     / (float) averageRenderingTime;
             stepX = (displayer.getWidth() - (this.x + paintWidth)) / layoutCount;
-            if (stepX < mOneFrameStepX) {
-                stepX = mOneFrameStepX;
+            if (stepX < m60FPSStepX) {
+                stepX = m60FPSStepX;
+            } else if(stepX > m30FPSStepX) {
+                stepX = m30FPSStepX;
             }
         }
 

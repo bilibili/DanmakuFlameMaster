@@ -32,7 +32,7 @@ public class R2LDanmaku extends BaseDanmaku {
 
     protected float[] RECT = null;
 
-    protected float mStepX, mOneFrameStepX;
+    protected float mStepX, m60FPSStepX,m30FPSStepX;
 
     protected long mLastTime;
 
@@ -46,18 +46,19 @@ public class R2LDanmaku extends BaseDanmaku {
             long currMS = mTimer.currMillisecond;
             long deltaDuration = currMS - time;
             if (deltaDuration > 0 && deltaDuration < duration.value) {
-                this.x = getStableLeft(displayer, currMS);
                 if (!this.isShown()) {
+                    this.x = getAccurateLeft(displayer, currMS);
                     this.y = y;
                     this.setVisibility(true);
+                } else {
+                    this.x = getStableLeft(displayer, currMS);
                 }
                 mLastTime = currMS;
                 return;
             }
-            this.setVisibility(false);
             mLastTime = currMS;
         }
-        this.x = displayer.getWidth();
+        this.setVisibility(false);
     }
 
     protected float getStableLeft(IDisplayer displayer, long currTime) {
@@ -68,16 +69,22 @@ public class R2LDanmaku extends BaseDanmaku {
         
         long averageRenderingTime = displayer.getAverageRenderingTime();
         if (averageRenderingTime > CORDON_RENDERING_TIME || Math.abs(mLastTime - currTime) > MAX_RENDERING_TIME){
-            return getAccurateLeft(displayer, currTime);
+            float newX = getAccurateLeft(displayer, currTime);
+            if(x - newX < m60FPSStepX) {
+                newX = x - m60FPSStepX;
+            }
+            return newX;
         }
         
-        float stepX = mOneFrameStepX;
+        float stepX = m60FPSStepX;
         
         if (averageRenderingTime > 0) {
             float layoutCount = (duration.value - elapsedTime) / (float) averageRenderingTime;
             stepX = (this.x + paintWidth) / layoutCount;
-            if (stepX < mOneFrameStepX) {
-                stepX = mOneFrameStepX;
+            if (stepX < m60FPSStepX) {
+                stepX = m60FPSStepX;
+            } else if (stepX > m30FPSStepX) {
+                stepX = m30FPSStepX;
             }
         }
         return this.x - stepX;
@@ -137,7 +144,8 @@ public class R2LDanmaku extends BaseDanmaku {
         super.measure(displayer);
         mDistance = (int) (displayer.getWidth() + paintWidth);
         mStepX = mDistance / (float) duration.value;
-        mOneFrameStepX = mStepX * 16;
+        m60FPSStepX = mStepX * 16;
+        m30FPSStepX = m60FPSStepX * 2;
         this.x = (mTimer != null ? getAccurateLeft(displayer, mTimer.currMillisecond) : displayer
                 .getWidth());
     }
