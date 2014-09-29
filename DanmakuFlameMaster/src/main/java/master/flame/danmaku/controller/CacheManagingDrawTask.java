@@ -167,7 +167,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         public void begin() {
             if (mThread == null) {
-                mThread = new HandlerThread("Cache Building Thread");
+                mThread = new HandlerThread("DFM Cache-Building Thread");
                 mThread.start();
             }
             if (mHandler == null)
