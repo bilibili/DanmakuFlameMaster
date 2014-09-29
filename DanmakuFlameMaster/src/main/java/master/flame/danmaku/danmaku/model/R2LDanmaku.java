@@ -46,12 +46,10 @@ public class R2LDanmaku extends BaseDanmaku {
             long currMS = mTimer.currMillisecond;
             long deltaDuration = currMS - time;
             if (deltaDuration > 0 && deltaDuration < duration.value) {
+                this.x = getAccurateLeft(displayer, currMS);
                 if (!this.isShown()) {
-                    this.x = getAccurateLeft(displayer, currMS);
                     this.y = y;
                     this.setVisibility(true);
-                } else {
-                    this.x = getStableLeft(displayer, currMS);
                 }
                 mLastTime = currMS;
                 return;

@@ -29,12 +29,10 @@ public class L2RDanmaku extends R2LDanmaku {
             long currMS = mTimer.currMillisecond;
             long deltaDuration = currMS - time;
             if (deltaDuration > 0 && deltaDuration < duration.value) {
+                this.x = getAccurateLeft(displayer, currMS);
                 if (!this.isShown()) {
-                    this.x = getAccurateLeft(displayer, currMS);
                     this.y = y;
                     this.setVisibility(true);
-                } else{
-                    this.x = getStableLeft(displayer, currMS);
                 }
                 mLastTime = currMS;
                 return;
@@ -68,7 +66,11 @@ public class L2RDanmaku extends R2LDanmaku {
         
         long averageRenderingTime = displayer.getAverageRenderingTime();
         if (averageRenderingTime > CORDON_RENDERING_TIME || Math.abs(mLastTime - currTime) > MAX_RENDERING_TIME){
-            return getAccurateLeft(displayer, currTime);
+            float newX = getAccurateLeft(displayer, currTime);
+            if(newX - this.x < m60FPSStepX) {
+                newX = this.x + m60FPSStepX;
+            }
+            return newX;
         }
 
         float stepX = m60FPSStepX;
