@@ -87,6 +87,8 @@ public class DrawHandler extends Handler {
 
     private AbsDisplayer<Canvas> mDisp;
 
+    private Thread mTimerThread;
+
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
         if (timer == null) {
@@ -235,28 +237,33 @@ public class DrawHandler extends Handler {
     }
 
     private void update() {
-        new Thread("DFM Timer Thread"){
-            
+        if (mTimerThread != null) {
+            return;
+        }
+
+        mTimerThread = new Thread("DFM Timer Thread") {
+
             @Override
             public void run() {
-                while(!quitFlag){
+                while (!quitFlag) {
                     long currTime = System.currentTimeMillis();
                     long d = timer.update(currTime - mTimeBase);
                     if (mCallback != null) {
                         mCallback.updateTimer(timer);
                     }
-                    if(mDanmakusVisible){
+                    if (mDanmakusVisible) {
                         d = mDanmakuView.drawDanmakus();
                     }
-                    if(d < 0){
+                    if (d < 0) {
                         SystemClock.sleep(200);
-                    }else if (d <= 16) {
+                    } else if (d <= 16) {
                         SystemClock.sleep(16 - d);
                     }
                 }
             }
-            
-        }.start();
+
+        };
+        mTimerThread.start();
     }
 
     private void prepare(final Runnable runnable) {
