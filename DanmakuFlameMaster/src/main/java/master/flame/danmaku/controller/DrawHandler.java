@@ -237,7 +237,7 @@ public class DrawHandler extends Handler {
     }
 
     private void update() {
-        if (mTimerThread != null) {
+        if (mTimerThread != null && mTimerThread.isAlive()) {
             return;
         }
 
