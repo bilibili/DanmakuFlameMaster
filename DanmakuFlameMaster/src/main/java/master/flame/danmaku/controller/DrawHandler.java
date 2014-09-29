@@ -171,33 +171,7 @@ public class DrawHandler extends Handler {
                 sendEmptyMessage(RESUME);
                 break;
             case UPDATE:
-                if (quitFlag) {
-                    break;
-                }
-                long startMS = System.currentTimeMillis();
-                long d = timer.update(startMS - mTimeBase);
-                if (mCallback != null) {
-                    mCallback.updateTimer(timer);
-                }
-                if (d < 0) {
-                    removeMessages(UPDATE);
-                    sendEmptyMessageDelayed(UPDATE, 60 - d);
-                    break;
-                }
-                d = mDanmakuView.drawDanmakus();                
-                removeMessages(UPDATE);
-                if (d == -1) {
-                    // reduce refresh rate
-                    sendEmptyMessageDelayed(UPDATE, 100);
-                    break;
-                }
-                
-                if (d <= 16) {
-                    sendEmptyMessage(UPDATE);
-                    SystemClock.sleep(16 - d);
-                    break;
-                }
-                sendEmptyMessage(UPDATE);
+                update();
                 break;
             case NOTIFY_DISP_SIZE_CHANGED:
                 DanmakuFactory.notifyDispSizeChanged(mDisp);
@@ -225,14 +199,17 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case HIDE_DANMAKUS:
+                mDanmakusVisible = false;
                 if (mDanmakuView != null) {
                     mDanmakuView.clear();
+                }
+                if(this.drawTask != null) {
+                    this.drawTask.requestClear();
                 }
                 Boolean quitDrawTask = (Boolean) msg.obj;
                 if (quitDrawTask && this.drawTask != null) {
                     this.drawTask.quit();
                 }
-                mDanmakusVisible = false;
                 if (!quitDrawTask) {
                     break;
                 }
@@ -255,6 +232,31 @@ public class DrawHandler extends Handler {
                 }
                 break;
         }
+    }
+
+    private void update() {
+        new Thread("DFM Timer Thread"){
+            
+            @Override
+            public void run() {
+                while(!quitFlag){
+                    long currTime = System.currentTimeMillis();
+                    long d = timer.update(currTime - mTimeBase);
+                    if (mCallback != null) {
+                        mCallback.updateTimer(timer);
+                    }
+                    if(mDanmakusVisible){
+                        d = mDanmakuView.drawDanmakus();
+                    }
+                    if(d < 0){
+                        SystemClock.sleep(200);
+                    }else if (d <= 16) {
+                        SystemClock.sleep(16 - d);
+                    }
+                }
+            }
+            
+        }.start();
     }
 
     private void prepare(final Runnable runnable) {
