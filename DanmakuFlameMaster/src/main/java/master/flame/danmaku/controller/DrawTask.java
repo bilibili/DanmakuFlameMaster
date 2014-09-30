@@ -31,6 +31,7 @@ import master.flame.danmaku.danmaku.model.objectpool.Pools;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
+import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
 
@@ -193,8 +194,8 @@ public class DrawTask implements IDrawTask {
     }
 
     @Override
-    public void draw(AbsDisplayer<?> displayer) {
-        drawDanmakus(displayer,mTimer);
+    public RenderingState draw(AbsDisplayer<?> displayer) {
+        return drawDanmakus(displayer,mTimer);
     }
 
     @Override
@@ -241,7 +242,7 @@ public class DrawTask implements IDrawTask {
         mParser = parser;
     }
 
-    protected void drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
+    protected RenderingState drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
         if (danmakuList != null) {
             Canvas canvas = (Canvas) disp.getExtraData();
             if (clearFlag > 0) {
@@ -258,9 +259,10 @@ public class DrawTask implements IDrawTask {
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION - 100,
                     currMills);
             if (danmakus != null) {
-                mRenderer.draw(mDisp, danmakus, mStartRenderTime);
+                return mRenderer.draw(mDisp, danmakus, mStartRenderTime);
             }
         }
+        return null;
     }
 
     public void requestClear() {

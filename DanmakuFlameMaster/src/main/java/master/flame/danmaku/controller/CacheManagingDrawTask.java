@@ -36,6 +36,7 @@ import master.flame.danmaku.danmaku.model.android.DrawingCachePoolManager;
 import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Pools;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 import tv.cjump.jni.NativeBitmapFactory;
 
@@ -74,13 +75,15 @@ public class CacheManagingDrawTask extends DrawTask {
     }
 
     @Override
-    public void draw(AbsDisplayer<?> displayer) {
+    public RenderingState draw(AbsDisplayer<?> displayer) {
+        RenderingState result = null;
         synchronized (danmakuList) {
-            super.draw(displayer);
+            result = super.draw(displayer);
         }
         synchronized(mDrawingNotify){
             mDrawingNotify.notify();
         }
+        return result;
     }
 
     @Override

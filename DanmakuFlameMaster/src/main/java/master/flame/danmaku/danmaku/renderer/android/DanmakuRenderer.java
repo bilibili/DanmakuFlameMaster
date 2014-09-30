@@ -29,7 +29,8 @@ public class DanmakuRenderer extends Renderer {
 
     private final Area mRefreshArea = new Area();    
     private final DanmakuTimer mStartTimer = new DanmakuTimer();
-
+    private final RenderingState mRenderingState = new RenderingState();
+    
     @Override
     public void clear() {
         DanmakusRetainer.clear();
@@ -42,8 +43,9 @@ public class DanmakuRenderer extends Renderer {
     }
     
     @Override
-    public void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
+    public RenderingState draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
         
+        mRenderingState.reset();
         float left = disp.getWidth(),top = disp.getHeight(), right = 0 ,bottom = 0;
         boolean fullScreenRefreshing = false;
         
@@ -78,6 +80,8 @@ public class DanmakuRenderer extends Renderer {
             // draw
             if (!drawItem.isOutside() && drawItem.isShown()) {
                 drawItem.draw(disp);
+                mRenderingState.add(drawItem.getType(), 1);
+                mRenderingState.add(1);
             }
             
             if (fullScreenRefreshing)
@@ -107,6 +111,9 @@ public class DanmakuRenderer extends Renderer {
         }
         float borderWidth = disp.getStrokeWidth() * 2;
         mRefreshArea.set(left, top, right + borderWidth, bottom + borderWidth);
+        
+        mRenderingState.consumingTime = mStartTimer.update(System.currentTimeMillis());
+        return mRenderingState;
     }
 
     @Override

@@ -16,6 +16,8 @@
 
 package master.flame.danmaku.danmaku.renderer;
 
+
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
@@ -48,8 +50,61 @@ public interface IRenderer {
         }
 
     }
+    
+    public class RenderingState {
+        public int r2lDanmakuCount;
+        public int l2rDanmakuCount;
+        public int ftDanmakuCount;
+        public int fbDanmakuCount;
+        public int specialDanmakuCount;
+        public int totalDanmakuCount;
+        public long consumingTime;
 
-    public void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime);
+        public int add(int count) {
+            totalDanmakuCount += count;
+            return totalDanmakuCount;
+        }
+
+        public int add(int type, int count) {
+            switch (type) {
+                case BaseDanmaku.TYPE_SCROLL_RL:
+                    r2lDanmakuCount += count;
+                    return r2lDanmakuCount;
+                case BaseDanmaku.TYPE_SCROLL_LR:
+                    l2rDanmakuCount += count;
+                    return l2rDanmakuCount;
+                case BaseDanmaku.TYPE_FIX_TOP:
+                    ftDanmakuCount += count;
+                    return ftDanmakuCount;
+                case BaseDanmaku.TYPE_FIX_BOTTOM:
+                    fbDanmakuCount += count;
+                    return fbDanmakuCount;
+                case BaseDanmaku.TYPE_SPECIAL:
+                    specialDanmakuCount += count;
+                    return specialDanmakuCount;
+            }
+            return 0;
+        }
+
+        public void reset() {
+            r2lDanmakuCount = l2rDanmakuCount = ftDanmakuCount = fbDanmakuCount = specialDanmakuCount = totalDanmakuCount = 0;
+            consumingTime = 0;
+        }
+
+        public void set(RenderingState other) {
+            if(other == null)
+                return;
+            r2lDanmakuCount = other.r2lDanmakuCount;
+            l2rDanmakuCount = other.l2rDanmakuCount;
+            ftDanmakuCount = other.ftDanmakuCount;
+            fbDanmakuCount = other.fbDanmakuCount;
+            specialDanmakuCount = other.specialDanmakuCount;
+            totalDanmakuCount = other.totalDanmakuCount;
+            consumingTime = other.consumingTime;
+        }
+    }
+
+    public RenderingState draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime);
 
     public void clear();
 
