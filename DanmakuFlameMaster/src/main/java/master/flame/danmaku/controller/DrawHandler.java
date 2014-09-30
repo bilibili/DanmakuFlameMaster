@@ -88,9 +88,9 @@ public class DrawHandler extends Handler {
 
     private AbsDisplayer<Canvas> mDisp;
 
-    private Thread mTimerThread;
-
     private final RenderingState mRenderingState = new RenderingState();
+
+    private int mSkipFrames;
 
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
@@ -182,15 +182,21 @@ public class DrawHandler extends Handler {
                 long startMS = System.currentTimeMillis();
                 long time = startMS - mTimeBase;
                 long d = 0;
-                if (mRenderingState != null
-                        && (mRenderingState.l2rDanmakuCount
-                                + mRenderingState.r2lDanmakuCount > 30
-                                || mRenderingState.consumingTime > 30
-                                || getAverageRenderingTime() > 25 
-                                || mRenderingState.r2lDanmakuCount + mRenderingState.l2rDanmakuCount + mRenderingState.specialDanmakuCount == 0)) {
-                    d = timer.update(time);
+                long averageTime = getAverageRenderingTime();
+                long gapTime = time - timer.currMillisecond;
+                if (mSkipFrames > 0
+                        || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.r2lDanmakuCount
+                                + mRenderingState.l2rDanmakuCount
+                                + mRenderingState.specialDanmakuCount == 0))) {
+                    // d = timer.update(time);
+                    d = timer.add(Math.max(30, gapTime / 3));
+                    if (mSkipFrames <= 0) {
+                        mSkipFrames = 4;
+                    } else {
+                        mSkipFrames--;
+                    }
                 } else {
-                    d = Math.max(16, getAverageRenderingTime());
+                    d = Math.max(16, averageTime + (gapTime / 10));
                     d = timer.add(d);
                 }
                 if (mCallback != null) {
@@ -203,15 +209,15 @@ public class DrawHandler extends Handler {
                 }
                 d = mDanmakuView.drawDanmakus();                
                 removeMessages(UPDATE);
-                if (d == -1) {
+                if (d <= -1) {
                     // reduce refresh rate
                     sendEmptyMessageDelayed(UPDATE, 100);
                     break;
                 }
                 
-                if (d <= 16) {
+                if (d < 15) {
                     sendEmptyMessage(UPDATE);
-                    SystemClock.sleep(16 - d);
+                    SystemClock.sleep(15 - d);
                     break;
                 }
                 sendEmptyMessage(UPDATE);
@@ -272,40 +278,6 @@ public class DrawHandler extends Handler {
                 }
                 break;
         }
-    }
-
-    private void update() {
-        if (mTimerThread != null && mTimerThread.isAlive()) {
-            return;
-        }
-
-        mTimerThread = new Thread("DFM Timer Thread") {
-
-            @Override
-            public void run() {
-                while (!quitFlag) {
-                    long currTime = System.currentTimeMillis();
-                    long time = currTime - mTimeBase;
-                    long averageTime = getAverageRenderingTime();
-                    if (averageTime < 20 && mRenderingState != null) {
-                        timer.add(Math.max(16, mRenderingState.consumingTime));
-                    } else {
-                        timer.update(time);
-                    }
-                    if (mCallback != null) {
-                        mCallback.updateTimer(timer);
-                    }
-                    long d = mDanmakuView.drawDanmakus();
-                    if (d < 0) {
-                        SystemClock.sleep(200);
-                    } else if (d <= 16) {
-                        SystemClock.sleep(16 - d);
-                    }
-                }
-            }
-
-        };
-        mTimerThread.start();
     }
 
     private void prepare(final Runnable runnable) {
@@ -413,7 +385,7 @@ public class DrawHandler extends Handler {
         return dtime / frames;
     }
 
-    private static final int MAX_RECORD_SIZE = 150;
+    private static final int MAX_RECORD_SIZE = 100;
     private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
 
     private void recordRenderingTime() {
