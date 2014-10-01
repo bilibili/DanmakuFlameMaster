@@ -230,7 +230,6 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case SHOW_DANMAKUS:
-                GlobalFlagValues.updateVisibleFlag();
                 Long start = (Long) msg.obj;
                 if(drawTask != null) {
                     if (start == null) {
@@ -243,6 +242,9 @@ public class DrawHandler extends Handler {
                     }
                 }
                 mDanmakusVisible = true;
+                if(quitFlag && mDanmakuView != null) {
+                    mDanmakuView.drawDanmakus(); 
+                }
                 break;
             case HIDE_DANMAKUS:
                 mDanmakusVisible = false;
