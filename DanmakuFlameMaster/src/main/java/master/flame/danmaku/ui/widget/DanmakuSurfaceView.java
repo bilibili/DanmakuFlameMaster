@@ -118,7 +118,6 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        isSurfaceCreated = true;
         if (handler != null) {
             handler.notifyDispSizeChanged(width, height);
         }
@@ -127,6 +126,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         isSurfaceCreated = false;
+        release();
     }
 
     @Override

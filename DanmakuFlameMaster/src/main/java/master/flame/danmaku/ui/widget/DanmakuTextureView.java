@@ -119,12 +119,12 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public synchronized boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         isSurfaceCreated = false;
+        release();
         return true;
     }
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        isSurfaceCreated = true;
         if (handler != null) {
             handler.notifyDispSizeChanged(width, height);
         }

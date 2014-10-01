@@ -698,6 +698,7 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             public void pause() {
+                mPause = true;
                 removeCallbacksAndMessages(null);
                 sendEmptyMessage(QUIT);
             }
