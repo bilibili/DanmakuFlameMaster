@@ -185,13 +185,15 @@ public class DrawHandler extends Handler {
                 long averageTime = getAverageRenderingTime();
                 long gapTime = time - timer.currMillisecond;
                 if (mSkipFrames > 0
-                        || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.r2lDanmakuCount
+                        || (mRenderingState != null && (gapTime > 90 || averageTime > 30
+                                || mRenderingState.consumingTime > 40
+                                || mRenderingState.r2lDanmakuCount
                                 + mRenderingState.l2rDanmakuCount
                                 + mRenderingState.specialDanmakuCount == 0))) {
                     // d = timer.update(time);
                     d = timer.add(Math.max(30, gapTime / 3));
                     if (mSkipFrames <= 0) {
-                        mSkipFrames = 4;
+                        mSkipFrames = 3;
                     } else {
                         mSkipFrames--;
                     }
@@ -211,7 +213,7 @@ public class DrawHandler extends Handler {
                 removeMessages(UPDATE);
                 if (d <= -1) {
                     // reduce refresh rate
-                    sendEmptyMessageDelayed(UPDATE, 100);
+                    sendEmptyMessageDelayed(UPDATE, 200);
                     break;
                 }
                 
@@ -245,6 +247,7 @@ public class DrawHandler extends Handler {
                 if(quitFlag && mDanmakuView != null) {
                     mDanmakuView.drawDanmakus(); 
                 }
+                mDrawTimes.clear();
                 break;
             case HIDE_DANMAKUS:
                 mDanmakusVisible = false;
