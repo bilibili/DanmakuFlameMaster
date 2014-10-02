@@ -185,11 +185,7 @@ public class DrawHandler extends Handler {
                 long averageTime = getAverageRenderingTime();
                 long gapTime = time - timer.currMillisecond;
                 if (mSkipFrames > 0
-                        || (mRenderingState != null && (gapTime > 90 || averageTime > 30
-                                || mRenderingState.consumingTime > 40
-                                || mRenderingState.r2lDanmakuCount
-                                + mRenderingState.l2rDanmakuCount
-                                + mRenderingState.specialDanmakuCount == 0))) {
+                        || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.consumingTime > 40))) {
                     // d = timer.update(time);
                     d = timer.add(Math.max(30, gapTime / 3));
                     if (mSkipFrames <= 0) {
