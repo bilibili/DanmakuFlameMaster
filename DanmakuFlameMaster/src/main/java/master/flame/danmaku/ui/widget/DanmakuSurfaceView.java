@@ -126,7 +126,6 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         isSurfaceCreated = false;
-        release();
     }
 
     @Override

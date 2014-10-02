@@ -119,7 +119,6 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public synchronized boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         isSurfaceCreated = false;
-        release();
         return true;
     }
 
