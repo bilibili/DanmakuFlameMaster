@@ -8,13 +8,13 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 [![acfun](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/acfun.png?raw=true)](https://play.google.com/store/apps/details?id=tv.acfundanmaku.video)
 [![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
 
+- Ac动画 http://www.acfun.tv/app/
 - AcFun视频民间版 https://github.com/yrom/acfunm
 - AcFun视频官方版 https://play.google.com/store/apps/details?id=tv.acfundanmaku.video
 - 哔哩哔哩动画 https://play.google.com/store/apps/details?id=tv.danmaku.bili
 - 斗鱼直播客户端 http://www.douyu.tv/client
 - 猎豹浏览器 https://play.google.com/store/apps/details?id=com.ijinshan.browser
 - 小米电视/盒子视频弹幕
-- Ac动画 http://www.acfun.tv/app/
 - 网易新闻客户端 http://www.163.com/newsapp/
 
 以上客户端均使用DFM弹幕引擎,实际效果可安装以上app参看。
@@ -53,7 +53,7 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 
 - jni代码优化
 
-#### Gradle
+### Gradle
   ```groovy
     dependencies {
       compile 'me.neavo:danmakuflamemaster:x.x.x'
@@ -61,7 +61,7 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
   ```  
 
 ### Version
-  * x.x.x = version, or set '+' for lastest
+  * x.x.x = version, or set '+' for lastest（0.1.7）
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
