@@ -24,6 +24,10 @@ import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 public interface IDrawTask {
 
     public void addDanmaku(BaseDanmaku item);
+    
+    public void removeAllDanmakus();
+    
+    public void removeAllLiveDanmakus();
 
     public RenderingState draw(AbsDisplayer<?> displayer);
 

@@ -412,4 +412,16 @@ public class DrawHandler extends Handler {
         }
     }
 
+    public void removeAllDanmakus() {
+        if (drawTask != null) {
+            drawTask.removeAllDanmakus();
+        }
+    }
+
+    public void removeAllLiveDanmakus() {
+        if (drawTask != null) {
+            drawTask.removeAllLiveDanmakus();
+        }
+    }
+
 }

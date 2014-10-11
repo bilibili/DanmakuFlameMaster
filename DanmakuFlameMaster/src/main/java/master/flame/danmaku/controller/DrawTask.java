@@ -23,6 +23,7 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Poolable;
@@ -184,12 +185,35 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void addDanmaku(BaseDanmaku item) {
-        if(danmakuList == null)
+        if (danmakuList == null)
             return;
-        synchronized (danmakuList){
+        synchronized (danmakuList) {
             item.setTimer(mTimer);
             item.index = danmakuList.size();
             danmakuList.addItem(item);
+        }
+    }
+    
+    @Override
+    public void removeAllDanmakus() {
+        if (danmakuList == null)
+            return;
+        synchronized (danmakuList) {
+            danmakuList.clear();
+        }
+    }
+
+    @Override
+    public void removeAllLiveDanmakus() {
+        if (danmakuList == null)
+            return;
+        synchronized (danmakuList) {
+            IDanmakuIterator it = danmakuList.iterator();
+            while (it.hasNext()) {
+                if (it.next().isLive) {
+                    it.remove();
+                }
+            }
         }
     }
 

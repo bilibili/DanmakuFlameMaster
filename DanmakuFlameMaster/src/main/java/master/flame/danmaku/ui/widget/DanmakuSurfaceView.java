@@ -94,8 +94,22 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     }
 
     public void addDanmaku(BaseDanmaku item) {
-        if(handler != null){
+        if (handler != null) {
             handler.addDanmaku(item);
+        }
+    }
+    
+    @Override
+    public void removeAllDanmakus() {
+        if (handler != null) {
+            handler.removeAllDanmakus();
+        }
+    }
+    
+    @Override
+    public void removeAllLiveDanmakus() {
+        if (handler != null) {
+            handler.removeAllLiveDanmakus();
         }
     }
 
