@@ -188,6 +188,9 @@ public class DrawTask implements IDrawTask {
         if (danmakuList == null)
             return;
         synchronized (danmakuList) {
+            if (item.isLive) {
+                removeUnusedLiveDanmakusIn(5);
+            }
             item.setTimer(mTimer);
             item.index = danmakuList.size();
             danmakuList.addItem(item);
@@ -196,7 +199,7 @@ public class DrawTask implements IDrawTask {
     
     @Override
     public void removeAllDanmakus() {
-        if (danmakuList == null)
+        if (danmakuList == null || danmakuList.isEmpty())
             return;
         synchronized (danmakuList) {
             danmakuList.clear();
@@ -205,7 +208,7 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void removeAllLiveDanmakus() {
-        if (danmakuList == null)
+        if (danmakuList == null || danmakuList.isEmpty())
             return;
         synchronized (danmakuList) {
             IDanmakuIterator it = danmakuList.iterator();
@@ -213,6 +216,22 @@ public class DrawTask implements IDrawTask {
                 if (it.next().isLive) {
                     it.remove();
                 }
+            }
+        }
+    }
+    
+    protected void removeUnusedLiveDanmakusIn(int msec) {
+        if (danmakuList == null || danmakuList.isEmpty())
+            return;
+        long startTime = System.currentTimeMillis();
+        IDanmakuIterator it = danmakuList.iterator();
+        while (it.hasNext()) {
+            BaseDanmaku danmaku = it.next();
+            if (danmaku.isLive && danmaku.isTimeOut()) {
+                it.remove();
+            }
+            if (System.currentTimeMillis() - startTime > msec) {
+                break;
             }
         }
     }

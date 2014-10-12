@@ -432,6 +432,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             buildCache(item);
                             CacheManagingDrawTask.super.addDanmaku(item);
                             if (item.isLive) {
+                                removeUnusedLiveDanmakusIn(5);
                                 mCacheTimer.update(mTimer.currMillisecond
                                         + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
                             }
