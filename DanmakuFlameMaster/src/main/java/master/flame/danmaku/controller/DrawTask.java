@@ -189,7 +189,7 @@ public class DrawTask implements IDrawTask {
             return;
         synchronized (danmakuList) {
             if (item.isLive) {
-                removeUnusedLiveDanmakusIn(5);
+                removeUnusedLiveDanmakusIn(10);
             }
             item.setTimer(mTimer);
             item.index = danmakuList.size();
@@ -227,10 +227,11 @@ public class DrawTask implements IDrawTask {
         IDanmakuIterator it = danmakuList.iterator();
         while (it.hasNext()) {
             BaseDanmaku danmaku = it.next();
-            if (danmaku.isLive && danmaku.isTimeOut()) {
+            boolean isTimeout = danmaku.isTimeOut();
+            if (danmaku.isLive && isTimeout) {
                 it.remove();
             }
-            if (System.currentTimeMillis() - startTime > msec) {
+            if (!isTimeout || System.currentTimeMillis() - startTime > msec) {
                 break;
             }
         }
