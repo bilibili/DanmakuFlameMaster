@@ -61,7 +61,7 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
   ```  
 
 ### Version
-  * x.x.x = version, or set '+' for lastest（0.1.7）
+  * x.x.x = version, or set '+' for lastest（0.1.8.1）
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
