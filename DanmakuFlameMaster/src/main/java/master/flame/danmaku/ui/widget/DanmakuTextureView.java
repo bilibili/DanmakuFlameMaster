@@ -103,6 +103,20 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
             handler.addDanmaku(item);
         }
     }
+    
+    @Override
+    public void removeAllDanmakus() {
+        if (handler != null) {
+            handler.removeAllDanmakus();
+        }
+    }
+    
+    @Override
+    public void removeAllLiveDanmakus() {
+        if (handler != null) {
+            handler.removeAllLiveDanmakus();
+        }
+    }
 
     public void setCallback(Callback callback) {
         mCallback = callback;

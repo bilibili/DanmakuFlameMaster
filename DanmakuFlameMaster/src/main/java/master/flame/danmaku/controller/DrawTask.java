@@ -23,6 +23,7 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Poolable;
@@ -184,12 +185,55 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void addDanmaku(BaseDanmaku item) {
-        if(danmakuList == null)
+        if (danmakuList == null)
             return;
-        synchronized (danmakuList){
+        synchronized (danmakuList) {
+            if (item.isLive) {
+                removeUnusedLiveDanmakusIn(10);
+            }
             item.setTimer(mTimer);
             item.index = danmakuList.size();
             danmakuList.addItem(item);
+        }
+    }
+    
+    @Override
+    public void removeAllDanmakus() {
+        if (danmakuList == null || danmakuList.isEmpty())
+            return;
+        synchronized (danmakuList) {
+            danmakuList.clear();
+        }
+    }
+
+    @Override
+    public void removeAllLiveDanmakus() {
+        if (danmakuList == null || danmakuList.isEmpty())
+            return;
+        synchronized (danmakuList) {
+            IDanmakuIterator it = danmakuList.iterator();
+            while (it.hasNext()) {
+                if (it.next().isLive) {
+                    it.remove();
+                }
+            }
+        }
+    }
+    
+    protected void removeUnusedLiveDanmakusIn(int msec) {
+        if (danmakuList == null || danmakuList.isEmpty())
+            return;
+        long startTime = System.currentTimeMillis();
+        IDanmakuIterator it = danmakuList.iterator();
+        while (it.hasNext()) {
+            BaseDanmaku danmaku = it.next();
+            boolean isTimeout = danmaku.isTimeOut();
+            if (danmaku.isLive && isTimeout) {
+                it.remove();
+            }
+            if (!isTimeout || System.currentTimeMillis() - startTime > msec) {
+                break;
+            }
         }
     }
 

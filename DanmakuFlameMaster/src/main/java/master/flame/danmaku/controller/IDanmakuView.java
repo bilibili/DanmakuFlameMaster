@@ -36,6 +36,10 @@ public interface IDanmakuView {
     
     public void addDanmaku(BaseDanmaku item);
     
+    public void removeAllDanmakus();
+    
+    public void removeAllLiveDanmakus();
+    
     public void setCallback(Callback callback);
     
     
