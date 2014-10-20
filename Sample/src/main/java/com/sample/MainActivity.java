@@ -15,6 +15,7 @@ import master.flame.danmaku.danmaku.loader.ILoader;
 import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
@@ -56,6 +57,8 @@ public class MainActivity extends Activity {
 	}
 
     private void findViews() {
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setScaleTextSize(3.0f);
+
         LayoutInflater mLayoutInflater = getLayoutInflater();
         mMediaController = mLayoutInflater.inflate(R.layout.media_controller, null);
         mMediaController.setOnClickListener(new View.OnClickListener() {
