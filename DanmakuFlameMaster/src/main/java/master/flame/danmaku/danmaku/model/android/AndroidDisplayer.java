@@ -276,7 +276,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                 applyPaintConfig(danmaku, paint, false);
                 canvas.drawText(lines[0], left, top - paint.ascent(), paint);
             } else {
-                Float textHeight = getTextHeight(paint);
+                Float textHeight = danmaku.paintHeight / lines.length;
                 for (int t = 0; t < lines.length; t++) {
                     if (lines[t] == null || lines[t].length() == 0) {
                         continue;
