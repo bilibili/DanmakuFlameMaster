@@ -25,10 +25,6 @@ import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.objectpool.Pool;
-import master.flame.danmaku.danmaku.model.objectpool.Poolable;
-import master.flame.danmaku.danmaku.model.objectpool.PoolableManager;
-import master.flame.danmaku.danmaku.model.objectpool.Pools;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
@@ -40,35 +36,12 @@ import java.util.LinkedList;
 
 public class DrawTask implements IDrawTask {
     
-    private static class RectPoolableCache implements Poolable<RectPoolableCache> {
-
-        private RectPoolableCache mNextElement;
-        private boolean mIsPooled;
+    private static class RectCacheData {
 
         public float[] mRect;
 
-        public RectPoolableCache(float[] rect) {
+        public RectCacheData(float[] rect) {
             mRect = rect;
-        }
-
-        @Override
-        public void setNextPoolable(RectPoolableCache element) {
-            mNextElement = element;
-        }
-
-        @Override
-        public RectPoolableCache getNextPoolable() {
-            return mNextElement;
-        }
-
-        @Override
-        public boolean isPooled() {
-            return mIsPooled;
-        }
-
-        @Override
-        public void setPooled(boolean isPooled) {
-            mIsPooled = isPooled;
         }
 
         public void setRect(float[] rect) {
@@ -85,45 +58,22 @@ public class DrawTask implements IDrawTask {
     public class RectCache {
 
         private int mCapity;
-        private Pool<RectPoolableCache> mRectsCachePool;
-        private PoolableManager<RectPoolableCache> manager = new PoolableManager<DrawTask.RectPoolableCache>() {
-
-            @Override
-            public void onReleased(RectPoolableCache element) {
-
-            }
-
-            @Override
-            public void onAcquired(RectPoolableCache element) {
-
-            }
-
-            @Override
-            public RectPoolableCache newInstance() {
-                return null;
-            }
-        };
-        private LinkedList<RectPoolableCache> mRects = new LinkedList<RectPoolableCache>();
+        private LinkedList<RectCacheData> mRects = new LinkedList<RectCacheData>();
         private float[] mRect = new float[4];
 
         public RectCache(int capity) {
             mCapity = capity;
-            mRectsCachePool = Pools.finitePool(manager, mCapity);
-            for (int i = 0; i < mCapity; i++) {
-                mRectsCachePool.release(new RectPoolableCache(new float[4]));
-            }
         }
 
         public void push(float[] rect) {
+            RectCacheData rc = null;
             if (mRects.size() >= mCapity) {
-                RectPoolableCache rc = mRects.removeFirst();
-                mRectsCachePool.release(rc);
+                rc = mRects.removeFirst();
+            } else {
+                rc = new RectCacheData(new float[4]);
             }
-            RectPoolableCache rc = mRectsCachePool.acquire();
-            if (rc != null) {
-                rc.setRect(rect);
-                mRects.add(rc);
-            }
+            rc.setRect(rect);
+            mRects.add(rc);
         }
 
         private void resetRect() {
@@ -135,7 +85,7 @@ public class DrawTask implements IDrawTask {
 
         public float[] getRect() {
             resetRect();
-            for (RectPoolableCache rc : mRects) {
+            for (RectCacheData rc : mRects) {
                 mRect[0] = Math.min(mRect[0], rc.mRect[0]);
                 mRect[1] = Math.min(mRect[1], rc.mRect[1]);
                 mRect[2] = Math.max(mRect[2], rc.mRect[2]);
