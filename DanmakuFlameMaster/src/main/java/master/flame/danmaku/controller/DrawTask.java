@@ -32,69 +32,8 @@ import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
 
-import java.util.LinkedList;
-
 public class DrawTask implements IDrawTask {
     
-    private static class RectCacheData {
-
-        public float[] mRect;
-
-        public RectCacheData(float[] rect) {
-            mRect = rect;
-        }
-
-        public void setRect(float[] rect) {
-            for (int j = 0; j < mRect.length; j++) {
-                mRect[j] = 0;
-            }
-            for (int i = 0; i < mRect.length && i < rect.length; i++) {
-                mRect[i] = rect[i];
-            }
-        }
-
-    }
-
-    public class RectCache {
-
-        private int mCapity;
-        private LinkedList<RectCacheData> mRects = new LinkedList<RectCacheData>();
-        private float[] mRect = new float[4];
-
-        public RectCache(int capity) {
-            mCapity = capity;
-        }
-
-        public void push(float[] rect) {
-            RectCacheData rc = null;
-            if (mRects.size() >= mCapity) {
-                rc = mRects.removeFirst();
-            } else {
-                rc = new RectCacheData(new float[4]);
-            }
-            rc.setRect(rect);
-            mRects.add(rc);
-        }
-
-        private void resetRect() {
-            mRect[0] = Integer.MAX_VALUE;
-            mRect[1] = Integer.MAX_VALUE;
-            mRect[2] = Integer.MIN_VALUE;
-            mRect[3] = Integer.MIN_VALUE;
-        }
-
-        public float[] getRect() {
-            resetRect();
-            for (RectCacheData rc : mRects) {
-                mRect[0] = Math.min(mRect[0], rc.mRect[0]);
-                mRect[1] = Math.min(mRect[1], rc.mRect[1]);
-                mRect[2] = Math.max(mRect[2], rc.mRect[2]);
-                mRect[3] = Math.max(mRect[3], rc.mRect[3]);
-            }
-            return mRect;
-        }
-    }
-
     protected AbsDisplayer<?> mDisp;
 
     protected IDanmakus danmakuList;
@@ -116,8 +55,6 @@ public class DrawTask implements IDrawTask {
     protected int clearFlag;
 
     private long mStartRenderTime = 0;
-    
-    RectCache mRectCache = new RectCache(3);
 
     public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
@@ -239,16 +176,7 @@ public class DrawTask implements IDrawTask {
     protected RenderingState drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
         if (danmakuList != null) {
             Canvas canvas = (Canvas) disp.getExtraData();
-            if (clearFlag > 0) {
-                DrawHelper.clearCanvas(canvas);
-                clearFlag--;
-            } else {
-                float[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
-                mRectCache.push(refreshRect);
-                float[] rect = mRectCache.getRect();
-                DrawHelper.clearCanvas(canvas, Math.max(0, rect[0]), Math.max(0, rect[1]),
-                        Math.min(disp.getWidth(), rect[2]), Math.min(disp.getHeight(), rect[3]));
-            }
+            DrawHelper.clearCanvas(canvas);
             long currMills = timer.currMillisecond;
             danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION - 100,
                     currMills);

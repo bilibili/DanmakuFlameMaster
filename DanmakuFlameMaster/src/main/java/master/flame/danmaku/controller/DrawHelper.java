@@ -31,6 +31,7 @@ public class DrawHelper {
     static {
         PAINT = new Paint();
         PAINT.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        PAINT.setColor(Color.TRANSPARENT);
         RECT = new RectF();
     }
 
@@ -47,9 +48,7 @@ public class DrawHelper {
     }
 
     public static void clearCanvas(Canvas canvas) {
-        // canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        RECT.set(0, 0, canvas.getWidth(), canvas.getHeight());
-        clearCanvas(canvas, RECT);
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
     }
     
     public static void fillTransparent(Canvas canvas){
