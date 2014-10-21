@@ -21,7 +21,6 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.DisplayMetrics;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
@@ -92,8 +91,13 @@ public class DrawHandler extends Handler {
 
     private int mSkipFrames;
 
+    private Thread mThread;
+
+    private boolean mUpdateInNewThread;
+
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
+        mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
         if (timer == null) {
             timer = new DanmakuTimer();
         }
@@ -176,48 +180,13 @@ public class DrawHandler extends Handler {
                 sendEmptyMessage(RESUME);
                 break;
             case UPDATE:
-                if (quitFlag) {
+                if (mUpdateInNewThread) {
+                    updateInNewThread();
                     break;
-                }
-                long startMS = System.currentTimeMillis();
-                long time = startMS - mTimeBase;
-                long d = 0;
-                long averageTime = getAverageRenderingTime();
-                long gapTime = time - timer.currMillisecond;
-                if (mSkipFrames > 0
-                        || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.consumingTime > 60))) {
-                    // d = timer.update(time);
-                    d = timer.add(Math.max(mRenderingState.consumingTime, gapTime / 4));
-                    if (mSkipFrames <= 0) {
-                        mSkipFrames = 4;
-                    } else {
-                        mSkipFrames--;
-                    }
                 } else {
-                    d = Math.max(16, averageTime + (gapTime / 15));
-                    d = timer.add(d);
-                }
-                if (mCallback != null) {
-                    mCallback.updateTimer(timer);
-                }
-                if (d < 0) {
-                    removeMessages(UPDATE);
-                    sendEmptyMessageDelayed(UPDATE, 60 - d);
-                    break;
-                }
-                d = mDanmakuView.drawDanmakus();                
-                removeMessages(UPDATE);
-                if (d <= -1) {
-                    // reduce refresh rate
-                    sendEmptyMessageDelayed(UPDATE, 200);
-                    break;
+                    updateInCurrentThread();
                 }
                 
-                if (d < 15) {
-                    sendEmptyMessageDelayed(UPDATE,15 - d);
-                    break;
-                }
-                sendEmptyMessage(UPDATE);
                 break;
             case NOTIFY_DISP_SIZE_CHANGED:
                 DanmakuFactory.notifyDispSizeChanged(mDisp);
@@ -263,6 +232,10 @@ public class DrawHandler extends Handler {
             case QUIT:
                 removeCallbacksAndMessages(null);
                 quitFlag = true;
+                if (mThread != null) {
+                    mThread.interrupt();
+                    mThread = null;
+                }
                 mDrawTimes.clear();
                 pausedPostion = timer.currMillisecond;
                 if (what == QUIT){
@@ -277,6 +250,105 @@ public class DrawHandler extends Handler {
                 }
                 break;
         }
+    }
+
+    private void updateInCurrentThread() {
+        if (quitFlag) {
+            return;
+        }
+        long startMS = System.currentTimeMillis();
+        long time = startMS - mTimeBase;
+        long d = 0;
+        long averageTime = getAverageRenderingTime();
+        long gapTime = time - timer.currMillisecond;
+        if (mSkipFrames > 0
+                || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.consumingTime > 60))) {
+            // d = timer.update(time);
+            d = timer.add(Math.max(mRenderingState.consumingTime, gapTime / 4));
+            if (mSkipFrames <= 0) {
+                mSkipFrames = 4;
+            } else {
+                mSkipFrames--;
+            }
+        } else {
+            d = Math.max(16, averageTime + (gapTime / 15));
+            d = timer.add(d);
+        }
+        if (mCallback != null) {
+            mCallback.updateTimer(timer);
+        }
+        if (d < 0) {
+            removeMessages(UPDATE);
+            sendEmptyMessageDelayed(UPDATE, 60 - d);
+            return;
+        }
+        d = mDanmakuView.drawDanmakus();
+        removeMessages(UPDATE);
+        if (d <= -1) {
+            // reduce refresh rate
+            sendEmptyMessageDelayed(UPDATE, 200);
+            return;
+        }
+
+        if (d < 15) {
+            sendEmptyMessageDelayed(UPDATE, 15 - d);
+            return;
+        }
+        sendEmptyMessage(UPDATE);
+    }
+
+    private void updateInNewThread() {
+        if (mThread != null) {
+            return;
+        }
+        mThread = new Thread("DFM update") {
+            @Override
+            public void run() {
+                try {
+                    long lasTime = System.currentTimeMillis();
+                    while (!isInterrupted() && !quitFlag) {
+                        if(System.currentTimeMillis() - lasTime < 16) {
+                            continue;
+                        }
+                        long startMS = lasTime = System.currentTimeMillis();
+                        long time = startMS - mTimeBase;
+                        long d = 0;
+                        long averageTime = getAverageRenderingTime();
+                        long gapTime = time - timer.currMillisecond;
+                        if (mSkipFrames > 0
+                                || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.consumingTime > 60))) {
+                            // d = timer.update(time);
+                            d = timer.add(Math.max(mRenderingState.consumingTime, gapTime / 4));
+                            if (mSkipFrames <= 0) {
+                                mSkipFrames = 4;
+                            } else {
+                                mSkipFrames--;
+                            }
+                        } else {
+                            d = Math.max(16, averageTime + (gapTime / 15));
+                            d = timer.add(d);
+                        }
+                        if (mCallback != null) {
+                            mCallback.updateTimer(timer);
+                        }
+                        if (d < 0) {
+                            Thread.sleep(60 - d);
+                            continue;
+                        }
+                        d = mDanmakuView.drawDanmakus();
+                        removeMessages(UPDATE);
+                        if (d <= -1) {
+                            // reduce refresh rate
+                            Thread.sleep(200);
+                            continue;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        mThread.start();
     }
 
     private void prepare(final Runnable runnable) {
