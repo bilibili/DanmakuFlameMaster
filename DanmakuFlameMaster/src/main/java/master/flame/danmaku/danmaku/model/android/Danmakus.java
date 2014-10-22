@@ -86,8 +86,12 @@ public class Danmakus implements IDanmakus {
     @Override
     public void addItem(BaseDanmaku item) {
         if (items != null) {
-            if (items.add(item))
-                mSize++;
+            try {
+                if (items.add(item))
+                    mSize++;
+            } catch (Exception e) {
+
+            }
         }
     }
 
@@ -151,7 +155,7 @@ public class Danmakus implements IDanmakus {
         }
 
         startItem.time = startTime;
-        endItem.time = endTime + 1000; // +1000减少subSet次数
+        endItem.time = endTime;
         subItems.setItems(((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem));
         return subItems;
     }

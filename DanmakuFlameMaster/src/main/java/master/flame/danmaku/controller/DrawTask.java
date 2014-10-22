@@ -60,6 +60,10 @@ public class DrawTask implements IDrawTask {
 
     protected boolean mReadyState;
 
+    private long mLastStartMills;
+
+    private long mLastEndMills;
+
     public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
         mTaskListener = taskListener;
@@ -85,6 +89,9 @@ public class DrawTask implements IDrawTask {
             item.setTimer(mTimer);
             item.index = danmakuList.size();
             danmakuList.addItem(item);
+            if (item.time > mLastStartMills && item.time < mLastEndMills) {
+                mLastEndMills = mLastStartMills = 0;
+            }
         }
         if (mTaskListener != null) {
             mTaskListener.onDanmakuAdd(item);
@@ -188,7 +195,11 @@ public class DrawTask implements IDrawTask {
             DrawHelper.clearCanvas(canvas);
             long startMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
             long endMills = timer.currMillisecond + DanmakuFactory.MAX_DANMAKU_DURATION;
-            danmakus = danmakuList.sub(startMills, endMills);
+            if(mLastStartMills > startMills || timer.currMillisecond > mLastEndMills) {
+                danmakus = danmakuList.sub(startMills, endMills);
+                mLastStartMills = startMills;
+                mLastEndMills = endMills;
+            }
             if (danmakus != null && !danmakus.isEmpty()) {
                 return mRenderer.draw(mDisp, danmakus, mStartRenderTime);
             } else {
