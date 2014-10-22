@@ -32,7 +32,7 @@ public class R2LDanmaku extends BaseDanmaku {
 
     protected float[] RECT = null;
 
-    protected float mStepX, m60FPSStepX,m30FPSStepX;
+    protected float mStepX;
 
     protected long mLastTime;
 
@@ -57,35 +57,6 @@ public class R2LDanmaku extends BaseDanmaku {
             mLastTime = currMS;
         }
         this.setVisibility(false);
-    }
-
-    protected float getStableLeft(IDisplayer displayer, long currTime) {
-        long elapsedTime = currTime - time;
-        if (elapsedTime >= duration.value) {
-            return -paintWidth;
-        }
-        
-        long averageRenderingTime = displayer.getAverageRenderingTime();
-        if (averageRenderingTime > CORDON_RENDERING_TIME || Math.abs(mLastTime - currTime) > MAX_RENDERING_TIME){
-            float newX = getAccurateLeft(displayer, currTime);
-            if(x - newX < m60FPSStepX) {
-                newX = x - m60FPSStepX;
-            }
-            return newX;
-        }
-        
-        float stepX = m60FPSStepX;
-        
-        if (averageRenderingTime > 0) {
-            float layoutCount = (duration.value - elapsedTime) / (float) averageRenderingTime;
-            stepX = (this.x + paintWidth) / layoutCount;
-            if (stepX < m60FPSStepX) {
-                stepX = m60FPSStepX;
-            } else if (stepX > m30FPSStepX) {
-                stepX = m30FPSStepX;
-            }
-        }
-        return this.x - stepX;
     }
 
     protected float getAccurateLeft(IDisplayer displayer, long currTime) {
@@ -142,10 +113,6 @@ public class R2LDanmaku extends BaseDanmaku {
         super.measure(displayer);
         mDistance = (int) (displayer.getWidth() + paintWidth);
         mStepX = mDistance / (float) duration.value;
-        m60FPSStepX = mStepX * 16;
-        m30FPSStepX = m60FPSStepX * 2;
-        this.x = (mTimer != null ? getAccurateLeft(displayer, mTimer.currMillisecond) : displayer
-                .getWidth());
     }
 
 }

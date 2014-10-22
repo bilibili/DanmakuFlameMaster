@@ -420,9 +420,9 @@ public class CacheManagingDrawTask extends DrawTask {
                         prepareCaches(repositioned);
                         if (repositioned)
                             mSeekedFlag = false;
-                        if (mTaskListener != null) {
+                        if (mTaskListener != null && mReadyState == false) {
                             mTaskListener.ready();
-                            mTaskListener = null;
+                            mReadyState = true;
                         }
 //                        Log.i(TAG,"BUILD_CACHES:"+mCacheTimer.currMillisecond+":"+mTimer.currMillisecond);
                         break;
@@ -430,12 +430,11 @@ public class CacheManagingDrawTask extends DrawTask {
                         synchronized (danmakuList) {
                             BaseDanmaku item = (BaseDanmaku) msg.obj;
                             buildCache(item);
-                            CacheManagingDrawTask.super.addDanmaku(item);
                             if (item.isLive) {
-                                removeUnusedLiveDanmakusIn(5);
                                 mCacheTimer.update(mTimer.currMillisecond
                                         + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
                             }
+                            CacheManagingDrawTask.super.addDanmaku(item);
                         }
                         break;
                     case CLEAR_TIMEOUT_CACHES:

@@ -56,6 +56,10 @@ public class DrawTask implements IDrawTask {
 
     private long mStartRenderTime = 0;
 
+    private RenderingState mRenderingState = new RenderingState();
+
+    protected boolean mReadyState;
+
     public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
         mTaskListener = taskListener;
@@ -81,6 +85,9 @@ public class DrawTask implements IDrawTask {
             item.setTimer(mTimer);
             item.index = danmakuList.size();
             danmakuList.addItem(item);
+        }
+        if (mTaskListener != null) {
+            mTaskListener.onDanmakuAdd(item);
         }
     }
     
@@ -161,6 +168,7 @@ public class DrawTask implements IDrawTask {
         loadDanmakus(mParser);
         if (mTaskListener != null) {
             mTaskListener.ready();
+            mReadyState = true;
         }
     }
 
@@ -171,17 +179,23 @@ public class DrawTask implements IDrawTask {
 
     public void setParser(BaseDanmakuParser parser) {
         mParser = parser;
+        mReadyState = false;
     }
 
     protected RenderingState drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
         if (danmakuList != null) {
             Canvas canvas = (Canvas) disp.getExtraData();
             DrawHelper.clearCanvas(canvas);
-            long currMills = timer.currMillisecond;
-            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION - 100,
-                    currMills);
-            if (danmakus != null) {
+            long startMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
+            long endMills = timer.currMillisecond + DanmakuFactory.MAX_DANMAKU_DURATION;
+            danmakus = danmakuList.sub(startMills, endMills);
+            if (danmakus != null && !danmakus.isEmpty()) {
                 return mRenderer.draw(mDisp, danmakus, mStartRenderTime);
+            } else {
+                mRenderingState.nothingRendered = true;
+                mRenderingState.startTime = startMills;
+                mRenderingState.endTime = endMills;
+                return mRenderingState;
             }
         }
         return null;

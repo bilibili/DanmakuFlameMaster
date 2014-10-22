@@ -64,6 +64,10 @@ public class DanmakuRenderer extends Renderer {
                 continue;
             }
             
+            if (drawItem.isLate()) {
+                break;
+            }
+            
             if(drawItem.getType() == BaseDanmaku.TYPE_SCROLL_RL){
                 // 同屏弹幕密度只对滚动弹幕有效
                 orderInScreen++;

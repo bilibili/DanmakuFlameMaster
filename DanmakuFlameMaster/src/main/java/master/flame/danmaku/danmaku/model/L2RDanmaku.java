@@ -46,7 +46,7 @@ public class L2RDanmaku extends R2LDanmaku {
     public float[] getRectAtTime(IDisplayer displayer, long time) {
         if (!isMeasured())
             return null;
-        float left = getStableLeft(displayer, time);
+        float left = getAccurateLeft(displayer, time);
         if (RECT == null) {
             RECT = new float[4];
         }
@@ -55,37 +55,6 @@ public class L2RDanmaku extends R2LDanmaku {
         RECT[2] = left + paintWidth;
         RECT[3] = y + paintHeight;
         return RECT;
-    }
-    
-    @Override
-    protected float getStableLeft(IDisplayer displayer, long currTime) {
-        long elapsedTime = currTime - time;
-        if (elapsedTime >= duration.value) {
-            return displayer.getWidth();
-        }
-        
-        long averageRenderingTime = displayer.getAverageRenderingTime();
-        if (averageRenderingTime > CORDON_RENDERING_TIME || Math.abs(mLastTime - currTime) > MAX_RENDERING_TIME){
-            float newX = getAccurateLeft(displayer, currTime);
-            if(newX - this.x < m60FPSStepX) {
-                newX = this.x + m60FPSStepX;
-            }
-            return newX;
-        }
-
-        float stepX = m60FPSStepX;
-        if(averageRenderingTime > 0) {
-            float layoutCount = (duration.value - elapsedTime)
-                    / (float) averageRenderingTime;
-            stepX = (displayer.getWidth() - (this.x + paintWidth)) / layoutCount;
-            if (stepX < m60FPSStepX) {
-                stepX = m60FPSStepX;
-            } else if(stepX > m30FPSStepX) {
-                stepX = m30FPSStepX;
-            }
-        }
-
-        return this.x + stepX;
     }
 
     protected float getAccurateLeft(IDisplayer displayer, long currTime) {
@@ -119,12 +88,6 @@ public class L2RDanmaku extends R2LDanmaku {
     @Override
     public int getType() {
         return TYPE_SCROLL_LR;
-    }
-    
-    @Override
-    public void measure(IDisplayer displayer) {
-        super.measure(displayer);
-        this.x = -paintWidth;
     }
 
 }
