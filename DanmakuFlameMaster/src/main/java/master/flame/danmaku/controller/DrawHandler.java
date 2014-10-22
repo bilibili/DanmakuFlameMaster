@@ -259,20 +259,23 @@ public class DrawHandler extends Handler {
         long startMS = System.currentTimeMillis();
         long time = startMS - mTimeBase;
         long d = 0;
-        long averageTime = getAverageRenderingTime();
-        long gapTime = time - timer.currMillisecond;
-        if (mSkipFrames > 0
-                || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.consumingTime > 60))) {
-            // d = timer.update(time);
-            d = timer.add(Math.max(mRenderingState.consumingTime, gapTime / 4));
-            if (mSkipFrames <= 0) {
-                mSkipFrames = 4;
-            } else {
-                mSkipFrames--;
-            }
+        if (!mDanmakusVisible) {
+            d = timer.update(time);
         } else {
-            d = Math.max(16, averageTime + (gapTime / 15));
-            d = timer.add(d);
+            long averageTime = getAverageRenderingTime();
+            long gapTime = time - timer.currMillisecond;
+            if (mSkipFrames > 0
+                    || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.consumingTime > 60))) {
+                d = timer.add(Math.max(mRenderingState.consumingTime, gapTime / 4));
+                if (mSkipFrames <= 0) {
+                    mSkipFrames = 4;
+                } else {
+                    mSkipFrames--;
+                }
+            } else {
+                d = Math.max(16, averageTime + (gapTime / 15));
+                d = timer.add(d);
+            }
         }
         if (mCallback != null) {
             mCallback.updateTimer(timer);
@@ -313,20 +316,24 @@ public class DrawHandler extends Handler {
                         long startMS = lasTime = System.currentTimeMillis();
                         long time = startMS - mTimeBase;
                         long d = 0;
-                        long averageTime = getAverageRenderingTime();
-                        long gapTime = time - timer.currMillisecond;
-                        if (mSkipFrames > 0
-                                || (mRenderingState != null && (gapTime > 90 || averageTime > 30 || mRenderingState.consumingTime > 60))) {
-                            // d = timer.update(time);
-                            d = timer.add(Math.max(mRenderingState.consumingTime, gapTime / 4));
-                            if (mSkipFrames <= 0) {
-                                mSkipFrames = 4;
-                            } else {
-                                mSkipFrames--;
-                            }
+                        if (!mDanmakusVisible) {
+                            d = timer.update(time);
                         } else {
-                            d = Math.max(16, averageTime + (gapTime / 15));
-                            d = timer.add(d);
+                            long averageTime = getAverageRenderingTime();
+                            long gapTime = time - timer.currMillisecond;
+                            if (mSkipFrames > 0
+                                    || (mRenderingState != null && (gapTime > 90
+                                            || averageTime > 30 || mRenderingState.consumingTime > 60))) {
+                                d = timer.add(Math.max(mRenderingState.consumingTime, gapTime / 4));
+                                if (mSkipFrames <= 0) {
+                                    mSkipFrames = 4;
+                                } else {
+                                    mSkipFrames--;
+                                }
+                            } else {
+                                d = Math.max(16, averageTime + (gapTime / 15));
+                                d = timer.add(d);
+                            }
                         }
                         if (mCallback != null) {
                             mCallback.updateTimer(timer);
