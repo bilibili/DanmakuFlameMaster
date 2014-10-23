@@ -135,7 +135,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         public HandlerThread mThread;
 
-        Danmakus mCaches = new Danmakus();
+        Danmakus mCaches = new Danmakus(Danmakus.ST_BY_LIST);
 
         DrawingCachePoolManager mCachePoolManager = new DrawingCachePoolManager();
 
