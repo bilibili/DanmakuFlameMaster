@@ -54,18 +54,20 @@ public class DanmakuRenderer extends Renderer {
         int orderInScreen = 0;        
         mStartTimer.update(System.currentTimeMillis());
         int sizeInScreen = danmakus.size();
+        BaseDanmaku lateDrawItem = null;
         while (itr.hasNext()) {
 
             BaseDanmaku drawItem = itr.next();
+            
+            if (drawItem.isLate()) {
+                lateDrawItem = drawItem;
+                break;
+            }
 
             if (drawItem.time < startRenderTime
                     || (drawItem.priority == 0 && DanmakuFilters.getDefault().filter(drawItem,
                             orderInScreen, sizeInScreen, mStartTimer))) {
                 continue;
-            }
-            
-            if (drawItem.isLate()) {
-                break;
             }
             
             if(drawItem.getType() == BaseDanmaku.TYPE_SCROLL_RL){
@@ -84,8 +86,9 @@ public class DanmakuRenderer extends Renderer {
             // draw
             if (!drawItem.isOutside() && drawItem.isShown()) {
                 drawItem.draw(disp);
-                mRenderingState.add(drawItem.getType(), 1);
-                mRenderingState.add(1);
+                mRenderingState.addCount(drawItem.getType(), 1);
+                mRenderingState.addCount(1);
+                mRenderingState.endTime = drawItem.time;
             }
             
             if (fullScreenRefreshing)
@@ -116,6 +119,11 @@ public class DanmakuRenderer extends Renderer {
         float borderWidth = disp.getStrokeWidth() * 2;
         mRefreshArea.set(left, top, right + borderWidth, bottom + borderWidth);
         
+        mRenderingState.nothingRendered = (mRenderingState.totalDanmakuCount == 0);
+        if (mRenderingState.nothingRendered) {
+            mRenderingState.startTime = RenderingState.UNKNOWN_TIME;
+            mRenderingState.endTime = lateDrawItem != null ? lateDrawItem.time : RenderingState.UNKNOWN_TIME;
+        }
         mRenderingState.consumingTime = mStartTimer.update(System.currentTimeMillis());
         return mRenderingState;
     }

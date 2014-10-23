@@ -52,6 +52,8 @@ public interface IRenderer {
     }
     
     public class RenderingState {
+        public final static int UNKNOWN_TIME = -1;
+        
         public int r2lDanmakuCount;
         public int l2rDanmakuCount;
         public int ftDanmakuCount;
@@ -65,12 +67,12 @@ public interface IRenderer {
         public long sysTime;
         public boolean inWaitingState;
 
-        public int add(int count) {
+        public int addCount(int count) {
             totalDanmakuCount += count;
             return totalDanmakuCount;
         }
 
-        public int add(int type, int count) {
+        public int addCount(int type, int count) {
             switch (type) {
                 case BaseDanmaku.TYPE_SCROLL_RL:
                     r2lDanmakuCount += count;
@@ -93,7 +95,8 @@ public interface IRenderer {
 
         public void reset() {
             r2lDanmakuCount = l2rDanmakuCount = ftDanmakuCount = fbDanmakuCount = specialDanmakuCount = totalDanmakuCount = 0;
-            consumingTime = 0;
+            sysTime = startTime = endTime = consumingTime = 0;
+            nothingRendered = false;
         }
 
         public void set(RenderingState other) {
