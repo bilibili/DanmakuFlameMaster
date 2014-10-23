@@ -332,6 +332,10 @@ public class CacheManagingDrawTask extends DrawTask {
         private synchronized BaseDanmaku findReuseableCache(BaseDanmaku refDanmaku,
                 boolean strictMode) {
             IDanmakuIterator it = mCaches.iterator();
+            int slopPixel = 0;
+            if (!strictMode) {
+                slopPixel = mDisp.getSlopPixel() * 2;
+            }
             while (it.hasNext()) {
                 BaseDanmaku danmaku = it.next();
                 if (!danmaku.hasDrawingCache()) {
@@ -356,7 +360,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
                 float widthGap = danmaku.cache.width() - refDanmaku.paintWidth;
                 float heightGap = danmaku.cache.height() - refDanmaku.paintHeight;
-                int slopPixel = mDisp.getSlopPixel();
                 if (widthGap >= 0 && widthGap <= slopPixel &&  
                     heightGap >= 0 && heightGap <= slopPixel) {
                     return danmaku;
