@@ -105,7 +105,7 @@ public class Danmakus implements IDanmakus {
                 if (items.add(item))
                     mSize++;
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }
