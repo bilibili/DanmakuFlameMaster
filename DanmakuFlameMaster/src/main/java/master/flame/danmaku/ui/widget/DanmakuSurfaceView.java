@@ -398,5 +398,12 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         mDrawingThreadType  = type;
     }
 
+    @Override
+    public long getCurrentTime() {
+        if (handler != null) {
+            return handler.geCurrenttTime();
+        }
+        return 0;
+    }
 
 }

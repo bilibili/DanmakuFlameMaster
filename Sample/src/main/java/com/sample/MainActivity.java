@@ -191,7 +191,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             danmaku.text = "这是一条弹幕";
             danmaku.padding = 5;
             danmaku.priority = 1;
-            danmaku.time = mParser.getTimer().currMillisecond + 100;
+            danmaku.time = mDanmakuView.getCurrentTime() + 200;
             danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
             danmaku.textColor = Color.RED;
             danmaku.textShadowColor = Color.WHITE;

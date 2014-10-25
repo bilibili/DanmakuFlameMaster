@@ -77,7 +77,7 @@ public class DrawHandler extends Handler {
 
     private Callback mCallback;
 
-    private DanmakuTimer timer;
+    private DanmakuTimer timer = new DanmakuTimer();
 
     private BaseDanmakuParser mParser;
 
@@ -100,9 +100,6 @@ public class DrawHandler extends Handler {
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
         mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
-        if (timer == null) {
-            timer = new DanmakuTimer();
-        }
         if(danmakuVisibile){
             showDanmakus(null);
         }else{
@@ -369,11 +366,6 @@ public class DrawHandler extends Handler {
 
                         @Override
                         public void onDanmakuAdd(BaseDanmaku danmaku) {
-                            if (mRenderingState.nothingRendered
-                                    && mRenderingState.inWaitingState) {
-                                danmaku.time += System.currentTimeMillis()
-                                        - mRenderingState.sysTime;
-                            }
                             notifyRendering();
                         }
                     });
@@ -464,7 +456,6 @@ public class DrawHandler extends Handler {
     }
     
     private void notifyRendering() {
-        mRenderingState.inWaitingState = false;
         if (mUpdateInNewThread) {
             synchronized (drawTask) {
                 drawTask.notifyAll();
@@ -473,6 +464,7 @@ public class DrawHandler extends Handler {
             removeMessages(UPDATE);
             sendEmptyMessage(UPDATE);
         }
+        mRenderingState.inWaitingState = false;
     }
         
     private void waitRendering(long dTime) {
@@ -494,7 +486,8 @@ public class DrawHandler extends Handler {
             if (dTime == INDEFINITE_TIME) {
                 removeMessages(UPDATE);
             } else {
-                sendEmptyMessageDelayed(UPDATE, dTime - 400);
+                removeMessages(UPDATE);
+                sendEmptyMessageDelayed(UPDATE, dTime);
             }
         }
     }
@@ -544,6 +537,13 @@ public class DrawHandler extends Handler {
         if (drawTask != null) {
             drawTask.removeAllLiveDanmakus();
         }
+    }
+
+    public long geCurrenttTime() {
+        if (quitFlag) {
+            return timer.currMillisecond;
+        }
+        return System.currentTimeMillis() - mTimeBase;
     }
 
 }

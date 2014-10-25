@@ -408,4 +408,12 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         mDrawingThreadType = type;
     }
 
+    @Override
+    public long getCurrentTime() {
+        if (handler != null) {
+            return handler.geCurrenttTime();
+        }
+        return 0;
+    }
+
 }
