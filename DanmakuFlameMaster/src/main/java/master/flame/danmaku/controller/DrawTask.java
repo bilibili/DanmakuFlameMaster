@@ -195,23 +195,23 @@ public class DrawTask implements IDrawTask {
         if (danmakuList != null) {
             Canvas canvas = (Canvas) disp.getExtraData();
             DrawHelper.clearCanvas(canvas);
-            long startMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
+            long beginMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
             long endMills = timer.currMillisecond + DanmakuFactory.MAX_DANMAKU_DURATION;
-            if(mLastStartMills > startMills || timer.currMillisecond > mLastEndMills) {
-                IDanmakus subDanmakus = danmakuList.sub(startMills, endMills);
+            if(mLastStartMills > beginMills || timer.currMillisecond > mLastEndMills) {
+                IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
                 if(subDanmakus != null) {
                     danmakus = subDanmakus;
                 } else {
                     removeUnusedDanmakusIn(15);
                 }
-                mLastStartMills = startMills;
+                mLastStartMills = beginMills;
                 mLastEndMills = endMills;
             }
             if (danmakus != null && !danmakus.isEmpty()) {
                 RenderingState renderingState = mRenderer.draw(mDisp, danmakus, mStartRenderTime);
                 if (renderingState.nothingRendered) {
-                    if (renderingState.startTime == RenderingState.UNKNOWN_TIME) {
-                        renderingState.startTime = startMills;
+                    if (renderingState.beginTime == RenderingState.UNKNOWN_TIME) {
+                        renderingState.beginTime = beginMills;
                     }
                     if (renderingState.endTime == RenderingState.UNKNOWN_TIME) {
                         renderingState.endTime = endMills;
@@ -220,7 +220,7 @@ public class DrawTask implements IDrawTask {
                 return renderingState;
             } else {
                 mRenderingState.nothingRendered = true;
-                mRenderingState.startTime = startMills;
+                mRenderingState.beginTime = beginMills;
                 mRenderingState.endTime = endMills;
                 return mRenderingState;
             }

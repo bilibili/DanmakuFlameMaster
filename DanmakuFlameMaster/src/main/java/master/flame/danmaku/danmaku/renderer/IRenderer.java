@@ -61,13 +61,13 @@ public interface IRenderer {
         public int specialDanmakuCount;
         public int totalDanmakuCount;
         public long consumingTime;
-        public long startTime;
+        public long beginTime;
         public long endTime;
         public boolean nothingRendered;
         public long sysTime;
         public boolean inWaitingState;
 
-        public int addCount(int count) {
+        public int addTotalCount(int count) {
             totalDanmakuCount += count;
             return totalDanmakuCount;
         }
@@ -95,7 +95,7 @@ public interface IRenderer {
 
         public void reset() {
             r2lDanmakuCount = l2rDanmakuCount = ftDanmakuCount = fbDanmakuCount = specialDanmakuCount = totalDanmakuCount = 0;
-            sysTime = startTime = endTime = consumingTime = 0;
+            sysTime = beginTime = endTime = consumingTime = 0;
             nothingRendered = false;
         }
 
@@ -109,7 +109,7 @@ public interface IRenderer {
             specialDanmakuCount = other.specialDanmakuCount;
             totalDanmakuCount = other.totalDanmakuCount;
             consumingTime = other.consumingTime;
-            startTime = other.startTime;
+            beginTime = other.beginTime;
             endTime = other.endTime;
             nothingRendered = other.nothingRendered;
             sysTime = other.sysTime;

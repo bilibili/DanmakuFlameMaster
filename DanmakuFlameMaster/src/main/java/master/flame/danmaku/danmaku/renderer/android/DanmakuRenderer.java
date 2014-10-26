@@ -54,13 +54,12 @@ public class DanmakuRenderer extends Renderer {
         int orderInScreen = 0;        
         mStartTimer.update(System.currentTimeMillis());
         int sizeInScreen = danmakus.size();
-        BaseDanmaku lateDrawItem = null;
+        BaseDanmaku drawItem = null;
         while (itr.hasNext()) {
 
-            BaseDanmaku drawItem = itr.next();
+            drawItem = itr.next();
             
             if (drawItem.isLate()) {
-                lateDrawItem = drawItem;
                 break;
             }
 
@@ -87,8 +86,7 @@ public class DanmakuRenderer extends Renderer {
             if (!drawItem.isOutside() && drawItem.isShown()) {
                 drawItem.draw(disp);
                 mRenderingState.addCount(drawItem.getType(), 1);
-                mRenderingState.addCount(1);
-                mRenderingState.endTime = drawItem.time;
+                mRenderingState.addTotalCount(1);
             }
             
             if (fullScreenRefreshing)
@@ -121,8 +119,8 @@ public class DanmakuRenderer extends Renderer {
         
         mRenderingState.nothingRendered = (mRenderingState.totalDanmakuCount == 0);
         if (mRenderingState.nothingRendered) {
-            mRenderingState.startTime = RenderingState.UNKNOWN_TIME;
-            mRenderingState.endTime = lateDrawItem != null ? lateDrawItem.time : RenderingState.UNKNOWN_TIME;
+            mRenderingState.beginTime = RenderingState.UNKNOWN_TIME;
+            mRenderingState.endTime = drawItem != null ? drawItem.time : RenderingState.UNKNOWN_TIME;
         }
         mRenderingState.consumingTime = mStartTimer.update(System.currentTimeMillis());
         return mRenderingState;
