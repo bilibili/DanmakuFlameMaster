@@ -123,6 +123,4 @@ public interface IRenderer {
 
     public void release();
 
-    public Area getRefreshArea();
-
 }
