@@ -122,7 +122,7 @@ public class DrawHandler extends Handler {
     }
 
     public void quit() {
-        removeCallbacksAndMessages(null);
+        removeMessages(QUIT);
         sendEmptyMessage(QUIT);
     }
 
