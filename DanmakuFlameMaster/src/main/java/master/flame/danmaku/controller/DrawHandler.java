@@ -314,6 +314,7 @@ public class DrawHandler extends Handler {
                         } else if (mRenderingState.nothingRendered) {
                             dTime = mRenderingState.endTime - timer.currMillisecond;
                             if (dTime > 500) {
+                                notifyRendering();
                                 waitRendering(dTime - 400);
                             }
                         }
