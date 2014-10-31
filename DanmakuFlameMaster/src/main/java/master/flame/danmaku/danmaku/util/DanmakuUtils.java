@@ -26,15 +26,19 @@ public class DanmakuUtils {
 
     /**
      * 检测两个弹幕是否会碰撞
-     * 
+     * 允许不同类型弹幕的碰撞
      * @param d1
      * @param d2
      * @return
      */
     public static boolean willHitInDuration(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2,
             long duration, long currTime) {
-        if (d1.getType() != d2.getType())
+        final int type1 = d1.getType();
+        final int type2 = d2.getType();
+        // allow hit if different type
+        if(type1 != type2)
             return false;
+        
         if(d1.isOutside()){
             return false;
         }
@@ -45,46 +49,37 @@ public class DanmakuUtils {
             return false;
         }
 
-        if (d1.getType() == BaseDanmaku.TYPE_FIX_TOP || d1.getType() == BaseDanmaku.TYPE_FIX_BOTTOM) {
+        if (type1 == BaseDanmaku.TYPE_FIX_TOP || type1 == BaseDanmaku.TYPE_FIX_BOTTOM) {
             return true;
         }
 
-        float[] rectArr1 = d1.getRectAtTime(disp, currTime);
-        float[] rectArr2 = d2.getRectAtTime(disp, currTime);
-        if (rectArr1 == null || rectArr2 == null)
-            return false;
-        if (checkHit(d1, d2, rectArr1, rectArr2)) {
-            return true;
-        }
-
-        long time = d1.time + d1.getDuration();
-        rectArr1 = d1.getRectAtTime(disp, time);
-        rectArr2 = d2.getRectAtTime(disp, time);
-        if (rectArr1 == null || rectArr2 == null)
-            return false;
-        if (checkHit(d1, d2, rectArr1, rectArr2)) {
-            return true;
-        }
-
-        return false;
+        return checkHitAtTime(disp, d1, d2, currTime) 
+                || checkHitAtTime(disp, d1, d2,  d1.time + d1.getDuration());
     }
-
-    private static boolean checkHit(BaseDanmaku d1, BaseDanmaku d2, float[] rectArr1,
+    
+    private static boolean checkHitAtTime(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2, long time){
+        final float[] rectArr1 = d1.getRectAtTime(disp, time);
+        final float[] rectArr2 = d2.getRectAtTime(disp, time);
+        if (rectArr1 == null || rectArr2 == null)
+            return false;
+        return checkHit(d1.getType(), d2.getType(), rectArr1, rectArr2);
+    }
+    
+    private static boolean checkHit(int type1, int type2, float[] rectArr1,
             float[] rectArr2) {
-
-        if (d1.getType() == BaseDanmaku.TYPE_SCROLL_RL
-                && d2.getType() == BaseDanmaku.TYPE_SCROLL_RL) {
-            if (rectArr2[0] < rectArr1[2]) {
-                return true;
-            }
-        } else if (d1.getType() == BaseDanmaku.TYPE_SCROLL_LR
-                && d2.getType() == BaseDanmaku.TYPE_SCROLL_LR) {
-            if (rectArr2[2] > rectArr1[0]) {
-                return true;
-            }
+        if(type1 != type2)
+            return false;
+        if (type1 == BaseDanmaku.TYPE_SCROLL_RL) {
+            // hit if left2 < right1
+            return rectArr2[0] < rectArr1[2];
         }
+        
+        if (type1 == BaseDanmaku.TYPE_SCROLL_LR){
+            // hit if right2 > left1
+            return rectArr2[2] > rectArr1[0];
+        }
+        
         return false;
-
     }
 
     public static DrawingCache buildDanmakuDrawingCache(BaseDanmaku danmaku, IDisplayer disp,
