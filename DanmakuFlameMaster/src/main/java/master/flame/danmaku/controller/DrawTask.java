@@ -25,10 +25,7 @@ import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.objectpool.Pool;
-import master.flame.danmaku.danmaku.model.objectpool.Poolable;
-import master.flame.danmaku.danmaku.model.objectpool.PoolableManager;
-import master.flame.danmaku.danmaku.model.objectpool.Pools;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
@@ -36,115 +33,8 @@ import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
 
-import java.util.LinkedList;
-
 public class DrawTask implements IDrawTask {
     
-    private static class RectPoolableCache implements Poolable<RectPoolableCache> {
-
-        private RectPoolableCache mNextElement;
-        private boolean mIsPooled;
-
-        public float[] mRect;
-
-        public RectPoolableCache(float[] rect) {
-            mRect = rect;
-        }
-
-        @Override
-        public void setNextPoolable(RectPoolableCache element) {
-            mNextElement = element;
-        }
-
-        @Override
-        public RectPoolableCache getNextPoolable() {
-            return mNextElement;
-        }
-
-        @Override
-        public boolean isPooled() {
-            return mIsPooled;
-        }
-
-        @Override
-        public void setPooled(boolean isPooled) {
-            mIsPooled = isPooled;
-        }
-
-        public void setRect(float[] rect) {
-            for (int j = 0; j < mRect.length; j++) {
-                mRect[j] = 0;
-            }
-            for (int i = 0; i < mRect.length && i < rect.length; i++) {
-                mRect[i] = rect[i];
-            }
-        }
-
-    }
-
-    public class RectCache {
-
-        private int mCapity;
-        private Pool<RectPoolableCache> mRectsCachePool;
-        private PoolableManager<RectPoolableCache> manager = new PoolableManager<DrawTask.RectPoolableCache>() {
-
-            @Override
-            public void onReleased(RectPoolableCache element) {
-
-            }
-
-            @Override
-            public void onAcquired(RectPoolableCache element) {
-
-            }
-
-            @Override
-            public RectPoolableCache newInstance() {
-                return null;
-            }
-        };
-        private LinkedList<RectPoolableCache> mRects = new LinkedList<RectPoolableCache>();
-        private float[] mRect = new float[4];
-
-        public RectCache(int capity) {
-            mCapity = capity;
-            mRectsCachePool = Pools.finitePool(manager, mCapity);
-            for (int i = 0; i < mCapity; i++) {
-                mRectsCachePool.release(new RectPoolableCache(new float[4]));
-            }
-        }
-
-        public void push(float[] rect) {
-            if (mRects.size() >= mCapity) {
-                RectPoolableCache rc = mRects.removeFirst();
-                mRectsCachePool.release(rc);
-            }
-            RectPoolableCache rc = mRectsCachePool.acquire();
-            if (rc != null) {
-                rc.setRect(rect);
-                mRects.add(rc);
-            }
-        }
-
-        private void resetRect() {
-            mRect[0] = Integer.MAX_VALUE;
-            mRect[1] = Integer.MAX_VALUE;
-            mRect[2] = Integer.MIN_VALUE;
-            mRect[3] = Integer.MIN_VALUE;
-        }
-
-        public float[] getRect() {
-            resetRect();
-            for (RectPoolableCache rc : mRects) {
-                mRect[0] = Math.min(mRect[0], rc.mRect[0]);
-                mRect[1] = Math.min(mRect[1], rc.mRect[1]);
-                mRect[2] = Math.max(mRect[2], rc.mRect[2]);
-                mRect[3] = Math.max(mRect[3], rc.mRect[3]);
-            }
-            return mRect;
-        }
-    }
-
     protected AbsDisplayer<?> mDisp;
 
     protected IDanmakus danmakuList;
@@ -161,13 +51,19 @@ public class DrawTask implements IDrawTask {
 
     AndroidCounter mCounter;
 
-    private IDanmakus danmakus;
+    private IDanmakus danmakus = new Danmakus(Danmakus.ST_BY_LIST);
 
     protected int clearFlag;
 
     private long mStartRenderTime = 0;
-    
-    RectCache mRectCache = new RectCache(3);
+
+    private RenderingState mRenderingState = new RenderingState();
+
+    protected boolean mReadyState;
+
+    private long mLastBeginMills;
+
+    private long mLastEndMills;
 
     public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
@@ -188,12 +84,17 @@ public class DrawTask implements IDrawTask {
         if (danmakuList == null)
             return;
         synchronized (danmakuList) {
-            if (item.isLive) {
-                removeUnusedLiveDanmakusIn(10);
-            }
             item.setTimer(mTimer);
             item.index = danmakuList.size();
-            danmakuList.addItem(item);
+            if(!item.isLive) {
+                danmakuList.addItem(item);
+            } 
+            synchronized (danmakus) {
+                danmakus.addItem(item);
+            }
+        }
+        if (mTaskListener != null) {
+            mTaskListener.onDanmakuAdd(item);
         }
     }
     
@@ -208,10 +109,10 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void removeAllLiveDanmakus() {
-        if (danmakuList == null || danmakuList.isEmpty())
+        if (danmakus == null || danmakus.isEmpty())
             return;
-        synchronized (danmakuList) {
-            IDanmakuIterator it = danmakuList.iterator();
+        synchronized (danmakus) {
+            IDanmakuIterator it = danmakus.iterator();
             while (it.hasNext()) {
                 if (it.next().isLive) {
                     it.remove();
@@ -220,19 +121,21 @@ public class DrawTask implements IDrawTask {
         }
     }
     
-    protected void removeUnusedLiveDanmakusIn(int msec) {
-        if (danmakuList == null || danmakuList.isEmpty())
+    protected void removeUnusedDanmakusIn(int msec) {
+        if (danmakus == null || danmakus.isEmpty())
             return;
-        long startTime = System.currentTimeMillis();
-        IDanmakuIterator it = danmakuList.iterator();
-        while (it.hasNext()) {
-            BaseDanmaku danmaku = it.next();
-            boolean isTimeout = danmaku.isTimeOut();
-            if (danmaku.isLive && isTimeout) {
-                it.remove();
-            }
-            if (!isTimeout || System.currentTimeMillis() - startTime > msec) {
-                break;
+        synchronized (danmakus) {
+            long startTime = System.currentTimeMillis();
+            IDanmakuIterator it = danmakus.iterator();
+            while (it.hasNext()) {
+                BaseDanmaku danmaku = it.next();
+                boolean isTimeout = danmaku.isTimeOut();
+                if (isTimeout) {
+                    it.remove();
+                }
+                if (!isTimeout || System.currentTimeMillis() - startTime > msec) {
+                    break;
+                }
             }
         }
     }
@@ -274,6 +177,7 @@ public class DrawTask implements IDrawTask {
         loadDanmakus(mParser);
         if (mTaskListener != null) {
             mTaskListener.ready();
+            mReadyState = true;
         }
     }
 
@@ -284,26 +188,44 @@ public class DrawTask implements IDrawTask {
 
     public void setParser(BaseDanmakuParser parser) {
         mParser = parser;
+        mReadyState = false;
     }
 
     protected RenderingState drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
         if (danmakuList != null) {
             Canvas canvas = (Canvas) disp.getExtraData();
-            if (clearFlag > 0) {
-                DrawHelper.clearCanvas(canvas);
-                clearFlag--;
+            DrawHelper.clearCanvas(canvas);
+            long beginMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
+            long endMills = timer.currMillisecond + DanmakuFactory.MAX_DANMAKU_DURATION;
+            if(mLastBeginMills > beginMills || timer.currMillisecond > mLastEndMills) {
+                IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
+                if(subDanmakus != null) {
+                    danmakus = subDanmakus;
+                } else {
+                    removeUnusedDanmakusIn(15);
+                }
+                mLastBeginMills = beginMills;
+                mLastEndMills = endMills;
             } else {
-                float[] refreshRect = mRenderer.getRefreshArea().mRefreshRect;
-                mRectCache.push(refreshRect);
-                float[] rect = mRectCache.getRect();
-                DrawHelper.clearCanvas(canvas, Math.max(0, rect[0]), Math.max(0, rect[1]),
-                        Math.min(disp.getWidth(), rect[2]), Math.min(disp.getHeight(), rect[3]));
+                beginMills = mLastBeginMills;
+                endMills = mLastEndMills;
             }
-            long currMills = timer.currMillisecond;
-            danmakus = danmakuList.sub(currMills - DanmakuFactory.MAX_DANMAKU_DURATION - 100,
-                    currMills);
-            if (danmakus != null) {
-                return mRenderer.draw(mDisp, danmakus, mStartRenderTime);
+            if (danmakus != null && !danmakus.isEmpty()) {
+                RenderingState renderingState = mRenderer.draw(mDisp, danmakus, mStartRenderTime);
+                if (renderingState.nothingRendered) {
+                    if (renderingState.beginTime == RenderingState.UNKNOWN_TIME) {
+                        renderingState.beginTime = beginMills;
+                    }
+                    if (renderingState.endTime == RenderingState.UNKNOWN_TIME) {
+                        renderingState.endTime = endMills;
+                    }
+                }
+                return renderingState;
+            } else {
+                mRenderingState.nothingRendered = true;
+                mRenderingState.beginTime = beginMills;
+                mRenderingState.endTime = endMills;
+                return mRenderingState;
             }
         }
         return null;

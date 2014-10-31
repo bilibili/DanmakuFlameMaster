@@ -213,6 +213,10 @@ public abstract class BaseDanmaku {
         long dtime = ctime - time;
         return dtime <= 0 ||  dtime >= duration.value;
     }
+    
+    public boolean isLate() {
+        return mTimer == null || mTimer.currMillisecond < time;
+    }
 
     public void setVisibility(boolean b) {
         if(b){

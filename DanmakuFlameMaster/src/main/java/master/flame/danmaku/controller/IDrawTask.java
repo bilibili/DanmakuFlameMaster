@@ -47,6 +47,8 @@ public interface IDrawTask {
 
     public interface TaskListener {
         public void ready();
+        
+        public void onDanmakuAdd(BaseDanmaku danmaku);
     }
 
 }

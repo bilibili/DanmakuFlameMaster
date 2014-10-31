@@ -135,7 +135,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         public HandlerThread mThread;
 
-        Danmakus mCaches = new Danmakus();
+        Danmakus mCaches = new Danmakus(Danmakus.ST_BY_LIST);
 
         DrawingCachePoolManager mCachePoolManager = new DrawingCachePoolManager();
 
@@ -332,6 +332,10 @@ public class CacheManagingDrawTask extends DrawTask {
         private synchronized BaseDanmaku findReuseableCache(BaseDanmaku refDanmaku,
                 boolean strictMode) {
             IDanmakuIterator it = mCaches.iterator();
+            int slopPixel = 0;
+            if (!strictMode) {
+                slopPixel = mDisp.getSlopPixel() * 2;
+            }
             while (it.hasNext()) {
                 BaseDanmaku danmaku = it.next();
                 if (!danmaku.hasDrawingCache()) {
@@ -356,7 +360,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
                 float widthGap = danmaku.cache.width() - refDanmaku.paintWidth;
                 float heightGap = danmaku.cache.height() - refDanmaku.paintHeight;
-                int slopPixel = mDisp.getSlopPixel();
                 if (widthGap >= 0 && widthGap <= slopPixel &&  
                     heightGap >= 0 && heightGap <= slopPixel) {
                     return danmaku;
@@ -420,9 +423,9 @@ public class CacheManagingDrawTask extends DrawTask {
                         prepareCaches(repositioned);
                         if (repositioned)
                             mSeekedFlag = false;
-                        if (mTaskListener != null) {
+                        if (mTaskListener != null && mReadyState == false) {
                             mTaskListener.ready();
-                            mTaskListener = null;
+                            mReadyState = true;
                         }
 //                        Log.i(TAG,"BUILD_CACHES:"+mCacheTimer.currMillisecond+":"+mTimer.currMillisecond);
                         break;
@@ -430,12 +433,11 @@ public class CacheManagingDrawTask extends DrawTask {
                         synchronized (danmakuList) {
                             BaseDanmaku item = (BaseDanmaku) msg.obj;
                             buildCache(item);
-                            CacheManagingDrawTask.super.addDanmaku(item);
                             if (item.isLive) {
-                                removeUnusedLiveDanmakusIn(5);
                                 mCacheTimer.update(mTimer.currMillisecond
                                         + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
                             }
+                            CacheManagingDrawTask.super.addDanmaku(item);
                         }
                         break;
                     case CLEAR_TIMEOUT_CACHES:

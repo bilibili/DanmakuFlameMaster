@@ -36,6 +36,7 @@ import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
+import java.util.LinkedList;
 import java.util.Locale;
 
 /**
@@ -180,29 +181,23 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
             mDrawThread.quit();
             mDrawThread = null;
         }
-        int priority = Thread.NORM_PRIORITY;
-        String threadName = "DFM Drawing thread";
+        
+        int priority;
         switch (type) {
-            case THREAD_TYPE_MAIN_THREAD: {                
+            case THREAD_TYPE_MAIN_THREAD:
                 return Looper.getMainLooper();
-            }
-            case THREAD_TYPE_HIGH_PRIORITY: {
-                priority = Thread.MAX_PRIORITY;
-                threadName += Thread.MAX_PRIORITY;
-            }
+            case THREAD_TYPE_HIGH_PRIORITY:
+                priority = android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY;
                 break;
-            case THREAD_TYPE_NORMAL_PRIORITY: {
-                priority = Thread.NORM_PRIORITY;
-                threadName += Thread.NORM_PRIORITY;
-            }
+            case THREAD_TYPE_LOW_PRIORITY:
+                priority = android.os.Process.THREAD_PRIORITY_LOWEST;
                 break;
-            case THREAD_TYPE_LOW_PRIORITY: {
-                priority = Thread.MIN_PRIORITY;
-                threadName += Thread.MIN_PRIORITY;
-            }
+            case THREAD_TYPE_NORMAL_PRIORITY:
+            default:
+                priority = android.os.Process.THREAD_PRIORITY_DEFAULT;
                 break;
         }
-        
+        String threadName = "DFM Drawing thread #"+priority;
         mDrawThread = new HandlerThread(threadName, priority);
         mDrawThread.start();
         return mDrawThread.getLooper();
@@ -230,7 +225,20 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     public void showFPS(boolean show) {
         mShowFps = show;
     }
-
+    private static final int MAX_RECORD_SIZE = 50;
+    private static final int ONE_SECOND = 1000;
+    private LinkedList<Long> mDrawTimes;
+    private float fps() {
+        long lastTime = System.currentTimeMillis();
+        mDrawTimes.addLast(lastTime);
+        float dtime = lastTime - mDrawTimes.getFirst();
+        int frames = mDrawTimes.size();
+        if (frames > MAX_RECORD_SIZE) {
+            mDrawTimes.removeFirst();
+        }
+        return dtime > 0 ? mDrawTimes.size() * ONE_SECOND / dtime : 0.0f;
+    }
+    
     @Override
     public synchronized long drawDanmakus() {
         if (!isSurfaceCreated)
@@ -244,9 +252,10 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
             if (handler != null) {
                 handler.draw(canvas);
                 if (mShowFps) {
-                    dtime = System.currentTimeMillis() - stime;
+                    if(mDrawTimes == null) mDrawTimes = new LinkedList<Long>();
+                    dtime = System.currentTimeMillis() - stime;  //not so accurate
                     String fps = String.format(Locale.getDefault(), "%02d MS, fps %.2f", dtime,
-                            1000 / (float) dtime);
+                            fps());
                     DrawHelper.drawFPS(canvas, fps);
                 }
             }
@@ -391,6 +400,14 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public void setDrawingThreadType(int type) {
         mDrawingThreadType = type;
+    }
+
+    @Override
+    public long getCurrentTime() {
+        if (handler != null) {
+            return handler.geCurrenttTime();
+        }
+        return 0;
     }
 
 }

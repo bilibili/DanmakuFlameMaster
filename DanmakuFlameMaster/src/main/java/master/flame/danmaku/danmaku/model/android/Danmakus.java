@@ -31,8 +31,13 @@ public class Danmakus implements IDanmakus {
     public static final int ST_BY_YPOS = 1;
 
     public static final int ST_BY_YPOS_DESC = 2;
+    
+    /**
+     * this type is used to iterate/remove/insert elements, not support sub/subnew
+     */
+    public static final int ST_BY_LIST = 4;
 
-    public Set<BaseDanmaku> items;
+    public Collection<BaseDanmaku> items;
 
     private Danmakus subItems;
 
@@ -45,6 +50,8 @@ public class Danmakus implements IDanmakus {
     private DanmakuIterator iterator;
 
     private int mSize = 0;
+
+    private int mSortType = ST_BY_TIME;
 
     public Danmakus() {
         this(ST_BY_TIME);
@@ -59,17 +66,25 @@ public class Danmakus implements IDanmakus {
         } else if (sortType == ST_BY_YPOS_DESC) {
             comparator = new YPosDescComparator();
         }
-        items = new TreeSet<BaseDanmaku>(comparator);
+        if(sortType == ST_BY_LIST) {
+            items = new LinkedList<BaseDanmaku>();
+        } else {
+            items = new TreeSet<BaseDanmaku>(comparator);
+        }
+        mSortType = sortType;
         mSize = 0;
         iterator = new DanmakuIterator(items);
     }
 
-    public Danmakus(Set<BaseDanmaku> items) {
+    public Danmakus(Collection<BaseDanmaku> items) {
         setItems(items);
     }
 
-    public void setItems(Set<BaseDanmaku> items) {        
+    public void setItems(Collection<BaseDanmaku> items) {        
         this.items = items;
+        if (items instanceof List) {
+            mSortType = ST_BY_LIST;
+        }
         mSize = (items == null ? 0 : items.size());
         if (iterator == null) {
             iterator = new DanmakuIterator(items);
@@ -86,8 +101,12 @@ public class Danmakus implements IDanmakus {
     @Override
     public void addItem(BaseDanmaku item) {
         if (items != null) {
-            if (items.add(item))
-                mSize++;
+            try {
+                if (items.add(item))
+                    mSize++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -103,8 +122,8 @@ public class Danmakus implements IDanmakus {
             mSize--;
     }
 
-    private Set<BaseDanmaku> subset(long startTime, long endTime) {
-        if (items == null || items.size() == 0) {
+    private Collection<BaseDanmaku> subset(long startTime, long endTime) {
+        if (mSortType == ST_BY_LIST || items == null || items.size() == 0) {
             return null;
         }
         if (subItems == null) {
@@ -124,13 +143,13 @@ public class Danmakus implements IDanmakus {
     
     @Override
     public IDanmakus subnew(long startTime, long endTime) {
-        Set<BaseDanmaku> subset = subset(startTime, endTime);
+        Collection<BaseDanmaku> subset = subset(startTime, endTime);
         return new Danmakus(subset);
     }
 
     @Override
     public IDanmakus sub(long startTime, long endTime) {
-        if (items == null || items.size() == 0) {
+        if (mSortType == ST_BY_LIST || items == null || items.size() == 0) {
             return null;
         }
         if (subItems == null) {
@@ -151,7 +170,7 @@ public class Danmakus implements IDanmakus {
         }
 
         startItem.time = startTime;
-        endItem.time = endTime + 1000; // +1000减少subSet次数
+        endItem.time = endTime;
         subItems.setItems(((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem));
         return subItems;
     }
@@ -178,6 +197,9 @@ public class Danmakus implements IDanmakus {
     @Override
     public BaseDanmaku first() {
         if (items != null && !items.isEmpty()) {
+            if (mSortType == ST_BY_LIST) {
+                return ((LinkedList<BaseDanmaku>) items).getFirst();
+            }
             return ((SortedSet<BaseDanmaku>) items).first();
         }
         return null;
@@ -186,6 +208,9 @@ public class Danmakus implements IDanmakus {
     @Override
     public BaseDanmaku last() {
         if (items != null && !items.isEmpty()) {
+            if (mSortType == ST_BY_LIST) {
+                return ((LinkedList<BaseDanmaku>) items).getLast();
+            }
             return ((SortedSet<BaseDanmaku>) items).last();
         }
         return null;
@@ -193,14 +218,18 @@ public class Danmakus implements IDanmakus {
     
     private class DanmakuIterator implements IDanmakuIterator{
         
-        private Set<BaseDanmaku> mData;
+        private Collection<BaseDanmaku> mData;
         private Iterator<BaseDanmaku> it;
+        private boolean mIteratorUsed;
 
-        public DanmakuIterator(Set<BaseDanmaku> datas){
+        public DanmakuIterator(Collection<BaseDanmaku> datas){
             setDatas(datas);
         }
         
-        public synchronized void reset(){
+        public synchronized void reset() {
+            if (!mIteratorUsed && it != null) {
+                return;
+            }
             if (mData != null && mSize > 0) {
                 it = mData.iterator();
             } else {
@@ -208,12 +237,17 @@ public class Danmakus implements IDanmakus {
             }
         }
 
-        public synchronized void setDatas(Set<BaseDanmaku> datas){
+        public synchronized void setDatas(Collection<BaseDanmaku> datas){
+            if (mData != datas) {
+                mIteratorUsed = false;
+                it = null;
+            }
             mData = datas;
         }
 
         @Override
         public synchronized BaseDanmaku next() {
+            mIteratorUsed = true;
             return it != null ? it.next() : null;
         }
 
@@ -224,6 +258,7 @@ public class Danmakus implements IDanmakus {
 
         @Override
         public synchronized void remove() {
+            mIteratorUsed = true;
             if (it != null) {
                 it.remove();
             }
