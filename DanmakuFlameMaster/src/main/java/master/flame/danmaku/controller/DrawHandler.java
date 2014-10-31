@@ -211,7 +211,6 @@ public class DrawHandler extends Handler {
                 if(quitFlag && mDanmakuView != null) {
                     mDanmakuView.drawDanmakus(); 
                 }
-                mDrawTimes.clear();
                 mSkipFrames = 0;
                 notifyRendering();
                 break;
@@ -239,7 +238,6 @@ public class DrawHandler extends Handler {
                     mThread.interrupt();
                     mThread = null;
                 }
-                mDrawTimes.clear();
                 mSkipFrames = 0;
                 pausedPostion = timer.currMillisecond;
                 if (what == QUIT){
@@ -457,11 +455,18 @@ public class DrawHandler extends Handler {
     }
     
     private void notifyRendering() {
+        if (!mRenderingState.inWaitingState) {
+            return;
+        }
         if (mUpdateInNewThread) {
+            synchronized(this) {
+                mDrawTimes.clear();
+            }
             synchronized (drawTask) {
                 drawTask.notifyAll();
             }
         } else {
+            mDrawTimes.clear();
             removeMessages(UPDATE);
             sendEmptyMessage(UPDATE);
         }
@@ -493,7 +498,7 @@ public class DrawHandler extends Handler {
         }
     }
 
-    private long getAverageRenderingTime() {
+    private synchronized long getAverageRenderingTime() {
         int frames = mDrawTimes.size();
         if(frames <= 0)
             return 0;
