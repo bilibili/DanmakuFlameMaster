@@ -93,6 +93,10 @@ public class DrawHandler extends Handler {
 
     private int mSkipFrames;
 
+    private static final int MAX_RECORD_SIZE = 100;
+
+    private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
+
     private Thread mThread;
 
     private boolean mUpdateInNewThread;
@@ -181,11 +185,9 @@ public class DrawHandler extends Handler {
             case UPDATE:
                 if (mUpdateInNewThread) {
                     updateInNewThread();
-                    break;
                 } else {
                     updateInCurrentThread();
                 }
-                
                 break;
             case NOTIFY_DISP_SIZE_CHANGED:
                 DanmakuFactory.notifyDispSizeChanged(mDisp);
@@ -505,9 +507,6 @@ public class DrawHandler extends Handler {
         long dtime = mDrawTimes.getLast() - mDrawTimes.getFirst();
         return dtime / frames;
     }
-
-    private static final int MAX_RECORD_SIZE = 100;
-    private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
 
     private void recordRenderingTime() {
         long lastTime = System.currentTimeMillis();
