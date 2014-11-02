@@ -200,7 +200,7 @@ public class DrawHandler extends Handler {
                 Long start = (Long) msg.obj;
                 if(drawTask != null) {
                     if (start == null) {
-                        timer.update(System.currentTimeMillis() - mTimeBase);
+                        timer.update(getCurrentTime());
                         drawTask.requestClear();
                     } else {
                         drawTask.start();
