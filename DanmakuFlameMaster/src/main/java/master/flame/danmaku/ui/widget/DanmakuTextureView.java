@@ -405,7 +405,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public long getCurrentTime() {
         if (handler != null) {
-            return handler.geCurrenttTime();
+            return handler.getCurrentTime();
         }
         return 0;
     }

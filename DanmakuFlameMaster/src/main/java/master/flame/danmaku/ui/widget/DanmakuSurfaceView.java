@@ -395,7 +395,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     @Override
     public long getCurrentTime() {
         if (handler != null) {
-            return handler.geCurrenttTime();
+            return handler.getCurrentTime();
         }
         return 0;
     }

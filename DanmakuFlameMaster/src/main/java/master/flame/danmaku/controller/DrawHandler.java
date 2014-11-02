@@ -544,7 +544,7 @@ public class DrawHandler extends Handler {
         }
     }
 
-    public long geCurrenttTime() {
+    public long getCurrentTime() {
         if (quitFlag) {
             return timer.currMillisecond;
         }
