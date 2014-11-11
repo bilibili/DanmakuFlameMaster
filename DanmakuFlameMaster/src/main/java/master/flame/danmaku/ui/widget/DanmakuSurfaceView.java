@@ -69,6 +69,9 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
 
     private void init() {
         setZOrderMediaOverlay(true);
+        setWillNotCacheDrawing(true);
+        setDrawingCacheEnabled(false);
+        setWillNotDraw(true);
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
