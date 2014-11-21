@@ -99,7 +99,7 @@ public class Danmakus implements IDanmakus {
     }
 
     @Override
-    public synchronized void addItem(BaseDanmaku item) {
+    public void addItem(BaseDanmaku item) {
         if (items != null) {
             try {
                 if (items.add(item))
@@ -111,7 +111,7 @@ public class Danmakus implements IDanmakus {
     }
 
     @Override
-    public synchronized void removeItem(BaseDanmaku item) {
+    public void removeItem(BaseDanmaku item) {
         if (item == null) {
             return;
         }
@@ -184,7 +184,7 @@ public class Danmakus implements IDanmakus {
     }
 
     @Override
-    public synchronized void clear() {
+    public void clear() {
         if (items != null){
             items.clear();
             mSize = 0;
