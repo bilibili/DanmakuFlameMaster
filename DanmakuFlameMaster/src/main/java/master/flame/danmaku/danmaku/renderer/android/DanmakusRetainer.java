@@ -100,6 +100,7 @@ public class DanmakusRetainer {
     private static class RLDanmakusRetainer implements IDanmakusRetainer {
 
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
+        protected boolean mCancelFixingFlag = false;
 
         @Override
         public void fix(BaseDanmaku drawItem, IDisplayer disp) {
@@ -108,11 +109,12 @@ public class DanmakusRetainer {
             float topPos = 0;
             boolean shown = drawItem.isShown();
             if (!shown) {
+                mCancelFixingFlag = false;
                 // 确定弹幕位置
                 IDanmakuIterator it = mVisibleDanmakus.iterator();
                 BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null;
                 boolean overwriteInsert = false;
-                while (it.hasNext()) {
+                while (!mCancelFixingFlag && it.hasNext()) {
                     BaseDanmaku item = it.next();
 
                     if(item == drawItem){
@@ -203,6 +205,7 @@ public class DanmakusRetainer {
 
         @Override
         public void clear() {
+            mCancelFixingFlag = true;
             mVisibleDanmakus.clear();
         }
 
@@ -237,8 +240,9 @@ public class DanmakusRetainer {
             }
             BaseDanmaku removeItem = null, firstItem = null;
             if (!shown) {
+                mCancelFixingFlag = false;
                 IDanmakuIterator it = mVisibleDanmakus.iterator();
-                while (it.hasNext()) {
+                while (!mCancelFixingFlag && it.hasNext()) {
                     BaseDanmaku item = it.next();
 
                     if (item == drawItem) {
@@ -295,6 +299,7 @@ public class DanmakusRetainer {
 
         @Override
         public void clear() {
+            mCancelFixingFlag = true;
             mVisibleDanmakus.clear();
         }
 
