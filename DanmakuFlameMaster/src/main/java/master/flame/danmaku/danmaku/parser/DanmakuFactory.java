@@ -40,7 +40,7 @@ public class DanmakuFactory {
     
     public static int CURRENT_DISP_WIDTH = 0, CURRENT_DISP_HEIGHT = 0;
     
-    private static final float CURRENT_DISP_SIZE_FACTOR = 1.0f;
+    private static float CURRENT_DISP_SIZE_FACTOR = 1.0f;
 
     public final static float OLD_BILI_PLAYER_HEIGHT = 385;
     
@@ -186,6 +186,7 @@ public class DanmakuFactory {
             REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY,
                     REAL_DANMAKU_DURATION);
             REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
+            CURRENT_DISP_SIZE_FACTOR = viewportSizeFactor;
         }
         return sizeChanged;
     }
