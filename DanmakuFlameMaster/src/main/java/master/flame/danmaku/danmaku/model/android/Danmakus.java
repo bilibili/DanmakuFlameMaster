@@ -99,27 +99,33 @@ public class Danmakus implements IDanmakus {
     }
 
     @Override
-    public void addItem(BaseDanmaku item) {
+    public boolean addItem(BaseDanmaku item) {
         if (items != null) {
             try {
-                if (items.add(item))
+                if (items.add(item)) {
                     mSize++;
+                    return true;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        return false;
     }
 
     @Override
-    public void removeItem(BaseDanmaku item) {
+    public boolean removeItem(BaseDanmaku item) {
         if (item == null) {
-            return;
+            return false;
         }
         if (item.isOutside()) {
             item.setVisibility(false);
         }
-        if (items.remove(item))
+        if (items.remove(item)) {
             mSize--;
+            return true;
+        }
+        return false;
     }
 
     private Collection<BaseDanmaku> subset(long startTime, long endTime) {
