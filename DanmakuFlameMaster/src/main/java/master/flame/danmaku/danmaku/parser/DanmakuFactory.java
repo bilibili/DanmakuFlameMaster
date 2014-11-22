@@ -145,8 +145,6 @@ public class DanmakuFactory {
                 scaleX = viewportWidth / (float) CURRENT_DISP_WIDTH;
                 scaleY = viewportHeight / (float) CURRENT_DISP_HEIGHT;
             }
-            CURRENT_DISP_WIDTH = (int) viewportWidth;
-            CURRENT_DISP_HEIGHT = (int) viewportHeight;
             if (viewportHeight > 0) {
                 updateSpecialDanmakusDate(scaleX, scaleY);
             }
@@ -186,6 +184,9 @@ public class DanmakuFactory {
             REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY,
                     REAL_DANMAKU_DURATION);
             REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
+            
+            CURRENT_DISP_WIDTH = (int) viewportWidth;
+            CURRENT_DISP_HEIGHT = (int) viewportHeight;
             CURRENT_DISP_SIZE_FACTOR = viewportSizeFactor;
         }
         return sizeChanged;
