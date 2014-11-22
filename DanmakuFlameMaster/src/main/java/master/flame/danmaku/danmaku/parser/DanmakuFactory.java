@@ -39,6 +39,8 @@ public class DanmakuFactory {
     public final static float BILI_PLAYER_WIDTH = 682;
     
     public static int CURRENT_DISP_WIDTH = 0, CURRENT_DISP_HEIGHT = 0;
+    
+    private static final float CURRENT_DISP_SIZE_FACTOR = 1.0f;
 
     public final static float OLD_BILI_PLAYER_HEIGHT = 385;
     
@@ -90,8 +92,7 @@ public class DanmakuFactory {
         if (disp == null)
             return null;
         sLastDisp = disp;
-        return createDanmaku(type, disp.getWidth(), disp.getHeight(),
-                1 / (disp.getDensity() - 0.6f));
+        return createDanmaku(type, disp.getWidth(), disp.getHeight(), CURRENT_DISP_SIZE_FACTOR);
     }
     
     public static BaseDanmaku createDanmaku(int type, IDisplayer disp, float viewportScale) {
@@ -119,22 +120,12 @@ public class DanmakuFactory {
      * @param type 弹幕类型
      * @param viewportWidth danmakuview宽度,会影响滚动弹幕的存活时间(duration)
      * @param viewportHeight danmakuview高度
-     * @param viewportScale 缩放比例,会影响滚动弹幕的存活时间(duration)
+     * @param viewportSizeFactor 会影响滚动弹幕的速度/存活时间(duration)
      * @return
      */
     public static BaseDanmaku createDanmaku(int type, float viewportWidth, float viewportHeight,
-            float viewportScale) {
-        boolean sizeChanged = false;
-        if (CURRENT_DISP_WIDTH != (int) viewportWidth
-                || CURRENT_DISP_HEIGHT != (int) viewportHeight) {
-            sizeChanged = true;
-            REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (viewportScale
-                    * viewportWidth / BILI_PLAYER_WIDTH));
-            REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY,
-                    REAL_DANMAKU_DURATION);
-            REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
-        }
-
+            float viewportSizeFactor) {
+        boolean sizeChanged = updateViewportState(viewportWidth, viewportHeight, viewportSizeFactor);
         if (MAX_Duration_Scroll_Danmaku == null) {
             MAX_Duration_Scroll_Danmaku = new Duration(REAL_DANMAKU_DURATION);
             MAX_Duration_Scroll_Danmaku.setFactor(DanmakuGlobalConfig.DEFAULT.scrollSpeedFactor);
@@ -183,6 +174,22 @@ public class DanmakuFactory {
         return instance;
     }
     
+    public static boolean updateViewportState(float viewportWidth, float viewportHeight,
+            float viewportSizeFactor) {
+        boolean sizeChanged = false;
+        if (CURRENT_DISP_WIDTH != (int) viewportWidth
+                || CURRENT_DISP_HEIGHT != (int) viewportHeight
+                || CURRENT_DISP_SIZE_FACTOR != viewportSizeFactor) {
+            sizeChanged = true;
+            REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (viewportSizeFactor
+                    * viewportWidth / BILI_PLAYER_WIDTH));
+            REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY,
+                    REAL_DANMAKU_DURATION);
+            REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
+        }
+        return sizeChanged;
+    }
+
     private static void updateSpecialDanmakusDate(float scaleX, float scaleY) {
         IDanmakus list = sSpecialDanmakus;
         IDanmakuIterator it = list.iterator();

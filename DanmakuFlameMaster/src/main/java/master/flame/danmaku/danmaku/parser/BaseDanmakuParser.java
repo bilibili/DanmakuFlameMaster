@@ -42,9 +42,19 @@ public abstract class BaseDanmakuParser {
         mDispHeight = disp.getHeight();
         mDispDensity = disp.getDensity();
         mScaledDensity = disp.getScaledDensity();
+        DanmakuFactory.updateViewportState(mDispWidth, mDispHeight, getViewportSizeFactor());
+        DanmakuFactory.updateMaxDanmakuDuration();
         return this;
     }
     
+    /**
+     * decide the speed of scroll-danmakus
+     * @return
+     */
+    protected float getViewportSizeFactor() {
+        return 1 / (mDispDensity - 0.6f);
+    }
+
     public IDisplayer getDisplayer(){
         return mDisp;
     }
@@ -69,8 +79,7 @@ public abstract class BaseDanmakuParser {
         DanmakuFactory.resetDurationsData();
         mDanmakus = parse();
         releaseDataSource();
-        if (mDanmakus != null)
-            DanmakuFactory.updateMaxDanmakuDuration();
+        DanmakuFactory.updateMaxDanmakuDuration();
         return mDanmakus;
     }
     
