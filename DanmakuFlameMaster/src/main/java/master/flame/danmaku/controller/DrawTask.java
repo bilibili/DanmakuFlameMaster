@@ -86,6 +86,9 @@ public class DrawTask implements IDrawTask {
         boolean added = false;
         synchronized (danmakuList) {
             item.setTimer(mTimer);
+            if(item.isLive) {
+                item.time = mTimer.currMillisecond;
+            }
             item.index = danmakuList.size();
             if (mLastBeginMills <= item.time && item.time <= mLastEndMills) {
                 synchronized (danmakus) {

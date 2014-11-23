@@ -430,9 +430,6 @@ public class DrawHandler extends Handler {
     public void addDanmaku(BaseDanmaku item) {
         if (drawTask != null) {
             drawTask.addDanmaku(item);
-            if(item.isLive) {
-                item.time = getCurrentTime() + 100;
-            }
             notifyRendering();
         }
     }
