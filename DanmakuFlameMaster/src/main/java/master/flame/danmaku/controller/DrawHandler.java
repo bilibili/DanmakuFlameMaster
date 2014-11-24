@@ -64,6 +64,8 @@ public class DrawHandler extends Handler {
     private static final int HIDE_DANMAKUS = 9;
 
     private static final int NOTIFY_DISP_SIZE_CHANGED = 10;
+    
+    private static final int NOTIFY_RENDERING = 11;
 
     private static final long INDEFINITE_TIME = 10000000;
 
@@ -107,7 +109,7 @@ public class DrawHandler extends Handler {
 
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
-        mUpdateInNewThread = false;//(Runtime.getRuntime().availableProcessors() > 3);
+        mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
         if(danmakuVisibile){
             showDanmakus(null);
         }else{
@@ -187,6 +189,7 @@ public class DrawHandler extends Handler {
                 notifyRendering();
                 break;
             case UPDATE:
+                mRenderingState.inWaitingState = false;
                 if (mUpdateInNewThread) {
                     updateInNewThread();
                 } else {
@@ -256,6 +259,9 @@ public class DrawHandler extends Handler {
                     if (this.getLooper() != Looper.getMainLooper())
                         this.getLooper().quit();
                 }
+                break;
+            case NOTIFY_RENDERING:
+                notifyRendering();
                 break;
         }
     }
@@ -482,6 +488,9 @@ public class DrawHandler extends Handler {
         if (!mRenderingState.inWaitingState) {
             return;
         }
+        if(drawTask != null) {
+            drawTask.requestClear();
+        }
         if (mUpdateInNewThread) {
             synchronized(this) {
                 mDrawTimes.clear();
@@ -508,16 +517,18 @@ public class DrawHandler extends Handler {
                     } else {
                         drawTask.wait(dTime);
                     }
+                    sendEmptyMessage(NOTIFY_RENDERING);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         } else {
             if (dTime == INDEFINITE_TIME) {
+                removeMessages(NOTIFY_RENDERING);
                 removeMessages(UPDATE);
             } else {
-                removeMessages(UPDATE);
-                sendEmptyMessageDelayed(UPDATE, dTime);
+                removeMessages(NOTIFY_RENDERING);
+                sendEmptyMessageDelayed(NOTIFY_RENDERING, dTime);
             }
         }
     }

@@ -240,6 +240,7 @@ public class DrawTask implements IDrawTask {
 
     public void requestClear() {
         clearFlag = 5;
+        mLastBeginMills = mLastEndMills = 0;
     }
 
 }
