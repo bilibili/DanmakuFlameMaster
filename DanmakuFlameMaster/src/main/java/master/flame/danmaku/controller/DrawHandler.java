@@ -107,7 +107,7 @@ public class DrawHandler extends Handler {
 
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
-        mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
+        mUpdateInNewThread = false;//(Runtime.getRuntime().availableProcessors() > 3);
         if(danmakuVisibile){
             showDanmakus(null);
         }else{
@@ -333,7 +333,7 @@ public class DrawHandler extends Handler {
     private final long syncTimer(long startMS) {
         long d = 0;
         long time = startMS - mTimeBase;
-        if (!mDanmakusVisible || mRenderingState.nothingRendered) {
+        if (!mDanmakusVisible || mRenderingState.nothingRendered || mRenderingState.inWaitingState) {
             timer.update(time);
         } else {
             long averageTime = getAverageRenderingTime();
