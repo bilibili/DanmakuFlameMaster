@@ -83,17 +83,23 @@ public class DrawTask implements IDrawTask {
     public void addDanmaku(BaseDanmaku item) {
         if (danmakuList == null)
             return;
+        boolean added = false;
         synchronized (danmakuList) {
             item.setTimer(mTimer);
-            item.index = danmakuList.size();
-            if(!item.isLive) {
-                danmakuList.addItem(item);
-            } 
-            synchronized (danmakus) {
-                danmakus.addItem(item);
+            if(item.isLive) {
+                item.time = mTimer.currMillisecond;
             }
+            item.index = danmakuList.size();
+            if (mLastBeginMills <= item.time && item.time <= mLastEndMills) {
+                synchronized (danmakus) {
+                    added = danmakus.addItem(item);
+                }
+            } else if(item.isLive){
+                mLastBeginMills = mLastEndMills = 0;
+            }
+            added = danmakuList.addItem(item);
         }
-        if (mTaskListener != null) {
+        if (added && mTaskListener != null) {
             mTaskListener.onDanmakuAdd(item);
         }
     }
@@ -122,11 +128,11 @@ public class DrawTask implements IDrawTask {
     }
     
     protected void removeUnusedDanmakusIn(int msec) {
-        if (danmakus == null || danmakus.isEmpty())
+        if (danmakuList == null || danmakuList.isEmpty())
             return;
-        synchronized (danmakus) {
+        synchronized (danmakuList) {
             long startTime = System.currentTimeMillis();
-            IDanmakuIterator it = danmakus.iterator();
+            IDanmakuIterator it = danmakuList.iterator();
             while (it.hasNext()) {
                 BaseDanmaku danmaku = it.next();
                 boolean isTimeout = danmaku.isTimeOut();
@@ -202,6 +208,7 @@ public class DrawTask implements IDrawTask {
                 if(subDanmakus != null) {
                     danmakus = subDanmakus;
                 } else {
+                    danmakus.clear();
                     removeUnusedDanmakusIn(15);
                 }
                 mLastBeginMills = beginMills;
@@ -233,6 +240,7 @@ public class DrawTask implements IDrawTask {
 
     public void requestClear() {
         clearFlag = 5;
+        mLastBeginMills = mLastEndMills = 0;
     }
 
 }

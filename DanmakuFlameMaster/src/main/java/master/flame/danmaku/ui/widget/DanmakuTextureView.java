@@ -77,6 +77,9 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void init() {
         setOpaque(false);
+        setWillNotCacheDrawing(true);
+        setDrawingCacheEnabled(false);
+        setWillNotDraw(true);
         setSurfaceTextureListener(this);
         setOnClickListener(this);
     }
@@ -405,7 +408,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public long getCurrentTime() {
         if (handler != null) {
-            return handler.geCurrenttTime();
+            return handler.getCurrentTime();
         }
         return 0;
     }
