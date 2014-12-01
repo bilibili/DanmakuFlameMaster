@@ -17,6 +17,7 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 - 小米电视/盒子视频弹幕
 - 网易新闻客户端 http://www.163.com/newsapp/
 - 土豆安卓客户端 http://mobile.tudou.com/
+- 被窝 http://mobile.beiwo.ac/
 
 以上客户端均使用DFM弹幕引擎,实际效果可安装以上app参看。
 
