@@ -290,8 +290,8 @@ public class DrawHandler extends Handler {
             }
         }
 
-        if (d < 15) {
-            sendEmptyMessageDelayed(UPDATE, 15 - d);
+        if (d < mFrameUpdateRate) {
+            sendEmptyMessageDelayed(UPDATE, mFrameUpdateRate - d);
             return;
         }
         sendEmptyMessage(UPDATE);
