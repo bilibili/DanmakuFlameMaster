@@ -281,6 +281,7 @@ public class DrawHandler extends Handler {
         removeMessages(UPDATE);
         if (!mDanmakusVisible) {
             waitRendering(INDEFINITE_TIME);
+            return;
         } else if (mRenderingState.nothingRendered) {
             long dTime = mRenderingState.endTime - timer.currMillisecond;
             if (dTime > 500) {
@@ -307,11 +308,12 @@ public class DrawHandler extends Handler {
                     long lastTime = System.currentTimeMillis();
                     long dTime = 0;
                     while (!isInterrupted() && !quitFlag) {
+                        long startMS = System.currentTimeMillis();
                         dTime = System.currentTimeMillis() - lastTime;
                         if (dTime < mFrameUpdateRate) {
                             continue;
                         }
-                        long startMS = lastTime = System.currentTimeMillis();
+                        lastTime = startMS;
                         long d = syncTimer(startMS);
                         if (d < 0) {
                             Thread.sleep(60 - d);
@@ -488,6 +490,7 @@ public class DrawHandler extends Handler {
         if (!mRenderingState.inWaitingState) {
             return;
         }
+        mRenderingState.inWaitingState = false;
         if(drawTask != null) {
             drawTask.requestClear();
         }
@@ -503,7 +506,6 @@ public class DrawHandler extends Handler {
             removeMessages(UPDATE);
             sendEmptyMessage(UPDATE);
         }
-        mRenderingState.inWaitingState = false;
     }
         
     private void waitRendering(long dTime) {
@@ -528,6 +530,7 @@ public class DrawHandler extends Handler {
                 removeMessages(UPDATE);
             } else {
                 removeMessages(NOTIFY_RENDERING);
+                removeMessages(UPDATE);
                 sendEmptyMessageDelayed(NOTIFY_RENDERING, dTime);
             }
         }
