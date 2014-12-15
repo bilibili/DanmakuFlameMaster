@@ -189,7 +189,6 @@ public class DrawHandler extends Handler {
                 notifyRendering();
                 break;
             case UPDATE:
-                mRenderingState.inWaitingState = false;
                 if (mUpdateInNewThread) {
                     updateInNewThread();
                 } else {
@@ -242,6 +241,7 @@ public class DrawHandler extends Handler {
             case QUIT:
                 removeCallbacksAndMessages(null);
                 quitFlag = true;
+                syncTimerIfNeeded();
                 if (mThread != null) {
                     notifyRendering();
                     mThread.interrupt();
@@ -281,7 +281,7 @@ public class DrawHandler extends Handler {
         removeMessages(UPDATE);
         if (!mDanmakusVisible) {
             waitRendering(INDEFINITE_TIME);
-            return;
+            return; 
         } else if (mRenderingState.nothingRendered) {
             long dTime = mRenderingState.endTime - timer.currMillisecond;
             if (dTime > 500) {
@@ -367,6 +367,12 @@ public class DrawHandler extends Handler {
         return d;
     }
     
+    private void syncTimerIfNeeded() {
+        if (mRenderingState.inWaitingState) {
+            syncTimer(System.currentTimeMillis());
+        }
+    }
+    
     private void initRenderingConfigs() {
         DanmakuTimer timer = new DanmakuTimer();
         timer.update(System.nanoTime());
@@ -396,7 +402,7 @@ public class DrawHandler extends Handler {
 
                         @Override
                         public void onDanmakuAdd(BaseDanmaku danmaku) {
-                            notifyRendering();
+                            obtainMessage(NOTIFY_RENDERING).sendToTarget();
                         }
                     });
         } else {
@@ -438,7 +444,7 @@ public class DrawHandler extends Handler {
     public void addDanmaku(BaseDanmaku item) {
         if (drawTask != null) {
             drawTask.addDanmaku(item);
-            notifyRendering();
+            obtainMessage(NOTIFY_RENDERING).sendToTarget();
         }
     }
 
@@ -451,6 +457,7 @@ public class DrawHandler extends Handler {
     }
 
     public void pause() {
+        syncTimerIfNeeded();
         sendEmptyMessage(DrawHandler.PAUSE);
     }
 
@@ -487,10 +494,6 @@ public class DrawHandler extends Handler {
     }
     
     private void notifyRendering() {
-        if (!mRenderingState.inWaitingState) {
-            return;
-        }
-        mRenderingState.inWaitingState = false;
         if(drawTask != null) {
             drawTask.requestClear();
         }
@@ -506,6 +509,7 @@ public class DrawHandler extends Handler {
             removeMessages(UPDATE);
             sendEmptyMessage(UPDATE);
         }
+        mRenderingState.inWaitingState = false;
     }
         
     private void waitRendering(long dTime) {
@@ -581,7 +585,7 @@ public class DrawHandler extends Handler {
     }
 
     public long getCurrentTime() {
-        if (quitFlag) {
+        if (quitFlag && !mRenderingState.inWaitingState) {
             return timer.currMillisecond;
         }
         return System.currentTimeMillis() - mTimeBase;
