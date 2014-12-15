@@ -76,6 +76,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void init() {
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
         setOpaque(false);
         setWillNotCacheDrawing(true);
         setDrawingCacheEnabled(false);

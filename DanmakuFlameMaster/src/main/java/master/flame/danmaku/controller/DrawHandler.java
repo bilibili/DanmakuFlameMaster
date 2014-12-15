@@ -189,7 +189,6 @@ public class DrawHandler extends Handler {
                 notifyRendering();
                 break;
             case UPDATE:
-                mRenderingState.inWaitingState = false;
                 if (mUpdateInNewThread) {
                     updateInNewThread();
                 } else {
@@ -242,6 +241,7 @@ public class DrawHandler extends Handler {
             case QUIT:
                 removeCallbacksAndMessages(null);
                 quitFlag = true;
+                syncTimerIfNeeded();
                 if (mThread != null) {
                     notifyRendering();
                     mThread.interrupt();
@@ -281,6 +281,7 @@ public class DrawHandler extends Handler {
         removeMessages(UPDATE);
         if (!mDanmakusVisible) {
             waitRendering(INDEFINITE_TIME);
+            return; 
         } else if (mRenderingState.nothingRendered) {
             long dTime = mRenderingState.endTime - timer.currMillisecond;
             if (dTime > 500) {
@@ -289,8 +290,8 @@ public class DrawHandler extends Handler {
             }
         }
 
-        if (d < 15) {
-            sendEmptyMessageDelayed(UPDATE, 15 - d);
+        if (d < mFrameUpdateRate) {
+            sendEmptyMessageDelayed(UPDATE, mFrameUpdateRate - d);
             return;
         }
         sendEmptyMessage(UPDATE);
@@ -307,11 +308,12 @@ public class DrawHandler extends Handler {
                     long lastTime = System.currentTimeMillis();
                     long dTime = 0;
                     while (!isInterrupted() && !quitFlag) {
+                        long startMS = System.currentTimeMillis();
                         dTime = System.currentTimeMillis() - lastTime;
                         if (dTime < mFrameUpdateRate) {
                             continue;
                         }
-                        long startMS = lastTime = System.currentTimeMillis();
+                        lastTime = startMS;
                         long d = syncTimer(startMS);
                         if (d < 0) {
                             Thread.sleep(60 - d);
@@ -365,6 +367,12 @@ public class DrawHandler extends Handler {
         return d;
     }
     
+    private void syncTimerIfNeeded() {
+        if (mRenderingState.inWaitingState) {
+            syncTimer(System.currentTimeMillis());
+        }
+    }
+    
     private void initRenderingConfigs() {
         DanmakuTimer timer = new DanmakuTimer();
         timer.update(System.nanoTime());
@@ -394,7 +402,7 @@ public class DrawHandler extends Handler {
 
                         @Override
                         public void onDanmakuAdd(BaseDanmaku danmaku) {
-                            notifyRendering();
+                            obtainMessage(NOTIFY_RENDERING).sendToTarget();
                         }
                     });
         } else {
@@ -436,7 +444,7 @@ public class DrawHandler extends Handler {
     public void addDanmaku(BaseDanmaku item) {
         if (drawTask != null) {
             drawTask.addDanmaku(item);
-            notifyRendering();
+            obtainMessage(NOTIFY_RENDERING).sendToTarget();
         }
     }
 
@@ -449,6 +457,7 @@ public class DrawHandler extends Handler {
     }
 
     public void pause() {
+        syncTimerIfNeeded();
         sendEmptyMessage(DrawHandler.PAUSE);
     }
 
@@ -485,9 +494,6 @@ public class DrawHandler extends Handler {
     }
     
     private void notifyRendering() {
-        if (!mRenderingState.inWaitingState) {
-            return;
-        }
         if(drawTask != null) {
             drawTask.requestClear();
         }
@@ -528,6 +534,7 @@ public class DrawHandler extends Handler {
                 removeMessages(UPDATE);
             } else {
                 removeMessages(NOTIFY_RENDERING);
+                removeMessages(UPDATE);
                 sendEmptyMessageDelayed(NOTIFY_RENDERING, dTime);
             }
         }
@@ -578,7 +585,7 @@ public class DrawHandler extends Handler {
     }
 
     public long getCurrentTime() {
-        if (quitFlag) {
+        if (quitFlag && !mRenderingState.inWaitingState) {
             return timer.currMillisecond;
         }
         return System.currentTimeMillis() - mTimeBase;
