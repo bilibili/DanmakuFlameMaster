@@ -8,16 +8,16 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 [![acfun](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/acfun.png?raw=true)](http://www.coolapk.com/apk/tv.acfundanmaku.video)
 [![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
 
-- 爱稀饭精选（AcFun主站客户端） http://www.acfun.tv/app/
-- 爱稀饭动画（AcFun动画客户端） http://www.acfun.tv/app/
-- AcFun视频民间版 https://github.com/yrom/acfunm
-- 哔哩哔哩动画 https://play.google.com/store/apps/details?id=tv.danmaku.bili
-- 斗鱼直播客户端 http://www.douyutv.com/client
-- 猎豹浏览器 https://play.google.com/store/apps/details?id=com.ijinshan.browser
 - 小米电视/盒子视频弹幕
-- 网易新闻客户端 http://www.163.com/newsapp/
-- 土豆安卓客户端 http://mobile.tudou.com/
-- 被窝 http://mobile.beiwo.ac/
+- 被窝 http://mobile.beiwo.ac
+- 土豆安卓客户端 http://mobile.tudou.com
+- 网易新闻客户端 http://www.163.com/newsapp
+- 斗鱼直播客户端 http://www.douyutv.com/client
+- AcFun视频民间版 https://github.com/yrom/acfunm
+- 爱稀饭精选（AcFun主站客户端） http://www.acfun.tv/app
+- 爱稀饭动画（AcFun动画客户端） http://www.acfun.tv/app
+- 哔哩哔哩动画 https://play.google.com/store/apps/details?id=tv.danmaku.bili
+- 猎豹浏览器 https://play.google.com/store/apps/details?id=com.ijinshan.browser
 
 以上客户端均使用DFM弹幕引擎,实际效果可安装以上app参看。
 
@@ -64,7 +64,7 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
   ```  
 
 ### Version
-  * x.x.x = version, or set '+' for lastest（0.2.0）
+  * x.x.x = version, or set '+' for lastest（0.2.1）
 
 ### License
     Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
