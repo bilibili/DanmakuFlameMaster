@@ -178,6 +178,7 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case SEEK_POS:
+                quitUpdateThread();
                 Long deltaMs = (Long) msg.obj;
                 mTimeBase -= deltaMs;
                 timer.update(System.currentTimeMillis() - mTimeBase);
@@ -244,8 +245,7 @@ public class DrawHandler extends Handler {
                 syncTimerIfNeeded();
                 if (mThread != null) {
                     notifyRendering();
-                    mThread.interrupt();
-                    mThread = null;
+                    quitUpdateThread();
                 }
                 mSkipFrames = 0;
                 pausedPostion = timer.currMillisecond;
@@ -263,6 +263,13 @@ public class DrawHandler extends Handler {
             case NOTIFY_RENDERING:
                 notifyRendering();
                 break;
+        }
+    }
+
+    private void quitUpdateThread() {
+        if (mThread != null) {
+            mThread.interrupt();
+            mThread = null;
         }
     }
 
@@ -494,6 +501,9 @@ public class DrawHandler extends Handler {
     }
     
     private void notifyRendering() {
+        if (!mRenderingState.inWaitingState) {
+            return;
+        }
         if(drawTask != null) {
             drawTask.requestClear();
         }
@@ -548,7 +558,7 @@ public class DrawHandler extends Handler {
         return dtime / frames;
     }
 
-    private void recordRenderingTime() {
+    private synchronized void recordRenderingTime() {
         long lastTime = System.currentTimeMillis();
         mDrawTimes.addLast(lastTime);
         int frames = mDrawTimes.size();
