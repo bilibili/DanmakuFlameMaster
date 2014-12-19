@@ -178,6 +178,7 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case SEEK_POS:
+                quitUpdateThread();
                 Long deltaMs = (Long) msg.obj;
                 mTimeBase -= deltaMs;
                 timer.update(System.currentTimeMillis() - mTimeBase);
@@ -219,7 +220,6 @@ public class DrawHandler extends Handler {
                 if(quitFlag && mDanmakuView != null) {
                     mDanmakuView.drawDanmakus(); 
                 }
-                mSkipFrames = 0;
                 notifyRendering();
                 break;
             case HIDE_DANMAKUS:
@@ -242,12 +242,11 @@ public class DrawHandler extends Handler {
                 removeCallbacksAndMessages(null);
                 quitFlag = true;
                 syncTimerIfNeeded();
+                mSkipFrames = 0;
                 if (mThread != null) {
                     notifyRendering();
-                    mThread.interrupt();
-                    mThread = null;
+                    quitUpdateThread();
                 }
-                mSkipFrames = 0;
                 pausedPostion = timer.currMillisecond;
                 if (what == QUIT){
                     if (this.drawTask != null){
@@ -263,6 +262,13 @@ public class DrawHandler extends Handler {
             case NOTIFY_RENDERING:
                 notifyRendering();
                 break;
+        }
+    }
+
+    private void quitUpdateThread() {
+        if (mThread != null) {
+            mThread.interrupt();
+            mThread = null;
         }
     }
 
@@ -494,9 +500,13 @@ public class DrawHandler extends Handler {
     }
     
     private void notifyRendering() {
+        if (!mRenderingState.inWaitingState) {
+            return;
+        }
         if(drawTask != null) {
             drawTask.requestClear();
         }
+        mSkipFrames = 0;
         if (mUpdateInNewThread) {
             synchronized(this) {
                 mDrawTimes.clear();
@@ -548,7 +558,7 @@ public class DrawHandler extends Handler {
         return dtime / frames;
     }
 
-    private void recordRenderingTime() {
+    private synchronized void recordRenderingTime() {
         long lastTime = System.currentTimeMillis();
         mDrawTimes.addLast(lastTime);
         int frames = mDrawTimes.size();

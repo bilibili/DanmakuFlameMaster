@@ -69,7 +69,6 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void addDanmaku(BaseDanmaku danmaku) {
-        super.addDanmaku(danmaku);
         if (mCacheManager == null)
             return;
         mCacheManager.addDanmaku(danmaku);
@@ -443,6 +442,7 @@ public class CacheManagingDrawTask extends DrawTask {
                                 mCacheTimer.update(mTimer.currMillisecond
                                         + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
                             }
+                            CacheManagingDrawTask.super.addDanmaku(item);
                         }
                         break;
                     case CLEAR_TIMEOUT_CACHES:
