@@ -250,8 +250,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
                 if (mShowFps) {
                     if(mDrawTimes == null) mDrawTimes = new LinkedList<Long>();
                     dtime = System.currentTimeMillis() - stime;  //not so accurate
-                    String fps = String.format(Locale.getDefault(), "%02d MS, fps %.2f", dtime,
-                            fps());
+                    String fps = String.format(Locale.getDefault(), "fps %.2f,time:%d s", fps(),
+                            handler.getCurrentTime() / 1000);
                     DrawHelper.drawFPS(canvas, fps);
                 }
             }

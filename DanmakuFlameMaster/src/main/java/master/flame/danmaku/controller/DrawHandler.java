@@ -220,7 +220,6 @@ public class DrawHandler extends Handler {
                 if(quitFlag && mDanmakuView != null) {
                     mDanmakuView.drawDanmakus(); 
                 }
-                mSkipFrames = 0;
                 notifyRendering();
                 break;
             case HIDE_DANMAKUS:
@@ -243,11 +242,11 @@ public class DrawHandler extends Handler {
                 removeCallbacksAndMessages(null);
                 quitFlag = true;
                 syncTimerIfNeeded();
+                mSkipFrames = 0;
                 if (mThread != null) {
                     notifyRendering();
                     quitUpdateThread();
                 }
-                mSkipFrames = 0;
                 pausedPostion = timer.currMillisecond;
                 if (what == QUIT){
                     if (this.drawTask != null){
@@ -507,6 +506,7 @@ public class DrawHandler extends Handler {
         if(drawTask != null) {
             drawTask.requestClear();
         }
+        mSkipFrames = 0;
         if (mUpdateInNewThread) {
             synchronized(this) {
                 mDrawTimes.clear();
