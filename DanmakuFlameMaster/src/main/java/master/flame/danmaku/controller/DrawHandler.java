@@ -17,7 +17,6 @@
 package master.flame.danmaku.controller;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -27,8 +26,8 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
-import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.ICanvas;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
@@ -446,6 +445,10 @@ public class DrawHandler extends Handler {
     public void seekBy(Long deltaMs) {
         removeMessages(DrawHandler.UPDATE);
         obtainMessage(DrawHandler.SEEK_POS, deltaMs).sendToTarget();
+    }
+    
+    public void updateTimer(long deltaMS) {
+        timer.add(deltaMS);
     }
 
     public void addDanmaku(BaseDanmaku item) {

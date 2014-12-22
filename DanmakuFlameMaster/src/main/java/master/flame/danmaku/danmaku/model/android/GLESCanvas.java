@@ -2,17 +2,20 @@
 package master.flame.danmaku.danmaku.model.android;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.text.TextPaint;
+import android.util.Log;
 
 import master.flame.danmaku.danmaku.model.ICanvas;
 import tv.cjump.gl.glrenderer.BitmapTexture;
 import tv.cjump.gl.glrenderer.GLCanvas;
-import tv.cjump.gl.glrenderer.GLES11Canvas;
 import tv.cjump.gl.glrenderer.GLES20Canvas;
 import tv.cjump.gl.glrenderer.GLPaint;
-import tv.cjump.gl.glrenderer.StringTexture;
+import tv.cjump.jni.NativeBitmapFactory;
 
 import javax.microedition.khronos.opengles.GL11;
 
@@ -24,16 +27,17 @@ public class GLESCanvas implements ICanvas<GL11> {
     private int mGLVersion = 2;
     private BitmapTexture mBitmapTexture;
     private float[] argb = new float[4];
-    private StringTexture mStringTexture;
+    private BitmapTexture mStringTexture;
     private int mWidth;
     private int mHeight;
     private GLPaint mGLPaint;
-    private IPaint<?> mLastPaint;
-    private String mLastText;
+    private BitmapHolder mStringBitmapHolder = new BitmapHolder();
+    private Rect mStringBounds = new Rect();
+    private Canvas mStringCanvas = new Canvas();
 
     public GLESCanvas(int version, GL11 gl, int width, int height) {
         mGLVersion = version;
-        mGLCanvas = version == 2 ? new GLES20Canvas() : new GLES11Canvas(gl);
+        mGLCanvas = new GLES20Canvas();
         mGL11 = gl;
         mWidth = width;
         mHeight = height;
@@ -44,7 +48,7 @@ public class GLESCanvas implements ICanvas<GL11> {
     public void attach(GL11 data) {
         mGL11 = data;
         if (mGLVersion == 1) {
-            mGLCanvas = new GLES11Canvas(data);
+            mGLCanvas = null; //new GLES11Canvas(data);
         }
     }
 
@@ -60,12 +64,12 @@ public class GLESCanvas implements ICanvas<GL11> {
     }
 
     @Override
-    public void contact(float[] matrix) {
+    public void concat(float[] matrix) {
         mGLCanvas.multiplyMatrix(matrix, 0);
     }
 
     @Override
-    public void setBitmap(master.flame.danmaku.danmaku.model.ICanvas.IBitmap<?> bitmap) {
+    public void setBitmap(master.flame.danmaku.danmaku.model.ICanvas.IBitmapHolder<?> bitmap) {
         mBitmapTexture = new BitmapTexture((Bitmap) bitmap.data());
         mBitmapTexture.setOpaque(false);
         mWidth = mBitmapTexture.getWidth();
@@ -76,9 +80,9 @@ public class GLESCanvas implements ICanvas<GL11> {
 
     @Override
     public void drawColor(int color, master.flame.danmaku.danmaku.model.ICanvas.IMode<?> mode) {
-        int a = (color >> 24) & 0xff;
-        int r = (color >> 16) & 0xff;
-        int g = (color >> 8) & 0xff;
+        int a = (color >>> 24) & 0xff;
+        int r = (color >>> 16) & 0xff;
+        int g = (color >>> 8) & 0xff;
         int b = color & 0xff;
         argb[0] = a / 255f;
         argb[1] = r / 255f;
@@ -119,30 +123,39 @@ public class GLESCanvas implements ICanvas<GL11> {
     }
 
     @Override
-    public synchronized void drawText(String text, float x, float y,
+    public synchronized void drawText(String text, float left, float top,
             master.flame.danmaku.danmaku.model.ICanvas.IPaint<?> paint) {
-
-        if (mLastText == null || mLastText.equals(text) == false || mLastPaint == null
-                || mLastPaint != paint || mLastPaint.getColor() != paint.getColor()) {
-            if (mStringTexture != null) {
-                mStringTexture.recycle();
-            }
-            mStringTexture = StringTexture.newInstance(text, (TextPaint) paint.data());
+        if (paint == null) {
+            return;
         }
-        mStringTexture.draw(mGLCanvas, (int) x, (int) y);
-        mLastPaint = paint;
-        mLastText = text;
+        if (mStringTexture != null) {
+            mStringTexture.recycle();
+        }
+        Paint tpaint = (Paint) paint.data();
+        tpaint.getTextBounds(text, 0, text.length(), mStringBounds);
+        Bitmap stringBitmap = NativeBitmapFactory.createBitmap(mStringBounds.width(),
+                (int) (mStringBounds.height() + tpaint.descent() - tpaint.ascent()),
+                Bitmap.Config.ARGB_8888);
+        mStringCanvas.setBitmap(stringBitmap);
+        mStringCanvas.drawColor(Color.YELLOW);
+        mStringCanvas.drawText(text, 0, -tpaint.ascent(), tpaint);
+        mStringBitmapHolder.attach(stringBitmap);
+        drawBitmap(mStringBitmapHolder, left, top, paint);
+        stringBitmap.recycle();
     }
 
     @Override
-    public synchronized void drawBitmap(master.flame.danmaku.danmaku.model.ICanvas.IBitmap<?> bitmap,
-            float left, float top, master.flame.danmaku.danmaku.model.ICanvas.IPaint<?> paint) {
+    public synchronized void drawBitmap(
+            master.flame.danmaku.danmaku.model.ICanvas.IBitmapHolder<?> bitmap, float left,
+            float top, master.flame.danmaku.danmaku.model.ICanvas.IPaint<?> paint) {
         if (mBitmapTexture == null) {
             mBitmapTexture = new BitmapTexture((Bitmap) bitmap.data());
         } else {
             mBitmapTexture.setBitmap((Bitmap) bitmap.data());
         }
+        mBitmapTexture.setOpaque(false);
         mBitmapTexture.draw(mGLCanvas, (int) left, (int) top);
+        mGLCanvas.deleteRecycledResources();
     }
 
     @Override
@@ -158,6 +171,27 @@ public class GLESCanvas implements ICanvas<GL11> {
     @Override
     public boolean isHardwareAccelerated() {
         return true;
+    }
+
+    @Override
+    public void setDensity(int density) {
+        if (mBitmapTexture != null) {
+            Bitmap bitmap = mBitmapTexture.getBitmap();
+            if (bitmap != null) {
+                bitmap.setDensity(density);
+            }
+        }
+    }
+
+    @Override
+    public void clear() {
+        mGLCanvas.clearBuffer();
+    }
+
+    @Override
+    public void clear(float left, float top, float right, float bottom) {
+        //mGLCanvas.fillRect(left, top, right, bottom, 0x00ffff00);
+        clear();  //TODO: fix this
     }
 
 }

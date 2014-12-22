@@ -210,7 +210,7 @@ public class AndroidDisplayer extends AbsDisplayer<ICanvas<?>> {
                 return;
             }
             // drawing cache
-            boolean cacheDrawn = false;
+            boolean cacheDrawn = true;
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null && !holder.bitmap.isRecycled()) {

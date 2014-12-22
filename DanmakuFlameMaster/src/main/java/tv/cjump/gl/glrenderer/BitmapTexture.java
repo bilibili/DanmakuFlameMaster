@@ -51,13 +51,16 @@ public class BitmapTexture extends UploadedTexture {
     public Bitmap getBitmap() {
         return mContentBitmap;
     }
-    
+
     public void setBitmap(Bitmap bitmap) {
-        Assert.assertTrue(bitmap != null && !bitmap.isRecycled());
-        if(bitmap != mContentBitmap && mContentBitmap !=null){
-            mContentBitmap.recycle();
-            mContentBitmap = null;
-        }
+        mBitmap = null;
+        recycle();
         mContentBitmap = bitmap;
+        mTextureWidth = bitmap.getWidth();
+        mTextureHeight = bitmap.getHeight();
+        mState = STATE_UNLOADED;
+        setAssociatedCanvas(null);
+        invalidateContent();
     }
+
 }

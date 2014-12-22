@@ -52,9 +52,7 @@ public class DrawingCacheHolder {
             canvas.setBitmap(bitmapHolder);
             return;
         }
-        if (bitmap != null) {
-            recycle();
-        }
+        recycle();
         width = w;
         height = h;
         bitmap = NativeBitmapFactory.createBitmap(w, h, Bitmap.Config.ARGB_8888);
@@ -82,10 +80,11 @@ public class DrawingCacheHolder {
         // if (canvas != null) {
         // canvas = null;
         // }
-        if (bitmap != null) {
-            bitmap.recycle();
-            bitmap = null;
+        if (bitmapHolder != null) {
+            bitmapHolder.recycle();
         }
+        bitmapHolder = null;
+        bitmap = null;
         extra = null;
         if (bitmapHolder != null) {
             bitmapHolder.detach();

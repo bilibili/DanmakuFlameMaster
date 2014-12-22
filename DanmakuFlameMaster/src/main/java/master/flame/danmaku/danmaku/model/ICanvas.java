@@ -25,6 +25,8 @@ public interface ICanvas<T> {
         public abstract T data();
         
         public abstract void detach();
+        
+        public abstract void recycle();
 
     }
 
