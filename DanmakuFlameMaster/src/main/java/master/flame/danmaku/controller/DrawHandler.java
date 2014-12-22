@@ -449,6 +449,7 @@ public class DrawHandler extends Handler {
 
     public void addDanmaku(BaseDanmaku item) {
         if (drawTask != null) {
+            item.setTimer(timer);
             drawTask.addDanmaku(item);
             obtainMessage(NOTIFY_RENDERING).sendToTarget();
         }

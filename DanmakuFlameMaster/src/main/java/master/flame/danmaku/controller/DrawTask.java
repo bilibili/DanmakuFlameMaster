@@ -85,7 +85,6 @@ public class DrawTask implements IDrawTask {
             return;
         boolean added = false;
         synchronized (danmakuList) {
-            item.setTimer(mTimer);
             if(item.isLive) {
                 removeUnusedLiveDanmakusIn(10);
             }
