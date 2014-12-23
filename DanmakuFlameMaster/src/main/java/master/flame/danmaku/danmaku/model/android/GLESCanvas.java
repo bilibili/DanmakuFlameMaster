@@ -133,14 +133,13 @@ public class GLESCanvas implements ICanvas<GL11> {
         }
         Paint tpaint = (Paint) paint.data();
         tpaint.getTextBounds(text, 0, text.length(), mStringBounds);
-        Bitmap stringBitmap = NativeBitmapFactory.createBitmap(mStringBounds.width(),
+        Bitmap stringBitmap = NativeBitmapFactory.createBitmap((int) tpaint.measureText(text),
                 (int) (mStringBounds.height() + tpaint.descent() - tpaint.ascent()),
                 Bitmap.Config.ARGB_8888);
         mStringCanvas.setBitmap(stringBitmap);
-        mStringCanvas.drawColor(Color.YELLOW);
         mStringCanvas.drawText(text, 0, -tpaint.ascent(), tpaint);
         mStringBitmapHolder.attach(stringBitmap);
-        drawBitmap(mStringBitmapHolder, left, top, paint);
+        drawBitmap(mStringBitmapHolder, left, top + tpaint.ascent(), paint);
         stringBitmap.recycle();
     }
 
@@ -165,7 +164,7 @@ public class GLESCanvas implements ICanvas<GL11> {
 
     @Override
     public int getHeight() {
-        return mWidth;
+        return mHeight;
     }
 
     @Override

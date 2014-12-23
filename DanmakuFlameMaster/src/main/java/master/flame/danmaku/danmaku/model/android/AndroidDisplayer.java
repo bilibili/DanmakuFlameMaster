@@ -210,7 +210,7 @@ public class AndroidDisplayer extends AbsDisplayer<ICanvas<?>> {
                 return;
             }
             // drawing cache
-            boolean cacheDrawn = true;
+            boolean cacheDrawn = false;
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null && !holder.bitmap.isRecycled()) {
@@ -218,14 +218,14 @@ public class AndroidDisplayer extends AbsDisplayer<ICanvas<?>> {
                     cacheDrawn = true;
                 }
             }
-            if (!cacheDrawn) {
-                if (alphaPaint != null) {
-                    PAINT.setAlpha(alphaPaint.getAlpha());
-                } else {
-                    resetPaintAlpha(PAINT);
-                }
-                drawDanmaku(danmaku, canvas, left, top, true);
-            }
+//            if (!cacheDrawn) {
+//                if (alphaPaint != null) {
+//                    PAINT.setAlpha(alphaPaint.getAlpha());
+//                } else {
+//                    resetPaintAlpha(PAINT);
+//                }
+//                drawDanmaku(danmaku, canvas, left, top, true);
+//            }
 
             if (needRestore) {
                 restoreCanvas(canvas);

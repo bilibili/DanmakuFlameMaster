@@ -83,12 +83,8 @@ public class DrawingCacheHolder {
         if (bitmapHolder != null) {
             bitmapHolder.recycle();
         }
-        bitmapHolder = null;
         bitmap = null;
         extra = null;
-        if (bitmapHolder != null) {
-            bitmapHolder.detach();
-        }
     }
 
 }

@@ -36,6 +36,7 @@ import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.ICanvas.IPaint;
 import master.flame.danmaku.danmaku.model.android.GLESCanvas;
 import master.flame.danmaku.danmaku.model.android.SimplePaint;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
@@ -84,10 +85,9 @@ public class DanmakuGLSurfaceView extends GLSurfaceView implements IDanmakuView,
         setEGLContextClientVersion(2);
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         setRenderer(new GLESRenderer());
-
+        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         mSurfaceHolder = getHolder();
         setZOrderMediaOverlay(true);
-        setZOrderOnTop(true);
       
         setOnClickListener(this);
 
@@ -148,34 +148,28 @@ public class DanmakuGLSurfaceView extends GLSurfaceView implements IDanmakuView,
         }
     }
 
-    protected Looper getLooper(int type) {
+    protected Looper getLooper(int type){
         if (mDrawThread != null) {
             mDrawThread.quit();
             mDrawThread = null;
         }
-        int priority = Thread.NORM_PRIORITY;
-        String threadName = "DFM Drawing thread";
+        
+        int priority;
         switch (type) {
-            case THREAD_TYPE_MAIN_THREAD: {
+            case THREAD_TYPE_MAIN_THREAD:
                 return Looper.getMainLooper();
-            }
-            case THREAD_TYPE_HIGH_PRIORITY: {
-                priority = Thread.MAX_PRIORITY;
-                threadName += Thread.MAX_PRIORITY;
-            }
+            case THREAD_TYPE_HIGH_PRIORITY:
+                priority = android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY;
                 break;
-            case THREAD_TYPE_NORMAL_PRIORITY: {
-                priority = Thread.NORM_PRIORITY;
-                threadName += Thread.NORM_PRIORITY;
-            }
+            case THREAD_TYPE_LOW_PRIORITY:
+                priority = android.os.Process.THREAD_PRIORITY_LOWEST;
                 break;
-            case THREAD_TYPE_LOW_PRIORITY: {
-                priority = Thread.MIN_PRIORITY;
-                threadName += Thread.MIN_PRIORITY;
-            }
+            case THREAD_TYPE_NORMAL_PRIORITY:
+            default:
+                priority = android.os.Process.THREAD_PRIORITY_DEFAULT;
                 break;
         }
-
+        String threadName = "DFM Drawing thread #"+priority;
         mDrawThread = new HandlerThread(threadName, priority);
         mDrawThread.start();
         return mDrawThread.getLooper();
@@ -208,6 +202,8 @@ public class DanmakuGLSurfaceView extends GLSurfaceView implements IDanmakuView,
     private static final int ONE_SECOND = 1000;
     private LinkedList<Long> mDrawTimes;
 
+    private long dtime = 16;
+
     private float fps() {
         long lastTime = System.currentTimeMillis();
         mDrawTimes.addLast(lastTime);
@@ -221,7 +217,7 @@ public class DanmakuGLSurfaceView extends GLSurfaceView implements IDanmakuView,
 
     @Override
     public long drawDanmakus() {
-        return 0;
+        return dtime;
     }
 
     public void toggle() {
@@ -340,11 +336,11 @@ public class DanmakuGLSurfaceView extends GLSurfaceView implements IDanmakuView,
         if (!isViewReady() || mSurfaceHolder == null) {
             return;
         }
-        Canvas canvas = mSurfaceHolder.lockCanvas();
-        if (canvas != null) {
-            DrawHelper.clearCanvas(canvas);
-            mSurfaceHolder.unlockCanvasAndPost(canvas);
-        }
+//        Canvas canvas = mSurfaceHolder.lockCanvas();
+//        if (canvas != null) {
+//            DrawHelper.clearCanvas(canvas);
+//            mSurfaceHolder.unlockCanvasAndPost(canvas);
+//        }
     }
 
     @Override
@@ -363,12 +359,15 @@ public class DanmakuGLSurfaceView extends GLSurfaceView implements IDanmakuView,
     private class GLESRenderer implements Renderer {
 
         GLESCanvas canvas = null;
-        private long lastTime = -1;
+        private long lastTime = System.currentTimeMillis();
         
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             isSurfaceCreated = true;
             BasicTexture.invalidateAllTextures();
+            paint.setColor(Color.GREEN);
+            paint.setStyle(Style.FILL);
+            paint.setTextSize(50f);
         }
 
         @Override
@@ -380,6 +379,8 @@ public class DanmakuGLSurfaceView extends GLSurfaceView implements IDanmakuView,
                 }
             }
         }
+        
+        SimplePaint paint = new SimplePaint();
 
         @Override
         public void onDrawFrame(GL10 gl) {
@@ -388,8 +389,13 @@ public class DanmakuGLSurfaceView extends GLSurfaceView implements IDanmakuView,
 //                    lastTime = System.currentTimeMillis();
 //                }
                 //handler.updateTimer(System.currentTimeMillis() - lastTime);
+                dtime = System.currentTimeMillis() - lastTime;
+                lastTime = System.currentTimeMillis();
                 handler.draw(canvas);
-                //lastTime = System.currentTimeMillis();
+//                canvas.clear();
+                if(mShowFps) {
+                    canvas.drawText("fps" + 1000/Math.max(1,dtime) + "," + handler.getCurrentTime()/1000 + "s" + ",h:"+canvas.getHeight() + ",w" + canvas.getWidth(), 0, canvas.getHeight() - 100, paint);
+                }
             }
         }
 
