@@ -22,6 +22,10 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
 public interface IRenderer {
+    
+    public static final int NOTHING_RENDERING = 0;
+    public static final int CACHE_RENDERING = 1;
+    public static final int TEXT_RENDERING = 2;    
 
     public class Area {
 
@@ -50,7 +54,7 @@ public interface IRenderer {
         }
 
     }
-    
+
     public class RenderingState {
         public final static int UNKNOWN_TIME = -1;
         
@@ -66,6 +70,8 @@ public interface IRenderer {
         public boolean nothingRendered;
         public long sysTime;
         public boolean inWaitingState;
+        public long cacheHitCount;
+        public long cacheMissCount;
 
         public int addTotalCount(int count) {
             totalDanmakuCount += count;
@@ -114,6 +120,8 @@ public interface IRenderer {
             nothingRendered = other.nothingRendered;
             sysTime = other.sysTime;
             inWaitingState = other.inWaitingState;
+            cacheHitCount = other.cacheHitCount;
+            cacheMissCount = other.cacheMissCount;
         }
     }
 

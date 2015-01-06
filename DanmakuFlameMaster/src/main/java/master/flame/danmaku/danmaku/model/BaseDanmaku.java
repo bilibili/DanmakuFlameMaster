@@ -174,8 +174,8 @@ public abstract class BaseDanmaku {
         this.duration = duration;
     }
 
-    public void draw(IDisplayer displayer) {
-        displayer.draw(this);
+    public int draw(IDisplayer displayer) {
+        return displayer.draw(this);
     }
 
     public boolean isMeasured() {

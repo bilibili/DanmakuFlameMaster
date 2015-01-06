@@ -28,6 +28,7 @@ import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+import master.flame.danmaku.danmaku.renderer.IRenderer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -177,7 +178,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     }
 
     @Override
-    public void draw(BaseDanmaku danmaku) {
+    public int draw(BaseDanmaku danmaku) {
         float top = danmaku.getTop();
         float left = danmaku.getLeft();
         if (canvas != null) {
@@ -186,7 +187,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             boolean needRestore = false;
             if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
                 if (danmaku.getAlpha() == AlphaValue.TRANSPARENT) {
-                    return;
+                    return IRenderer.NOTHING_RENDERING;
                 }
                 if (danmaku.rotationZ != 0 || danmaku.rotationY != 0) {
                     saveCanvas(danmaku, canvas, left, top);
@@ -202,10 +203,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             
             // skip drawing when danmaku is transparent
             if(alphaPaint!=null && alphaPaint.getAlpha()== AlphaValue.TRANSPARENT){
-                return;
+                return IRenderer.NOTHING_RENDERING;
             }
             // drawing cache
             boolean cacheDrawn = false;
+            int result = IRenderer.CACHE_RENDERING;
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
                 if (holder != null && holder.bitmap != null && !holder.bitmap.isRecycled()) {
@@ -220,12 +222,17 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                     resetPaintAlpha(PAINT);
                 }
                 drawDanmaku(danmaku, canvas, left, top, true);
+                result = IRenderer.TEXT_RENDERING;
             }
 
             if (needRestore) {
                 restoreCanvas(canvas);
             }
+            
+            return result;
         }
+        
+        return IRenderer.NOTHING_RENDERING;
     }
 
     private void resetPaintAlpha(Paint paint) {

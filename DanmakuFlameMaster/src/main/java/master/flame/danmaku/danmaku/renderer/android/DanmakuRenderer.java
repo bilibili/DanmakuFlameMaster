@@ -22,6 +22,7 @@ import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
 
@@ -77,7 +78,12 @@ public class DanmakuRenderer extends Renderer {
 
             // draw
             if (!drawItem.isOutside() && drawItem.isShown()) {
-                drawItem.draw(disp);
+                int renderingType = drawItem.draw(disp);
+                if(renderingType == IRenderer.CACHE_RENDERING) {
+                    mRenderingState.cacheHitCount++;
+                } else if(renderingType == IRenderer.TEXT_RENDERING) {
+                    mRenderingState.cacheMissCount++;
+                }
                 mRenderingState.addCount(drawItem.getType(), 1);
                 mRenderingState.addTotalCount(1);
             }

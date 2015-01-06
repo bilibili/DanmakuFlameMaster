@@ -27,7 +27,7 @@ public interface IDisplayer {
 
     public abstract int getDensityDpi();
 
-    public abstract void draw(BaseDanmaku danmaku);
+    public abstract int draw(BaseDanmaku danmaku);
 
     public abstract float getScaledDensity();
 

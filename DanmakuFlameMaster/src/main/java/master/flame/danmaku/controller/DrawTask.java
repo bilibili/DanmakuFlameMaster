@@ -216,7 +216,7 @@ public class DrawTask implements IDrawTask {
                 endMills = mLastEndMills;
             }
             if (danmakus != null && !danmakus.isEmpty()) {
-                RenderingState renderingState = mRenderer.draw(mDisp, danmakus, mStartRenderTime);
+                RenderingState renderingState = mRenderingState = mRenderer.draw(mDisp, danmakus, mStartRenderTime);
                 if (renderingState.nothingRendered) {
                     if (renderingState.beginTime == RenderingState.UNKNOWN_TIME) {
                         renderingState.beginTime = beginMills;
