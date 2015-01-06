@@ -57,6 +57,9 @@ public class CacheManagingDrawTask extends DrawTask {
         super(timer, context, disp, taskListener);
         NativeBitmapFactory.loadLibs();
         mMaxCacheSize = maxCacheSize;
+        if(NativeBitmapFactory.isInNativeAlloc()) {
+            mMaxCacheSize *= 3;
+        }
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
     }
 
@@ -490,13 +493,13 @@ public class CacheManagingDrawTask extends DrawTask {
                 BaseDanmaku firstCache = mCaches.first();
                 //TODO 如果firstcache大于当前时间超过半屏并且水位在0.5f以下,
                 long gapTime = firstCache != null ? firstCache.time - mTimer.currMillisecond : 0;
-                long twoScreenDuration = DanmakuFactory.MAX_DANMAKU_DURATION * 2;
+                long doubleScreenDuration = DanmakuFactory.MAX_DANMAKU_DURATION * 2;
                 if (level < 0.6f && gapTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
                     mCacheTimer.update(mTimer.currMillisecond);
                     removeMessages(BUILD_CACHES);
                     sendEmptyMessage(BUILD_CACHES);
                     return 0;
-                } else if (level > 0.4f && gapTime < -twoScreenDuration) {
+                } else if (level > 0.4f && gapTime < -doubleScreenDuration) {
                     // clear timeout caches
                     removeMessages(CLEAR_TIMEOUT_CACHES);
                     sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
@@ -513,10 +516,10 @@ public class CacheManagingDrawTask extends DrawTask {
                     sendEmptyMessage(CLEAR_OUTSIDE_CACHES);
                     sendEmptyMessage(BUILD_CACHES);
                     return 0;
-                } else if (deltaTime > twoScreenDuration) {
+                } else if (deltaTime > doubleScreenDuration) {
                     removeMessages(CLEAR_TIMEOUT_CACHES);
                     sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
-                    return deltaTime;
+                    return 0;
                 }
                 
                 removeMessages(BUILD_CACHES);
@@ -546,8 +549,10 @@ public class CacheManagingDrawTask extends DrawTask {
                 IDanmakus danmakus = null;
                 danmakus = danmakuList.subnew(curr, end);
 
-                if (danmakus == null || danmakus.isEmpty())
+                if (danmakus == null || danmakus.isEmpty()) {
+                    mCacheTimer.update(end);
                     return 0;
+                }
                 BaseDanmaku last = danmakus.last();
                 IDanmakuIterator itr = danmakus.iterator();
 
@@ -627,9 +632,8 @@ public class CacheManagingDrawTask extends DrawTask {
                 if (item != null) {
                     mCacheTimer.update(item.time);
 //Log.i("cache","stop at :"+item.time+","+count+",size:"+danmakus.size()+","+message);
-                }else if (count==0 || danmakus.isEmpty() || count == danmakus.size() || isPoolFull()) {
+                }else {
                     mCacheTimer.update(end);
-                    sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
                 }
                 return consumingTime;
             }
