@@ -50,15 +50,13 @@ public class CacheManagingDrawTask extends DrawTask {
 
     private DanmakuTimer mCacheTimer;
 
-    private final Object mDrawingNotify = new Object();
-
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener, int maxCacheSize) {
         super(timer, context, disp, taskListener);
         NativeBitmapFactory.loadLibs();
         mMaxCacheSize = maxCacheSize;
-        if(NativeBitmapFactory.isInNativeAlloc()) {
-            mMaxCacheSize *= 3;
+        if (NativeBitmapFactory.isInNativeAlloc()) {
+            mMaxCacheSize = maxCacheSize * 3;
         }
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
     }
@@ -82,9 +80,6 @@ public class CacheManagingDrawTask extends DrawTask {
         RenderingState result = null;
         synchronized (danmakuList) {
             result = super.draw(displayer);
-        }
-        synchronized(mDrawingNotify){
-            mDrawingNotify.notify();
         }
         return result;
     }
@@ -317,13 +312,6 @@ public class CacheManagingDrawTask extends DrawTask {
             while (it.hasNext()) {
                 BaseDanmaku val = it.next();
                 if (val.isTimeOut(time)) {
-                    try {
-                        synchronized (mDrawingNotify) {
-                            mDrawingNotify.wait(20);
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     entryRemoved(false, val, null);
                     it.remove();
                 }else{
@@ -422,6 +410,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         sendEmptyMessageDelayed(DISPATCH_ACTIONS, delayed);
                         break;
                     case BUILD_CACHES:
+                        removeMessages(BUILD_CACHES);
                         boolean repositioned = (mTaskListener != null || mSeekedFlag);
                         prepareCaches(repositioned);
                         if (repositioned)
@@ -512,14 +501,12 @@ public class CacheManagingDrawTask extends DrawTask {
                 // check cache time
                 long deltaTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                 if (deltaTime < 0) {
-                    removeMessages(CLEAR_OUTSIDE_CACHES);
+                    mCacheTimer.update(mTimer.currMillisecond);
                     sendEmptyMessage(CLEAR_OUTSIDE_CACHES);
                     sendEmptyMessage(BUILD_CACHES);
                     return 0;
                 } else if (deltaTime > doubleScreenDuration) {
-                    removeMessages(CLEAR_TIMEOUT_CACHES);
-                    sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
-                    return 0;
+                    return doubleScreenDuration;
                 }
                 
                 removeMessages(BUILD_CACHES);
@@ -602,16 +589,6 @@ public class CacheManagingDrawTask extends DrawTask {
                     }
 
                     // build cache
-
-                    if (!repositioned) {
-                        try {
-                            synchronized (mDrawingNotify) {
-                                mDrawingNotify.wait(50);
-                            }
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
 
                     buildSuccess = buildCache(item);
                     if (!buildSuccess) {
