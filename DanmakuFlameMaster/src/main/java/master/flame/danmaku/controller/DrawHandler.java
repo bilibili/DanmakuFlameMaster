@@ -101,7 +101,7 @@ public class DrawHandler extends Handler {
 
     private Thread mThread;
 
-    private boolean mUpdateInNewThread;
+    private final boolean mUpdateInNewThread;
 
     private long mCordonTime = 30;
 
@@ -489,15 +489,16 @@ public class DrawHandler extends Handler {
         return mDanmakusVisible;
     }
 
-    public void draw(Canvas canvas) {
+    public RenderingState draw(Canvas canvas) {
         if (drawTask == null)
-            return;
+            return mRenderingState;
         mDisp.setAverageRenderingTime(Math.max(mFrameUpdateRate, getAverageRenderingTime()));
         mDisp.setLastFrameRenderingTime(mDrawTimes.size() < 2 ? mFrameUpdateRate : mDrawTimes.getLast()
                 - mDrawTimes.get(mDrawTimes.size() - 2));
         mDisp.setExtraData(canvas);
         mRenderingState.set(drawTask.draw(mDisp));
         recordRenderingTime();
+        return mRenderingState;
     }
     
     private void notifyRendering() {

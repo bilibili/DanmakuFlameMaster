@@ -33,6 +33,7 @@ import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 
 import java.util.LinkedList;
 import java.util.Locale;
@@ -245,13 +246,15 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         long dtime = 0;
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null){
-            if(handler != null){
-                handler.draw(canvas);
+            if (handler != null) {
+                RenderingState rs = handler.draw(canvas);
                 if (mShowFps) {
-                    if(mDrawTimes == null) mDrawTimes = new LinkedList<Long>();
-                    dtime = System.currentTimeMillis() - stime;  //not so accurate
-                    String fps = String.format(Locale.getDefault(), "fps %.2f,time:%d s", fps(),
-                            handler.getCurrentTime() / 1000);
+                    if (mDrawTimes == null)
+                        mDrawTimes = new LinkedList<Long>();
+                    dtime = System.currentTimeMillis() - stime;
+                    String fps = String.format(Locale.getDefault(),
+                            "fps %.2f,time:%d s,cache:%d,miss:%d", fps(),
+                            handler.getCurrentTime() / 1000, rs.cacheHitCount, rs.cacheMissCount);
                     DrawHelper.drawFPS(canvas, fps);
                 }
             }
