@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.os.SystemClock;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -156,6 +157,7 @@ public class CacheManagingDrawTask extends DrawTask {
         public void seek(long mills) {
             if (mHandler == null)
                 return;
+            mHandler.requestCancelCaching();
             mHandler.removeMessages(CacheHandler.BUILD_CACHES);
             mHandler.obtainMessage(CacheHandler.SEEK, mills).sendToTarget();
         }
@@ -388,8 +390,14 @@ public class CacheManagingDrawTask extends DrawTask {
 
             private boolean mSeekedFlag;
 
+            private boolean mCanelFlag;
+
             public CacheHandler(android.os.Looper looper) {
                 super(looper);
+            }
+
+            public void requestCancelCaching() {
+                mCanelFlag = true;   
             }
 
             @Override
@@ -459,7 +467,6 @@ public class CacheManagingDrawTask extends DrawTask {
                     case CLEAR_ALL_CACHES:
                         evictAll();
                         reset();
-//                        GlobalFlagValues.updateVisibleFlag();
                         mCacheTimer.update(mTimer.currMillisecond);
                         mSeekedFlag = true;
                         clearFlag = 5;
@@ -506,7 +513,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     sendEmptyMessage(BUILD_CACHES);
                     return 0;
                 } else if (deltaTime > doubleScreenDuration) {
-                    return doubleScreenDuration;
+                    return 0;
                 }
                 
                 removeMessages(BUILD_CACHES);
@@ -533,16 +540,21 @@ public class CacheManagingDrawTask extends DrawTask {
                     return 0;
                 }
                 long startTime =  System.currentTimeMillis();
-                IDanmakus danmakus = null;
-                danmakus = danmakuList.subnew(curr, end);
-
+                IDanmakus danmakus = danmakuList.subnew(curr, end);
                 if (danmakus == null || danmakus.isEmpty()) {
                     mCacheTimer.update(end);
                     return 0;
                 }
+                BaseDanmaku first = danmakus.first();
                 BaseDanmaku last = danmakus.last();
+                long sleepTime = 0;
+                long deltaTime = first.time - mTimer.currMillisecond;
+                if (deltaTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
+                    sleepTime = 30 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
+                    sleepTime = Math.min(100, sleepTime);
+                }
+                
                 IDanmakuIterator itr = danmakus.iterator();
-
                 BaseDanmaku item = null;
                 long consumingTime = 0;
                 int count = 0;
@@ -550,7 +562,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 int currScreenIndex = 0;
                 int sizeInScreen = danmakus.size();
 //                String message = "";
-                while (!mPause) {
+                while (!mPause && !mCanelFlag) {
                     boolean hasNext = itr.hasNext();
                     if(!hasNext){
 //                        message = "break at not hasNext";
@@ -559,7 +571,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     item = itr.next();
                     count++;
                     
-                    if (last != null && last.time < mTimer.currMillisecond) {
+                    if (last.time < mTimer.currMillisecond) {
 //                        message = "break at last.time < mTimer.currMillisecond";
                         break;
                     }
@@ -589,7 +601,6 @@ public class CacheManagingDrawTask extends DrawTask {
                     }
 
                     // build cache
-
                     buildSuccess = buildCache(item);
                     if (!buildSuccess) {
 //                        message = "break at build failed";
@@ -603,8 +614,11 @@ public class CacheManagingDrawTask extends DrawTask {
                             break;
                         }
                     }
+                    if(sleepTime > 0) {
+                        SystemClock.sleep(sleepTime);
+                    }
                 }
-
+                mCanelFlag = false;
                 consumingTime = System.currentTimeMillis() - startTime;
                 if (item != null) {
                     mCacheTimer.update(item.time);
