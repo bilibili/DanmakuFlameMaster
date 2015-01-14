@@ -449,10 +449,10 @@ public class CacheManagingDrawTask extends DrawTask {
                         clearTimeOutCaches();
                         break;
                     case SEEK:
-                        Long seekMills = (Long)msg.obj;
-                        if(seekMills!=null){
+                        Long seekMills = (Long) msg.obj;
+                        if (seekMills != null) {
                             mCacheTimer.update(seekMills.longValue());
-                            mSeekedFlag = true;                        
+                            mSeekedFlag = true;
                             evictAllNotInScreen();
                             resume();
                         }
@@ -618,7 +618,6 @@ public class CacheManagingDrawTask extends DrawTask {
                         SystemClock.sleep(sleepTime);
                     }
                 }
-                mCanelFlag = false;
                 consumingTime = System.currentTimeMillis() - startTime;
                 if (item != null) {
                     mCacheTimer.update(item.time);
@@ -707,6 +706,7 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             public void resume() {
+                mCanelFlag = false;
                 mPause = false;
                 removeMessages(DISPATCH_ACTIONS);
                 sendEmptyMessage(DISPATCH_ACTIONS);
