@@ -35,10 +35,6 @@ public interface IDisplayer {
     
     public abstract void measure(BaseDanmaku danmaku);
     
-    public abstract long getAverageRenderingTime();
-    
-    public abstract long getLastFrameRenderingTime();
-    
     public abstract float getStrokeWidth();
 
 
@@ -49,9 +45,5 @@ public interface IDisplayer {
     public abstract void setDensities(float density, int densityDpi, float scaledDensity);
     
     public abstract void setSize(int width, int height);
-
-    public abstract void setAverageRenderingTime(long ms);
-    
-    public abstract void setLastFrameRenderingTime(long ms);
 
 }

@@ -144,10 +144,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     private float scaledDensity = 1;
 
     private int mSlopPixel = 0;
-    
-    private long lastAverageRenderingTime = 16;
-
-    private long lastFrameRenderingTime;
 
     private void update(Canvas c) {
         canvas = c;
@@ -501,16 +497,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     }
 
     @Override
-    public long getAverageRenderingTime() {
-        return this.lastAverageRenderingTime;
-    }
-
-    @Override
-    public void setAverageRenderingTime(long ms) {
-        this.lastAverageRenderingTime = ms;
-    }
-
-    @Override
     public float getStrokeWidth() {
         if (HAS_SHADOW && HAS_STROKE) {
             return Math.max(SHADOW_RADIUS, STROKE_WIDTH);
@@ -524,14 +510,5 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         return 0f;
     }
 
-    @Override
-    public long getLastFrameRenderingTime() {
-        return this.lastFrameRenderingTime;
-    }
-
-    @Override
-    public void setLastFrameRenderingTime(long ms) {
-        this.lastFrameRenderingTime = ms;
-    }
 
 }

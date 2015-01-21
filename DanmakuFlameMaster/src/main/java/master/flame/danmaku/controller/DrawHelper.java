@@ -46,7 +46,7 @@ public class DrawHelper {
         if (PAINT_FPS == null) {
             PAINT_FPS = new Paint();
             PAINT_FPS.setColor(Color.RED);
-            PAINT_FPS.setTextSize(50);
+            PAINT_FPS.setTextSize(30);
         }
         int top = canvas.getHeight() - 50;
         
