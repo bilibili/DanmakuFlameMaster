@@ -8,9 +8,11 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.*;
 import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import master.flame.danmaku.controller.DrawHandler.Callback;
@@ -124,6 +126,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     mDanmakuView.start();
                 }
             });
+            mDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
+                @Override
+                public void onDanmakuClick(BaseDanmaku danmaku) {
+                    Log.d("lijun", "onDanmakuClick text:" + danmaku.text);
+                }
+            });
+
             mDanmakuView.prepare(mParser);
 
             mDanmakuView.showFPS(true);

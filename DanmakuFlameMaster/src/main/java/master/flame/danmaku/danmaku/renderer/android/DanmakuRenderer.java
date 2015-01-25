@@ -42,7 +42,7 @@ public class DanmakuRenderer extends Renderer {
     
     @Override
     public RenderingState draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
-        mRenderingState.reset();       
+        mRenderingState.reset();
         IDanmakuIterator itr = danmakus.iterator();
         int orderInScreen = 0;        
         mStartTimer.update(System.currentTimeMillis());

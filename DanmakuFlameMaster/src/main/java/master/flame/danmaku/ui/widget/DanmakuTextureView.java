@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 
@@ -34,9 +35,11 @@ import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -63,6 +66,10 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     private OnClickListener mOnClickListener;
 
+    private OnDanmakuClickListener mOnDanmakuClickListener;
+
+    private DanmakuTouchHelper mTouchHelper;
+
     private boolean mShowFps;
 
     private boolean mDanmakuVisibile = true;
@@ -83,6 +90,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         setWillNotDraw(true);
         setSurfaceTextureListener(this);
         setOnClickListener(this);
+        mTouchHelper = DanmakuTouchHelper.instance(this);
     }
 
     @Override
@@ -121,6 +129,15 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         if (handler != null) {
             handler.removeAllLiveDanmakus();
         }
+    }
+
+    @Override
+    public List<BaseDanmaku> getCurrentVisibleDanmakus() {
+        if (handler != null) {
+            return handler.getCurrentVisibleDanmakus();
+        }
+
+        return null;
     }
 
     public void setCallback(Callback callback) {
@@ -323,6 +340,15 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         }
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (null != mTouchHelper) {
+            mTouchHelper.onTouchEvent(event);
+        }
+
+        return super.onTouchEvent(event);
+    }
+
     public void seekTo(Long ms) {
         if (handler != null) {
             handler.seekTo(ms);
@@ -378,6 +404,16 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
             return 0;
         }
         return handler.hideDanmakus(true);
+    }
+
+    @Override
+    public void setOnDanmakuClickListener(OnDanmakuClickListener listener) {
+        mOnDanmakuClickListener = listener;
+    }
+
+    @Override
+    public OnDanmakuClickListener getOnDanmakuClickListener() {
+        return mOnDanmakuClickListener;
     }
 
     @Override

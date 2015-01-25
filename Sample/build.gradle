@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.7.+'
-    }
-}
-apply plugin: 'android'
+//apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 dependencies {
     compile project(':DanmakuFlameMaster')
 }
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 7
@@ -41,7 +34,7 @@ android {
         into new File(buildDir, 'native-libs')
     }
 
-    tasks.withType(Compile) {
+    tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn copyNativeLibs
     }
 

@@ -19,6 +19,9 @@ package master.flame.danmaku.controller;
 import android.content.Context;
 import android.graphics.Canvas;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
@@ -125,7 +128,26 @@ public class DrawTask implements IDrawTask {
             }
         }
     }
-    
+
+    @Override
+    public List<BaseDanmaku> getVisibleDanmakusOnTime(long time) {
+        long beginMills = time - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
+        long endMills = time + DanmakuFactory.MAX_DANMAKU_DURATION;
+        IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
+        List<BaseDanmaku> visibleDanmakus = new ArrayList<BaseDanmaku>();
+        if (null != subDanmakus && !subDanmakus.isEmpty()) {
+            IDanmakuIterator iterator = subDanmakus.iterator();
+            while (iterator.hasNext()) {
+                BaseDanmaku danmaku = iterator.next();
+                if (danmaku.isShown() && !danmaku.isOutside()) {
+                    visibleDanmakus.add(danmaku);
+                }
+            }
+        }
+
+        return visibleDanmakus;
+    }
+
     protected void removeUnusedLiveDanmakusIn(int msec) {
         if (danmakuList == null || danmakuList.isEmpty())
             return;
