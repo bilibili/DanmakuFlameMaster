@@ -356,9 +356,7 @@ public class DrawHandler extends Handler {
         } else {
             long averageTime = getAverageRenderingTime();
             long gapTime = time - timer.currMillisecond;
-            if (Math.abs(gapTime) > 3000) {
-                d = timer.update(time);
-            } else if (mSkipFrames > 0
+            if (mSkipFrames > 0
                     || (mRenderingState != null && (gapTime > 120
                             || averageTime > mCordonTime || mRenderingState.consumingTime > 60))) {
                 d = timer.add(Math.max(Math.min(mRenderingState.consumingTime, averageTime),
