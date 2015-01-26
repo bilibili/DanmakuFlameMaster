@@ -95,7 +95,7 @@ public class DrawHandler extends Handler {
 
     private int mSkipFrames;
 
-    private static final int MAX_RECORD_SIZE = 100;
+    private static final int MAX_RECORD_SIZE = 200;
 
     private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
 
@@ -106,6 +106,10 @@ public class DrawHandler extends Handler {
     private long mCordonTime = 30;
 
     private long mFrameUpdateRate = 16;
+
+    private long mThresholdTime;
+
+    private long mLastDeltaTime;
 
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
@@ -352,7 +356,9 @@ public class DrawHandler extends Handler {
         } else {
             long averageTime = getAverageRenderingTime();
             long gapTime = time - timer.currMillisecond;
-            if (mSkipFrames > 0
+            if (Math.abs(gapTime) > 3000) {
+                d = timer.update(time);
+            } else if (mSkipFrames > 0
                     || (mRenderingState != null && (gapTime > 120
                             || averageTime > mCordonTime || mRenderingState.consumingTime > 60))) {
                 d = timer.add(Math.max(Math.min(mRenderingState.consumingTime, averageTime),
@@ -363,9 +369,17 @@ public class DrawHandler extends Handler {
                     mSkipFrames--;
                 }
             } else {
-                d = Math.max(mFrameUpdateRate, averageTime + (gapTime / 15));
+                if (mRenderingState.consumingTime > mThresholdTime && averageTime < mThresholdTime) {
+                    d = mThresholdTime;
+                } else {
+                    d = Math.max(mFrameUpdateRate, averageTime + (gapTime / 15));
+                }
+                if(Math.abs(d - mLastDeltaTime) > 3) {
+                    d = mLastDeltaTime;
+                }
                 d = timer.add(d);
             }
+            mLastDeltaTime = d;
         }
         if (mCallback != null) {
             mCallback.updateTimer(timer);
@@ -383,14 +397,15 @@ public class DrawHandler extends Handler {
         DanmakuTimer timer = new DanmakuTimer();
         timer.update(System.nanoTime());
         DrawHelper.useDrawColorToClearCanvas(true);
-        int frameCount = 20;
+        int frameCount = 30;
         for (int i = 0; i < frameCount; i++) {
             mDanmakuView.clear();
         }
         long consumingTime = timer.update(System.nanoTime());
         long averageFrameConsumingTime = consumingTime / frameCount / 1000000;
         mCordonTime = Math.max(33, (long) (averageFrameConsumingTime * 2.5f));
-        mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 16 * 16);
+        mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
+        mThresholdTime = mFrameUpdateRate + 4;
 //        Log.i("DrawHandler", "initRenderingConfigs test-fps:" + averageFrameConsumingTime + "ms,mCordonTime:"
 //                + mCordonTime + ",mFrameRefreshingRate:" + mFrameUpdateRate);
     }
