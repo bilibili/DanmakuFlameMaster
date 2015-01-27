@@ -756,16 +756,16 @@ public class CacheManagingDrawTask extends DrawTask {
     }
     
     @Override
-    public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
+    public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
             Object... values) {
-        super.onDanmakuConfigChanged(config, tag, values);
-        if (tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)) {
-            return;
+        if(super.onDanmakuConfigChanged(config, tag, values)) {
+            return true;
         }
+        
         if (tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
             mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
             requestClear();
-            return;
+            return true;
         }
         if (tag.isVisibilityRelatedTag()) {
             if (values != null && values.length > 0) {
@@ -778,7 +778,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
             }
             requestClear();
-            return;
+            return true;
         }
         if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
             mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
@@ -788,11 +788,12 @@ public class CacheManagingDrawTask extends DrawTask {
                 mCacheManager.requestClearAll();
                 mCacheManager.requestBuild();
             }
-            return;
+            return true;
         }
         if (mCacheManager != null) {
             mCacheManager.requestClearUnused();
             mCacheManager.requestBuild();
         }
+        return true;
     }
 }

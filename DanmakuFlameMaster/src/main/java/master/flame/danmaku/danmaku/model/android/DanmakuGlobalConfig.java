@@ -512,7 +512,7 @@ public class DanmakuGlobalConfig {
     
     
     public interface ConfigChangedCallback {
-        public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
+        public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
                 Object... value);
     }
 
