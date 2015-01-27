@@ -98,8 +98,29 @@ public class DanmakuUtils {
     public static int getCacheSize(int w, int h) {
         return (w) * (h) * 4;
     }
+    
+    public final static boolean isDuplicate(BaseDanmaku obj1, BaseDanmaku obj2) {
+        if(obj1 == obj2) {
+            return false;
+        }
+//        if(obj1.isTimeOut() || obj2.isTimeOut()) {
+//            return false;
+//        }
+//        long dtime = Math.abs(obj1.time - obj2.time);
+//        if(dtime > obj1.getDuration()) {
+//            return false;
+//        }
+        if (obj1.text == obj2.text) {
+            return true;
+        }
+        if (obj1.text != null && obj1.text.equals(obj2.text)) {
+            return true;
+        }
+        return false;
+    }
 
-    public static int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
+    public final static int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
+        
         if (obj1 == obj2) {
             return 0;
         }

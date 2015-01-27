@@ -17,7 +17,7 @@ import android.graphics.Typeface;
 public class DanmakuGlobalConfig {
 
     public enum DanmakuConfigTag {
-        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU;
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU, DUPLICATE_MERGING_ENABLED;
 
         public boolean isVisibilityRelatedTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
@@ -26,10 +26,6 @@ public class DanmakuGlobalConfig {
                     || this.equals(USER_ID_BLACK_LIST);
         }
     }
-
-    /*
-     * TODO 选项：合并异色同字弹幕缓存
-     */
 
     public static DanmakuGlobalConfig DEFAULT = new DanmakuGlobalConfig();
 
@@ -108,6 +104,8 @@ public class DanmakuGlobalConfig {
     private ArrayList<ConfigChangedCallback> mCallbackList;
 
     private boolean mBlockGuestDanmaku = false;
+
+    private boolean mDuplicateMergingEnable = false;
 
     /**
      * set typeface
@@ -468,16 +466,17 @@ public class DanmakuGlobalConfig {
      * @return
      */
     public DanmakuGlobalConfig blockGuestDanmaku(boolean block) {
-        mBlockGuestDanmaku = block;
-        if (block) {
-            setFilterData(DanmakuFilters.TAG_GUEST_FILTER, block);
-        } else {
-            DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_GUEST_FILTER);
+        if (mBlockGuestDanmaku != block) {
+            mBlockGuestDanmaku = block;
+            if (block) {
+                setFilterData(DanmakuFilters.TAG_GUEST_FILTER, block);
+            } else {
+                DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_GUEST_FILTER);
+            }
+            notifyConfigureChanged(DanmakuConfigTag.BLOCK_GUEST_DANMAKU, block);
         }
-        notifyConfigureChanged(DanmakuConfigTag.BLOCK_GUEST_DANMAKU, block);
         return this;
     }
-    
     
     /**
      * 设置弹幕滚动速度系数,只对滚动弹幕有效
@@ -492,6 +491,23 @@ public class DanmakuGlobalConfig {
             notifyConfigureChanged(DanmakuConfigTag.SCROLL_SPEED_FACTOR, p);
         }
         return this;
+    }
+    
+    /**
+     * 设置是否启用合并重复弹幕
+     * @param enable
+     * @return
+     */
+    public DanmakuGlobalConfig setDuplicateMergingEnabled(boolean enable) {
+        if (mDuplicateMergingEnable != enable) {
+            mDuplicateMergingEnable = enable;
+            notifyConfigureChanged(DanmakuConfigTag.DUPLICATE_MERGING_ENABLED, enable);
+        }
+        return this;
+    }
+    
+    public boolean isDuplicateMergingEnabled() {
+        return mDuplicateMergingEnable;
     }
     
     

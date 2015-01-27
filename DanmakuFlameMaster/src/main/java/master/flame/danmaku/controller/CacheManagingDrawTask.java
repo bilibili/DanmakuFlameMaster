@@ -29,7 +29,6 @@ import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
-import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.ConfigChangedCallback;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.DanmakuConfigTag;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.model.android.DrawingCache;
@@ -107,6 +106,7 @@ public class CacheManagingDrawTask extends DrawTask {
         } else {
             mCacheManager.resume();
         }
+        DanmakuGlobalConfig.DEFAULT.registerConfigChangedCallback(this);
     }
 
     @Override
@@ -118,6 +118,7 @@ public class CacheManagingDrawTask extends DrawTask {
             mCacheManager = null;
         }
         NativeBitmapFactory.releaseLibs();
+        DanmakuGlobalConfig.DEFAULT.unregisterConfigChangedCallback(this);
     }
 
     @Override
@@ -127,7 +128,7 @@ public class CacheManagingDrawTask extends DrawTask {
         mCacheManager.begin();
     }
 
-    public class CacheManager implements ConfigChangedCallback {
+    public class CacheManager {
 
         @SuppressWarnings("unused")
         private static final String TAG = "CacheManager";
@@ -176,13 +177,9 @@ public class CacheManagingDrawTask extends DrawTask {
             if (mHandler == null)
                 mHandler = new CacheHandler(mThread.getLooper());
             mHandler.begin();
-            
-            DanmakuGlobalConfig.DEFAULT.registerConfigChangedCallback(this);
         }
 
-        public void end() {
-            DanmakuGlobalConfig.DEFAULT.unregisterConfigChangedCallback(this);
-            
+        public void end() {            
             if (mHandler != null) {
                 mHandler.pause();
                 mHandler = null;
@@ -196,7 +193,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 mThread.quit();
                 mThread = null;
             }
-            
         }
 
         public void resume() {
@@ -735,45 +731,68 @@ public class CacheManagingDrawTask extends DrawTask {
             return 0;
         }
 
-        @Override
-        public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
-                Object... values) {
-            if (tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)) {
-                return;
-            }
-            if (tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
-                mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
-                requestClear();
-                return;
-            }
-            if (tag.isVisibilityRelatedTag()) {
-                if (values != null && values.length > 0) {
-                    if (values[0] != null
-                            && ((values[0] instanceof Boolean) == false || ((Boolean) values[0])
-                                    .booleanValue())) {
-                        if (mHandler != null) {
-                            mHandler.requestBuildCacheAndDraw();
-                        }
-                    }
-                }
-                requestClear();
-                return;
-            }
-            if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
-                mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
-            }
-            if (tag.equals(DanmakuConfigTag.TRANSPARENCY) || tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
-                mHandler.removeMessages(CacheHandler.CLEAR_ALL_CACHES);
-                mHandler.sendEmptyMessage(CacheHandler.CLEAR_ALL_CACHES);
-                mHandler.requestBuildCacheAndDraw();
-                return;
-            }
-            if (mHandler != null) {
-                mHandler.removeMessages(CacheHandler.CLEAR_OUTSIDE_CACHES_AND_RESET);
-                mHandler.sendEmptyMessage(CacheHandler.CLEAR_OUTSIDE_CACHES_AND_RESET);
+        public void requestBuild() {
+            if(mHandler != null) {
                 mHandler.requestBuildCacheAndDraw();
             }
         }
 
+        public void requestClearAll() {
+            if (mHandler == null) {
+                return;
+            }
+            mHandler.removeMessages(CacheHandler.CLEAR_ALL_CACHES);
+            mHandler.sendEmptyMessage(CacheHandler.CLEAR_ALL_CACHES);
+        }
+
+        public void requestClearUnused() {
+            if (mHandler == null) {
+                return;
+            }
+            mHandler.removeMessages(CacheHandler.CLEAR_OUTSIDE_CACHES_AND_RESET);
+            mHandler.sendEmptyMessage(CacheHandler.CLEAR_OUTSIDE_CACHES_AND_RESET);
+        }
+
+    }
+    
+    @Override
+    public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
+            Object... values) {
+        super.onDanmakuConfigChanged(config, tag, values);
+        if (tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)) {
+            return;
+        }
+        if (tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
+            mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+            requestClear();
+            return;
+        }
+        if (tag.isVisibilityRelatedTag()) {
+            if (values != null && values.length > 0) {
+                if (values[0] != null
+                        && ((values[0] instanceof Boolean) == false || ((Boolean) values[0])
+                                .booleanValue())) {
+                    if (mCacheManager != null) {
+                        mCacheManager.requestBuild();
+                    }
+                }
+            }
+            requestClear();
+            return;
+        }
+        if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
+            mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+        }
+        if (tag.equals(DanmakuConfigTag.TRANSPARENCY) || tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
+            if (mCacheManager != null) {
+                mCacheManager.requestClearAll();
+                mCacheManager.requestBuild();
+            }
+            return;
+        }
+        if (mCacheManager != null) {
+            mCacheManager.requestClearUnused();
+            mCacheManager.requestBuild();
+        }
     }
 }

@@ -9,6 +9,7 @@ import java.util.TreeMap;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 
@@ -309,6 +310,66 @@ public class DanmakuFilters {
 
     }
     
+    public static class DuplicateMergingFilter implements IDanmakuFilter<Void> {
+        
+        protected final IDanmakus blockedDanmakus = new Danmakus();
+        protected final IDanmakus currentDanmakus = new Danmakus(true);
+        private final IDanmakus passedDanmakus = new Danmakus();
+        
+        private final void removeTimeoutDanmakus(final IDanmakus danmakus, long limitTime) {
+            IDanmakuIterator it = danmakus.iterator();
+            long startTime = System.currentTimeMillis();
+            while (it.hasNext()) {
+                try {
+                    BaseDanmaku item = it.next();
+                    if (item.isTimeOut()) {
+                        it.remove();
+                    } else {
+                        break;
+                    }
+                } catch (Exception e) {
+                    break;
+                }
+                if (System.currentTimeMillis() - startTime > limitTime) {
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                DanmakuTimer timer) {
+            removeTimeoutDanmakus(blockedDanmakus,2);
+            removeTimeoutDanmakus(passedDanmakus,2);
+            removeTimeoutDanmakus(currentDanmakus,3);
+            if(passedDanmakus.contains(danmaku)) {
+                return false;
+            }
+            if (blockedDanmakus.contains(danmaku)) {
+                return true;
+            }
+            if (!currentDanmakus.addItem(danmaku)) {
+                blockedDanmakus.addItem(danmaku);
+                return true;
+            }
+            passedDanmakus.addItem(danmaku);
+            return false;
+        }
+
+        @Override
+        public void setData(Void data) {
+            
+        }
+
+        @Override
+        public void reset() {
+            passedDanmakus.clear();
+            blockedDanmakus.clear();
+            currentDanmakus.clear();
+        }
+        
+    }
+    
     public final static String TAG_TYPE_DANMAKU_FILTER = "1010_Filter";
 
     public final static String TAG_QUANTITY_DANMAKU_FILTER = "1011_Filter";
@@ -322,6 +383,8 @@ public class DanmakuFilters {
     public final static String TAG_USER_HASH_FILTER = "1015_Filter";
     
     public static final String TAG_GUEST_FILTER = "1016_Filter";
+    
+    public static final String TAG_DUPLICATE_FILTER = "1017_Filter";
 
     private static DanmakuFilters instance = null;
 
@@ -372,6 +435,8 @@ public class DanmakuFilters {
                 filter = new UserHashFilter();
             } else if (TAG_GUEST_FILTER.equals(tag)) {
                 filter = new GuestFilter();
+            } else if (TAG_DUPLICATE_FILTER.equals(tag)) {
+                filter = new DuplicateMergingFilter();
             }
             // add more filter
         }

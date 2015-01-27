@@ -25,7 +25,10 @@ import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.DanmakuConfigTag;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.ConfigChangedCallback;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
@@ -33,7 +36,7 @@ import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
 
-public class DrawTask implements IDrawTask {
+public class DrawTask implements IDrawTask, ConfigChangedCallback {
     
     protected AbsDisplayer<?> mDisp;
 
@@ -73,6 +76,14 @@ public class DrawTask implements IDrawTask {
         mRenderer = new DanmakuRenderer();
         mDisp = disp;
         initTimer(timer);
+        Boolean enable = DanmakuGlobalConfig.DEFAULT.isDuplicateMergingEnabled();
+        if (enable != null) {
+            if(enable) {
+                DanmakuFilters.getDefault().registerFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
+            } else {
+                DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
+            }
+        }
     }
 
     protected void initTimer(DanmakuTimer timer) {
@@ -161,7 +172,7 @@ public class DrawTask implements IDrawTask {
     @Override
     public void seek(long mills) {
         reset();
-        requestClear();
+//        requestClear();
         GlobalFlagValues.updateVisibleFlag();
         mStartRenderTime = mills < 1000 ? 0 : mills;
     }
@@ -239,6 +250,24 @@ public class DrawTask implements IDrawTask {
     public void requestClear() {
         clearFlag = 5;
         mLastBeginMills = mLastEndMills = 0;
+    }
+
+    @Override
+    public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
+            Object... values) {
+        if (tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)) {
+            return;
+        }
+        if (tag.equals(DanmakuConfigTag.DUPLICATE_MERGING_ENABLED)) {
+            Boolean enable = (Boolean) values[0];
+            if (enable != null) {
+                if(enable) {
+                    DanmakuFilters.getDefault().registerFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
+                } else {
+                    DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
+                }
+            }
+        }
     }
 
 }
