@@ -1,14 +1,14 @@
 
 package com.sample;
 
-import java.io.InputStream;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.*;
+import android.view.Menu;
+import android.view.View;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.VideoView;
@@ -28,7 +28,7 @@ import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 
-import com.sample.R;
+import java.io.InputStream;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -109,7 +109,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(true);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
