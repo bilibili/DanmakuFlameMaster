@@ -414,7 +414,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                     case BUILD_CACHES:
                         removeMessages(BUILD_CACHES);
-                        boolean repositioned = (mTaskListener != null || mSeekedFlag);
+                        boolean repositioned = ((mTaskListener != null && mReadyState == false) || mSeekedFlag);
                         prepareCaches(repositioned);
                         if (repositioned)
                             mSeekedFlag = false;
