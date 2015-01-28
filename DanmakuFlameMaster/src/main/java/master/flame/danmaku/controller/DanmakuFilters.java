@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class DanmakuFilters {
@@ -362,11 +363,12 @@ public class DanmakuFilters {
 
         private void removeTimeoutDanmakus(LinkedHashMap<String, BaseDanmaku> danmakus,
                 int limitTime) {
-            Iterator<BaseDanmaku> it = danmakus.values().iterator();
+            Iterator<Entry<String, BaseDanmaku>> it = danmakus.entrySet().iterator();
             long startTime = System.currentTimeMillis();
             while (it.hasNext()) {
                 try {
-                    BaseDanmaku item = it.next();
+                    Entry<String, BaseDanmaku> entry = it.next();
+                    BaseDanmaku item = entry.getValue();
                     if (item.isTimeOut()) {
                         it.remove();
                     } else {
