@@ -157,7 +157,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     @Override
     public void release() {
         stop();
-        DanmakuFilters.getDefault().clear();
+        if(mDrawTimes!= null) mDrawTimes.clear();
     }
 
     @Override

@@ -99,6 +99,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void start() {
+        super.start();
         NativeBitmapFactory.loadLibs();
         if (mCacheManager == null) {
             mCacheManager = new CacheManager(mMaxCacheSize, MAX_CACHE_SCREEN_SIZE);
@@ -106,7 +107,6 @@ public class CacheManagingDrawTask extends DrawTask {
         } else {
             mCacheManager.resume();
         }
-        DanmakuGlobalConfig.DEFAULT.registerConfigChangedCallback(this);
     }
 
     @Override
@@ -118,7 +118,6 @@ public class CacheManagingDrawTask extends DrawTask {
             mCacheManager = null;
         }
         NativeBitmapFactory.releaseLibs();
-        DanmakuGlobalConfig.DEFAULT.unregisterConfigChangedCallback(this);
     }
 
     @Override
@@ -579,7 +578,8 @@ public class CacheManagingDrawTask extends DrawTask {
                     if (repositioned == false && (item.isTimeOut() || !item.isOutside())) {
                         continue;
                     }
-                    boolean skip = DanmakuFilters.getDefault().filter(item , orderInScreen , sizeInScreen , null );
+                    boolean skip = DanmakuFilters.getDefault().filter(item, orderInScreen,
+                            sizeInScreen, null, true);
 //Log.e("prepareCache", currScreenIndex+","+orderInScreen+"," + item.time+"skip:"+skip);
                     if (skip) {
                         continue;

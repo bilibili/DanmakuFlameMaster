@@ -149,7 +149,6 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     @Override
     public void release() {
         stop();
-        DanmakuFilters.getDefault().clear();
         if(mDrawTimes!= null) mDrawTimes.clear();
     }
 

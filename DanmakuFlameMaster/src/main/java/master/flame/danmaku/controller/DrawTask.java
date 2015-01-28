@@ -179,13 +179,14 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
 
     @Override
     public void start() {
-
+        DanmakuGlobalConfig.DEFAULT.registerConfigChangedCallback(this);
     }
 
     @Override
     public void quit() {
         if (mRenderer != null)
             mRenderer.release();
+        DanmakuGlobalConfig.DEFAULT.unregisterConfigChangedCallback(this);
     }
 
     public void prepare() {

@@ -34,11 +34,13 @@ public class DanmakuRenderer extends Renderer {
     @Override
     public void clear() {
         DanmakusRetainer.clear();
+        DanmakuFilters.getDefault().clear();
     }
 
     @Override
     public void release() {
         DanmakusRetainer.release();
+        DanmakuFilters.getDefault().release();
     }
     
     @Override
@@ -59,7 +61,7 @@ public class DanmakuRenderer extends Renderer {
 
             if (drawItem.time < startRenderTime
                     || (drawItem.priority == 0 && DanmakuFilters.getDefault().filter(drawItem,
-                            orderInScreen, sizeInScreen, mStartTimer))) {
+                            orderInScreen, sizeInScreen, mStartTimer, false))) {
                 continue;
             }
             
