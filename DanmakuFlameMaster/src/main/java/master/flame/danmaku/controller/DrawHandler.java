@@ -365,7 +365,7 @@ public class DrawHandler extends Handler {
         } else {
             long gapTime = time - timer.currMillisecond;
             long averageTime = Math.max(mFrameUpdateRate, getAverageRenderingTime());
-            if (gapTime < -1000 || gapTime > 1000) {
+            if (gapTime > 1000 || gapTime < -1000) {
                 d = averageTime;
                 timer.add(d);
             } else if (mSkipFrames > 0
@@ -414,7 +414,8 @@ public class DrawHandler extends Handler {
         long averageFrameConsumingTime = consumingTime / frameCount / 1000000;
         mCordonTime = Math.max(33, (long) (averageFrameConsumingTime * 2.5f));
         mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
-        mThresholdTime = mFrameUpdateRate + 3;
+        mLastDeltaTime = mFrameUpdateRate;
+        mThresholdTime = mFrameUpdateRate + 4;
 //        Log.i("DrawHandler", "initRenderingConfigs test-fps:" + averageFrameConsumingTime + "ms,mCordonTime:"
 //                + mCordonTime + ",mFrameRefreshingRate:" + mFrameUpdateRate);
     }
