@@ -5,8 +5,10 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +31,8 @@ import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 
 import java.io.InputStream;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -53,6 +57,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Button mBtnSendDanmaku;
 
     private long mPausedPosition;
+
+    private Button mBtnSendDanmakus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +103,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mBtnPauseDanmaku = (Button) findViewById(R.id.btn_pause);
         mBtnResumeDanmaku = (Button) findViewById(R.id.btn_resume);
         mBtnSendDanmaku = (Button) findViewById(R.id.btn_send);
+        mBtnSendDanmakus = (Button) findViewById(R.id.btn_send_danmakus);
         mBtnRotate.setOnClickListener(this);
         mBtnHideDanmaku.setOnClickListener(this);
         mMediaController.setOnClickListener(this);
@@ -104,12 +111,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mBtnPauseDanmaku.setOnClickListener(this);
         mBtnResumeDanmaku.setOnClickListener(this);
         mBtnSendDanmaku.setOnClickListener(this);
-
+        mBtnSendDanmakus.setOnClickListener(this);
+        
         // VideoView
         VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(true);
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
@@ -185,21 +193,51 @@ public class MainActivity extends Activity implements View.OnClickListener {
         } else if (v == mBtnResumeDanmaku) {
             mDanmakuView.resume();
         } else if (v == mBtnSendDanmaku) {
-            BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
-            //for(int i=0;i<100;i++){
-            //}
-            danmaku.text = "这是一条弹幕";
-            danmaku.padding = 5;
-            danmaku.priority = 1;
-            danmaku.time = mDanmakuView.getCurrentTime() + 200;
-            danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
-            danmaku.textColor = Color.RED;
-            danmaku.textShadowColor = Color.WHITE;
-            //danmaku.underlineColor = Color.GREEN;
-            danmaku.borderColor = Color.GREEN;
-            
-            mDanmakuView.addDanmaku(danmaku);
+            addDanmaku(false);
+        } else if (v == mBtnSendDanmakus) {
+            Boolean b = (Boolean) mBtnSendDanmakus.getTag();
+            timer.cancel();
+            if(b == null || !b) {
+                mBtnSendDanmakus.setText(R.string.cancel_sending_danmakus);
+                timer = new Timer();                
+                timer.schedule(new AsyncAddTask(), 0, 1000);
+                mBtnSendDanmakus.setTag(true);
+            } else {
+                mBtnSendDanmakus.setText(R.string.send_danmakus);
+                mBtnSendDanmakus.setTag(false);
+            }
         }
+    }
+    
+    Timer timer = new Timer();
+    class AsyncAddTask extends TimerTask {
+        
+        @Override
+        public void run() {
+            for(int i = 0;i<5;i++) {
+                addDanmaku(true);
+                SystemClock.sleep(20);
+            }
+        }
+    };
+    
+    
+
+    private void addDanmaku(boolean islive) {
+        BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
+        //for(int i=0;i<100;i++){
+        //}
+        danmaku.text = "这是一条弹幕" + System.nanoTime();
+        danmaku.padding = 5;
+        danmaku.priority = 1;
+        danmaku.isLive = islive;
+        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
+        danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
+        danmaku.textColor = Color.RED;
+        danmaku.textShadowColor = Color.WHITE;
+        //danmaku.underlineColor = Color.GREEN;
+        danmaku.borderColor = Color.GREEN;
+        mDanmakuView.addDanmaku(danmaku);
     }
 
 }

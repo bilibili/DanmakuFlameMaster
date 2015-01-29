@@ -10,7 +10,9 @@
     <string name="show_danmaku">show</string>
     <string name="pause_danmaku">pause</string>
     <string name="resume_danmaku">resume</string>
-    <string name="send_danmaku">发送一条弹幕</string>
+    <string name="send_danmaku">发送一条</string>
+    <string name="send_danmakus">定时发送</string>
+    <string name="cancel_sending_danmakus">取消定时</string>
 
     <string name="release">release</string>
     <string name="rotate">旋转屏幕</string>
