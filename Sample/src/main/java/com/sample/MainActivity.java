@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -118,7 +119,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(true);
         if (mDanmakuView != null) {
-            mParser = createParser(null);
+            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
 
                 @Override
