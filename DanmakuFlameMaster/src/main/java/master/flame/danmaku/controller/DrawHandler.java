@@ -95,7 +95,7 @@ public class DrawHandler extends Handler {
 
     private int mSkipFrames;
 
-    private static final int MAX_RECORD_SIZE = 300;
+    private static final int MAX_RECORD_SIZE = 500;
 
     private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
 
@@ -386,7 +386,9 @@ public class DrawHandler extends Handler {
                 }
                 timer.add(d);
             }
-            mLastDeltaTime = d;
+            if(d >= mFrameUpdateRate && d <= mThresholdTime){
+                mLastDeltaTime = d;
+            }
         }
         if (mCallback != null) {
             mCallback.updateTimer(timer);
@@ -413,7 +415,7 @@ public class DrawHandler extends Handler {
         mCordonTime = Math.max(33, (long) (averageFrameConsumingTime * 2.5f));
         mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
         mLastDeltaTime = mFrameUpdateRate;
-        mThresholdTime = mFrameUpdateRate + 4;
+        mThresholdTime = mFrameUpdateRate + 3;
 //        Log.i("DrawHandler", "initRenderingConfigs test-fps:" + averageFrameConsumingTime + "ms,mCordonTime:"
 //                + mCordonTime + ",mFrameRefreshingRate:" + mFrameUpdateRate);
     }
