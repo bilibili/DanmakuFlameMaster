@@ -95,7 +95,7 @@ public class DrawHandler extends Handler {
 
     private int mSkipFrames;
 
-    private static final int MAX_RECORD_SIZE = 1200;
+    private static final int MAX_RECORD_SIZE = 300;
 
     private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
 
@@ -532,18 +532,14 @@ public class DrawHandler extends Handler {
         }
         mSkipFrames = 0;
         if (mUpdateInNewThread) {
-            if (!mInSeekingAction) {
-                synchronized (this) {
-                    mDrawTimes.clear();
-                }
+            synchronized (this) {
+                mDrawTimes.clear();
             }
             synchronized (drawTask) {
                 drawTask.notifyAll();
             }
         } else {
-            if (!mInSeekingAction) {
-                mDrawTimes.clear();
-            }
+            mDrawTimes.clear();
             removeMessages(UPDATE);
             sendEmptyMessage(UPDATE);
         }
