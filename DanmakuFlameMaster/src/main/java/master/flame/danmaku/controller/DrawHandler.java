@@ -111,8 +111,6 @@ public class DrawHandler extends Handler {
 
     private long mLastDeltaTime;
 
-    private long mLastSeekTimeStamp;
-
     private boolean mInSeekingAction;
 
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
@@ -189,8 +187,8 @@ public class DrawHandler extends Handler {
                 break;
             case SEEK_POS:
                 quitUpdateThread();
-                Long ms = (Long) msg.obj;
-                long deltaMs = ms - timer.currMillisecond + (System.currentTimeMillis() -  mLastSeekTimeStamp);
+                Long position = (Long) msg.obj;
+                long deltaMs = position - timer.currMillisecond;
                 mTimeBase -= deltaMs;
                 timer.update(System.currentTimeMillis() - mTimeBase);
                 if (drawTask != null)
@@ -465,7 +463,6 @@ public class DrawHandler extends Handler {
 
     public void seekTo(Long ms) {
         mInSeekingAction = true;
-        mLastSeekTimeStamp = System.currentTimeMillis();
         removeMessages(DrawHandler.UPDATE);
         removeMessages(DrawHandler.RESUME);
         removeMessages(DrawHandler.SEEK_POS);
