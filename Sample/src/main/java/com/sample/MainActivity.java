@@ -12,6 +12,7 @@ import android.os.SystemClock;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.VideoView;
 
@@ -28,6 +29,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
+import master.flame.danmaku.ui.widget.DanmakuStupidView;
 import master.flame.danmaku.ui.widget.DanmakuSurfaceView;
 
 import java.io.InputStream;
@@ -116,8 +118,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // VideoView
         VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
-        mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(true);
+        //mDanmakuView = (DanmakuStupidView) findViewById(R.id.sv_danmaku);
+        mDanmakuView = new DanmakuStupidView(this);
+        FrameLayout layout = (FrameLayout)findViewById(R.id.frameLayout);
+        layout.addView((DanmakuStupidView)mDanmakuView, new FrameLayout.LayoutParams(
+        		FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
@@ -134,7 +141,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             });
             mDanmakuView.prepare(mParser);
 
-            mDanmakuView.showFPS(true);
+            //mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
             ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
 

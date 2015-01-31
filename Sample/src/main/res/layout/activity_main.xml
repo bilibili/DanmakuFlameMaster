@@ -15,6 +15,7 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -30,12 +31,10 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
     
-
-
-    <master.flame.danmaku.ui.widget.DanmakuSurfaceView
+    <!--<master.flame.danmaku.ui.widget.DanmakuStupidView
         android:id="@+id/sv_danmaku"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" /> -->
 
     <include android:id="@+id/media_controller"
         android:layout_width="match_parent"
