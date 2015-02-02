@@ -1,5 +1,4 @@
 #include <pthread.h>
-#include <android/log.h>
 #include <SkSurface.h>
 #include <GrContext.h>
 #include <SkGpuDevice.h>
@@ -8,12 +7,10 @@
 #include "sk_stupid_renderer.hpp"
 
 SkStupidRenderer::SkStupidRenderer(void* nativeHandle) {
-	__android_log_print(ANDROID_LOG_DEBUG, "SkStupidRenderer", "ctor");
 	pthread_mutex_init(&this->mCanvasMutex, nullptr);
 }
 
 SkStupidRenderer::~SkStupidRenderer() {
-	__android_log_print(ANDROID_LOG_DEBUG, "SkStupidRenderer", "dtor");
 	if (mBackendType != kNone_BackEndType) {
 		teardownBackend();
 	}
@@ -30,7 +27,6 @@ bool SkStupidRenderer::isHardwareAccelerated() {
 }
 
 bool SkStupidRenderer::setupBackend(SkBackEndTypes backendType, int width, int height, int msaaSampleCount) {
-	__android_log_print(ANDROID_LOG_DEBUG, "SkStupidRenderer", "setupBackend");
 	SkASSERT(mBackendType == kNone_BackEndType);
 
 	mBackendType = kNone_BackEndType;
@@ -127,7 +123,6 @@ void SkStupidRenderer::windowSizeChanged() {
 			mCanvas = mSurface->getCanvas();
 		}
 	}
-	__android_log_print(ANDROID_LOG_DEBUG, "SkStupidRenderer", "windowSizeChanged successed!");
 }
 
 void SkStupidRenderer::updateSize(int width, int height) {
@@ -143,11 +138,10 @@ void SkStupidRenderer::onSizeChange() {
 SkCanvas* SkStupidRenderer::lockCanvas() {
 	//pthread_mutex_lock(&this->mCanvasMutex);
 	if (mSurface == nullptr) {
-		if (mCurrentContext) {__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "attempt to NewRenderTargetDirect");
+		if (mCurrentContext) {
 			//SkAutoTUnref<SkBaseDevice> gpuDevice(new SkGpuDevice(mCurrentContext, mCurrentRenderTarget));   // 5.0
 			//mCanvas = new SkCanvas(gpuDevice);
 			mSurface = SkSurface::NewRenderTargetDirect(mCurrentContext, mCurrentRenderTarget);   // 4.4.x
-			__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "NewRenderTargetDirect succeed!");
 		}
 	}
 	if (mCanvas == nullptr) {

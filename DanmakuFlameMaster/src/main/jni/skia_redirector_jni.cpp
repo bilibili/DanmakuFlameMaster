@@ -55,7 +55,8 @@ static void nativeTerm(JNIEnv* env, jobject thiz, jlong nativeHandle) {
 	if (nativeHandle != 0) {
 		SkStupidRenderer* renderer = reinterpret_cast<SkStupidRenderer*>(nativeHandle);
 		renderer->teardownBackend();
-		delete renderer;__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeTerm succeed!");
+		delete renderer;
+		__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeTerm succeed!");
 	}
 }
 
@@ -68,7 +69,6 @@ static jboolean nativeIsHardwareAccelerated(JNIEnv* env, jobject thiz, jlong nat
 }
 
 static void nativeUpdateSize(JNIEnv* env, jobject thiz, jlong nativeHandle, jint width, jint height) {
-	__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeUpdateSize");
 	if (nativeHandle != 0) {
 		SkStupidRenderer* renderer = reinterpret_cast<SkStupidRenderer*>(nativeHandle);
 		renderer->updateSize(width, height);
@@ -80,7 +80,6 @@ static void nativeUpdateSize(JNIEnv* env, jobject thiz, jlong nativeHandle, jint
 }
 
 static jobject nativeLockCanvas(JNIEnv* env, jobject thiz, jlong nativeHandle) {
-	//__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeLockCanvas");
 	if (nativeHandle != 0) {
 		SkStupidRenderer* renderer = reinterpret_cast<SkStupidRenderer*>(nativeHandle);
 		SkCanvas* skcanvas = renderer->lockCanvas();
@@ -96,7 +95,6 @@ static jobject nativeLockCanvas(JNIEnv* env, jobject thiz, jlong nativeHandle) {
 }
 
 static void nativeUnlockCanvasAndPost(JNIEnv* env, jobject thiz, jlong nativeHandle, jobject canvas) {
-	//__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeUnlockCanvas");
 	if (nativeHandle != 0) {
 		reinterpret_cast<SkStupidRenderer*>(nativeHandle)->unlockCanvasAndPost(nullptr);
 	}
