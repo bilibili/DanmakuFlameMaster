@@ -76,9 +76,10 @@ bool SkStupidRenderer::setupBackend(SkBackEndTypes backendType, int width, int h
 }
 
 bool SkStupidRenderer::teardownBackend() {
-	if (mSurface) {
-		mSurface->unref();
-		mSurface = nullptr;
+	if (mCanvas) {
+		//mSurface->unref();
+		//mSurface = nullptr;
+		delete mCanvas;
 		mCanvas = nullptr;
 	}
 
@@ -115,12 +116,13 @@ void SkStupidRenderer::windowSizeChanged() {
 		SkSafeUnref(mCurrentRenderTarget);
 		mCurrentRenderTarget = mCurrentContext->wrapBackendRenderTarget(desc);
 
-		if (mSurface) {
-			mSurface->unref();
-			//SkAutoTUnref<SkBaseDevice> gpuDevice(new SkGpuDevice(mCurrentContext, mCurrentRenderTarget));   // 5.0
-			//mCanvas = new SkCanvas(gpuDevice);
-			mSurface = SkSurface::NewRenderTargetDirect(mCurrentContext, mCurrentRenderTarget);  // 4.4.x
-			mCanvas = mSurface->getCanvas();
+		if (mCanvas) {
+			//mSurface->unref();
+			delete mCanvas;
+			SkAutoTUnref<SkBaseDevice> gpuDevice(new SkGpuDevice(mCurrentContext, mCurrentRenderTarget));   // 5.0
+			mCanvas = new SkCanvas(gpuDevice);
+			//mSurface = SkSurface::NewRenderTargetDirect(mCurrentContext, mCurrentRenderTarget);  // 4.4.x
+			//mCanvas = mSurface->getCanvas();
 		}
 	}
 }
@@ -137,16 +139,16 @@ void SkStupidRenderer::onSizeChange() {
 
 SkCanvas* SkStupidRenderer::lockCanvas() {
 	//pthread_mutex_lock(&this->mCanvasMutex);
-	if (mSurface == nullptr) {
+	if (mCanvas == nullptr) {
 		if (mCurrentContext) {
-			//SkAutoTUnref<SkBaseDevice> gpuDevice(new SkGpuDevice(mCurrentContext, mCurrentRenderTarget));   // 5.0
-			//mCanvas = new SkCanvas(gpuDevice);
-			mSurface = SkSurface::NewRenderTargetDirect(mCurrentContext, mCurrentRenderTarget);   // 4.4.x
+			SkAutoTUnref<SkBaseDevice> gpuDevice(new SkGpuDevice(mCurrentContext, mCurrentRenderTarget));   // 5.0
+			mCanvas = new SkCanvas(gpuDevice);
+			//mSurface = SkSurface::NewRenderTargetDirect(mCurrentContext, mCurrentRenderTarget);   // 4.4.x
 		}
 	}
-	if (mCanvas == nullptr) {
-		mCanvas = mSurface->getCanvas();
-	}
+	//if (mCanvas == nullptr) {
+	//	mCanvas = mSurface->getCanvas();
+	//}
 	return mCanvas;
 }
 

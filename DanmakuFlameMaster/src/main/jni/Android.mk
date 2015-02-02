@@ -33,6 +33,6 @@ LOCAL_SHARED_LIBRARYS := libndkbitmap
 LOCAL_MODULE    := DFMACC
 LOCAL_SRC_FILES := jni_entry.cpp skia_redirector_jni.cpp sk_stupid_renderer.cpp
 LOCAL_CPPFLAGS  := -std=c++11 -march=armv7-a -DHAVE_LITTLE_ENDIAN
-LOCAL_LDLIBS    := -L$(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/ -llog -lcutils.19 -lskia.19
+LOCAL_LDLIBS    := -L$(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/ -llog -lcutils.21 -lskia.21
 
 include $(BUILD_SHARED_LIBRARY)

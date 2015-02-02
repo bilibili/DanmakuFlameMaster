@@ -43,9 +43,15 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
     private boolean mDanmakuVisible = true;
     
     protected int mDrawingThreadType = THREAD_TYPE_NORMAL_PRIORITY;
+
+    private Object mDrawCondition = new Object();
+    
+    private boolean mDrawFinished = false;
+    
+    private long mLastRenderingTime = 0;
     
     public DanmakuStupidView(Context context) {
-        super(context, 0);
+        super(context, 4);
         init();
     }
 
@@ -218,13 +224,23 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
         if (!isShown())
             return -1;
         this.requestRender();
-        return 0;
+        
+        synchronized (mDrawCondition) {
+            while (!mDrawFinished) {
+                try {
+                    mDrawCondition.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            mDrawFinished = false;
+        }
+        return mLastRenderingTime;
     }
     
     @Override
     protected void onSkiaDraw(Canvas canvas) {
         long stime = System.currentTimeMillis();
-        @SuppressWarnings("unused")
         long dtime = 0;
         if (canvas != null) {
             if (mHandler != null) {
@@ -241,7 +257,11 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
             }
         }
         dtime = System.currentTimeMillis() - stime;
-        // TODO report drawing time?
+        synchronized (mDrawCondition) {
+            mLastRenderingTime = dtime;
+            mDrawFinished = true;
+            mDrawCondition.notifyAll();
+        }
     }
     
     @Override

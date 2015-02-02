@@ -58,7 +58,7 @@ public class SkStupidRenderer implements SkStupidView.Renderer {
 	    if (mCanvas == null) {
 	        mCanvas = nativeLockCanvas(mNativeHandle);
 	    }
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		//gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		mStupidView.onSkiaDraw(mCanvas);
 		nativeUnlockCanvasAndPost(mNativeHandle, mCanvas);
 	}

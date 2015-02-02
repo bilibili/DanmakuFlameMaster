@@ -21,10 +21,10 @@ int initSkiaRedirectorJni(JNIEnv* env) {
 	jclass clazz = env->FindClass("android/graphics/Canvas");
 	gSysCanvasClass = (jclass)env->NewGlobalRef(clazz);
 	env->DeleteLocalRef((jobject)clazz);
-	gSysCanvasCtorID = env->GetMethodID(gSysCanvasClass, "<init>", "(I)V");
+	gSysCanvasCtorID = env->GetMethodID(gSysCanvasClass, "<init>", "(J)V");
 
-	//void* pAndroidRuntimeLib = dlopen("libandroid_runtime.so", RTLD_NOW | RTLD_LOCAL);
-	//create_canvas = (rt_create_canvas_t)dlsym(pAndroidRuntimeLib, "_ZN7android6Canvas13create_canvasEP8SkCanvas");
+	void* pAndroidRuntimeLib = dlopen("libandroid_runtime.so", RTLD_NOW | RTLD_LOCAL);
+	create_canvas = (rt_create_canvas_t)dlsym(pAndroidRuntimeLib, "_ZN7android6Canvas13create_canvasEP8SkCanvas");
 
 	if (gSysCanvasCtorID != 0) {
 		SkGraphics::Init();
@@ -48,6 +48,7 @@ static jlong nativeInit(JNIEnv* env, jobject thiz, jint width, jint height, jint
 	SkStupidRenderer* renderer = new SkStupidRenderer(nullptr);
 	renderer->setupBackend(kNativeGL_BackEndType, width, height, msaaSampleCount);
 	return reinterpret_cast<jlong>(renderer);
+	__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeInit succeed!");
 }
 
 static void nativeTerm(JNIEnv* env, jobject thiz, jlong nativeHandle) {
@@ -84,9 +85,9 @@ static jobject nativeLockCanvas(JNIEnv* env, jobject thiz, jlong nativeHandle) {
 		SkStupidRenderer* renderer = reinterpret_cast<SkStupidRenderer*>(nativeHandle);
 		SkCanvas* skcanvas = renderer->lockCanvas();
 		if (renderer->javaCanvas == nullptr) {
-			//skcanvas->ref();
-			//void* pCanvasWrapper = create_canvas(skcanvas);
-			renderer->javaCanvas = env->NewObject(gSysCanvasClass, gSysCanvasCtorID, reinterpret_cast<jint>(skcanvas));
+			skcanvas->ref();
+			void* pCanvasWrapper = create_canvas(skcanvas);
+			renderer->javaCanvas = env->NewObject(gSysCanvasClass, gSysCanvasCtorID, reinterpret_cast<jlong>(pCanvasWrapper));
 			renderer->javaCanvas = env->NewGlobalRef(renderer->javaCanvas);
 		}
 		return renderer->javaCanvas;
