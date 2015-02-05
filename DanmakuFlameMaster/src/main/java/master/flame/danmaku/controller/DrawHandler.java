@@ -113,6 +113,10 @@ public class DrawHandler extends Handler {
 
     private boolean mInSeekingAction;
 
+    private long mRemainingTime;
+
+    private boolean mInSyncAction;
+
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
         mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
@@ -353,46 +357,35 @@ public class DrawHandler extends Handler {
     }
 
     private final long syncTimer(long startMS) {
-        if (mInSeekingAction) {
+        if (mInSeekingAction || mInSyncAction) {
             return 0;
         }
+        mInSyncAction = true;
         long d = 0;
         long time = startMS - mTimeBase;
         if (!mDanmakusVisible || mRenderingState.nothingRendered || mRenderingState.inWaitingState) {
             timer.update(time);
+            mRemainingTime = 0;
         } else {
             long gapTime = time - timer.currMillisecond;
             long averageTime = Math.max(mFrameUpdateRate, getAverageRenderingTime());
-            if (gapTime > 1000 || gapTime < -1000) {
-                d = averageTime;
-                timer.add(d);
-            } else if (mSkipFrames > 0
-                    || (mRenderingState != null && (gapTime > 120 || averageTime > mCordonTime || mRenderingState.consumingTime > 60))) {
-                d = Math.max(Math.min(mRenderingState.consumingTime, averageTime), gapTime / 4);
-                timer.add(d);
-                if (mSkipFrames <= 0) {
-                    mSkipFrames = 4;
-                } else {
-                    mSkipFrames--;
-                }
-            } else {
-                if (mRenderingState.consumingTime > mThresholdTime && averageTime < mThresholdTime) {
-                    d = mThresholdTime;
-                } else {
-                    d = Math.max(mFrameUpdateRate, averageTime + (gapTime / 15));
-                }
-                if (Math.abs(d - mLastDeltaTime) > 3) {
-                    d = mLastDeltaTime;
-                }
-                timer.add(d);
+            d = averageTime + gapTime / mFrameUpdateRate;
+            d = Math.max(mFrameUpdateRate, d);
+            d = Math.min(mCordonTime, d);
+            
+            long a = d - mLastDeltaTime;
+            if ((Math.abs(a) < 4)&& d > mFrameUpdateRate && mLastDeltaTime > mFrameUpdateRate) {
+                d = mLastDeltaTime;
             }
-            if(d >= mFrameUpdateRate && d <= mThresholdTime){
-                mLastDeltaTime = d;
-            }
+            mLastDeltaTime = d;
+            mRemainingTime = gapTime;
+            timer.add(d);
+//            Log.e("DrawHandler", "d:" + d  + "a:" + a + "RemaingTime:" + mRemainingTime + ",gapTime:" + gapTime);
         }
         if (mCallback != null) {
             mCallback.updateTimer(timer);
         }
+        mInSyncAction = false;
         return d;
     }
     
@@ -619,7 +612,7 @@ public class DrawHandler extends Handler {
 
     public long getCurrentTime() {
         if (quitFlag || !mRenderingState.inWaitingState) {
-            return timer.currMillisecond;
+            return timer.currMillisecond - mRemainingTime;
         }
         return System.currentTimeMillis() - mTimeBase;
     }

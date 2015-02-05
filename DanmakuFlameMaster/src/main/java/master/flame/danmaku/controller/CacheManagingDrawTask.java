@@ -56,7 +56,7 @@ public class CacheManagingDrawTask extends DrawTask {
         NativeBitmapFactory.loadLibs();
         mMaxCacheSize = maxCacheSize;
         if (NativeBitmapFactory.isInNativeAlloc()) {
-            mMaxCacheSize = maxCacheSize * 3;
+            mMaxCacheSize = maxCacheSize * 2;
         }
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
     }
@@ -544,8 +544,8 @@ public class CacheManagingDrawTask extends DrawTask {
                 BaseDanmaku last = danmakus.last();
                 long sleepTime = 0;
                 long deltaTime = first.time - mTimer.currMillisecond;
-                if (deltaTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
-                    sleepTime = 30 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
+                if (deltaTime > DanmakuFactory.MAX_DANMAKU_DURATION / 2) {
+                    sleepTime = 10 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
                     sleepTime = Math.min(100, sleepTime);
                 }
                 
