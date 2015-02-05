@@ -21,6 +21,7 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
@@ -99,7 +100,7 @@ public class DrawHandler extends Handler {
 
     private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
 
-    private Thread mThread;
+    private UpdateThread mThread;
 
     private final boolean mUpdateInNewThread;
 
@@ -190,6 +191,7 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case SEEK_POS:
+                quitFlag = true;
                 quitUpdateThread();
                 Long position = (Long) msg.obj;
                 long deltaMs = position - timer.currMillisecond;
@@ -279,7 +281,7 @@ public class DrawHandler extends Handler {
 
     private void quitUpdateThread() {
         if (mThread != null) {
-            mThread.interrupt();
+            mThread.quit();
             mThread = null;
         }
     }
@@ -319,37 +321,33 @@ public class DrawHandler extends Handler {
         if (mThread != null) {
             return;
         }
-        mThread = new Thread("DFM update") {
+        mThread = new UpdateThread("DFM update") {
             @Override
             public void run() {
-                try {
-                    long lastTime = System.currentTimeMillis();
-                    long dTime = 0;
-                    while (!isInterrupted() && !quitFlag) {
-                        long startMS = System.currentTimeMillis();
-                        dTime = System.currentTimeMillis() - lastTime;
-                        if (dTime < mFrameUpdateRate) {
-                            continue;
-                        }
-                        lastTime = startMS;
-                        long d = syncTimer(startMS);
-                        if (d < 0) {
-                            Thread.sleep(60 - d);
-                            continue;
-                        }
-                        d = mDanmakuView.drawDanmakus();
-                        if (!mDanmakusVisible) {
-                            waitRendering(INDEFINITE_TIME);
-                        } else if (mRenderingState.nothingRendered) {
-                            dTime = mRenderingState.endTime - timer.currMillisecond;
-                            if (dTime > 500) {
-                                notifyRendering();
-                                waitRendering(dTime - 400);
-                            }
+                long lastTime = System.currentTimeMillis();
+                long dTime = 0;
+                while (!isQuited() && !quitFlag) {
+                    long startMS = System.currentTimeMillis();
+                    dTime = System.currentTimeMillis() - lastTime;
+                    if (dTime < mFrameUpdateRate) {
+                        continue;
+                    }
+                    lastTime = startMS;
+                    long d = syncTimer(startMS);
+                    if (d < 0) {
+                        SystemClock.sleep(60 - d);
+                        continue;
+                    }
+                    d = mDanmakuView.drawDanmakus();
+                    if (!mDanmakusVisible) {
+                        waitRendering(INDEFINITE_TIME);
+                    } else if (mRenderingState.nothingRendered) {
+                        dTime = mRenderingState.endTime - timer.currMillisecond;
+                        if (dTime > 500) {
+                            notifyRendering();
+                            waitRendering(dTime - 400);
                         }
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         };
