@@ -156,6 +156,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
 
     }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
+            mDanmakuView.pause();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
+            mDanmakuView.resume();
+        }
+    }
 
     @Override
     protected void onDestroy() {

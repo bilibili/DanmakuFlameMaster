@@ -298,6 +298,14 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
             restart();
         }
     }
+    
+    @Override
+    public boolean isPaused() {
+        if(handler != null) {
+            return handler.isStop();
+        }
+        return false;
+    }
 
     public void restart() {
         stop();

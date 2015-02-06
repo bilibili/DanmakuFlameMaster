@@ -289,6 +289,14 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
             restart();
         }
     }
+    
+    @Override
+    public boolean isPaused() {
+        if(handler != null) {
+            return handler.isStop();
+        }
+        return false;
+    }
 
     public void restart() {
         stop();

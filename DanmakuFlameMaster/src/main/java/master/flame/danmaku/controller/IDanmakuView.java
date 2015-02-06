@@ -17,6 +17,8 @@ public interface IDanmakuView {
     
 
     public boolean isPrepared();
+    
+    public boolean isPaused();
 
     public boolean isViewReady();
 
