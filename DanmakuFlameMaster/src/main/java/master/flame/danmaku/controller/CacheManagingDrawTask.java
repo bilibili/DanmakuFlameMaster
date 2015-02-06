@@ -49,6 +49,8 @@ public class CacheManagingDrawTask extends DrawTask {
     private CacheManager mCacheManager;
 
     private DanmakuTimer mCacheTimer;
+    
+    private final Object mDrawingNotify = new Object();
 
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener, int maxCacheSize) {
@@ -80,6 +82,9 @@ public class CacheManagingDrawTask extends DrawTask {
         RenderingState result = null;
         synchronized (danmakuList) {
             result = super.draw(displayer);
+        }
+        synchronized(mDrawingNotify){
+            mDrawingNotify.notify();
         }
         return result;
     }
@@ -595,6 +600,16 @@ public class CacheManagingDrawTask extends DrawTask {
                             currScreenIndex = screenIndex;
                         }
                     }
+                    
+                    if (!repositioned && sleepTime > 0) {
+                        try {
+                            synchronized (mDrawingNotify) {
+                                mDrawingNotify.wait(sleepTime);
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
                     // build cache
                     buildSuccess = buildCache(item);
@@ -610,9 +625,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             break;
                         }
                     }
-                    if(sleepTime > 0) {
-                        SystemClock.sleep(sleepTime);
-                    }
+                    
                 }
                 consumingTime = System.currentTimeMillis() - startTime;
                 if (item != null) {
