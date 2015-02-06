@@ -252,8 +252,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
                         mDrawTimes = new LinkedList<Long>();
                     dtime = System.currentTimeMillis() - stime;
                     String fps = String.format(Locale.getDefault(),
-                            "fps %.2f,time:%d s,cache:%d,miss:%d", fps(),
-                            handler.getCurrentTime() / 1000, rs.cacheHitCount, rs.cacheMissCount);
+                            "fps %.2f,time:%d s,cache:%d,miss:%d", fps(), getCurrentTime() / 1000,
+                            rs.cacheHitCount, rs.cacheMissCount);
                     DrawHelper.drawFPS(canvas, fps);
                 }
             }
