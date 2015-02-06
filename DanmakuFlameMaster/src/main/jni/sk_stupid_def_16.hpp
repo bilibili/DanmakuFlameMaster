@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-#ifndef _SKIA_REDIRECTOR_JNI_HPP
-#define _SKIA_REDIRECTOR_JNI_HPP
+#ifndef _SK_STUPID_DEF_16_HPP
+#define _SK_STUPID_DEF_16_HPP
 
-#include <jni.h>
 
-int initSkiaRedirectorJni(JNIEnv* env);
-int termSkiaRedirectorJni();
 
-int registerSkiaRedirectorMethods(JNIEnv* env, const char* className);
 
-#endif // _SKIA_REDIRECTOR_JNI_HPP
+#endif // _SK_STUPID_DEF_16_HPP

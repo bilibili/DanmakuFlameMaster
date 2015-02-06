@@ -17,92 +17,91 @@ import android.util.Log;
 public class SkStupidView extends GLSurfaceView {
 
     public static final String TAG = "SkStupidView";
-	private final SkStupidRenderer mSkiaRenderer;
-	private int mRequestedMSAASampleCount;
-	private Callback mCallback;
-	
-	static {
-		try {
-			System.loadLibrary("skia");
-			System.loadLibrary("DFMACC");
-		} catch (UnsatisfiedLinkError e) {
-			throw e;
-		}
-	}
-	
-	public SkStupidView(Context context, int msaaSampleCount) {
-		super(context);
-		
-		mSkiaRenderer = new SkStupidRenderer(this);
-		mRequestedMSAASampleCount = msaaSampleCount;
-		
-		setEGLContextClientVersion(2);
-		//if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			setEGLConfigChooser(8, 8, 8, 8, 0, 8);
-		//} else {
-		//	setEGLConfigChooser(new SkStupidViewEGLConfigChooser());
-		//}
-		
-		setRenderer(mSkiaRenderer);
-		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-	}
+    private final SkStupidRenderer mSkiaRenderer;
+    private int mRequestedMSAASampleCount;
+    private Callback mCallback;
+    
+    static {
+        try {
+            System.loadLibrary("DFMACC");
+        } catch (UnsatisfiedLinkError e) {
+            throw e;
+        }
+    }
+    
+    public SkStupidView(Context context, int msaaSampleCount) {
+        super(context);
+        
+        mSkiaRenderer = new SkStupidRenderer(this);
+        mRequestedMSAASampleCount = msaaSampleCount;
+        
+        setEGLContextClientVersion(2);
+        //if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            setEGLConfigChooser(8, 8, 8, 8, 0, 8);
+        //} else {
+        //    setEGLConfigChooser(new SkStupidViewEGLConfigChooser());
+        //}
+        
+        setRenderer(mSkiaRenderer);
+        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+    }
 
     /**
      * Implement this to do your drawing.
      * You cannot directly call this method or it may cause undefined exception.
      * @param canvas the canvas to be drawn with HW-accelerated Skia backend.
      */
-	protected void onSkiaDraw(Canvas canvas) {
-	}
-	
-	@Override
-	public boolean isHardwareAccelerated() {
-		return mSkiaRenderer.isHardwareAccelerated();
-	}
-	
-	public void terminate() {
-		queueEvent(new Runnable() {			
-			@Override
-			public void run() {
-				mSkiaRenderer.terminate();
-			}
-		});
-	}
-	
-	public interface Callback {
-	    // Will be called immediately after Skia backend created.
-	    public void onBackendCreated();
-	    // Will be called immediately after rebuilt render-target for new size.
-	    public void onBackendChanged(int width, int height);
-	    // Will be called immediately after Skia backend teardowned.
-	    public void onBackendDestroyed();
-	}
-	
-	public void setCallback(Callback callback) {
-	    mCallback = callback;
-	}
+    protected void onSkiaDraw(Canvas canvas) {
+    }
+    
+    @Override
+    public boolean isHardwareAccelerated() {
+        return true;
+    }
+    
+    public void terminate() {
+        queueEvent(new Runnable() {            
+            @Override
+            public void run() {
+                mSkiaRenderer.terminate();
+            }
+        });
+    }
+    
+    public interface Callback {
+        // Will be called immediately after Skia backend created.
+        public void onBackendCreated();
+        // Will be called immediately after rebuilt render-target for new size.
+        public void onBackendChanged(int width, int height);
+        // Will be called immediately after Skia backend teardowned.
+        public void onBackendDestroyed();
+    }
+    
+    public void setCallback(Callback callback) {
+        mCallback = callback;
+    }
 
-	protected void backendCreated() {
-	    if (mCallback != null) {
-	        mCallback.onBackendCreated();
-	    }
-	}
-	
-	protected void backendChanged(int width, int height) {
+    protected void backendCreated() {
+        if (mCallback != null) {
+            mCallback.onBackendCreated();
+        }
+    }
+    
+    protected void backendChanged(int width, int height) {
         if (mCallback != null) {
             mCallback.onBackendChanged(width, height);
         }
     }
-	
-	protected void backendDestroyed() {
-	    if (mCallback != null) {
-	        mCallback.onBackendDestroyed();
-	    }
-	}
-	
-	private class SkStupidViewEGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
-		@Override
-		public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
+    
+    protected void backendDestroyed() {
+        if (mCallback != null) {
+            mCallback.onBackendDestroyed();
+        }
+    }
+    
+    private class SkStupidViewEGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
+        @Override
+        public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
             int numConfigs = 0;
             int[] configSpec = null;
             int[] value = new int[1];
@@ -121,7 +120,7 @@ public class SkStupidView extends GLSurfaceView {
                 // spec if we are attempting to get access to the OpenGL APIs.
                 int renderableType = EGL14.EGL_OPENGL_BIT;
                 if (currentAPI == EGL14.EGL_OPENGL_API) {
-                	renderableType = EGL14.EGL_OPENGL_ES2_BIT;
+                    renderableType = EGL14.EGL_OPENGL_ES2_BIT;
                 }
 
                 if (mRequestedMSAASampleCount > 0) {
@@ -163,7 +162,7 @@ public class SkStupidView extends GLSurfaceView {
                     Log.i("Skia", "spec: " + configSpec);
 
                     if (!egl.eglChooseConfig(display, configSpec, null, 0, value)) {
-                    	Log.i("Skia", "Could not get non-MSAA context count");
+                        Log.i("Skia", "Could not get non-MSAA context count");
                     }
                     numConfigs = value[0];
                 }
@@ -191,8 +190,8 @@ public class SkStupidView extends GLSurfaceView {
             }
 
             throw new IllegalArgumentException("Could not find suitable EGL config");
-		}
-		
+        }
+        
         private int findConfigAttrib(EGL10 egl, EGLDisplay display, EGLConfig config, int attribute, int defaultValue) {
             int[] value = new int[1];
             if (egl.eglGetConfigAttrib(display, config, attribute, value)) {
@@ -200,7 +199,7 @@ public class SkStupidView extends GLSurfaceView {
             }
             return defaultValue;
         }
-		
-	}
-	
+        
+    }
+    
 }

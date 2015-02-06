@@ -1,117 +1,158 @@
+/*
+ * Copyright (C) 2015 zheng qian <xqq@0ginr.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include <jni.h>
-#include <dlfcn.h>
 #include <android/log.h>
-#include <SkGraphics.h>
-#include <SkCanvas.h>
-#include "sk_stupid_renderer.hpp"
+#include "version_utils.hpp"
+#include "sk_stupid_common_def.hpp"
+#include "sk_stupid_renderer_base.hpp"
+#include "sk_stupid_renderer_16.hpp"
+#include "sk_stupid_renderer_18.hpp"
+#include "sk_stupid_injector.hpp"
 #include "skia_redirector_jni.hpp"
 
 #ifndef NELEM
-	#define NELEM(x) ((int)(sizeof(x) / sizeof((x)[0])))
+    #define NELEM(x) ((int)(sizeof(x) / sizeof((x)[0])))
 #endif
 
-typedef void* (*rt_create_canvas_t)(SkCanvas* skcanvas);
+static const int minSdkVersion = 18;
+static const int maxSdkVersion = 21;
+static bool isDeviceSupported = false;
 
-static jclass    gSysCanvasClass = nullptr;
-static jmethodID gSysCanvasCtorID = nullptr;
-
-rt_create_canvas_t create_canvas = nullptr;
+static bool testIsDeviceSupported();
 
 int initSkiaRedirectorJni(JNIEnv* env) {
-	jclass clazz = env->FindClass("android/graphics/Canvas");
-	gSysCanvasClass = (jclass)env->NewGlobalRef(clazz);
-	env->DeleteLocalRef((jobject)clazz);
-	gSysCanvasCtorID = env->GetMethodID(gSysCanvasClass, "<init>", "(J)V");
-
-	void* pAndroidRuntimeLib = dlopen("libandroid_runtime.so", RTLD_NOW | RTLD_LOCAL);
-	create_canvas = (rt_create_canvas_t)dlsym(pAndroidRuntimeLib, "_ZN7android6Canvas13create_canvasEP8SkCanvas");
-
-	if (gSysCanvasCtorID != 0) {
-		SkGraphics::Init();
-		return 0;
-	} else {
-		return -1;
-	}
+    isDeviceSupported = testIsDeviceSupported();
+    return 0;
 }
 
 int termSkiaRedirectorJni() {
-	SkGraphics::Term();
-	return 0;
+    return 0;
+}
+
+static bool testIsDeviceSupported() {
+    int apiLevel = getDeviceApiLevel();
+    if (apiLevel >= minSdkVersion && apiLevel <= maxSdkVersion) {
+        SkStupidRendererBase* testRenderer = nullptr;
+
+        if (SkStupidRenderer_18::supportApi(apiLevel)) {
+            testRenderer = new SkStupidRenderer_18(nullptr);
+        } else if (false) {
+
+        } else {
+            return false;
+        }
+
+        bool support = testRenderer->isDeviceSupported();
+        delete testRenderer;
+        return support;
+    }
+    return false;
+}
+
+static SkStupidRendererBase* createCompatibleRenderer() {
+    if (isDeviceSupported == false) {
+        return nullptr;
+    }
+
+    int apiLevel = getDeviceApiLevel();
+    if (SkStupidRenderer_18::supportApi(apiLevel)) {
+        return new SkStupidRenderer_18(nullptr);
+    } else if (false) {
+
+    }
+
+    return nullptr;
 }
 
 static jboolean nativeIsSupported(JNIEnv* env, jclass clazz) {
-	return true; // TODO
+    return static_cast<jboolean>(isDeviceSupported);
 }
 
 static jlong nativeInit(JNIEnv* env, jobject thiz, jint width, jint height, jint msaaSampleCount) {
-	__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeInit");
-	SkStupidRenderer* renderer = new SkStupidRenderer(nullptr);
-	renderer->setupBackend(kNativeGL_BackEndType, width, height, msaaSampleCount);
-	return reinterpret_cast<jlong>(renderer);
-	__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeInit succeed!");
+    __android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeInit");
+
+    if (isDeviceSupported == false) {
+        return 0;
+    }
+
+    SkStupidRendererBase* renderer = createCompatibleRenderer();
+    SkStupidInjector* injector = new SkStupidInjector(env);
+    if (renderer->isDeviceSupported() == false || injector->isDeviceSupported() == false) {
+        injector->dispose(env);
+        delete injector;
+        delete renderer;
+        return 0;
+    }
+
+    renderer->setExtraData(injector);
+    renderer->setupBackend(width, height, msaaSampleCount);
+    return reinterpret_cast<jlong>(renderer);
 }
 
 static void nativeTerm(JNIEnv* env, jobject thiz, jlong nativeHandle) {
-	__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeTerm");
-	if (nativeHandle != 0) {
-		SkStupidRenderer* renderer = reinterpret_cast<SkStupidRenderer*>(nativeHandle);
-		renderer->teardownBackend();
-		delete renderer;
-		__android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeTerm succeed!");
-	}
-}
+    __android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeTerm");
 
-static jboolean nativeIsHardwareAccelerated(JNIEnv* env, jobject thiz, jlong nativeHandle) {
-	if (nativeHandle != 0) {
-		return reinterpret_cast<SkStupidRenderer*>(nativeHandle)->isHardwareAccelerated();
-	} else {
-		return static_cast<jboolean>(false);
-	}
+    if (nativeHandle != 0) {
+        SkStupidRendererBase* renderer = reinterpret_cast<SkStupidRendererBase*>(nativeHandle);
+        SkStupidInjector* injector = reinterpret_cast<SkStupidInjector*>(renderer->getExtraData());
+        renderer->teardownBackend();
+        injector->dispose(env);
+        delete injector;
+        delete renderer;
+    }
 }
 
 static void nativeUpdateSize(JNIEnv* env, jobject thiz, jlong nativeHandle, jint width, jint height) {
-	if (nativeHandle != 0) {
-		SkStupidRenderer* renderer = reinterpret_cast<SkStupidRenderer*>(nativeHandle);
-		renderer->updateSize(width, height);
-		if (renderer->javaCanvas) {
-			env->DeleteGlobalRef(renderer->javaCanvas);
-			renderer->javaCanvas = nullptr;
-		}
-	}
+    __android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeUpdateSize");
+
+    if (nativeHandle != 0) {
+        SkStupidRendererBase* renderer = reinterpret_cast<SkStupidRendererBase*>(nativeHandle);
+        renderer->updateSize(width, height);
+    }
 }
 
 static jobject nativeLockCanvas(JNIEnv* env, jobject thiz, jlong nativeHandle) {
-	if (nativeHandle != 0) {
-		SkStupidRenderer* renderer = reinterpret_cast<SkStupidRenderer*>(nativeHandle);
-		SkCanvas* skcanvas = renderer->lockCanvas();
-		if (renderer->javaCanvas == nullptr) {
-			skcanvas->ref();
-			void* pCanvasWrapper = create_canvas(skcanvas);
-			renderer->javaCanvas = env->NewObject(gSysCanvasClass, gSysCanvasCtorID, reinterpret_cast<jlong>(pCanvasWrapper));
-			renderer->javaCanvas = env->NewGlobalRef(renderer->javaCanvas);
-		}
-		return renderer->javaCanvas;
-	}
-	return nullptr;
+    if (nativeHandle != 0) {
+        SkStupidRendererBase* renderer = reinterpret_cast<SkStupidRendererBase*>(nativeHandle);
+        SkStupidInjector* injector = reinterpret_cast<SkStupidInjector*>(renderer->getExtraData());
+        if (injector) {
+            jobject javaCanvas = injector->getJavaCanvas(env, renderer->lockCanvas());
+            return javaCanvas;
+        }
+    }
+    return nullptr;
 }
 
 static void nativeUnlockCanvasAndPost(JNIEnv* env, jobject thiz, jlong nativeHandle, jobject canvas) {
-	if (nativeHandle != 0) {
-		reinterpret_cast<SkStupidRenderer*>(nativeHandle)->unlockCanvasAndPost(nullptr);
-	}
+    if (nativeHandle != 0) {
+        reinterpret_cast<SkStupidRendererBase*>(nativeHandle)->unlockCanvasAndPost(nullptr);
+    }
 }
 
 static JNINativeMethod gMethods[] = {
-	{"nativeIsSupported", "()Z", (void*)nativeIsSupported},
+    {"nativeIsSupported", "()Z", (void*)nativeIsSupported},
     {"nativeInit", "(III)J", (void*)nativeInit},
     {"nativeTerm", "(J)V", (void*)nativeTerm},
-    {"nativeIsHardwareAccelerated", "(J)Z", (void*)nativeIsHardwareAccelerated},
     {"nativeUpdateSize", "(JII)V", (void*)nativeUpdateSize},
     {"nativeLockCanvas", "(J)Landroid/graphics/Canvas;", (void*)nativeLockCanvas},
     {"nativeUnlockCanvasAndPost", "(JLandroid/graphics/Canvas;)V", (void*)nativeUnlockCanvasAndPost}
 };
 
 int registerSkiaRedirectorMethods(JNIEnv* env, const char* className) {
-	jclass clazz = env->FindClass(className);
-	return env->RegisterNatives(clazz, gMethods, NELEM(gMethods));
+    jclass clazz = env->FindClass(className);
+    return env->RegisterNatives(clazz, gMethods, NELEM(gMethods));
 }

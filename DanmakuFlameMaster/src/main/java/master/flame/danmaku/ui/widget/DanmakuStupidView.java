@@ -172,7 +172,7 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
                 priority = android.os.Process.THREAD_PRIORITY_DEFAULT;
                 break;
         }
-        String threadName = "DFM stupid drawing thread #" + priority;
+        String threadName = "DFM Stupid Drawing-Thread #" + priority;
         mDrawThread = new HandlerThread(threadName, priority);
         mDrawThread.start();
         return mDrawThread.getLooper();

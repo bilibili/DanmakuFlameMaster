@@ -14,14 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef _SKIA_REDIRECTOR_JNI_HPP
-#define _SKIA_REDIRECTOR_JNI_HPP
+#ifndef _SK_STUPID_COMMON_DEF_HPP
+#define _SK_STUPID_COMMON_DEF_HPP
 
-#include <jni.h>
+#include "sk_refcnt.hpp"
 
-int initSkiaRedirectorJni(JNIEnv* env);
-int termSkiaRedirectorJni();
+class SkSurface_t: public SkRefCnt_t {
+    // nothing needed here
+};
 
-int registerSkiaRedirectorMethods(JNIEnv* env, const char* className);
+class SkCanvas_t : public SkRefCnt_t {
+    // nothing needed here
+};
 
-#endif // _SKIA_REDIRECTOR_JNI_HPP
+class GrContext_t : public SkRefCnt_t {
+    // nothing needed here
+};
+
+struct GrGLInterface_t : public SkRefCnt_t {
+    // nothing needed here
+};
+
+class GrRenderTarget_t : public SkRefCnt_t {
+    // nothing needed here
+};
+
+class SkGpuDevice_t : public SkRefCnt_t {
+    // nothing needed here
+};
+
+#endif // _SK_STUPID_COMMON_DEF_HPP
