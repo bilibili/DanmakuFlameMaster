@@ -119,6 +119,7 @@ static const char* symbol_GrRenderTarget_Dtor_21_later = "_ZN11GrGpuObjectD1Ev";
 
 static const char* symbol_SkGpuDevice_Ctor = "_ZN11SkGpuDeviceC1EP9GrContextP14GrRenderTarget";  // use C1 ctor
 static const char* symbol_SkGpuDevice_Dtor = "_ZN11SkGpuDeviceD1Ev";                             // use D1 dtor
+static const char* symbol_SkGpuDevice_Ctor_21_later = "_ZN11SkGpuDeviceC1EP9GrContextP14GrRenderTargetj"; // 5.0+, also use C1
 
 static const char* symbol_SkCanvas_Ctor = "_ZN8SkCanvasC1EP8SkDevice";
 static const char* symbol_SkCanvas_Dtor = "_ZN8SkCanvasD1Ev";

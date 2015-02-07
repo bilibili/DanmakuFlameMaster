@@ -38,7 +38,6 @@ bool SkStupidRenderer_18::supportApi(int api) {
 SkStupidRenderer_18::SkStupidRenderer_18(void* nativeHandle) {
     mApiLevel = getDeviceApiLevel();
     mAndroidVersion = getDeviceAndroidVersion();
-    __android_log_print(ANDROID_LOG_DEBUG, "SkStupidRenderer", "attempt to loadSymbols, %d", mApiLevel);
     loadSymbols();__android_log_print(ANDROID_LOG_DEBUG, "SkStupidRenderer", "loadSymbols() succeed! %d, %d", mSymbolsLoaded, mSymbolsComplete);
     pthread_mutex_init(&this->mCanvasMutex, nullptr);
 }
@@ -85,13 +84,14 @@ void SkStupidRenderer_18::loadSymbols() {
 
     if (mApiLevel >= 21) {
         GrRenderTarget_Symbol.Dtor = (Func_GrRenderTarget_Dtor)dlsym(mLibraryHandle, symbol_GrRenderTarget_Dtor_21_later);
+        SkGpuDevice_Symbol.Ctor = (Func_SkGpuDeviceCtor)dlsym(mLibraryHandle, symbol_SkGpuDevice_Ctor_21_later);
     } else {
         GrRenderTarget_Symbol.Dtor = (Func_GrRenderTarget_Dtor)dlsym(mLibraryHandle, symbol_GrRenderTarget_Dtor);
+        SkGpuDevice_Symbol.Ctor = (Func_SkGpuDeviceCtor)dlsym(mLibraryHandle, symbol_SkGpuDevice_Ctor);
     }
 
-    SkGpuDevice_Symbol.Ctor = (Func_SkGpuDeviceCtor)dlsym(mLibraryHandle, symbol_SkGpuDevice_Ctor);
     SkGpuDevice_Symbol.Dtor = (Func_SkGpuDeviceDtor)dlsym(mLibraryHandle, symbol_SkGpuDevice_Dtor);
-    __android_log_print(ANDROID_LOG_DEBUG, "SkStupidRenderer", "Android version: %d, %d, %d", mAndroidVersion.major, mAndroidVersion.minor, mAndroidVersion.revision);
+    __android_log_print(ANDROID_LOG_DEBUG, "SkStupidRenderer_18", "Android version: %d.%d.%d", mAndroidVersion.major, mAndroidVersion.minor, mAndroidVersion.revision);
     if ((mAndroidVersion.major == 4 && mAndroidVersion.minor == 4 && mAndroidVersion.revision >= 3)
         || (mAndroidVersion.major >= 5)) {
         SkCanvas_Symbol.Ctor = (Func_SkCanvasCtor)dlsym(mLibraryHandle, symbol_SkCanvas_Ctor_19_2_later);
@@ -106,6 +106,10 @@ void SkStupidRenderer_18::loadSymbols() {
 }
 
 bool SkStupidRenderer_18::checkSymbols() {
+    __android_log_print(ANDROID_LOG_DEBUG, "SymbolCheck", "Symbols: %p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p",
+            GrGLInterface_Symbol.GrGLCreateNativeInterface,
+            GrContext_Symbol.Create, GrContext_Symbol.contextDestroyed, GrContext_Symbol.wrapBackendRenderTarget, GrContext_Symbol.flush, GrContext_Symbol.Dtor,
+            GrRenderTarget_Symbol.Dtor, SkGpuDevice_Symbol.Ctor, SkGpuDevice_Symbol.Dtor, SkCanvas_Symbol.Ctor, SkCanvas_Symbol.Dtor);
     if (mSymbolsLoaded) {
         if (GrGLInterface_Symbol.GrGLCreateNativeInterface &&
             GrContext_Symbol.Create &&
@@ -146,13 +150,12 @@ bool SkStupidRenderer_18::setupBackend(int width, int height, int msaaSampleCoun
 
     GrGLInterface_t* glInterface = GrGLInterface_Symbol.GrGLCreateNativeInterface();
     mCurrentInterface = glInterface;
-    glInterface->unref();
 
     mCurrentContext = GrContext_Symbol.Create(GrBackend_t::kOpenGL_GrBackend, (GrBackendContext_t)mCurrentInterface);
 
     if (mCurrentContext == nullptr || mCurrentInterface == nullptr) {
         __android_log_print(ANDROID_LOG_ERROR, "SkStupidRenderer_18",
-                "SkStupidRenderer_18::setupBackend(): Fail to setup GrContext/GrGLInterface, %d, %d", mCurrentContext, mCurrentInterface);
+                "SkStupidRenderer_18::setupBackend(): Fail to setup GrContext/GrGLInterface: %p, %p", mCurrentContext, mCurrentInterface);
         Sk_SafeUnref(mCurrentContext, (void*)GrContext_Symbol.Dtor);
         Sk_SafeUnref(mCurrentInterface);
         mCurrentContext = nullptr;

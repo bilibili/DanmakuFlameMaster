@@ -141,7 +141,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             });
             mDanmakuView.prepare(mParser);
 
-            //mDanmakuView.showFPS(true);
+            mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
             ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
 

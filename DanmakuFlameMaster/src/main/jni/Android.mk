@@ -22,7 +22,7 @@ LOCAL_SRC_FILES := jni_entry.cpp \
                    sk_stupid_renderer_18.cpp \
                    sk_stupid_injector.cpp
 
-LOCAL_CPPFLAGS  := -std=c++11 -march=armv7-a
-LOCAL_LDLIBS    := -L$(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/ -llog -lGLESv2 #-lcutils.19 -lskia.19
+LOCAL_CPPFLAGS  := -std=c++11 -O2 -Wall -march=armv7-a
+LOCAL_LDLIBS    := -llog -lGLESv2
 
 include $(BUILD_SHARED_LIBRARY)

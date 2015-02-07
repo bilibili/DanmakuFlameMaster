@@ -51,7 +51,7 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
     private long mLastRenderingTime = 0;
     
     public DanmakuStupidView(Context context) {
-        super(context, 4);
+        super(context, 0);
         init();
     }
 
