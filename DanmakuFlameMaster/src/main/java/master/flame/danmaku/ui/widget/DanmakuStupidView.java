@@ -145,8 +145,8 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
     
     @Override
     public void release() {
-        DanmakuFilters.getDefault().clear();
         stop();
+        DanmakuFilters.getDefault().clear();
         if (mDrawTimes != null) {
             mDrawTimes.clear();
         }        
