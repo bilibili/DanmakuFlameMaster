@@ -1,23 +1,39 @@
 /*
- * @author: zheng qian <xqq@0ginr.com>
+ * Copyright (C) 2015 zheng qian <xqq@0ginr.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package master.flame.danmaku.ui.SkiaRedirector;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
+import android.util.AttributeSet;
 import android.util.Log;
 
 public class SkStupidView extends GLSurfaceView {
 
     public static final String TAG = "SkStupidView";
-    private final SkStupidRenderer mSkiaRenderer;
+    private static final boolean mDeviceSupported;
+    private SkStupidRenderer mSkiaRenderer;
     private int mRequestedMSAASampleCount;
     private Callback mCallback;
     
@@ -27,11 +43,20 @@ public class SkStupidView extends GLSurfaceView {
         } catch (UnsatisfiedLinkError e) {
             throw e;
         }
+        mDeviceSupported = SkStupidRenderer.isDeviceSupported();
     }
     
     public SkStupidView(Context context, int msaaSampleCount) {
         super(context);
-        
+        init(msaaSampleCount);
+    }
+    
+    public SkStupidView(Context context, AttributeSet attrs, int msaaSampleCount) {
+        super(context, attrs);
+        init(msaaSampleCount);
+    }
+    
+    private void init(int msaaSampleCount) {
         mSkiaRenderer = new SkStupidRenderer(this);
         mRequestedMSAASampleCount = msaaSampleCount;
         
@@ -54,6 +79,26 @@ public class SkStupidView extends GLSurfaceView {
     protected void onSkiaDraw(Canvas canvas) {
     }
     
+    // must be called inner GLThread, e.g. use queueEvent()
+    public Canvas lockCanvas() {
+        if (mSkiaRenderer != null) {
+            return mSkiaRenderer.lockCanvas();
+        } else {
+            return null;
+        }
+    }
+    
+    // must be called inner GLThread, e.g. use queueEvent()
+    public void unlockCanvasAndPost(Canvas canvas) {
+        if (mSkiaRenderer != null) {
+            mSkiaRenderer.unlockCanvasAndPost(canvas);   
+        }
+    }
+    
+    public static boolean isDeviceSupported() {
+        return mDeviceSupported;
+    }
+    
     @Override
     public boolean isHardwareAccelerated() {
         return true;
@@ -63,7 +108,9 @@ public class SkStupidView extends GLSurfaceView {
         queueEvent(new Runnable() {            
             @Override
             public void run() {
-                mSkiaRenderer.terminate();
+                if (mSkiaRenderer != null) {
+                    mSkiaRenderer.terminate();
+                }
             }
         });
     }
@@ -99,6 +146,7 @@ public class SkStupidView extends GLSurfaceView {
         }
     }
     
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private class SkStupidViewEGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
         @Override
         public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {

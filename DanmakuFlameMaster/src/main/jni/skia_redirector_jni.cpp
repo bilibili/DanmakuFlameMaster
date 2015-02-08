@@ -48,10 +48,10 @@ static bool testIsDeviceSupported() {
     if (apiLevel >= minSdkVersion && apiLevel <= maxSdkVersion) {
         SkStupidRendererBase* testRenderer = nullptr;
 
-        if (SkStupidRenderer_18::supportApi(apiLevel)) {
+        if (false/*SkStupidRenderer_16::supportApi(apiLevel)*/) {
+            //testRenderer = new SkStupidRenderer_16(nullptr);
+        } else if (SkStupidRenderer_18::supportApi(apiLevel)) {
             testRenderer = new SkStupidRenderer_18(nullptr);
-        } else if (false) {
-
         } else {
             return false;
         }
@@ -69,10 +69,10 @@ static SkStupidRendererBase* createCompatibleRenderer() {
     }
 
     int apiLevel = getDeviceApiLevel();
-    if (SkStupidRenderer_18::supportApi(apiLevel)) {
+    if (false/*SkStupidRenderer_16::supportApi(apiLevel)*/) {
+        //return new SkStupidRenderer_16(nullptr);
+    } else if (SkStupidRenderer_18::supportApi(apiLevel)) {
         return new SkStupidRenderer_18(nullptr);
-    } else if (false) {
-
     }
 
     return nullptr;
@@ -113,6 +113,7 @@ static void nativeTerm(JNIEnv* env, jobject thiz, jlong nativeHandle) {
         injector->dispose(env);
         delete injector;
         delete renderer;
+        __android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "Cleanup succeed!");
     }
 }
 

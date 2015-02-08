@@ -36,7 +36,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved) {
     assert(env != nullptr);
 
     initSkiaRedirectorJni(env);
-    __android_log_print(ANDROID_LOG_DEBUG, "libDFMACC.so", "initSkiaRedirectorJni succeed");
     registerSkiaRedirectorMethods(env, "master/flame/danmaku/ui/SkiaRedirector/SkStupidRenderer");
 
     return jniVersion;

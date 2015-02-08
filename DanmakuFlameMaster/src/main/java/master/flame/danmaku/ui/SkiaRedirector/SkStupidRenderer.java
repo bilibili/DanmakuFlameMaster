@@ -1,8 +1,23 @@
 /*
- * @author: zheng qian <xqq@0ginr.com>
+ * Copyright (C) 2015 zheng qian <xqq@0ginr.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package master.flame.danmaku.ui.SkiaRedirector;
 
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
@@ -63,6 +78,19 @@ public class SkStupidRenderer implements SkStupidView.Renderer {
         nativeUnlockCanvasAndPost(mNativeHandle, mCanvas);
     }
 
+    // must be called inner GLThread, e.g. use queueEvent()
+    protected Canvas lockCanvas() {
+        return nativeLockCanvas(mNativeHandle);
+    }
+    
+    // must be called inner GLThread, e.g. use queueEvent()
+    protected void unlockCanvasAndPost(Canvas canvas) {
+        nativeUnlockCanvasAndPost(mNativeHandle, canvas);
+        EGL10 egl = (EGL10) EGLContext.getEGL();
+        egl.eglSwapBuffers(egl.eglGetCurrentDisplay(), egl.eglGetCurrentSurface(EGL10.EGL_DRAW));
+    }
+    
+    // must be called inner GLThread, e.g. use queueEvent()
     protected void terminate() {
         nativeTerm(mNativeHandle);
         mStupidView.backendDestroyed();

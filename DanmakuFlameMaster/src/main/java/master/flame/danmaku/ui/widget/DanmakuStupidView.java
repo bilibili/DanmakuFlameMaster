@@ -1,7 +1,24 @@
+/*
+ * Copyright (C) 2015 zheng qian <xqq@0ginr.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package master.flame.danmaku.ui.widget;
 
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.content.Context;
@@ -55,6 +72,11 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
         init();
     }
 
+    public DanmakuStupidView(Context context, AttributeSet attrs) {
+        super(context, attrs, 0);
+        init();
+    }
+    
     private void init() {
         setZOrderMediaOverlay(true);
         setWillNotCacheDrawing(true);
@@ -123,8 +145,8 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
     
     @Override
     public void release() {
-        stop();
         DanmakuFilters.getDefault().clear();
+        stop();
         if (mDrawTimes != null) {
             mDrawTimes.clear();
         }        
@@ -149,6 +171,7 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
             mDrawThread.quit();
             mDrawThread = null;
         }
+        super.terminate();
     }
     
     protected Looper getLooper(int type) {
@@ -172,7 +195,7 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
                 priority = android.os.Process.THREAD_PRIORITY_DEFAULT;
                 break;
         }
-        String threadName = "DFM Stupid Drawing-Thread #" + priority;
+        String threadName = "DFM Stupid Looper-Thread #" + priority;
         mDrawThread = new HandlerThread(threadName, priority);
         mDrawThread.start();
         return mDrawThread.getLooper();
@@ -223,18 +246,25 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
             return 0;
         if (!isShown())
             return -1;
-        this.requestRender();
-        
-        synchronized (mDrawCondition) {
-            while (!mDrawFinished) {
-                try {
-                    mDrawCondition.wait();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+        if (mDanmakuVisible) {
+            this.requestRender();
+            
+            synchronized (mDrawCondition) {
+                while (!mDrawFinished) {
+                    try {
+                        mDrawCondition.wait();
+                    } catch (InterruptedException e) {
+                        if (mHandler == null || mHandler.isStop()) {
+                            break;
+                        } else {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
                 }
+                mDrawFinished = false;
             }
-            mDrawFinished = false;
         }
+
         return mLastRenderingTime;
     }
     
@@ -301,7 +331,6 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
     @Override
     public void start() {
         start(0);
-        
     }
 
     @Override
@@ -385,7 +414,16 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
         if (!isViewReady()) {
             return;
         }
-        // TODO?        
+        queueEvent(new Runnable() {            
+            @Override
+            public void run() {
+                Canvas canvas = lockCanvas();
+                if (canvas != null) {
+                    DrawHelper.clearCanvas(canvas);
+                    unlockCanvasAndPost(canvas);
+                }
+            }
+        });
     }
     
     @Override

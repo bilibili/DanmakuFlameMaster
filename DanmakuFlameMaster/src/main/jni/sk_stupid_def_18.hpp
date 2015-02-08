@@ -109,6 +109,7 @@ static const size_t sizeof_SkCanvas_21    = 248;
 static const char* symbol_GrGLCreateNativeInterface = "_Z25GrGLCreateNativeInterfacev";
 
 static const char* symbol_Create = "_ZN9GrContext6CreateE9GrBackendi";
+//static const char* symbol_ContextLost = "_ZN9GrContext11contextLostEv";
 static const char* symbol_ContextDestroyed = "_ZN9GrContext16contextDestroyedEv";
 static const char* symbol_WrapBackendRenderTarget = "_ZN9GrContext23wrapBackendRenderTargetERK25GrBackendRenderTargetDesc";
 static const char* symbol_Flush = "_ZN9GrContext5flushEi";

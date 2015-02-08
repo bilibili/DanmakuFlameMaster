@@ -14,4 +14,14 @@
  * limitations under the License.
  */
 
+#define TAG_SK_STUPID_RENDERER_16 16
+
+#include <malloc.h>
+#include <dlfcn.h>
+#include <pthread.h>
+#include <GLES2/gl2.h>
+#include <android/log.h>
+#include "version_utils.hpp"
+#include "sk_stupid_def_16.hpp"
 #include "sk_stupid_renderer_16.hpp"
+

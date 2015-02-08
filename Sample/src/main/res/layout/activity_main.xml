@@ -31,10 +31,10 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
     
-    <!--<master.flame.danmaku.ui.widget.DanmakuStupidView
+    <master.flame.danmaku.ui.widget.DanmakuStupidView
         android:id="@+id/sv_danmaku"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" /> -->
+        android:layout_height="match_parent" />
 
     <include android:id="@+id/media_controller"
         android:layout_width="match_parent"

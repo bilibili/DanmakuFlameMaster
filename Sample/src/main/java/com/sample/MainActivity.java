@@ -118,13 +118,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // VideoView
         VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
-        //mDanmakuView = (DanmakuStupidView) findViewById(R.id.sv_danmaku);
-        mDanmakuView = new DanmakuStupidView(this);
-        FrameLayout layout = (FrameLayout)findViewById(R.id.frameLayout);
-        layout.addView((DanmakuStupidView)mDanmakuView, new FrameLayout.LayoutParams(
-        		FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        mDanmakuView = (DanmakuStupidView) findViewById(R.id.sv_danmaku);
         
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
+
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
@@ -156,10 +153,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
             mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
-                    //mediaPlayer.start();
+                    mediaPlayer.start();
                 }
             });
-            //mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
+            mVideoView.setVideoPath(Environment.getExternalStorageDirectory() + "/1.flv");
         }
 
     }

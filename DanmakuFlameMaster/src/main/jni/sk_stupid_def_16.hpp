@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#ifndef _SK_STUPID_DEF_16_HPP
+#if !defined(_SK_STUPID_DEF_16_HPP) && defined(TAG_SK_STUPID_RENDERER_16)
 #define _SK_STUPID_DEF_16_HPP
 
 
