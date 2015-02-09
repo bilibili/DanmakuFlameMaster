@@ -179,6 +179,7 @@ public class DrawHandler extends Handler {
             case RESUME:
                 quitFlag = false;
                 if (mReady) {
+                    mDrawTimes.clear();
                     mTimeBase = System.currentTimeMillis() - pausedPostion;
                     timer.update(pausedPostion);
                     removeMessages(RESUME);
