@@ -109,8 +109,8 @@ static void nativeTerm(JNIEnv* env, jobject thiz, jlong nativeHandle) {
     if (nativeHandle != 0) {
         SkStupidRendererBase* renderer = reinterpret_cast<SkStupidRendererBase*>(nativeHandle);
         SkStupidInjector* injector = reinterpret_cast<SkStupidInjector*>(renderer->getExtraData());
-        renderer->teardownBackend();
         injector->dispose(env);
+        renderer->teardownBackend();
         delete injector;
         delete renderer;
         __android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "Cleanup succeed!");
@@ -118,7 +118,7 @@ static void nativeTerm(JNIEnv* env, jobject thiz, jlong nativeHandle) {
 }
 
 static void nativeUpdateSize(JNIEnv* env, jobject thiz, jlong nativeHandle, jint width, jint height) {
-    __android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeUpdateSize");
+    __android_log_print(ANDROID_LOG_DEBUG, "SkiaRedirector", "nativeUpdateSize, %dx%d", width, height);
 
     if (nativeHandle != 0) {
         SkStupidRendererBase* renderer = reinterpret_cast<SkStupidRendererBase*>(nativeHandle);

@@ -174,19 +174,19 @@ bool SkStupidRenderer_18::setupBackend(int width, int height, int msaaSampleCoun
 
 bool SkStupidRenderer_18::teardownBackend() {
     if (mCanvas) {
+        mCurrentContext->ref();  // temp workaround for "call to OpenGL ES API with no current context" error
         mCanvas->unref((void*)SkCanvas_Symbol.Dtor);
         mCanvas = nullptr;
     }
 
     if (mCurrentContext) {
-        //GrContext_Symbol.contextDestroyed(mCurrentContext);
-        mCurrentContext->unref((void*)GrContext_Symbol.Dtor);
+        //GrContext_Symbol.contextDestroyed(mCurrentContext);  // WTF this function will block thread forever and 100% cpu?
+        mCurrentContext->unref((void*)GrContext_Symbol.Dtor);  // WTF the GrContext's dtor decrease 2 refcnt while destruct?
         mCurrentContext = nullptr;
     }
 
     Sk_SafeUnref(mCurrentInterface);
     mCurrentInterface = nullptr;
-
     Sk_SafeUnref(mCurrentRenderTarget, (void*)GrRenderTarget_Symbol.Dtor);
     mCurrentRenderTarget = nullptr;
 

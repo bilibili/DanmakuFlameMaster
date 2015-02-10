@@ -23,15 +23,12 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import android.graphics.Canvas;
-import android.os.Handler;
 
 public class SkStupidRenderer implements SkStupidView.Renderer {
     
     private final SkStupidView mStupidView;
-    private Handler mHandler = new Handler();
     private int mMSAASampleCount;
     private long mNativeHandle;
-    private Canvas mCanvas = null;
 
     public SkStupidRenderer(SkStupidView view) {
         mStupidView = view;
@@ -64,18 +61,15 @@ public class SkStupidRenderer implements SkStupidView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         nativeUpdateSize(mNativeHandle, width, height);
-        mCanvas = null;
         mStupidView.backendChanged(width, height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        if (mCanvas == null) {
-            mCanvas = nativeLockCanvas(mNativeHandle);
-        }
+        Canvas canvas = nativeLockCanvas(mNativeHandle);
         //gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        mStupidView.onSkiaDraw(mCanvas);
-        nativeUnlockCanvasAndPost(mNativeHandle, mCanvas);
+        mStupidView.onSkiaDraw(canvas);
+        nativeUnlockCanvasAndPost(mNativeHandle, canvas);
     }
 
     // must be called inner GLThread, e.g. use queueEvent()

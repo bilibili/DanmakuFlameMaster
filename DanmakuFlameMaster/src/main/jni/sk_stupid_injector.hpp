@@ -48,7 +48,12 @@ private:
     SkCanvas_t* mSkCanvas = nullptr;
     jobject mJavaCanvas = nullptr;
     jclass mJavaCanvasClass = nullptr;
+    jfieldID mJavaCanvasHandleID = nullptr;
     jmethodID mJavaCanvasCtorID = nullptr;
+    jmethodID mJavaCanvasReleaseID = nullptr;
+    jfieldID mJavaCanvasFinalizer = nullptr;
+    jclass mJavaCanvasFinalizerClass = nullptr;
+    jfieldID mJavaCanvasFinalizerHandleID = nullptr;
     void* mRTLibrary = nullptr;
     Func_create_canvas create_canvas = nullptr;
 };

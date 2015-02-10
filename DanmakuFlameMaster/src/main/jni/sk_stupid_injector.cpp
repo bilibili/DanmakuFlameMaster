@@ -52,10 +52,22 @@ void SkStupidInjector::loadSymbols(JNIEnv* env) {
     mJavaCanvasClass = (jclass)env->NewGlobalRef(clazz);
     env->DeleteLocalRef(clazz);
 
-    if (mApiLevel >= 21) {  // Android 5.0+
-        mJavaCanvasCtorID = env->GetMethodID(mJavaCanvasClass, "<init>", "(J)V"); // Lollipop+ use int64 to store pointer
+    if (mApiLevel >= 20) {  // Android 4.4w+
+        mJavaCanvasCtorID = env->GetMethodID(mJavaCanvasClass, "<init>", "(J)V"); // 4.4w+ use int64 to store pointer
     } else {                // before
         mJavaCanvasCtorID = env->GetMethodID(mJavaCanvasClass, "<init>", "(I)V");
+    }
+
+    if (mApiLevel >= 19) {
+        mJavaCanvasReleaseID = env->GetMethodID(mJavaCanvasClass, "release", "()V");
+    } else {
+        /*jclass clazz = env->FindClass("android/graphics/Canvas$CanvasFinalizer");
+        mJavaCanvasFinalizerClass = (jclass)env->NewGlobalRef(clazz);
+        env->DeleteLocalRef(clazz);
+
+        mJavaCanvasFinalizer = env->GetFieldID(mJavaCanvasClass, "mFinalizer", "android/graphics/Canvas$CanvasFinalizer");
+        mJavaCanvasFinalizerHandleID = env->GetFieldID(mJavaCanvasFinalizerClass, "mNativeCanvas", "I");
+        mJavaCanvasHandleID = env->GetFieldID(mJavaCanvasClass, "mNativeCanvas", "I");*/
     }
 
     mSymbolsComplete = checkSymbols();
@@ -70,6 +82,17 @@ bool SkStupidInjector::checkSymbols() {
         return false;
     }
 
+    if (mApiLevel >= 19 && mJavaCanvasReleaseID == nullptr) {
+        return false;
+    }
+
+    /*if (mApiLevel < 19) {
+        if (mJavaCanvasFinalizerClass == nullptr || mJavaCanvasFinalizer == nullptr
+            || mJavaCanvasFinalizerHandleID == nullptr || mJavaCanvasHandleID == nullptr) {
+            return false;
+        }
+    }*/
+
     return true;
 }
 
@@ -79,6 +102,11 @@ bool SkStupidInjector::isDeviceSupported() {
 
 void SkStupidInjector::dispose(JNIEnv* env) {
     if (mJavaCanvas) {
+        if (mApiLevel >= 19) {
+            env->CallVoidMethod(mJavaCanvas, mJavaCanvasReleaseID);
+        } else {
+
+        }
         env->DeleteGlobalRef(mJavaCanvas);
         mJavaCanvas = nullptr;
     }
@@ -102,16 +130,26 @@ jobject SkStupidInjector::getJavaCanvas(JNIEnv* env, SkCanvas_t* skcanvas) {
         mSkCanvas = skcanvas;
 
         if (mJavaCanvas) {
+            if (mApiLevel >= 19) {
+                env->CallVoidMethod(mJavaCanvas, mJavaCanvasReleaseID);
+            } else {
+
+            }
             env->DeleteGlobalRef(mJavaCanvas);
             mJavaCanvas = nullptr;
         }
 
-        if (mApiLevel >= 21) {  // Android 5.0+
-            skcanvas->ref();
-            void* canvasWrapper = create_canvas(mSkCanvas);
+        if (mApiLevel >= 20) {  // Android 4.4w+
+            mSkCanvas->ref();
+            void* canvasWrapper = nullptr;
+            if (mApiLevel >= 21) {  // Android 5.0+
+                canvasWrapper = create_canvas(mSkCanvas);
+            } else {                // Android 4.4w
+                canvasWrapper = mSkCanvas;
+            }
             mJavaCanvas = env->NewObject(mJavaCanvasClass, mJavaCanvasCtorID, reinterpret_cast<jlong>(canvasWrapper));
         } else {                // before
-            skcanvas->ref();
+            mSkCanvas->ref();
             mJavaCanvas = env->NewObject(mJavaCanvasClass, mJavaCanvasCtorID, reinterpret_cast<jint>(mSkCanvas));
         }
 

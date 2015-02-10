@@ -18,7 +18,6 @@
 #define _VERSION_UTILS_HPP
 
 #include <cstdint>
-#include <sys/system_properties.h>
 
 const int ICE_CREAM_SANDWICH = 14;      // Android 4.0
 const int ICE_CREAM_SANDWICH_MR1 = 15;  // Android 4.0.3

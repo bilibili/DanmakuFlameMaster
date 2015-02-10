@@ -154,7 +154,7 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
     
     @Override
     public void stop() {
-        stopDraw();        
+        stopDraw();
     }
 
     private void stopDraw() {
@@ -414,7 +414,7 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
         if (!isViewReady()) {
             return;
         }
-        queueEvent(new Runnable() {            
+        queueEvent(new Runnable() {
             @Override
             public void run() {
                 Canvas canvas = lockCanvas();
