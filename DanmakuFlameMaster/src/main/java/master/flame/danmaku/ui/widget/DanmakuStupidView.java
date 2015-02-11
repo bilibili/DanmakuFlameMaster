@@ -322,6 +322,14 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
             restart();
         }        
     }
+    
+    @Override
+    public boolean isPaused() {
+        if(mHandler != null) {
+            return mHandler.isStop();
+        }
+        return false;
+    }
 
     public void restart() {
         stop();
