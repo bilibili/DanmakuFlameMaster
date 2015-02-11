@@ -105,9 +105,12 @@ public class DrawHandler extends Handler {
     private final boolean mUpdateInNewThread;
 
     private long mCordonTime = 30;
+    
+    private long mCordonTime2 = 60;
 
     private long mFrameUpdateRate = 16;
 
+    @SuppressWarnings("unused")
     private long mThresholdTime;
 
     private long mLastDeltaTime;
@@ -363,7 +366,7 @@ public class DrawHandler extends Handler {
         mInSyncAction = true;
         long d = 0;
         long time = startMS - mTimeBase;
-        if (!mDanmakusVisible || mRenderingState.nothingRendered || mRenderingState.inWaitingState) {
+        if (!mDanmakusVisible || mRenderingState.nothingRendered || mRenderingState.inWaitingState || mRenderingState.consumingTime > mCordonTime2) {
             timer.update(time);
             mRemainingTime = 0;
         } else {
@@ -406,6 +409,7 @@ public class DrawHandler extends Handler {
         long consumingTime = timer.update(System.nanoTime());
         long averageFrameConsumingTime = consumingTime / frameCount / 1000000;
         mCordonTime = Math.max(33, (long) (averageFrameConsumingTime * 2.5f));
+        mCordonTime2 = mCordonTime * 2;
         mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
         mLastDeltaTime = mFrameUpdateRate;
         mThresholdTime = mFrameUpdateRate + 3;

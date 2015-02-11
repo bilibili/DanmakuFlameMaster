@@ -58,7 +58,7 @@ public class CacheManagingDrawTask extends DrawTask {
         NativeBitmapFactory.loadLibs();
         mMaxCacheSize = maxCacheSize;
         if (NativeBitmapFactory.isInNativeAlloc()) {
-            mMaxCacheSize = maxCacheSize * 2;
+            mMaxCacheSize = maxCacheSize * 3;
         }
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
     }
