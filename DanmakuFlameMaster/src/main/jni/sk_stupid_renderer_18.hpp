@@ -17,7 +17,6 @@
 #ifndef _SK_STUPID_RENDERER_18_HPP
 #define _SK_STUPID_RENDERER_18_HPP
 
-#include <pthread.h>
 #include "version_utils.hpp"
 #include "sk_stupid_renderer_base.hpp"
 
@@ -70,7 +69,6 @@ private:
     bool mSymbolsLoaded = false;
     bool mSymbolsComplete = false;
     SkCanvas_t* mCanvas = nullptr;
-    pthread_mutex_t mCanvasMutex;
     SkBackEndTypes_t mBackendType = kNone_BackEndType;
     GrContext_t* mCurrentContext = nullptr;
     const GrGLInterface_t* mCurrentInterface = nullptr;

@@ -39,15 +39,12 @@ SkStupidRenderer_18::SkStupidRenderer_18(void* nativeHandle) {
     mApiLevel = getDeviceApiLevel();
     mAndroidVersion = getDeviceAndroidVersion();
     loadSymbols();
-    pthread_mutex_init(&this->mCanvasMutex, nullptr);
 }
 
 SkStupidRenderer_18::~SkStupidRenderer_18() {
     if (mBackendType != kNone_BackEndType) {
         teardownBackend();
     }
-
-    pthread_mutex_destroy(&this->mCanvasMutex);
 
     if (mLibraryHandle) {
         dlclose(mLibraryHandle);
@@ -254,7 +251,6 @@ void SkStupidRenderer_18::updateSize(int width, int height) {
 }
 
 SkCanvas_t* SkStupidRenderer_18::lockCanvas() {
-    pthread_mutex_lock(&this->mCanvasMutex);
     if (mCanvas == nullptr) {
         if (mCurrentContext) {
             this->createSkCanvas();
@@ -267,5 +263,4 @@ void SkStupidRenderer_18::unlockCanvasAndPost(SkCanvas_t* canvas) {
     if (mCurrentContext) {
         GrContext_Symbol.flush(mCurrentContext, 0);
     }
-    pthread_mutex_unlock(&this->mCanvasMutex);
 }
