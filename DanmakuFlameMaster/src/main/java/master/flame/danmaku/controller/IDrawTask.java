@@ -51,4 +51,6 @@ public interface IDrawTask {
         public void onDanmakuAdd(BaseDanmaku danmaku);
     }
 
+    public void requestHide();
+
 }

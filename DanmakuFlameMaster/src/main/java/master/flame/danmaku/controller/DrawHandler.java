@@ -244,6 +244,7 @@ public class DrawHandler extends Handler {
                 }
                 if(this.drawTask != null) {
                     this.drawTask.requestClear();
+                    this.drawTask.requestHide();
                 }
                 Boolean quitDrawTask = (Boolean) msg.obj;
                 if (quitDrawTask && this.drawTask != null) {
@@ -495,6 +496,7 @@ public class DrawHandler extends Handler {
     public long hideDanmakus(boolean quitDrawTask) {
         if (!mDanmakusVisible)
             return timer.currMillisecond;
+        mDanmakuView.clear();
         removeMessages(SHOW_DANMAKUS);
         removeMessages(HIDE_DANMAKUS);
         obtainMessage(HIDE_DANMAKUS, quitDrawTask).sendToTarget();
