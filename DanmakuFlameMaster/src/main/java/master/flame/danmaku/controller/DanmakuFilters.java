@@ -3,7 +3,6 @@ package master.flame.danmaku.controller;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 
@@ -337,27 +336,29 @@ public class DanmakuFilters {
 
     public static class DuplicateMergingFilter extends BaseDanmakuFilter<Void> {
 
-        protected final IDanmakus blockedDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
+        protected final List<BaseDanmaku> blockedDanmakus = new ArrayList<BaseDanmaku>();
         protected final LinkedHashMap<String, BaseDanmaku> currentDanmakus = new LinkedHashMap<String, BaseDanmaku>();
-        private final IDanmakus passedDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
+        private final List<BaseDanmaku> passedDanmakus = new ArrayList<BaseDanmaku>();
+        private long mLastTime;
 
-        private final void removeTimeoutDanmakus(final IDanmakus danmakus, long limitTime) {
-            IDanmakuIterator it = danmakus.iterator();
+        private final void removeTimeoutDanmakus(final List<BaseDanmaku> danmakus, long limitTime) {
+            Iterator<BaseDanmaku> it = danmakus.iterator();
             long startTime = System.currentTimeMillis();
-            while (it.hasNext()) {
-                try {
+            try {
+                while (it.hasNext()) {
+
                     BaseDanmaku item = it.next();
                     if (item.isTimeOut()) {
                         it.remove();
                     } else {
                         break;
                     }
-                } catch (Exception e) {
-                    break;
+                    if (System.currentTimeMillis() - startTime > limitTime) {
+                        break;
+                    }
                 }
-                if (System.currentTimeMillis() - startTime > limitTime) {
-                    break;
-                }
+            } catch (Exception e) {
+
             }
         }
 
@@ -365,8 +366,8 @@ public class DanmakuFilters {
                 int limitTime) {
             Iterator<Entry<String, BaseDanmaku>> it = danmakus.entrySet().iterator();
             long startTime = System.currentTimeMillis();
-            while (it.hasNext()) {
-                try {
+            try {
+                while (it.hasNext()) {
                     Entry<String, BaseDanmaku> entry = it.next();
                     BaseDanmaku item = entry.getValue();
                     if (item.isTimeOut()) {
@@ -374,21 +375,27 @@ public class DanmakuFilters {
                     } else {
                         break;
                     }
-                } catch (Exception e) {
-                    break;
+                    if (System.currentTimeMillis() - startTime > limitTime) {
+                        break;
+                    }
                 }
-                if (System.currentTimeMillis() - startTime > limitTime) {
-                    break;
-                }
+            } catch (Exception e) {
+
             }
         }
 
         @Override
         public synchronized boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
                 DanmakuTimer timer, boolean fromCachingTask) {
-            removeTimeoutDanmakus(blockedDanmakus, 2);
-            removeTimeoutDanmakus(passedDanmakus, 2);
-            removeTimeoutDanmakus(currentDanmakus, 3);
+            if (fromCachingTask || danmaku == null || danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
+                return false;
+            }
+            if (Math.abs(timer.currMillisecond - mLastTime) > 2000) {
+                removeTimeoutDanmakus(blockedDanmakus, 7);
+                removeTimeoutDanmakus(passedDanmakus, 7);
+                removeTimeoutDanmakus(currentDanmakus, 8);
+                mLastTime = timer.currMillisecond;
+            }
             if (blockedDanmakus.contains(danmaku) && !danmaku.isOutside()) {
                 return true;
             }
@@ -397,12 +404,12 @@ public class DanmakuFilters {
             }
             if (currentDanmakus.containsKey(danmaku.text)) {
                 currentDanmakus.put(danmaku.text, danmaku);
-                blockedDanmakus.removeItem(danmaku);
-                blockedDanmakus.addItem(danmaku);
+                blockedDanmakus.remove(danmaku);
+                blockedDanmakus.add(danmaku);
                 return true;
             } else {
                 currentDanmakus.put(danmaku.text, danmaku);
-                passedDanmakus.addItem(danmaku);
+                passedDanmakus.add(danmaku);
                 return false;
             }
 
