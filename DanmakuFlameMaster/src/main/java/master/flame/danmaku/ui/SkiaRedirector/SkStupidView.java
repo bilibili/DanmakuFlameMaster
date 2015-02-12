@@ -32,7 +32,7 @@ import android.util.Log;
 public class SkStupidView extends GLSurfaceView {
 
     public static final String TAG = "SkStupidView";
-    private static final boolean mDeviceSupported;
+    private static boolean mDeviceSupported;
     private SkStupidRenderer mSkiaRenderer;
     private int mRequestedMSAASampleCount;
     private Callback mCallback;
@@ -40,10 +40,10 @@ public class SkStupidView extends GLSurfaceView {
     static {
         try {
             System.loadLibrary("DFMACC");
+            mDeviceSupported = SkStupidRenderer.isDeviceSupported();
         } catch (UnsatisfiedLinkError e) {
-            throw e;
+            mDeviceSupported = false;
         }
-        mDeviceSupported = SkStupidRenderer.isDeviceSupported();
     }
     
     public SkStupidView(Context context, int msaaSampleCount) {
