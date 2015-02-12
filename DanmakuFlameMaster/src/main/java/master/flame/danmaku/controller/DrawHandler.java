@@ -124,13 +124,13 @@ public class DrawHandler extends Handler {
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
         mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
+        bindView(view);
         if(danmakuVisibile){
             showDanmakus(null);
         }else{
             hideDanmakus(false);
         }
         mDanmakusVisible = danmakuVisibile;
-        bindView(view);
     }
 
     private void bindView(IDanmakuView view) {
@@ -505,7 +505,9 @@ public class DrawHandler extends Handler {
     public long hideDanmakus(boolean quitDrawTask) {
         if (!mDanmakusVisible)
             return timer.currMillisecond;
-        mDanmakuView.clear();
+        if(mDanmakuView != null) {
+            mDanmakuView.clear();
+        }
         removeMessages(SHOW_DANMAKUS);
         removeMessages(HIDE_DANMAKUS);
         obtainMessage(HIDE_DANMAKUS, quitDrawTask).sendToTarget();
