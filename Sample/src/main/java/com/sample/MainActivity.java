@@ -118,7 +118,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // VideoView
         VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
-        mDanmakuView = (DanmakuStupidView) findViewById(R.id.sv_danmaku);
+        mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
         
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3);
 

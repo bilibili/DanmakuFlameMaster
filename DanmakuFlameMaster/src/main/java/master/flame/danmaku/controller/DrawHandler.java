@@ -372,9 +372,9 @@ public class DrawHandler extends Handler {
         } else {
             long gapTime = time - timer.currMillisecond;
             long averageTime = Math.max(mFrameUpdateRate, getAverageRenderingTime());
-            if (gapTime > 1000 || mRenderingState.consumingTime > mCordonTime2) {
-                d = Math.max(averageTime, mRenderingState.consumingTime) + gapTime
-                        / mFrameUpdateRate;
+            if (gapTime > 2000 || mRenderingState.consumingTime > mCordonTime2) {
+                d = gapTime;
+                gapTime = 0;
             } else {
                 d = averageTime + gapTime / mFrameUpdateRate;
                 d = Math.max(mFrameUpdateRate, d);
@@ -384,6 +384,7 @@ public class DrawHandler extends Handler {
                 if ((Math.abs(a) < 4) && d > mFrameUpdateRate && mLastDeltaTime > mFrameUpdateRate) {
                     d = mLastDeltaTime;
                 }
+                gapTime -= d;
             }
             mLastDeltaTime = d;
             mRemainingTime = gapTime;
