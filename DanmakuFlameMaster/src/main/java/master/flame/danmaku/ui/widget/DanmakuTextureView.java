@@ -28,7 +28,6 @@ import android.util.AttributeSet;
 import android.view.TextureView;
 import android.view.View;
 
-import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
