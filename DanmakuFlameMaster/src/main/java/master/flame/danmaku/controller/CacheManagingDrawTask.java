@@ -139,7 +139,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         public HandlerThread mThread;
 
-        Danmakus mCaches = new Danmakus(Danmakus.ST_BY_LIST);
+        Danmakus mCaches = new Danmakus();
 
         DrawingCachePoolManager mCachePoolManager = new DrawingCachePoolManager();
 
@@ -314,9 +314,16 @@ public class CacheManagingDrawTask extends DrawTask {
             while (it.hasNext()) {
                 BaseDanmaku val = it.next();
                 if (val.isTimeOut(time)) {
+                    synchronized (mDrawingNotify) {
+                        try {
+                            mDrawingNotify.wait(30);
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
                     entryRemoved(false, val, null);
                     it.remove();
-                }else{
+                } else {
                     break;
                 }
             }
@@ -487,7 +494,6 @@ public class CacheManagingDrawTask extends DrawTask {
             private long dispatchAction() {
                 float level = getPoolPercent();
                 BaseDanmaku firstCache = mCaches.first();
-                //TODO 如果firstcache大于当前时间超过半屏并且水位在0.5f以下,
                 long gapTime = firstCache != null ? firstCache.time - mTimer.currMillisecond : 0;
                 long doubleScreenDuration = DanmakuFactory.MAX_DANMAKU_DURATION * 2;
                 if (level < 0.6f && gapTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
@@ -495,11 +501,11 @@ public class CacheManagingDrawTask extends DrawTask {
                     removeMessages(BUILD_CACHES);
                     sendEmptyMessage(BUILD_CACHES);
                     return 0;
-                } else if (level > 0.4f && gapTime < -doubleScreenDuration) {
+                } else if (level > 0.3f && gapTime < -doubleScreenDuration) {
                     // clear timeout caches
                     removeMessages(CLEAR_TIMEOUT_CACHES);
                     sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
-                    return 1000;
+                    return 500;
                 }
                 
                 if (level >= 0.9f) {
@@ -549,10 +555,8 @@ public class CacheManagingDrawTask extends DrawTask {
                 BaseDanmaku last = danmakus.last();
                 long sleepTime = 0;
                 long deltaTime = first.time - mTimer.currMillisecond;
-                if (deltaTime > DanmakuFactory.MAX_DANMAKU_DURATION / 2) {
-                    sleepTime = 10 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
-                    sleepTime = Math.min(100, sleepTime);
-                }
+                sleepTime = 20 * (1 + deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION);
+                sleepTime = Math.min(100, sleepTime);
                 
                 IDanmakuIterator itr = danmakus.iterator();
                 BaseDanmaku item = null;
