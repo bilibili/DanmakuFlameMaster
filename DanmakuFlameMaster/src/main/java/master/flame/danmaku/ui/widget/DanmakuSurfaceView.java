@@ -26,7 +26,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
@@ -38,8 +37,7 @@ import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import java.util.LinkedList;
 import java.util.Locale;
 
-public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, SurfaceHolder.Callback,
-        View.OnClickListener {
+public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, SurfaceHolder.Callback {
 
     public static final String TAG = "DanmakuSurfaceView";
 
@@ -76,15 +74,6 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        setOnClickListener(this);
-    }
-
-    @Override
-    public void setOnClickListener(OnClickListener l) {
-        if (l != this) {
-            mOnClickListener = l;
-        } else
-            super.setOnClickListener(l);
     }
 
     public DanmakuSurfaceView(Context context, AttributeSet attrs) {
@@ -316,13 +305,6 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
             handler.removeCallbacksAndMessages(null);
         }
         handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (mOnClickListener != null) {
-            mOnClickListener.onClick(view);
-        }
     }
 
     public void seekTo(Long ms) {

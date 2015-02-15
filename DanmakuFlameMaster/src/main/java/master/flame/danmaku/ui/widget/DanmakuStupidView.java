@@ -37,7 +37,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.ui.SkiaRedirector.*;
 
-public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkStupidView.Callback, View.OnClickListener {
+public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkStupidView.Callback {
 
     public static final String TAG = "DanmakuStupidView";
     
@@ -85,7 +85,6 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
         mSurfaceHolder = getHolder();
         super.setCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        setOnClickListener(this);
     }
     
     @Override
@@ -349,13 +348,6 @@ public class DanmakuStupidView extends SkStupidView implements IDanmakuView, SkS
             mHandler.removeCallbacksAndMessages(null);
         }
         mHandler.obtainMessage(DrawHandler.START, postion).sendToTarget();
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (mOnClickListener != null) {
-            mOnClickListener.onClick(v);
-        }        
     }
     
     @Override
