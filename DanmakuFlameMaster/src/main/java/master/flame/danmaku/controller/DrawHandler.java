@@ -367,9 +367,8 @@ public class DrawHandler extends Handler {
         long d = 0;
         long time = startMS - mTimeBase;
         if (!mDanmakusVisible || mRenderingState.nothingRendered || mRenderingState.inWaitingState) {
-            mRemainingTime = 0;
             timer.update(time);
-                
+            mRemainingTime = 0;
         } else {
             long gapTime = time - timer.currMillisecond;
             long averageTime = Math.max(mFrameUpdateRate, getAverageRenderingTime());
@@ -626,7 +625,7 @@ public class DrawHandler extends Handler {
 
     public long getCurrentTime() {
         if (quitFlag || !mRenderingState.inWaitingState) {
-            return timer.current() - mRemainingTime;
+            return timer.currMillisecond - mRemainingTime;
         }
         return System.currentTimeMillis() - mTimeBase;
     }
