@@ -32,10 +32,10 @@ static const int minSdkVersion = 18;
 static const int maxSdkVersion = 21;
 static bool isDeviceSupported = false;
 
-static bool testIsDeviceSupported();
+static bool testIsDeviceSupported(JNIEnv* env);
 
 int initSkiaRedirectorJni(JNIEnv* env) {
-    isDeviceSupported = testIsDeviceSupported();
+    isDeviceSupported = testIsDeviceSupported(env);
     return 0;
 }
 
@@ -43,8 +43,8 @@ int termSkiaRedirectorJni() {
     return 0;
 }
 
-static bool testIsDeviceSupported() {
-    int apiLevel = getDeviceApiLevel();
+static bool testIsDeviceSupported(JNIEnv* env) {
+    int apiLevel = getDeviceApiLevel(env);
     if (apiLevel >= minSdkVersion && apiLevel <= maxSdkVersion) {
         SkStupidRendererBase* testRenderer = nullptr;
 

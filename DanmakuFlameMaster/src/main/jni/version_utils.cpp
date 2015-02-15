@@ -17,7 +17,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <android/log.h>
+#include <jni.h>
 #include <sys/system_properties.h>
 #include "version_utils.hpp"
 
@@ -39,6 +39,19 @@ int getDeviceApiLevel() {
     }
 
     return api;
+}
+
+int getDeviceApiLevel(JNIEnv* env) {
+	if (gApiLevel != 0) {
+		return gApiLevel;
+	}
+
+	jclass versionClass = env->FindClass("android/os/Build$VERSION");
+	jfieldID sdkIntField = env->GetStaticFieldID(versionClass, "SDK_INT", "I");
+	int sdk = env->GetStaticIntField(versionClass, sdkIntField);
+
+	gApiLevel = sdk;
+	return sdk;
 }
 
 AndroidVersion getDeviceAndroidVersion() {

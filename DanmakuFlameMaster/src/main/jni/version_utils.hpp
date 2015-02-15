@@ -18,6 +18,7 @@
 #define _VERSION_UTILS_HPP
 
 #include <cstdint>
+#include <jni.h>
 
 const int ICE_CREAM_SANDWICH = 14;      // Android 4.0
 const int ICE_CREAM_SANDWICH_MR1 = 15;  // Android 4.0.3
@@ -35,6 +36,7 @@ struct AndroidVersion {
 };
 
 int getDeviceApiLevel();
+int getDeviceApiLevel(JNIEnv* env);
 AndroidVersion getDeviceAndroidVersion();
 
 #endif // _VERSION_UTILS_HPP
