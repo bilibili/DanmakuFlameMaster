@@ -48,7 +48,7 @@ import java.util.Locale;
  */
 @SuppressLint("NewApi")
 public class DanmakuTextureView extends TextureView implements IDanmakuView,
-        TextureView.SurfaceTextureListener, View.OnClickListener {
+        TextureView.SurfaceTextureListener {
 
     public static final String TAG = "DanmakuTextureView";
 
@@ -83,7 +83,6 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         setDrawingCacheEnabled(false);
         setWillNotDraw(true);
         setSurfaceTextureListener(this);
-        setOnClickListener(this);
     }
 
     @Override
@@ -325,13 +324,6 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
             handler.removeCallbacksAndMessages(null);
         }
         handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (mOnClickListener != null) {
-            mOnClickListener.onClick(view);
-        }
     }
 
     public void seekTo(Long ms) {
