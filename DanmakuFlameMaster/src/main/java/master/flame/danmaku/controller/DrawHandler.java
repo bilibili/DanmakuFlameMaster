@@ -105,9 +105,12 @@ public class DrawHandler extends Handler {
     private final boolean mUpdateInNewThread;
 
     private long mCordonTime = 30;
+    
+    private long mCordonTime2 = 60;
 
     private long mFrameUpdateRate = 16;
 
+    @SuppressWarnings("unused")
     private long mThresholdTime;
 
     private long mLastDeltaTime;
@@ -121,13 +124,13 @@ public class DrawHandler extends Handler {
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
         mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
+        bindView(view);
         if(danmakuVisibile){
             showDanmakus(null);
         }else{
             hideDanmakus(false);
         }
         mDanmakusVisible = danmakuVisibile;
-        bindView(view);
     }
 
     private void bindView(IDanmakuView view) {
@@ -244,6 +247,7 @@ public class DrawHandler extends Handler {
                 }
                 if(this.drawTask != null) {
                     this.drawTask.requestClear();
+                    this.drawTask.requestHide();
                 }
                 Boolean quitDrawTask = (Boolean) msg.obj;
                 if (quitDrawTask && this.drawTask != null) {
@@ -368,18 +372,24 @@ public class DrawHandler extends Handler {
         } else {
             long gapTime = time - timer.currMillisecond;
             long averageTime = Math.max(mFrameUpdateRate, getAverageRenderingTime());
-            d = averageTime + gapTime / mFrameUpdateRate;
-            d = Math.max(mFrameUpdateRate, d);
-            d = Math.min(mCordonTime, d);
-            
-            long a = d - mLastDeltaTime;
-            if ((Math.abs(a) < 4)&& d > mFrameUpdateRate && mLastDeltaTime > mFrameUpdateRate) {
-                d = mLastDeltaTime;
+            if (gapTime > 2000 || mRenderingState.consumingTime > mCordonTime2) {
+                d = gapTime;
+                gapTime = 0;
+            } else {
+                d = averageTime + gapTime / mFrameUpdateRate;
+                d = Math.max(mFrameUpdateRate, d);
+                d = Math.min(mCordonTime, d);
+
+                long a = d - mLastDeltaTime;
+                if ((Math.abs(a) < 4) && d > mFrameUpdateRate && mLastDeltaTime > mFrameUpdateRate) {
+                    d = mLastDeltaTime;
+                }
+                gapTime -= d;
             }
             mLastDeltaTime = d;
             mRemainingTime = gapTime;
             timer.add(d);
-//            Log.e("DrawHandler", "d:" + d  + "a:" + a + "RemaingTime:" + mRemainingTime + ",gapTime:" + gapTime);
+//            Log.e("DrawHandler", time+"|d:" + d  + "RemaingTime:" + mRemainingTime + ",gapTime:" + gapTime + ",rtim:" + mRenderingState.consumingTime + ",average:" + averageTime);
         }
         if (mCallback != null) {
             mCallback.updateTimer(timer);
@@ -405,6 +415,7 @@ public class DrawHandler extends Handler {
         long consumingTime = timer.update(System.nanoTime());
         long averageFrameConsumingTime = consumingTime / frameCount / 1000000;
         mCordonTime = Math.max(33, (long) (averageFrameConsumingTime * 2.5f));
+        mCordonTime2 = mCordonTime * 2;
         mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
         mLastDeltaTime = mFrameUpdateRate;
         mThresholdTime = mFrameUpdateRate + 3;
@@ -495,6 +506,9 @@ public class DrawHandler extends Handler {
     public long hideDanmakus(boolean quitDrawTask) {
         if (!mDanmakusVisible)
             return timer.currMillisecond;
+        if(mDanmakuView != null) {
+            mDanmakuView.clear();
+        }
         removeMessages(SHOW_DANMAKUS);
         removeMessages(HIDE_DANMAKUS);
         obtainMessage(HIDE_DANMAKUS, quitDrawTask).sendToTarget();
