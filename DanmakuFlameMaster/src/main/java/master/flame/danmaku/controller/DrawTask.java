@@ -68,6 +68,8 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
 
     private long mLastEndMills;
 
+    private boolean mIsHidden;
+
     public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
         mTaskListener = taskListener;
@@ -212,6 +214,9 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
         if (danmakuList != null) {
             Canvas canvas = (Canvas) disp.getExtraData();
             DrawHelper.clearCanvas(canvas);
+            if (mIsHidden) {
+                return mRenderingState;
+            }
             long beginMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
             long endMills = timer.currMillisecond + DanmakuFactory.MAX_DANMAKU_DURATION;
             if(mLastBeginMills > beginMills || timer.currMillisecond > mLastEndMills) {
@@ -251,6 +256,7 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     public void requestClear() {
         clearFlag = 5;
         mLastBeginMills = mLastEndMills = 0;
+        mIsHidden = false;
     }
 
     @Override
@@ -271,6 +277,11 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
             }
         }
         return false;
+    }
+
+    @Override
+    public void requestHide() {
+        mIsHidden = true;
     }
 
 }
