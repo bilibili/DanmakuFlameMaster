@@ -1,5 +1,4 @@
-/develop/android/workspace/source/ibili-android/contrib/DanmakuFlameMaster/DanmakuFlameMaster/src/main/obj/local/armeabi/objs/DFMACC/version_utils.o: \
- /develop/android/workspace/source/ibili-android/contrib/DanmakuFlameMaster/DanmakuFlameMaster/src/main/jni/version_utils.cpp \
+obj/local/armeabi/objs/DFMACC/version_utils.o: jni/version_utils.cpp \
  /develop/android/android-ndk-r9d/sources/cxx-stl/system/include/cstdint \
  /develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/stdint.h \
  /develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/sys/_types.h \
@@ -25,9 +24,9 @@
  /develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/memory.h \
  /develop/android/android-ndk-r9d/sources/cxx-stl/system/include/cstring \
  /develop/android/android-ndk-r9d/sources/cxx-stl/system/include/cstddef \
- /develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/android/log.h \
+ /develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/jni.h \
  /develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/sys/system_properties.h \
- /develop/android/workspace/source/ibili-android/contrib/DanmakuFlameMaster/DanmakuFlameMaster/src/main/jni/version_utils.hpp
+ jni/version_utils.hpp
 
 /develop/android/android-ndk-r9d/sources/cxx-stl/system/include/cstdint:
 
@@ -79,8 +78,8 @@
 
 /develop/android/android-ndk-r9d/sources/cxx-stl/system/include/cstddef:
 
-/develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/android/log.h:
+/develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/jni.h:
 
 /develop/android/android-ndk-r9d/platforms/android-16/arch-arm/usr/include/sys/system_properties.h:
 
-/develop/android/workspace/source/ibili-android/contrib/DanmakuFlameMaster/DanmakuFlameMaster/src/main/jni/version_utils.hpp:
+jni/version_utils.hpp:
