@@ -175,11 +175,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if (mDanmakuView != null) {
             // dont forget release!
             mDanmakuView.release();
+            mDanmakuView = null;
         }
-        super.onDestroy();
+    }
+    
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (mDanmakuView != null) {
+            // dont forget release!
+            mDanmakuView.release();
+            mDanmakuView = null;
+        }
     }
 
     @Override
