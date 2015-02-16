@@ -117,7 +117,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (DanmakuSurfaceView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(true);
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
