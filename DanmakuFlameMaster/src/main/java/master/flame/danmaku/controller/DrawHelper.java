@@ -31,6 +31,8 @@ public class DrawHelper {
     
     private static boolean USE_DRAWCOLOR_TO_CLEAR_CANVAS = true;
     
+    private static boolean USE_DRAWCOLOR_MODE_CLEAR = true; 
+    
     static {
         PAINT = new Paint();
         PAINT.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -38,8 +40,9 @@ public class DrawHelper {
         RECT = new RectF();
     }
     
-    public static void useDrawColorToClearCanvas(boolean use) {
+    public static void useDrawColorToClearCanvas(boolean use, boolean useClearMode) {
         USE_DRAWCOLOR_TO_CLEAR_CANVAS = use;
+        USE_DRAWCOLOR_MODE_CLEAR = useClearMode;
     }
 
     public static void drawFPS(Canvas canvas, String text) {
@@ -56,7 +59,11 @@ public class DrawHelper {
 
     public static void clearCanvas(Canvas canvas) {
         if (USE_DRAWCOLOR_TO_CLEAR_CANVAS) {
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            if(USE_DRAWCOLOR_MODE_CLEAR) {
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            } else {
+                canvas.drawColor(Color.TRANSPARENT);
+            }
         } else {
             RECT.set(0, 0, canvas.getWidth(), canvas.getHeight());
             clearCanvas(canvas, RECT);
