@@ -407,7 +407,6 @@ public class DrawHandler extends Handler {
     private void initRenderingConfigs() {
         DanmakuTimer timer = new DanmakuTimer();
         timer.update(System.nanoTime());
-        DrawHelper.useDrawColorToClearCanvas(true);
         int frameCount = 30;
         for (int i = 0; i < frameCount; i++) {
             mDanmakuView.clear();
