@@ -225,12 +225,12 @@ public class DanmakuView extends View implements IDanmakuView {
         }
     }
     
-    private void lockCanvasAndClear() {
+    @SuppressLint("NewApi") private void lockCanvasAndClear() {
         mClearFlag = true;
-        final int lockCount = mLockCount++;
-        this.postInvalidate();
-        while (mLockCount > lockCount) {
-            SystemClock.sleep(2);
+        if(Build.VERSION.SDK_INT >= 16) {
+            this.postInvalidateOnAnimation();
+        } else {
+            this.postInvalidate();
         }
     }
     
@@ -354,6 +354,7 @@ public class DanmakuView extends View implements IDanmakuView {
     @Override
     public void showAndResumeDrawTask(Long position) {
         mDanmakuVisibile = true;
+        mClearFlag = false;
         if (handler == null) {
             return;
         }
