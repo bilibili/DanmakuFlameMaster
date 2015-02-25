@@ -52,8 +52,6 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
     private boolean isSurfaceCreated;
 
     private boolean mEnableDanmakuDrwaingCache = true;
-
-    private OnClickListener mOnClickListener;
     
     private boolean mShowFps;
 
@@ -74,6 +72,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+        DrawHelper.useDrawColorToClearCanvas(true, true);
     }
 
     public DanmakuSurfaceView(Context context, AttributeSet attrs) {

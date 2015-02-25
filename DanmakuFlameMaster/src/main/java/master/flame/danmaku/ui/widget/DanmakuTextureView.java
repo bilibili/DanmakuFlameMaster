@@ -28,7 +28,6 @@ import android.util.AttributeSet;
 import android.view.TextureView;
 import android.view.View;
 
-import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
@@ -62,8 +61,6 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     private boolean mEnableDanmakuDrwaingCache = true;
 
-    private OnClickListener mOnClickListener;
-
     private boolean mShowFps;
 
     private boolean mDanmakuVisibile = true;
@@ -83,14 +80,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         setDrawingCacheEnabled(false);
         setWillNotDraw(true);
         setSurfaceTextureListener(this);
-    }
-
-    @Override
-    public void setOnClickListener(OnClickListener l) {
-        if (l != this) {
-            mOnClickListener = l;
-        } else
-            super.setOnClickListener(l);
+        DrawHelper.useDrawColorToClearCanvas(true, true);
     }
 
     public DanmakuTextureView(Context context, AttributeSet attrs) {
