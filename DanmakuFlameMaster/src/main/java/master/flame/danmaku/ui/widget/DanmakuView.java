@@ -26,7 +26,6 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.TextView;
 
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
@@ -212,30 +211,40 @@ public class DanmakuView extends View implements IDanmakuView {
         dtime = System.currentTimeMillis() - stime;
         return dtime;
     }
-
-    @SuppressLint("NewApi") private void lockCanvas() {
-        final int lockCount = mLockCount++;
+    
+    @SuppressLint("NewApi") private void postInvalidateCompat() {
         if(Build.VERSION.SDK_INT >= 16) {
             this.postInvalidateOnAnimation();
         } else {
             this.postInvalidate();
         }
+    }
+
+    private void lockCanvas() {
+        if(mDanmakuVisibile == false) {
+            return;
+        }
+        final int lockCount = mLockCount++;
+        postInvalidateCompat();
+        int count = 0;
         while (mLockCount > lockCount) {
             SystemClock.sleep(2);
+            if (mDanmakuVisibile == false || count++ > 50) {
+                break;
+            }
         }
     }
     
-    @SuppressLint("NewApi") private void lockCanvasAndClear() {
+    private void lockCanvasAndClear() {
         mClearFlag = true;
-        if(Build.VERSION.SDK_INT >= 16) {
-            this.postInvalidateOnAnimation();
-        } else {
-            this.postInvalidate();
-        }
+        lockCanvas();
     }
     
     private void unlockCanvasAndPost() {
-       mLockCount--;
+        if (mDanmakuVisibile == false) {
+            return;
+        }
+        mLockCount--;
     }
     
     @Override
