@@ -91,6 +91,9 @@ public class DanmakuUtils {
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
             AndroidDisplayer.drawDanmaku(danmaku, holder.canvas, 0, 0, false);
+            if(disp.isHardwareAccelerated()) {
+                holder.splitWith(disp.getMaximumCacheWidth(), disp.getMaximumCacheHeight());
+            }
         }
         return cache;
     }
@@ -176,6 +179,10 @@ public class DanmakuUtils {
 
         r = obj1.hashCode() - obj1.hashCode();
         return r;
+    }
+
+    public final static boolean isOverSize(IDisplayer disp, BaseDanmaku item) {
+        return disp.isHardwareAccelerated() && (item.paintWidth > disp.getMaximumCacheWidth() || item.paintHeight > disp.getMaximumCacheHeight());
     }
 
 }

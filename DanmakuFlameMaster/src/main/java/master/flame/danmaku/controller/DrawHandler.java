@@ -426,7 +426,7 @@ public class DrawHandler extends Handler {
         if (drawTask == null) {
             drawTask = createDrawTask(mDanmakuView.isDanmakuDrawingCacheEnabled(), timer,
                     mDanmakuView.getContext(), mDanmakuView.getWidth(), mDanmakuView.getHeight(),
-                    new IDrawTask.TaskListener() {
+                    mDanmakuView.isHardwareAccelerated(), new IDrawTask.TaskListener() {
                         @Override
                         public void ready() {
                             initRenderingConfigs();
@@ -448,15 +448,17 @@ public class DrawHandler extends Handler {
     }
 
     private IDrawTask createDrawTask(boolean useDrwaingCache, DanmakuTimer timer, Context context,
-            int width, int height, IDrawTask.TaskListener taskListener) {
+            int width, int height, boolean isHardwareAccelerated,
+            IDrawTask.TaskListener taskListener) {
         mDisp = new AndroidDisplayer();
         mDisp.setSize(width, height);
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         mDisp.setDensities(displayMetrics.density, displayMetrics.densityDpi,
                 displayMetrics.scaledDensity);
         mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+        mDisp.setHardwareAccelerated(isHardwareAccelerated);
         obtainMessage(NOTIFY_DISP_SIZE_CHANGED, false).sendToTarget();
-        
+
         IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, mDisp,
                 taskListener, 1024 * 1024 * AndroidUtils.getMemoryClass(context) / 3)
                 : new DrawTask(timer, context, mDisp, taskListener);

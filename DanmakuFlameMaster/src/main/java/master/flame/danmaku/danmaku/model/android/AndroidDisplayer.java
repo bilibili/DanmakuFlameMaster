@@ -16,17 +16,19 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import android.annotation.SuppressLint;
 import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.text.TextPaint;
 
+import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 
@@ -113,6 +115,24 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         BORDER_PAINT.setStrokeWidth(BORDER_WIDTH);
     }
     
+    @SuppressLint("NewApi")
+    private static final int getMaximumBitmapWidth(Canvas c) {
+        if(Build.VERSION.SDK_INT >= 14) {
+            return c.getMaximumBitmapWidth();
+        } else {
+            return c.getWidth();
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private static final int getMaximumBitmapHeight(Canvas c) {
+        if(Build.VERSION.SDK_INT >= 14) {
+            return c.getMaximumBitmapHeight();
+        } else {
+            return c.getHeight();
+        }
+    }
+
     public static void setTypeFace(Typeface font){
         if(PAINT!=null)
             PAINT.setTypeface(font);
@@ -145,11 +165,21 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private int mSlopPixel = 0;
 
+    private boolean mIsHardwareAccelerated = true;
+
+    private int mMaximumBitmapWidth = 2048;
+
+    private int mMaximumBitmapHeight = 2048;
+
     private void update(Canvas c) {
         canvas = c;
         if (c != null) {
             width = c.getWidth();
             height = c.getHeight();
+            if (mIsHardwareAccelerated) {
+                mMaximumBitmapWidth = getMaximumBitmapWidth(c);
+                mMaximumBitmapHeight = getMaximumBitmapHeight(c);
+            }
         }
     }
 
@@ -206,9 +236,8 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             int result = IRenderer.CACHE_RENDERING;
             if (danmaku.hasDrawingCache()) {
                 DrawingCacheHolder holder = ((DrawingCache) danmaku.cache).get();
-                if (holder != null && holder.bitmap != null && !holder.bitmap.isRecycled()) {
-                    canvas.drawBitmap(holder.bitmap, left, top, alphaPaint);                    
-                    cacheDrawn = true;
+                if (holder != null) {
+                    cacheDrawn = holder.draw(canvas, left, top, alphaPaint);
                 }
             }
             if (!cacheDrawn) {
@@ -508,6 +537,26 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             return STROKE_WIDTH;
         }
         return 0f;
+    }
+
+    @Override
+    public void setHardwareAccelerated(boolean enable) {
+        mIsHardwareAccelerated = enable;
+    }
+
+    @Override
+    public boolean isHardwareAccelerated() {
+        return mIsHardwareAccelerated ;
+    }
+
+    @Override
+    public int getMaximumCacheWidth() {
+        return mMaximumBitmapWidth;
+    }
+
+    @Override
+    public int getMaximumCacheHeight() {
+        return mMaximumBitmapHeight;
     }
 
 

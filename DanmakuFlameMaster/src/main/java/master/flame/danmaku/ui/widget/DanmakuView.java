@@ -414,4 +414,10 @@ public class DanmakuView extends View implements IDanmakuView {
         return 0;
     }
 
+    @Override
+    public boolean isHardwareAccelerated() {
+        // >= 3.0
+        return Build.VERSION.SDK_INT >= 11;
+    }
+
 }

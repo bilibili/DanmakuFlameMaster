@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.os.SystemClock;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -136,6 +135,9 @@ public class CacheManagingDrawTask extends DrawTask {
 
         @SuppressWarnings("unused")
         private static final String TAG = "CacheManager";
+        public static final byte RESULT_SUCCESS = 0;
+        public static final byte RESULT_FAILED = 1;
+        public static final byte RESULT_FAILED_OVERSIZE = 2;
 
         public HandlerThread mThread;
 
@@ -386,8 +388,6 @@ public class CacheManagingDrawTask extends DrawTask {
 
             private boolean mPause;
 
-            private boolean buildSuccess;
-
             private boolean mSeekedFlag;
 
             private boolean mCanelFlag;
@@ -612,9 +612,8 @@ public class CacheManagingDrawTask extends DrawTask {
                     }
 
                     // build cache
-                    buildSuccess = buildCache(item);
-                    if (!buildSuccess) {
-//                        message = "break at build failed";
+                    if (buildCache(item) == RESULT_FAILED) {
+                        // message = "break at build failed";
                         break;
                     }
 
@@ -637,7 +636,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 return consumingTime;
             }
 
-            private boolean buildCache(BaseDanmaku item) {
+            private byte buildCache(BaseDanmaku item) {
                 
                 // measure
                 if (!item.isMeasured()) {
@@ -655,7 +654,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         cache.increaseReference();
                         item.cache = cache;
                         mCacheManager.push(item, sizeOf(item));
-                        return true;
+                        return RESULT_SUCCESS;
                     }
                     
                     // try to find reuseable cache from timeout && no-refrerence caches
@@ -669,7 +668,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache);  //redraw
                         item.cache = cache;
                         mCacheManager.push(item, 0);
-                        return true;
+                        return RESULT_SUCCESS;
                     }
                     
                     // guess cache size
@@ -677,7 +676,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             (int) item.paintHeight);
                     if (mRealSize + cacheSize > mMaxSize) {
 //                        Log.d("cache", "break at MaxSize:"+mMaxSize);
-                        return false;
+                        return RESULT_FAILED;
                     }
 
                     cache = mCachePool.acquire();
@@ -689,17 +688,17 @@ public class CacheManagingDrawTask extends DrawTask {
                             releaseDanmakuCache(item, cache);
 //Log.e("cache", "break at push failed:" + mMaxSize);
                         }
-                        return pushed;
+                        return pushed ? RESULT_SUCCESS : RESULT_FAILED;
                     }
 
                 } catch (OutOfMemoryError e) {
 //Log.e("cache", "break at error: oom");
                     releaseDanmakuCache(item, cache);
-                    return false;
+                    return RESULT_FAILED;
                 } catch (Exception e) {
 //Log.e("cache", "break at exception:" + e.getMessage());
                     releaseDanmakuCache(item, cache);
-                    return false;
+                    return RESULT_FAILED;
                 }
             }
 

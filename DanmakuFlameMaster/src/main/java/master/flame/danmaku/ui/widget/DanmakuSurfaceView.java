@@ -394,4 +394,9 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, Sur
         return 0;
     }
 
+    @Override
+    public boolean isHardwareAccelerated() {
+        return false;
+    }
+
 }

@@ -407,4 +407,9 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
         return 0;
     }
 
+    @Override
+    public boolean isHardwareAccelerated() {
+        return false;
+    }
+
 }

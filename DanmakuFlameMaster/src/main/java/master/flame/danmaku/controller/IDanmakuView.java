@@ -24,6 +24,8 @@ public interface IDanmakuView {
 
     public long drawDanmakus();
     
+    public boolean isHardwareAccelerated();
+
     /**
      * 
      * @param type One of THREAD_TYPE_MAIN_THREAD, THREAD_TYPE_HIGH_PRIORITY, THREAD_TYPE_NORMAL_PRIORITY, or THREAD_TYPE_LOW_PRIORITY.
