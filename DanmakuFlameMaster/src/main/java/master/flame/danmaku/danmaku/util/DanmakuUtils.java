@@ -92,7 +92,8 @@ public class DanmakuUtils {
         if (holder != null) {
             AndroidDisplayer.drawDanmaku(danmaku, holder.canvas, 0, 0, false);
             if(disp.isHardwareAccelerated()) {
-                holder.splitWith(disp.getMaximumCacheWidth(), disp.getMaximumCacheHeight());
+                holder.splitWith(disp.getWidth(), disp.getHeight(), disp.getMaximumCacheWidth(),
+                        disp.getMaximumCacheHeight());
             }
         }
         return cache;

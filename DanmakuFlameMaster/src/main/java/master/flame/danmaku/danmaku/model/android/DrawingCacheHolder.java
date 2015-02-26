@@ -6,7 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
+import android.graphics.Rect;
 
 import tv.cjump.jni.NativeBitmapFactory;
 
@@ -26,7 +26,6 @@ public class DrawingCacheHolder {
 
     public boolean drawn;
 
-    @SuppressWarnings("unused")
     private int mDensity;
 
     public DrawingCacheHolder() {
@@ -88,7 +87,7 @@ public class DrawingCacheHolder {
     }
 
     @SuppressLint("NewApi")
-    public void splitWith(int maximumCacheWidth, int maximumCacheHeight) {
+    public void splitWith(int dispWidth, int dispHeight, int maximumCacheWidth, int maximumCacheHeight) {
         recycleBitmapArray();
         if (width <= 0 || height <= 0 || bitmap == null || bitmap.isRecycled()) {
             return;
@@ -96,20 +95,36 @@ public class DrawingCacheHolder {
         if (width <= maximumCacheWidth && height <= maximumCacheHeight) {
             return;
         }
-        if (Build.VERSION.SDK_INT >= 19) {
-            bitmap.setPremultiplied(true);
-        }
+        maximumCacheWidth = Math.min(maximumCacheWidth, dispWidth);
+        maximumCacheHeight = Math.min(maximumCacheHeight, dispHeight);
         int xCount = width / maximumCacheWidth + (width % maximumCacheWidth == 0 ? 0 : 1);
         int yCount = height / maximumCacheHeight + (height % maximumCacheHeight == 0 ? 0 : 1);
         int averageWidth = width / xCount;
         int averageHeight = height / yCount;
         final Bitmap[][] bmpArray = new Bitmap[yCount][xCount];
-        for (int yIndex = 0; yIndex < yCount; yIndex++) {
-            for (int xIndex = 0; xIndex < xCount; xIndex++) {
-                bmpArray[yIndex][xIndex] = Bitmap.createBitmap(bitmap, xIndex * averageWidth,
-                        yIndex * averageHeight, averageWidth, averageHeight);
+        if (canvas == null){
+            canvas = new Canvas();
+            if (mDensity > 0) {
+                canvas.setDensity(mDensity);
             }
         }
+        Rect rectSrc = new Rect();
+        Rect rectDst = new Rect();
+        for (int yIndex = 0; yIndex < yCount; yIndex++) {
+            for (int xIndex = 0; xIndex < xCount; xIndex++) {
+                Bitmap bmp = bmpArray[yIndex][xIndex] = NativeBitmapFactory.createBitmap(
+                        averageWidth, averageHeight, Bitmap.Config.ARGB_8888);
+                if (mDensity > 0) {
+                    bmp.setDensity(mDensity);
+                }
+                canvas.setBitmap(bmp);
+                int left = xIndex * averageWidth, top = yIndex * averageHeight;
+                rectSrc.set(left, top, left + averageWidth, top + averageHeight);
+                rectDst.set(0, 0, bmp.getWidth(), bmp.getHeight());
+                canvas.drawBitmap(bitmap, rectSrc, rectDst, null);
+            }
+        }
+        canvas.setBitmap(bitmap);
         bitmapArray = bmpArray;
     }
 
@@ -149,8 +164,15 @@ public class DrawingCacheHolder {
                 for (int j = 0; j < bitmapArray[i].length; j++) {
                     Bitmap bmp = bitmapArray[i][j];
                     if (bmp != null && !bmp.isRecycled()) {
-                        canvas.drawBitmap(bmp, left + j * bmp.getWidth(),
-                                top + i * bmp.getHeight(), paint);
+                        float dleft = left + j * bmp.getWidth();
+                        if (dleft > canvas.getWidth() || dleft + bmp.getWidth() < 0) {
+                            continue;
+                        }
+                        float dtop = top + i * bmp.getHeight();
+                        if (dtop > canvas.getHeight() || dtop + bmp.getHeight() < 0) {
+                            continue;
+                        }
+                        canvas.drawBitmap(bmp, dleft, dtop, paint);
                     }
                 }
             }
