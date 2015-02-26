@@ -314,8 +314,15 @@ public class CacheManagingDrawTask extends DrawTask {
         private synchronized void clearTimeOutCaches(long time) {
             IDanmakuIterator it = mCaches.iterator();
             while (it.hasNext()) {
+                try {
+                    synchronized (mDrawingNotify) {
+                        mDrawingNotify.wait(50);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 BaseDanmaku val = it.next();
-                if (val.isTimeOut(time)) {
+                if (val.isTimeOut()) {
                     entryRemoved(false, val, null);
                     it.remove();
                 }else{
@@ -406,7 +413,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 switch (what) {
                     case PREPARE:
                         evictAllNotInScreen();
-                        for (int i = 0; i < 200; i++) {
+                        for (int i = 0; i < 300; i++) {
                             mCachePool.release(new DrawingCache());
                         }
                     case DISPATCH_ACTIONS:
@@ -535,7 +542,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
             private long prepareCaches(boolean repositioned) {
                 long curr = mCacheTimer.currMillisecond;
-                long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
+                long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize * 3;
                 if (end < mTimer.currMillisecond) {
                     return 0;
                 }
@@ -547,12 +554,9 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
                 BaseDanmaku first = danmakus.first();
                 BaseDanmaku last = danmakus.last();
-                long sleepTime = 0;
                 long deltaTime = first.time - mTimer.currMillisecond;
-                if (deltaTime > DanmakuFactory.MAX_DANMAKU_DURATION / 2) {
-                    sleepTime = 10 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
-                    sleepTime = Math.min(100, sleepTime);
-                }
+                long sleepTime = 10 + 10 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
+                sleepTime = Math.min(100, sleepTime);
                 
                 IDanmakuIterator itr = danmakus.iterator();
                 BaseDanmaku item = null;
