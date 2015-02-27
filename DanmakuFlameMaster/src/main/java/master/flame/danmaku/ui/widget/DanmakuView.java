@@ -393,7 +393,13 @@ public class DanmakuView extends View implements IDanmakuView {
         if (!isViewReady()) {
             return;
         }
-        lockCanvasAndClear();
+        if (!mDanmakuVisibile) {
+            mClearFlag = true;
+            mLockCount++;
+            postInvalidateCompat();
+        } else {
+            lockCanvasAndClear();
+        }
     }
 
     @Override
