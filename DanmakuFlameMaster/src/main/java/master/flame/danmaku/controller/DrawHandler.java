@@ -372,7 +372,7 @@ public class DrawHandler extends Handler {
         } else {
             long gapTime = time - timer.currMillisecond;
             long averageTime = Math.max(mFrameUpdateRate, getAverageRenderingTime());
-            if (gapTime > 2000 || mRenderingState.consumingTime > mCordonTime2) {
+            if (gapTime > 2000 || mRenderingState.consumingTime > mCordonTime2 || averageTime > mCordonTime) {
                 d = gapTime;
                 gapTime = 0;
             } else {
