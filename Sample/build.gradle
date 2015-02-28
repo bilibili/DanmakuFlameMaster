@@ -14,15 +14,7 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.1+'
-    }
-}
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 dependencies {
     compile project(':DanmakuFlameMaster')
@@ -34,22 +26,7 @@ android {
     defaultConfig {
         minSdkVersion 7
         targetSdkVersion 19
-    }
-	
-    task copyNativeLibs(type: Copy) {
-        from(new File(project(':DanmakuFlameMaster').getProjectDir(), 'src/main/libs')) { include '**/*.so' }
-        into new File(buildDir, 'native-libs')
-    }
-
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn copyNativeLibs
-    }
-
-    clean.dependsOn 'cleanCopyNativeLibs'
-
-    tasks.withType(com.android.build.gradle.tasks.PackageApplication) {
-        pkgTask ->
-            pkgTask.jniFolders = new HashSet<File>()
-            pkgTask.jniFolders.add(new File(buildDir, 'native-libs'))
+        versionCode 1
+        versionName "1.0"
     }
 }

@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.1+'
-    }
-}
-//apply plugin: 'android'
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 19
@@ -32,6 +23,14 @@ android {
     defaultConfig {
         minSdkVersion 7
         targetSdkVersion 19
+        versionName VERSION_NAME
+        versionCode Integer.parseInt(VERSION_CODE)
     }
-	
+	sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/libs']
+        }
+    }
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

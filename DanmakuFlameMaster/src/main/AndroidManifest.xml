@@ -16,7 +16,7 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="master.flame.danmaku.activity"
+    package="master.flame.danmaku"
     android:versionCode="2050"
     android:versionName="v0.2.5" >
 
