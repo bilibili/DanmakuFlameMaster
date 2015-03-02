@@ -51,8 +51,6 @@ public class CacheManagingDrawTask extends DrawTask {
     
     private final Object mDrawingNotify = new Object();
 
-    private RenderingState mLastRenderingState = new RenderingState();
-
     public CacheManagingDrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener, int maxCacheSize) {
         super(timer, context, disp, taskListener);
@@ -88,11 +86,10 @@ public class CacheManagingDrawTask extends DrawTask {
             mDrawingNotify.notify();
         }
         if(result != null && mCacheManager != null) {
-            if(mLastRenderingState.totalDanmakuCount - result.totalDanmakuCount > 20) {
+            if(result.incrementCount < -20) {
                 mCacheManager.requestClearTimeout();
                 mCacheManager.requestBuild();
             }
-            mLastRenderingState.set(result);
         }
         return result;
     }
@@ -429,7 +426,7 @@ public class CacheManagingDrawTask extends DrawTask {
 //Log.e(TAG,"dispatch_actions:"+mCacheTimer.currMillisecond+":"+mTimer.currMillisecond);
                         long delayed = dispatchAction();
                         if (delayed <= 0) {
-                            delayed = Math.min(600, DanmakuFactory.MAX_DANMAKU_DURATION / 5);
+                            delayed = DanmakuFactory.MAX_DANMAKU_DURATION / 2;
                         }
                         sendEmptyMessageDelayed(DISPATCH_ACTIONS, delayed);
                         break;
@@ -564,7 +561,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 BaseDanmaku first = danmakus.first();
                 BaseDanmaku last = danmakus.last();
                 long deltaTime = first.time - mTimer.currMillisecond;
-                long sleepTime = 10 + 10 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
+                long sleepTime = 30 + 10 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
                 sleepTime = Math.min(100, sleepTime);
                 
                 IDanmakuIterator itr = danmakus.iterator();

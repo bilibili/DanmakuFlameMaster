@@ -64,6 +64,7 @@ public interface IRenderer {
         public int fbDanmakuCount;
         public int specialDanmakuCount;
         public int totalDanmakuCount;
+        public int incrementCount;
         public long consumingTime;
         public long beginTime;
         public long endTime;
@@ -114,6 +115,7 @@ public interface IRenderer {
             fbDanmakuCount = other.fbDanmakuCount;
             specialDanmakuCount = other.specialDanmakuCount;
             totalDanmakuCount = other.totalDanmakuCount;
+            incrementCount = other.incrementCount;
             consumingTime = other.consumingTime;
             beginTime = other.beginTime;
             endTime = other.endTime;

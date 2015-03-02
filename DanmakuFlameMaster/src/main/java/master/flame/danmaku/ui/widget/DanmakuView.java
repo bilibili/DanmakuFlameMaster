@@ -206,13 +206,12 @@ public class DanmakuView extends View implements IDanmakuView {
         if (!isShown())
             return -1;
         long stime = System.currentTimeMillis();
-        long dtime = 0;
         lockCanvas();
-        dtime = System.currentTimeMillis() - stime;
-        return dtime;
+        return System.currentTimeMillis() - stime;
     }
     
-    @SuppressLint("NewApi") private void postInvalidateCompat() {
+    @SuppressLint("NewApi")
+    private void postInvalidateCompat() {
         if(Build.VERSION.SDK_INT >= 16) {
             this.postInvalidateOnAnimation();
         } else {
@@ -265,7 +264,6 @@ public class DanmakuView extends View implements IDanmakuView {
                 }
             }
         }
-        super.onDraw(canvas);
         unlockCanvasAndPost();
     }
     

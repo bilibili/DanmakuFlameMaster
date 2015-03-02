@@ -45,6 +45,7 @@ public class DanmakuRenderer extends Renderer {
     
     @Override
     public RenderingState draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
+        int lastTotalDanmakuCount = mRenderingState.totalDanmakuCount;
         mRenderingState.reset();       
         IDanmakuIterator itr = danmakus.iterator();
         int orderInScreen = 0;        
@@ -97,6 +98,7 @@ public class DanmakuRenderer extends Renderer {
             mRenderingState.beginTime = RenderingState.UNKNOWN_TIME;
             mRenderingState.endTime = drawItem != null ? drawItem.time : RenderingState.UNKNOWN_TIME;
         }
+        mRenderingState.incrementCount = mRenderingState.totalDanmakuCount - lastTotalDanmakuCount;
         mRenderingState.consumingTime = mStartTimer.update(System.currentTimeMillis());
         return mRenderingState;
     }
