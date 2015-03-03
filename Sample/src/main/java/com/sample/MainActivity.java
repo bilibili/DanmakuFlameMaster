@@ -131,6 +131,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 public void prepared() {
                     mDanmakuView.start();
                 }
+                
+                @Override
+                public void drawingFinished() {
+                    mDanmakuView.seekTo(0l);
+                }
             });
             mDanmakuView.prepare(mParser);
 

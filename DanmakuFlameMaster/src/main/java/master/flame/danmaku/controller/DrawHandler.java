@@ -44,6 +44,8 @@ public class DrawHandler extends Handler {
         public void prepared();
 
         public void updateTimer(DanmakuTimer timer);
+        
+        public void drawingFinished();
     }
 
     public static final int START = 1;
@@ -437,6 +439,13 @@ public class DrawHandler extends Handler {
                         @Override
                         public void onDanmakuAdd(BaseDanmaku danmaku) {
                             obtainMessage(NOTIFY_RENDERING).sendToTarget();
+                        }
+
+                        @Override
+                        public void onDanmakusDrawingFinished() {
+                            if (mCallback != null) {
+                                mCallback.drawingFinished();
+                            }
                         }
                     });
         } else {
