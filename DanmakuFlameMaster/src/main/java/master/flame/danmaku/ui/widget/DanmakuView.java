@@ -23,7 +23,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -57,6 +56,10 @@ public class DanmakuView extends View implements IDanmakuView {
     private boolean mDanmakuVisibile = true;
 
     protected int mDrawingThreadType = THREAD_TYPE_NORMAL_PRIORITY;
+
+    private Object mDrawMonitor = new Object();
+
+    private boolean mDrawFinished = false;
 
     public DanmakuView(Context context) {
         super(context);
@@ -186,8 +189,6 @@ public class DanmakuView extends View implements IDanmakuView {
     private static final int ONE_SECOND = 1000;
     private LinkedList<Long> mDrawTimes;
 
-    private int mLockCount;
-
     private boolean mClearFlag;
     private float fps() {
         long lastTime = System.currentTimeMillis();
@@ -223,14 +224,20 @@ public class DanmakuView extends View implements IDanmakuView {
         if(mDanmakuVisibile == false) {
             return;
         }
-        final int lockCount = mLockCount++;
         postInvalidateCompat();
-        int count = 0;
-        while (mLockCount > lockCount) {
-            SystemClock.sleep(2);
-            if (mDanmakuVisibile == false || count++ > 50) {
-                break;
+        synchronized (mDrawMonitor) {
+            while (!mDrawFinished) {
+                try {
+                    mDrawMonitor.wait(200);
+                } catch (InterruptedException e) {
+                    if (mDanmakuVisibile == false || handler == null || handler.isStop()) {
+                        break;
+                    } else {
+                        Thread.currentThread().interrupt();
+                    }
+                }
             }
+            mDrawFinished = false;
         }
     }
     
@@ -240,10 +247,10 @@ public class DanmakuView extends View implements IDanmakuView {
     }
     
     private void unlockCanvasAndPost() {
-        if (mDanmakuVisibile == false) {
-            return;
+        synchronized (mDrawMonitor) {
+            mDrawFinished = true;
+            mDrawMonitor.notifyAll();
         }
-        mLockCount--;
     }
     
     @Override
@@ -393,7 +400,6 @@ public class DanmakuView extends View implements IDanmakuView {
         }
         if (!mDanmakuVisibile) {
             mClearFlag = true;
-            mLockCount++;
             postInvalidateCompat();
         } else {
             lockCanvasAndClear();
