@@ -63,7 +63,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     private boolean mShowFps;
 
-    private boolean mDanmakuVisibile = true;
+    private boolean mDanmakuVisible = true;
     
     protected int mDrawingThreadType = THREAD_TYPE_NORMAL_PRIORITY;
 
@@ -199,7 +199,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     private void prepare() {
         if (handler == null)
-            handler = new DrawHandler(getLooper(mDrawingThreadType), this, mDanmakuVisibile);
+            handler = new DrawHandler(getLooper(mDrawingThreadType), this, mDanmakuVisible);
     }
 
     @Override
@@ -348,7 +348,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     
     @Override
     public void showAndResumeDrawTask(Long position) {
-        mDanmakuVisibile = true;
+        mDanmakuVisible = true;
         if (handler == null) {
             return;
         }
@@ -357,7 +357,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     @Override
     public void hide() {
-        mDanmakuVisibile = false;
+        mDanmakuVisible = false;
         if (handler == null) {
             return;
         }
@@ -366,7 +366,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
     
     @Override
     public long hideAndPauseDrawTask() {
-        mDanmakuVisibile = false;
+        mDanmakuVisible = false;
         if (handler == null) {
             return 0;
         }

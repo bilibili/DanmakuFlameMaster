@@ -53,7 +53,7 @@ public class DanmakuView extends View implements IDanmakuView {
     
     private boolean mShowFps;
 
-    private boolean mDanmakuVisibile = true;
+    private boolean mDanmakuVisible = true;
 
     protected int mDrawingThreadType = THREAD_TYPE_NORMAL_PRIORITY;
 
@@ -165,7 +165,7 @@ public class DanmakuView extends View implements IDanmakuView {
 
     private void prepare() {
         if (handler == null)
-            handler = new DrawHandler(getLooper(mDrawingThreadType), this, mDanmakuVisibile);
+            handler = new DrawHandler(getLooper(mDrawingThreadType), this, mDanmakuVisible);
     }
 
     @Override
@@ -221,7 +221,7 @@ public class DanmakuView extends View implements IDanmakuView {
     }
 
     private void lockCanvas() {
-        if(mDanmakuVisibile == false) {
+        if(mDanmakuVisible == false) {
             return;
         }
         postInvalidateCompat();
@@ -230,7 +230,7 @@ public class DanmakuView extends View implements IDanmakuView {
                 try {
                     mDrawMonitor.wait(200);
                 } catch (InterruptedException e) {
-                    if (mDanmakuVisibile == false || handler == null || handler.isStop()) {
+                    if (mDanmakuVisible == false || handler == null || handler.isStop()) {
                         break;
                     } else {
                         Thread.currentThread().interrupt();
@@ -367,7 +367,7 @@ public class DanmakuView extends View implements IDanmakuView {
     
     @Override
     public void showAndResumeDrawTask(Long position) {
-        mDanmakuVisibile = true;
+        mDanmakuVisible = true;
         mClearFlag = false;
         if (handler == null) {
             return;
@@ -377,7 +377,7 @@ public class DanmakuView extends View implements IDanmakuView {
 
     @Override
     public void hide() {
-        mDanmakuVisibile = false;
+        mDanmakuVisible = false;
         if (handler == null) {
             return;
         }
@@ -386,7 +386,7 @@ public class DanmakuView extends View implements IDanmakuView {
     
     @Override
     public long hideAndPauseDrawTask() {
-        mDanmakuVisibile = false;
+        mDanmakuVisible = false;
         if (handler == null) {
             return 0;
         }
@@ -398,7 +398,7 @@ public class DanmakuView extends View implements IDanmakuView {
         if (!isViewReady()) {
             return;
         }
-        if (!mDanmakuVisibile) {
+        if (!mDanmakuVisible) {
             mClearFlag = true;
             postInvalidateCompat();
         } else {
