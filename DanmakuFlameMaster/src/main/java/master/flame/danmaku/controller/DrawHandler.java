@@ -406,14 +406,7 @@ public class DrawHandler extends Handler {
     }
     
     private void initRenderingConfigs() {
-        DanmakuTimer timer = new DanmakuTimer();
-        timer.update(System.nanoTime());
-        int frameCount = 30;
-        for (int i = 0; i < frameCount; i++) {
-            mDanmakuView.clear();
-        }
-        long consumingTime = timer.update(System.nanoTime());
-        long averageFrameConsumingTime = consumingTime / frameCount / 1000000;
+        long averageFrameConsumingTime = 16;
         mCordonTime = Math.max(33, (long) (averageFrameConsumingTime * 2.5f));
         mCordonTime2 = mCordonTime * 2;
         mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
