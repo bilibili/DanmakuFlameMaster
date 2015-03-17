@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 
-public class CpuInfo {
+public class DeviceUtils {
 
     public static final String ABI_X86 = "x86";
-    
+
     public static final String ABI_MIPS = "mips";
 
     public static enum ARCH {
@@ -109,7 +109,7 @@ public class CpuInfo {
     public static boolean supportX86() {
         return supportABI(ABI_X86);
     }
-    
+
     public static boolean supportMips() {
         return supportABI(ABI_MIPS);
     }
@@ -117,6 +117,24 @@ public class CpuInfo {
     public static boolean isARMSimulatedByX86() {
         ARCH arch = getMyCpuArch();
         return !supportX86() && ARCH.X86.equals(arch);
+    }
+
+    public static boolean isMiBox2Device() {
+        String manufacturer = Build.MANUFACTURER;
+        String productName = Build.PRODUCT;
+        return manufacturer.equalsIgnoreCase("Xiaomi")
+            && productName.equalsIgnoreCase("dredd");
+    }
+
+    public static boolean isMagicBoxDevice() {
+        String manufacturer = Build.MANUFACTURER;
+        String productName = Build.PRODUCT;
+        return manufacturer.equalsIgnoreCase("MagicBox")
+            && productName.equalsIgnoreCase("MagicBox");
+    }
+
+    public static boolean isProblemBoxDevice() {
+        return isMiBox2Device() || isMagicBoxDevice();
     }
 
 }

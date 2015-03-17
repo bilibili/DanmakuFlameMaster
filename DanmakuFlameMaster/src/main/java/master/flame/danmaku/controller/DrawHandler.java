@@ -24,6 +24,8 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 
+import tv.cjump.jni.DeviceUtils;
+
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
@@ -121,9 +123,12 @@ public class DrawHandler extends Handler {
 
     private boolean mInSyncAction;
 
+    private boolean mIdleSleep;
+
     public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
         super(looper);
         mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
+        mIdleSleep = !DeviceUtils.isProblemBoxDevice();
         bindView(view);
         if(danmakuVisibile){
             showDanmakus(null);
@@ -306,8 +311,8 @@ public class DrawHandler extends Handler {
         removeMessages(UPDATE);
         if (!mDanmakusVisible) {
             waitRendering(INDEFINITE_TIME);
-            return; 
-        } else if (mRenderingState.nothingRendered) {
+            return;
+        } else if (mRenderingState.nothingRendered && mIdleSleep) {
             long dTime = mRenderingState.endTime - timer.currMillisecond;
             if (dTime > 500) {
                 waitRendering(dTime - 400);
@@ -348,7 +353,7 @@ public class DrawHandler extends Handler {
                     d = mDanmakuView.drawDanmakus();
                     if (!mDanmakusVisible) {
                         waitRendering(INDEFINITE_TIME);
-                    } else if (mRenderingState.nothingRendered) {
+                    } else if (mRenderingState.nothingRendered && mIdleSleep) {
                         dTime = mRenderingState.endTime - timer.currMillisecond;
                         if (dTime > 500) {
                             notifyRendering();
