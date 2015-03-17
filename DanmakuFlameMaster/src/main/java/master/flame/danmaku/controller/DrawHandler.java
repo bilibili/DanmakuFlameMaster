@@ -108,6 +108,7 @@ public class DrawHandler extends Handler {
 
     private long mCordonTime = 30;
     
+    @SuppressWarnings("unused")
     private long mCordonTime2 = 60;
 
     private long mFrameUpdateRate = 16;
@@ -122,6 +123,8 @@ public class DrawHandler extends Handler {
     private long mRemainingTime;
 
     private boolean mInSyncAction;
+
+    private boolean mInWaitingState;
 
     private boolean mIdleSleep;
 
@@ -373,7 +376,7 @@ public class DrawHandler extends Handler {
         mInSyncAction = true;
         long d = 0;
         long time = startMS - mTimeBase;
-        if (!mDanmakusVisible || mRenderingState.nothingRendered || mRenderingState.inWaitingState) {
+        if (!mDanmakusVisible || mRenderingState.nothingRendered || mInWaitingState) {
             timer.update(time);
             mRemainingTime = 0;
         } else {
@@ -405,7 +408,7 @@ public class DrawHandler extends Handler {
     }
     
     private void syncTimerIfNeeded() {
-        if (mRenderingState.inWaitingState) {
+        if (mInWaitingState) {
             syncTimer(System.currentTimeMillis());
         }
     }
@@ -526,7 +529,7 @@ public class DrawHandler extends Handler {
     }
     
     private void notifyRendering() {
-        if (!mRenderingState.inWaitingState) {
+        if (!mInWaitingState) {
             return;
         }
         if(drawTask != null) {
@@ -545,12 +548,12 @@ public class DrawHandler extends Handler {
             removeMessages(UPDATE);
             sendEmptyMessage(UPDATE);
         }
-        mRenderingState.inWaitingState = false;
+        mInWaitingState = false;
     }
         
     private void waitRendering(long dTime) {
         mRenderingState.sysTime = System.currentTimeMillis();
-        mRenderingState.inWaitingState = true;
+        mInWaitingState = true;
         if (mUpdateInNewThread) {
             try {
                 synchronized (drawTask) {
@@ -621,7 +624,7 @@ public class DrawHandler extends Handler {
     }
 
     public long getCurrentTime() {
-        if (quitFlag || !mRenderingState.inWaitingState) {
+        if (quitFlag || !mInWaitingState) {
             return timer.currMillisecond - mRemainingTime;
         }
         return System.currentTimeMillis() - mTimeBase;

@@ -70,7 +70,6 @@ public interface IRenderer {
         public long endTime;
         public boolean nothingRendered;
         public long sysTime;
-        public boolean inWaitingState;
         public long cacheHitCount;
         public long cacheMissCount;
 
@@ -121,7 +120,6 @@ public interface IRenderer {
             endTime = other.endTime;
             nothingRendered = other.nothingRendered;
             sysTime = other.sysTime;
-            inWaitingState = other.inWaitingState;
             cacheHitCount = other.cacheHitCount;
             cacheMissCount = other.cacheMissCount;
         }
