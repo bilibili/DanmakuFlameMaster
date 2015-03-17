@@ -94,9 +94,9 @@ public class DanmakuRenderer extends Renderer {
         }
         
         mRenderingState.nothingRendered = (mRenderingState.totalDanmakuCount == 0);
+        mRenderingState.endTime = drawItem != null ? drawItem.time : RenderingState.UNKNOWN_TIME;
         if (mRenderingState.nothingRendered) {
             mRenderingState.beginTime = RenderingState.UNKNOWN_TIME;
-            mRenderingState.endTime = drawItem != null ? drawItem.time : RenderingState.UNKNOWN_TIME;
         }
         mRenderingState.incrementCount = mRenderingState.totalDanmakuCount - lastTotalDanmakuCount;
         mRenderingState.consumingTime = mStartTimer.update(System.currentTimeMillis());
