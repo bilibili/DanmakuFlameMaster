@@ -15,6 +15,8 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 - 小米电视/盒子视频弹幕
 - 被窝 http://mobile.beiwo.ac
 - MissEvan http://www.missevan.cn/app
+- 开讯视频 http://www.ikaixun.com/osm-web/download.html
+- echo回声 http://echo.kibey.com/default
 - 斗鱼直播客户端 http://www.douyutv.com/client
 - AcFun视频民间版 https://github.com/yrom/acfunm
 - 爱稀饭精选（AcFun主站客户端） http://www.acfun.tv/app
