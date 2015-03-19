@@ -70,6 +70,8 @@ public class DrawHandler extends Handler {
     
     private static final int NOTIFY_RENDERING = 11;
 
+    private static final int UPDATE_WHEN_PAUSED = 12;
+
     private static final long INDEFINITE_TIME = 10000000;
 
     private long pausedPostion = 0;
@@ -289,6 +291,13 @@ public class DrawHandler extends Handler {
             case NOTIFY_RENDERING:
                 notifyRendering();
                 break;
+            case UPDATE_WHEN_PAUSED:
+                if (quitFlag && mDanmakuView != null) {
+                    drawTask.requestClear();
+                    mDanmakuView.drawDanmakus();
+                    notifyRendering();
+                }
+                break;
         }
     }
 
@@ -438,6 +447,13 @@ public class DrawHandler extends Handler {
                         @Override
                         public void onDanmakuAdd(BaseDanmaku danmaku) {
                             obtainMessage(NOTIFY_RENDERING).sendToTarget();
+                        }
+
+                        @Override
+                        public void onDanmakuConfigChanged() {
+                            if (quitFlag && mDanmakusVisible) {
+                                obtainMessage(UPDATE_WHEN_PAUSED).sendToTarget();
+                            }
                         }
                     });
         } else {

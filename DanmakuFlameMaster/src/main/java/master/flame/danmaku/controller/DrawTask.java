@@ -262,21 +262,26 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     @Override
     public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
             Object... values) {
-        if (tag == null || tag.equals(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN)) {
-            return true;
-        }
-        if (tag.equals(DanmakuConfigTag.DUPLICATE_MERGING_ENABLED)) {
+        boolean handled = false;
+
+        if (tag == null || DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN.equals(tag)) {
+            handled = true;
+        } else if (DanmakuConfigTag.DUPLICATE_MERGING_ENABLED.equals(tag)) {
             Boolean enable = (Boolean) values[0];
             if (enable != null) {
-                if(enable) {
+                if (enable) {
                     DanmakuFilters.getDefault().registerFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
                 } else {
                     DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
                 }
-               return true;
+                handled = true;
             }
         }
-        return false;
+
+        if (mTaskListener != null) {
+            mTaskListener.onDanmakuConfigChanged();
+        }
+        return handled;
     }
 
     @Override

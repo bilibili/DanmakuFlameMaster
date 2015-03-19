@@ -788,41 +788,46 @@ public class CacheManagingDrawTask extends DrawTask {
     @Override
     public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
             Object... values) {
-        if(super.onDanmakuConfigChanged(config, tag, values)) {
-            return true;
-        }
-        
-        if (tag.equals(DanmakuConfigTag.SCROLL_SPEED_FACTOR)) {
+        if (DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN.equals(tag)) {
+            // do nothing
+        } else if (DanmakuConfigTag.DUPLICATE_MERGING_ENABLED.equals(tag)) {
+            Boolean enable = (Boolean) values[0];
+            if (enable != null) {
+                if (enable) {
+                    DanmakuFilters.getDefault().registerFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
+                } else {
+                    DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
+                }
+            }
+        } else if (DanmakuConfigTag.SCROLL_SPEED_FACTOR.equals(tag)) {
             mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
             requestClear();
-            return true;
-        }
-        if (tag.isVisibilityRelatedTag()) {
+        } else if (tag.isVisibilityRelatedTag()) {
             if (values != null && values.length > 0) {
-                if (values[0] != null
-                        && ((values[0] instanceof Boolean) == false || ((Boolean) values[0])
-                                .booleanValue())) {
+                if (values[0] != null && ((values[0] instanceof Boolean) == false || ((Boolean) values[0]).booleanValue())) {
                     if (mCacheManager != null) {
                         mCacheManager.requestBuild();
                     }
                 }
             }
             requestClear();
-            return true;
-        }
-        if (tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
-            mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
-        }
-        if (tag.equals(DanmakuConfigTag.TRANSPARENCY) || tag.equals(DanmakuConfigTag.SCALE_TEXTSIZE)) {
+        } else if (DanmakuConfigTag.TRANSPARENCY.equals(tag) || DanmakuConfigTag.SCALE_TEXTSIZE.equals(tag)) {
+            if (DanmakuConfigTag.SCALE_TEXTSIZE.equals(tag)) {
+                mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
+            }
             if (mCacheManager != null) {
                 mCacheManager.requestClearAll();
                 mCacheManager.requestBuild();
             }
-            return true;
+        } else {
+            if (mCacheManager != null) {
+                mCacheManager.requestClearUnused();
+                mCacheManager.requestBuild();
+            }
         }
-        if (mCacheManager != null) {
-            mCacheManager.requestClearUnused();
-            mCacheManager.requestBuild();
+
+        if (mTaskListener != null) {
+            mTaskListener.onDanmakuConfigChanged();
         }
         return true;
     }
