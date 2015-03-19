@@ -102,6 +102,15 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
             String tagName = localName.length() != 0 ? localName : qName;
             tagName = tagName.toLowerCase(Locale.getDefault()).trim();
             if (tagName.equals("d")) {
+                // <d p="23.826000213623,1,25,16777215,1422201084,0,057075e9,757076900">我从未见过如此厚颜无耻之猴</d>
+                // 0:时间(弹幕出现时间)
+                // 1:类型(1从左至右滚动弹幕|6从右至左滚动弹幕|5顶端固定弹幕|4底端固定弹幕|7高级弹幕|8脚本弹幕)
+                // 2:字号
+                // 3:颜色
+                // 4:时间戳 ?
+                // 5:弹幕池id
+                // 6:用户hash
+                // 7:弹幕id
                 String pValue = attributes.getValue("p");
                 // parse p value to danmaku
                 String[] values = pValue.split(",");
