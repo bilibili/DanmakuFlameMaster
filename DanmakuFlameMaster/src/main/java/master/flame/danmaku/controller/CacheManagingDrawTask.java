@@ -798,17 +798,8 @@ public class CacheManagingDrawTask extends DrawTask {
     @Override
     public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
             Object... values) {
-        if (DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN.equals(tag)) {
+        if (super.handleOnDanmakuConfigChanged(config, tag, values)) {
             // do nothing
-        } else if (DanmakuConfigTag.DUPLICATE_MERGING_ENABLED.equals(tag)) {
-            Boolean enable = (Boolean) values[0];
-            if (enable != null) {
-                if (enable) {
-                    DanmakuFilters.getDefault().registerFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
-                } else {
-                    DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_DUPLICATE_FILTER);
-                }
-            }
         } else if (DanmakuConfigTag.SCROLL_SPEED_FACTOR.equals(tag)) {
             mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
             requestClear();

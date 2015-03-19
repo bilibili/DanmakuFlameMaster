@@ -262,8 +262,15 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     @Override
     public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
             Object... values) {
-        boolean handled = false;
+        boolean handled = handleOnDanmakuConfigChanged(config, tag, values);
+        if (mTaskListener != null) {
+            mTaskListener.onDanmakuConfigChanged();
+        }
+        return handled;
+    }
 
+    protected boolean handleOnDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag, Object[] values) {
+        boolean handled = false;
         if (tag == null || DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN.equals(tag)) {
             handled = true;
         } else if (DanmakuConfigTag.DUPLICATE_MERGING_ENABLED.equals(tag)) {
@@ -276,10 +283,6 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
                 }
                 handled = true;
             }
-        }
-
-        if (mTaskListener != null) {
-            mTaskListener.onDanmakuConfigChanged();
         }
         return handled;
     }
