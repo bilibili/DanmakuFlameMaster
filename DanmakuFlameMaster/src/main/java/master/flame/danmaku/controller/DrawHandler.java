@@ -74,7 +74,7 @@ public class DrawHandler extends Handler {
 
     private static final long INDEFINITE_TIME = 10000000;
 
-    private long pausedPostion = 0;
+    private long pausedPosition = 0;
 
     private boolean quitFlag = true;
 
@@ -185,16 +185,16 @@ public class DrawHandler extends Handler {
             case START:
                 Long startTime = (Long) msg.obj;
                 if (startTime != null) {
-                    pausedPostion = startTime;
+                    pausedPosition = startTime;
                 } else {
-                    pausedPostion = 0;
+                    pausedPosition = 0;
                 }
             case RESUME:
                 quitFlag = false;
                 if (mReady) {
                     mDrawTimes.clear();
-                    mTimeBase = System.currentTimeMillis() - pausedPostion;
-                    timer.update(pausedPostion);
+                    mTimeBase = System.currentTimeMillis() - pausedPosition;
+                    timer.update(pausedPosition);
                     removeMessages(RESUME);
                     sendEmptyMessage(UPDATE);
                     drawTask.start();
@@ -213,7 +213,7 @@ public class DrawHandler extends Handler {
                 timer.update(System.currentTimeMillis() - mTimeBase);
                 if (drawTask != null)
                     drawTask.seek(timer.currMillisecond);
-                pausedPostion = timer.currMillisecond;
+                pausedPosition = timer.currMillisecond;
                 removeMessages(RESUME);
                 sendEmptyMessage(RESUME);
                 break;
@@ -276,7 +276,7 @@ public class DrawHandler extends Handler {
                     notifyRendering();
                     quitUpdateThread();
                 }
-                pausedPostion = timer.currMillisecond;
+                pausedPosition = timer.currMillisecond;
                 if (what == QUIT){
                     if (this.drawTask != null){
                         this.drawTask.quit();
