@@ -69,6 +69,7 @@ public class JSONSource implements IDataSource<JSONArray>{
 	public void release() {
 		IOUtils.closeQuietly(mInput);
 		mInput = null;
+		mJSONArray = null;
 	}
 
 }
