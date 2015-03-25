@@ -277,6 +277,9 @@ public class DanmakuView extends View implements IDanmakuView {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        if (handler != null) {
+            handler.notifyDispSizeChanged(right - left, bottom - top);
+        }
         isSurfaceCreated = true;
     }
 

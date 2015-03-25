@@ -66,7 +66,7 @@ public class DanmakuRenderer extends Renderer {
                 continue;
             }
             
-            if(drawItem.getType() == BaseDanmaku.TYPE_SCROLL_RL){
+            if (drawItem.getType() == BaseDanmaku.TYPE_SCROLL_RL){
                 // 同屏弹幕密度只对滚动弹幕有效
                 orderInScreen++;
             }
@@ -81,6 +81,9 @@ public class DanmakuRenderer extends Renderer {
 
             // draw
             if (!drawItem.isOutside() && drawItem.isShown()) {
+                if (drawItem.lines == null && drawItem.getBottom() > disp.getHeight()) {
+                    continue;    // skip bottom outside danmaku
+                }
                 int renderingType = drawItem.draw(disp);
                 if(renderingType == IRenderer.CACHE_RENDERING) {
                     mRenderingState.cacheHitCount++;
