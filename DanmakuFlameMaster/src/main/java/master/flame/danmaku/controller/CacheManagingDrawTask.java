@@ -481,7 +481,6 @@ public class CacheManagingDrawTask extends DrawTask {
                         evictAll();
                         reset();
                         mSeekedFlag = true;
-                        clearFlag = 5;
                         break;
                     case CLEAR_OUTSIDE_CACHES:
                         evictAllNotInScreen(true);

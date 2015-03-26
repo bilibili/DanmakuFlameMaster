@@ -137,6 +137,7 @@ public class DanmakuGlobalConfig {
             scaleTextSize = p;
             AndroidDisplayer.clearTextHeightCache();
             GlobalFlagValues.updateMeasureFlag();
+            GlobalFlagValues.updateVisibleFlag();
             notifyConfigureChanged(DanmakuConfigTag.SCALE_TEXTSIZE, p);
         }
         isTextScaled = (scaleTextSize != 1f);
@@ -488,6 +489,7 @@ public class DanmakuGlobalConfig {
             scrollSpeedFactor = p;
             DanmakuFactory.updateDurationFactor(p);
             GlobalFlagValues.updateMeasureFlag();
+            GlobalFlagValues.updateVisibleFlag();
             notifyConfigureChanged(DanmakuConfigTag.SCROLL_SPEED_FACTOR, p);
         }
         return this;

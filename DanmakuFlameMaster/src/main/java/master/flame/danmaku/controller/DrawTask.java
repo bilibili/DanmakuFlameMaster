@@ -34,6 +34,7 @@ import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
+import master.flame.danmaku.danmaku.renderer.android.DanmakusRetainer;
 import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 public class DrawTask implements IDrawTask, ConfigChangedCallback {
@@ -56,7 +57,7 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
 
     private IDanmakus danmakus = new Danmakus(Danmakus.ST_BY_LIST);
 
-    protected int clearFlag;
+    protected boolean clearRetainerFlag;
 
     private long mStartRenderTime = 0;
 
@@ -211,6 +212,10 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     }
 
     protected RenderingState drawDanmakus(AbsDisplayer<?> disp, DanmakuTimer timer) {
+        if (clearRetainerFlag) {
+            DanmakusRetainer.clear();
+            clearRetainerFlag = false;
+        }
         if (danmakuList != null) {
             Canvas canvas = (Canvas) disp.getExtraData();
             DrawHelper.clearCanvas(canvas);
@@ -254,9 +259,12 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     }
 
     public void requestClear() {
-        clearFlag = 5;
         mLastBeginMills = mLastEndMills = 0;
         mIsHidden = false;
+    }
+
+    public void requestClearRetainer() {
+        clearRetainerFlag = true;
     }
 
     @Override
@@ -283,6 +291,9 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
                 }
                 handled = true;
             }
+        } else if (DanmakuConfigTag.SCALE_TEXTSIZE.equals(tag) || DanmakuConfigTag.SCROLL_SPEED_FACTOR.equals(tag)) {
+            requestClearRetainer();
+            handled = false;
         }
         return handled;
     }
