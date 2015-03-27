@@ -35,7 +35,6 @@ import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakusRetainer;
-import master.flame.danmaku.danmaku.util.AndroidCounter;
 
 public class DrawTask implements IDrawTask, ConfigChangedCallback {
     
@@ -52,8 +51,6 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     IRenderer mRenderer;
 
     DanmakuTimer mTimer;
-
-    AndroidCounter mCounter;
 
     private IDanmakus danmakus = new Danmakus(Danmakus.ST_BY_LIST);
 
@@ -74,7 +71,6 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
         mTaskListener = taskListener;
-        mCounter = new AndroidCounter();
         mContext = context;
         mRenderer = new DanmakuRenderer();
         mDisp = disp;
