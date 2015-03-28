@@ -61,12 +61,15 @@ public class DanmakuView extends View implements IDanmakuView {
 
     private boolean mDrawFinished = false;
 
+    private long mUiThreadId;
+
     public DanmakuView(Context context) {
         super(context);
         init();
     }
 
     private void init() {
+        mUiThreadId = Thread.currentThread().getId();
         setBackgroundColor(Color.TRANSPARENT);
         setDrawingCacheBackgroundColor(Color.TRANSPARENT);
         DrawHelper.useDrawColorToClearCanvas(true, false);
@@ -401,7 +404,7 @@ public class DanmakuView extends View implements IDanmakuView {
         if (!isViewReady()) {
             return;
         }
-        if (!mDanmakuVisible) {
+        if (!mDanmakuVisible || Thread.currentThread().getId() == mUiThreadId) {
             mClearFlag = true;
             postInvalidateCompat();
         } else {
