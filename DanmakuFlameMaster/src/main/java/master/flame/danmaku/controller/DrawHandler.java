@@ -303,12 +303,11 @@ public class DrawHandler extends Handler {
 
     private void quitUpdateThread() {
         if (mThread != null) {
-            mThread.quit();
             synchronized (drawTask) {
                 drawTask.notifyAll();
             }
+            mThread.quit();
             try {
-                mThread.interrupt();
                 mThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
