@@ -351,7 +351,7 @@ public class DrawHandler extends Handler {
         if (mThread != null) {
             return;
         }
-        mThread = new UpdateThread("DFM update") {
+        mThread = new UpdateThread("DFM Update") {
             @Override
             public void run() {
                 long lastTime = System.currentTimeMillis();

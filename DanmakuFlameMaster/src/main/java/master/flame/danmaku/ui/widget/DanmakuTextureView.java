@@ -53,7 +53,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     private Callback mCallback;
 
-    private HandlerThread mDrawThread;
+    private HandlerThread mHandlerThread;
 
     private DrawHandler handler;
 
@@ -159,21 +159,21 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
             handler.quit();
             handler = null;
         }
-        if (mDrawThread != null) {
+        if (mHandlerThread != null) {
             try {
-                mDrawThread.join();
+                mHandlerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            mDrawThread.quit();
-            mDrawThread = null;
+            mHandlerThread.quit();
+            mHandlerThread = null;
         }
     }
     
     protected Looper getLooper(int type){
-        if (mDrawThread != null) {
-            mDrawThread.quit();
-            mDrawThread = null;
+        if (mHandlerThread != null) {
+            mHandlerThread.quit();
+            mHandlerThread = null;
         }
         
         int priority;
@@ -191,10 +191,10 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
                 priority = android.os.Process.THREAD_PRIORITY_DEFAULT;
                 break;
         }
-        String threadName = "DFM Drawing thread #"+priority;
-        mDrawThread = new HandlerThread(threadName, priority);
-        mDrawThread.start();
-        return mDrawThread.getLooper();
+        String threadName = "DFM Handler Thread #"+priority;
+        mHandlerThread = new HandlerThread(threadName, priority);
+        mHandlerThread.start();
+        return mHandlerThread.getLooper();
     }
 
     private void prepare() {
@@ -281,7 +281,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView,
 
     @Override
     public void resume() {
-        if (handler != null && mDrawThread != null && handler.isPrepared())
+        if (handler != null && mHandlerThread != null && handler.isPrepared())
             handler.resume();
         else {
             restart();
