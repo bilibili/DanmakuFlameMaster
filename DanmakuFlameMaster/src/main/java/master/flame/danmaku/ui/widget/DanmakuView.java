@@ -229,7 +229,7 @@ public class DanmakuView extends View implements IDanmakuView {
         }
         postInvalidateCompat();
         synchronized (mDrawMonitor) {
-            while (!mDrawFinished) {
+            while ((!mDrawFinished) && (handler != null)) {
                 try {
                     mDrawMonitor.wait(200);
                 } catch (InterruptedException e) {
