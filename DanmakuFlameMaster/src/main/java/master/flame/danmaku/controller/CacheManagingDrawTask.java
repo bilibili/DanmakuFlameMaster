@@ -161,7 +161,10 @@ public class CacheManagingDrawTask extends DrawTask {
 
         private CacheHandler mHandler;
 
+        private boolean mEndFlag;
+
         public CacheManager(int maxSize, int screenSize) {
+            mEndFlag = false;
             mRealSize = 0;
             mMaxSize = maxSize;
             mScreenSize = screenSize;
@@ -191,7 +194,11 @@ public class CacheManagingDrawTask extends DrawTask {
             mHandler.begin();
         }
 
-        public void end() {            
+        public void end() {
+            mEndFlag = true;
+            synchronized (mDrawingNotify) {
+                mDrawingNotify.notifyAll();
+            }
             if (mHandler != null) {
                 mHandler.pause();
                 mHandler = null;
@@ -222,11 +229,11 @@ public class CacheManagingDrawTask extends DrawTask {
             return mRealSize/(float)mMaxSize;
         }
         
-        public synchronized boolean isPoolFull(){
+        public boolean isPoolFull(){
             return mRealSize + 5120 >= mMaxSize; 
         }
 
-        private synchronized void evictAll() {
+        private void evictAll() {
             if (mCaches != null) {
                 IDanmakuIterator it = mCaches.iterator();
                 while(it.hasNext()) {
@@ -238,11 +245,11 @@ public class CacheManagingDrawTask extends DrawTask {
             mRealSize = 0;
         }
         
-        private synchronized void evictAllNotInScreen() {
+        private void evictAllNotInScreen() {
             evictAllNotInScreen(false);
         }
 
-        private synchronized void evictAllNotInScreen(boolean removeAllReferences) {
+        private void evictAllNotInScreen(boolean removeAllReferences) {
             if (mCaches != null) {
                 IDanmakuIterator it = mCaches.iterator();
                 while (it.hasNext()) {
@@ -296,7 +303,7 @@ public class CacheManagingDrawTask extends DrawTask {
             }
         }
 
-        private synchronized boolean push(BaseDanmaku item, int itemSize) {
+        private boolean push(BaseDanmaku item, int itemSize) {
             int size = itemSize; //sizeOf(item);
             while (mRealSize + size > mMaxSize && mCaches.size() > 0) {
                 BaseDanmaku oldValue = mCaches.first();
@@ -313,31 +320,32 @@ public class CacheManagingDrawTask extends DrawTask {
             return true;
         }
 
-        private synchronized void clearTimeOutCaches() {
+        private void clearTimeOutCaches() {
             clearTimeOutCaches(mTimer.currMillisecond);
         }
 
-        private synchronized void clearTimeOutCaches(long time) {
+        private void clearTimeOutCaches(long time) {
             IDanmakuIterator it = mCaches.iterator();
-            while (it.hasNext()) {
+            while (it.hasNext() && !mEndFlag) {
                 BaseDanmaku val = it.next();
                 if (val.isTimeOut()) {
-                    try {
-                        synchronized (mDrawingNotify) {
+                    synchronized (mDrawingNotify) {
+                        try {
                             mDrawingNotify.wait(30);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break;
                         }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                     entryRemoved(false, val, null);
                     it.remove();
-                }else{
+                } else {
                     break;
                 }
             }
         }
         
-        private synchronized BaseDanmaku findReuseableCache(BaseDanmaku refDanmaku,
+        private BaseDanmaku findReuseableCache(BaseDanmaku refDanmaku,
                 boolean strictMode) {
             IDanmakuIterator it = mCaches.iterator();
             int slopPixel = 0;
@@ -617,6 +625,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            break;
                         }
                     }
 
