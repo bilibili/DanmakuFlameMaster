@@ -61,6 +61,8 @@ public class DanmakuView extends View implements IDanmakuView {
 
     private boolean mDrawFinished = false;
 
+    private boolean mRequestRender = false;
+
     private long mUiThreadId;
 
     public DanmakuView(Context context) {
@@ -216,6 +218,7 @@ public class DanmakuView extends View implements IDanmakuView {
     
     @SuppressLint("NewApi")
     private void postInvalidateCompat() {
+        mRequestRender = true;
         if(Build.VERSION.SDK_INT >= 16) {
             this.postInvalidateOnAnimation();
         } else {
@@ -258,6 +261,10 @@ public class DanmakuView extends View implements IDanmakuView {
     
     @Override
     protected void onDraw(Canvas canvas) {
+        if (!mRequestRender) {
+            super.onDraw(canvas);
+            return;
+        }
         if (mClearFlag) {
             DrawHelper.clearCanvas(canvas);
             mClearFlag = false;
@@ -274,6 +281,7 @@ public class DanmakuView extends View implements IDanmakuView {
                 }
             }
         }
+        mRequestRender = false;
         unlockCanvasAndPost();
     }
     
@@ -431,9 +439,14 @@ public class DanmakuView extends View implements IDanmakuView {
     }
 
     @Override
+    @SuppressLint("NewApi")
     public boolean isHardwareAccelerated() {
         // >= 3.0
-        return Build.VERSION.SDK_INT >= 11;
+        if (Build.VERSION.SDK_INT >= 11) {
+            return super.isHardwareAccelerated();
+        } else {
+            return false;
+        }
     }
 
 }
