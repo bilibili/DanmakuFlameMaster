@@ -62,7 +62,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     private static Paint UNDERLINE_PAINT;
     
     private static Paint BORDER_PAINT;
-    
+
     /**
      * 下划线高度
      */
@@ -82,7 +82,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
      * 描边宽度
      */
     private static float STROKE_WIDTH = 3.5f;
-    
+
+    /**
+     * 投影参数
+     */
+    private static float sProjectionOffsetX = 1.0f;
+    private static float sProjectionOffsetY = 1.0f;
+    private static int sProjectionAlpha = 0xCC;
 
     /**
      * 开启阴影，可动态改变
@@ -95,6 +101,12 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
      */
     public static boolean CONFIG_HAS_STROKE = true;
     private static boolean HAS_STROKE = CONFIG_HAS_STROKE;
+
+    /**
+     * 开启投影，可动态改变
+     */
+    public static boolean CONFIG_HAS_PROJECTION = false;
+    private static boolean HAS_PROJECTION = CONFIG_HAS_PROJECTION;
 
     /**
      * 开启抗锯齿，可动态改变
@@ -146,7 +158,15 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         PAINT.setStrokeWidth(s);
         STROKE_WIDTH = s;
     }
-    
+
+    public static void setProjectionConfig(float offsetX, float offsetY, int alpha) {
+        if (sProjectionOffsetX != offsetX || sProjectionOffsetY != offsetY || sProjectionAlpha != alpha) {
+            sProjectionOffsetX = (offsetX > 1.0f) ? offsetX : 1.0f;
+            sProjectionOffsetY = (offsetY > 1.0f) ? offsetY : 1.0f;
+            sProjectionAlpha = (alpha < 0) ? 0 : ((alpha > 255) ? 255 : alpha);
+        }
+    }
+
     public static void setFakeBoldText(boolean fakeBoldText){
         PAINT.setFakeBoldText(fakeBoldText);
     }
@@ -296,6 +316,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         
         HAS_STROKE = CONFIG_HAS_STROKE;
         HAS_SHADOW = CONFIG_HAS_SHADOW;
+        HAS_PROJECTION = CONFIG_HAS_PROJECTION;
         ANTI_ALIAS = !quick && CONFIG_ANTI_ALIAS;
         TextPaint paint = getPaint(danmaku, quick);
         if (danmaku.lines != null) {
@@ -303,7 +324,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             if (lines.length == 1) {
                 if (hasStroke(danmaku)) {
                     applyPaintConfig(danmaku, paint, true);
-                    canvas.drawText(lines[0], left, top - paint.ascent(), paint);
+                    float strokeLeft = left;
+                    float strokeTop = top - paint.ascent();
+                    if (HAS_PROJECTION) {
+                        strokeLeft += sProjectionOffsetX;
+                        strokeTop += sProjectionOffsetY;
+                    }
+                    canvas.drawText(lines[0], strokeLeft, strokeTop, paint);
                 }
                 applyPaintConfig(danmaku, paint, false);
                 canvas.drawText(lines[0], left, top - paint.ascent(), paint);
@@ -315,7 +342,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                     }
                     if (hasStroke(danmaku)) {
                         applyPaintConfig(danmaku, paint, true);
-                        canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
+                        float strokeLeft = left;
+                        float strokeTop = t * textHeight + top - paint.ascent();
+                        if (HAS_PROJECTION) {
+                            strokeLeft += sProjectionOffsetX;
+                            strokeTop += sProjectionOffsetY;
+                        }
+                        canvas.drawText(lines[t], strokeLeft, strokeTop, paint);
                     }
                     applyPaintConfig(danmaku, paint, false);
                     canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
@@ -324,7 +357,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         } else {
             if (hasStroke(danmaku)) {                
                 applyPaintConfig(danmaku, paint, true);
-                canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
+                float strokeLeft = left;
+                float strokeTop = top - paint.ascent();
+                if (HAS_PROJECTION) {
+                    strokeLeft += sProjectionOffsetX;
+                    strokeTop += sProjectionOffsetY;
+                }
+                canvas.drawText(danmaku.text, strokeLeft, strokeTop, paint);
             }
             applyPaintConfig(danmaku, paint, false);
             canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
@@ -347,7 +386,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     }
     
     private static boolean hasStroke(BaseDanmaku danmaku) {
-        return HAS_STROKE && STROKE_WIDTH > 0 && danmaku.textShadowColor != 0;
+        return (HAS_STROKE || HAS_PROJECTION) && STROKE_WIDTH > 0 && danmaku.textShadowColor != 0;
     }
 
     public static Paint getBorderPaint(BaseDanmaku danmaku) {
@@ -389,24 +428,27 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
         if (DanmakuGlobalConfig.DEFAULT.isTranslucent) {
             if(stroke){
-                paint.setStyle(Style.STROKE);
-                int color = (danmaku.textShadowColor & 0x00FFFFFF) | (DanmakuGlobalConfig.DEFAULT.transparency<<24);
-                paint.setColor(color);
+                paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
+                paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
+                int alpha = HAS_PROJECTION ? (sProjectionAlpha * (DanmakuGlobalConfig.DEFAULT.transparency / AlphaValue.MAX))
+                        : DanmakuGlobalConfig.DEFAULT.transparency;
+                paint.setAlpha(alpha);
             }else{
                 paint.setStyle(Style.FILL);
-                int color = (danmaku.textColor & 0x00FFFFFF) | (DanmakuGlobalConfig.DEFAULT.transparency<<24);
-                paint.setColor(color);
+                paint.setColor(danmaku.textColor & 0x00FFFFFF);
+                paint.setAlpha(DanmakuGlobalConfig.DEFAULT.transparency);
             }
-            paint.setAlpha(DanmakuGlobalConfig.DEFAULT.transparency);
         } else {
             if(stroke){
-                paint.setStyle(Style.STROKE);
-                paint.setColor(danmaku.textShadowColor);
+                paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
+                paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
+                int alpha = HAS_PROJECTION ? sProjectionAlpha : AlphaValue.MAX;
+                paint.setAlpha(alpha);
             }else{
                 paint.setStyle(Style.FILL);
-                paint.setColor(danmaku.textColor);
+                paint.setColor(danmaku.textColor & 0x00FFFFFF);
+                paint.setAlpha(AlphaValue.MAX);
             }
-            paint.setAlpha(AlphaValue.MAX);
         }
             
     }

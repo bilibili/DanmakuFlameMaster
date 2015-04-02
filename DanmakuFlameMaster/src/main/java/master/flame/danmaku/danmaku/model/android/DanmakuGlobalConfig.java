@@ -90,6 +90,7 @@ public class DanmakuGlobalConfig {
     public final static int DANMAKU_STYLE_NONE = 0; // 无
     public final static int DANMAKU_STYLE_SHADOW = 1; // 阴影
     public final static int DANMAKU_STYLE_STROKEN = 2; // 描边
+    public final static int DANMAKU_STYLE_PROJECTION = 3; // 投影
 
     public BorderType shadowType = BorderType.SHADOW;
 
@@ -302,29 +303,44 @@ public class DanmakuGlobalConfig {
      * 设置描边样式
      * 
      * @param type DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or
-     *            DANMAKU_STYLE_STROKEN
-     * @param size
+     *            DANMAKU_STYLE_STROKEN or DANMAKU_STYLE_PROJECTION
+     * @param values
+     *        DANMAKU_STYLE_SHADOW 阴影模式下，values传入阴影半径
+     *        DANMAKU_STYLE_STROKEN 描边模式下，values传入描边宽度
+     *        DANMAKU_STYLE_PROJECTION
+     *            投影模式下，values传入offsetX, offsetY, alpha
+     *                offsetX/offsetY: x/y 方向上的偏移量
+     *                alpha: 投影透明度 [0...255]
      * @return
      */
-    public DanmakuGlobalConfig setDanmakuStyle(int style, float size) {
+    public DanmakuGlobalConfig setDanmakuStyle(int style, float... values) {
         switch (style) {
             case DANMAKU_STYLE_NONE:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = false;
                 AndroidDisplayer.CONFIG_HAS_STROKE = false;
+                AndroidDisplayer.CONFIG_HAS_PROJECTION = false;
                 break;
             case DANMAKU_STYLE_SHADOW:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = true;
                 AndroidDisplayer.CONFIG_HAS_STROKE = false;
-                AndroidDisplayer.setShadowRadius(size);
+                AndroidDisplayer.CONFIG_HAS_PROJECTION = false;
+                AndroidDisplayer.setShadowRadius(values[0]);
                 break;
             case DANMAKU_STYLE_DEFAULT:
             case DANMAKU_STYLE_STROKEN:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = false;
                 AndroidDisplayer.CONFIG_HAS_STROKE = true;
-                AndroidDisplayer.setPaintStorkeWidth(size);
+                AndroidDisplayer.CONFIG_HAS_PROJECTION = false;
+                AndroidDisplayer.setPaintStorkeWidth(values[0]);
+                break;
+            case DANMAKU_STYLE_PROJECTION:
+                AndroidDisplayer.CONFIG_HAS_SHADOW = false;
+                AndroidDisplayer.CONFIG_HAS_STROKE = false;
+                AndroidDisplayer.CONFIG_HAS_PROJECTION = true;
+                AndroidDisplayer.setProjectionConfig(values[0], values[1], (int)values[2]);
                 break;
         }
-        notifyConfigureChanged(DanmakuConfigTag.DANMAKU_STYLE, style, size);
+        notifyConfigureChanged(DanmakuConfigTag.DANMAKU_STYLE, style, values[0]);
         return this;
     }
 
