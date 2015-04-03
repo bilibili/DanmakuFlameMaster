@@ -746,6 +746,7 @@ public class CacheManagingDrawTask extends DrawTask {
             public void requestBuildCacheAndDraw(long correctionTime) {
                 removeMessages(CacheHandler.BUILD_CACHES);
                 mSeekedFlag = true;
+                mCanelFlag = false;
                 mCacheTimer.update(mTimer.currMillisecond + correctionTime);
                 sendEmptyMessage(CacheHandler.BUILD_CACHES);
             }
@@ -771,6 +772,8 @@ public class CacheManagingDrawTask extends DrawTask {
             if (mHandler == null) {
                 return;
             }
+            mHandler.removeMessages(CacheHandler.BUILD_CACHES);
+            mHandler.requestCancelCaching();
             mHandler.removeMessages(CacheHandler.CLEAR_ALL_CACHES);
             mHandler.sendEmptyMessage(CacheHandler.CLEAR_ALL_CACHES);
         }
