@@ -430,7 +430,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             if(stroke){
                 paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
                 paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
-                int alpha = HAS_PROJECTION ? (sProjectionAlpha * (DanmakuGlobalConfig.DEFAULT.transparency / AlphaValue.MAX))
+                int alpha = HAS_PROJECTION ? (int)(sProjectionAlpha * ((float)DanmakuGlobalConfig.DEFAULT.transparency / AlphaValue.MAX))
                         : DanmakuGlobalConfig.DEFAULT.transparency;
                 paint.setAlpha(alpha);
             }else{
