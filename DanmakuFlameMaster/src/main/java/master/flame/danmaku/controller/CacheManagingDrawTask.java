@@ -411,14 +411,14 @@ public class CacheManagingDrawTask extends DrawTask {
 
             private boolean mSeekedFlag;
 
-            private boolean mCanelFlag;
+            private boolean mCancelFlag;
 
             public CacheHandler(android.os.Looper looper) {
                 super(looper);
             }
 
             public void requestCancelCaching() {
-                mCanelFlag = true;   
+                mCancelFlag = true;
             }
 
             @Override
@@ -579,7 +579,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 int currScreenIndex = 0;
                 int sizeInScreen = danmakus.size();
 //                String message = "";
-                while (!mPause && !mCanelFlag) {
+                while (!mPause && !mCancelFlag) {
                     boolean hasNext = itr.hasNext();
                     if(!hasNext){
 //                        message = "break at not hasNext";
@@ -732,7 +732,7 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             public void resume() {
-                mCanelFlag = false;
+                mCancelFlag = false;
                 mPause = false;
                 removeMessages(DISPATCH_ACTIONS);
                 sendEmptyMessage(DISPATCH_ACTIONS);
@@ -746,7 +746,7 @@ public class CacheManagingDrawTask extends DrawTask {
             public void requestBuildCacheAndDraw(long correctionTime) {
                 removeMessages(CacheHandler.BUILD_CACHES);
                 mSeekedFlag = true;
-                mCanelFlag = false;
+                mCancelFlag = false;
                 mCacheTimer.update(mTimer.currMillisecond + correctionTime);
                 sendEmptyMessage(CacheHandler.BUILD_CACHES);
             }
