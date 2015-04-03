@@ -422,7 +422,7 @@ public class DanmakuView extends View implements IDanmakuView {
 
     @Override
     public boolean isShown() {
-        return !(handler == null || !isViewReady()) && handler.getVisibility();
+        return mDanmakuVisible && super.isShown();
     }
 
     @Override
