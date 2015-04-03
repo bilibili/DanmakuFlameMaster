@@ -487,6 +487,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                     case CLEAR_ALL_CACHES:
                         evictAll();
+                        mCacheTimer.update(mTimer.currMillisecond);
                         mSeekedFlag = true;
                         break;
                     case CLEAR_OUTSIDE_CACHES:
