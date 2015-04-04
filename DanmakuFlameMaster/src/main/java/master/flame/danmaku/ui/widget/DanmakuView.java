@@ -261,7 +261,7 @@ public class DanmakuView extends View implements IDanmakuView {
     
     @Override
     protected void onDraw(Canvas canvas) {
-        if (!mRequestRender) {
+        if ((!mDanmakuVisible) && (!mRequestRender)) {
             super.onDraw(canvas);
             return;
         }
