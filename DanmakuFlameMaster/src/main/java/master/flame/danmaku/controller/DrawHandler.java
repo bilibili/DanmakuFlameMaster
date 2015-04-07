@@ -267,8 +267,11 @@ public class DrawHandler extends Handler {
                     break;
                 }
             case PAUSE:
+                removeMessages(UPDATE);
             case QUIT:
-                removeCallbacksAndMessages(null);
+                if (what == QUIT) {
+                    removeCallbacksAndMessages(null);
+                }
                 quitFlag = true;
                 syncTimerIfNeeded();
                 mSkipFrames = 0;
