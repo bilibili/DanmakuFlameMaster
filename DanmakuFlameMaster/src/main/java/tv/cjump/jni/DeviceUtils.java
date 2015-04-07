@@ -4,6 +4,7 @@ package tv.cjump.jni;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,6 +55,7 @@ public class DeviceUtils {
                         sArch = ARCH.ARM64;
                         break;
                     default:
+                        Log.e("NativeBitmapFactory", "libc.so is unknown arch: " + Integer.toHexString(machine));
                         break;
                 }
             } catch (FileNotFoundException e) {
@@ -135,6 +137,11 @@ public class DeviceUtils {
 
     public static boolean isProblemBoxDevice() {
         return isMiBox2Device() || isMagicBoxDevice();
+    }
+
+    public static boolean isRealARMArch() {
+        ARCH arch = getMyCpuArch();
+        return (supportABI("armeabi-v7a") || supportABI("armeabi")) && ARCH.ARM.equals(arch);
     }
 
 }
