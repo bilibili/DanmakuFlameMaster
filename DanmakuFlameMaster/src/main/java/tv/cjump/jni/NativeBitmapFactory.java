@@ -22,7 +22,7 @@ public class NativeBitmapFactory {
     }
 
     public static void loadLibs() {
-        if (!DeviceUtils.isRealARMArch()) {
+        if (!(DeviceUtils.isRealARMArch() || DeviceUtils.isRealX86Arch())) {
             nativeLibLoaded = false;
             return;
         }

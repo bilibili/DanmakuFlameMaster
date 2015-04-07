@@ -144,4 +144,9 @@ public class DeviceUtils {
         return (supportABI("armeabi-v7a") || supportABI("armeabi")) && ARCH.ARM.equals(arch);
     }
 
+    public static boolean isRealX86Arch() {
+        ARCH arch = getMyCpuArch();
+        return supportABI(ABI_X86) || ARCH.X86.equals(arch);
+    }
+
 }
