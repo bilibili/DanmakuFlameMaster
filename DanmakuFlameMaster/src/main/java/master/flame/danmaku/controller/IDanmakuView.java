@@ -1,7 +1,6 @@
 
 package master.flame.danmaku.controller;
 
-import android.content.Context;
 import android.view.View;
 
 import master.flame.danmaku.controller.DrawHandler.Callback;
@@ -20,12 +19,7 @@ public interface IDanmakuView {
     
     public boolean isPaused();
 
-    public boolean isViewReady();
-
-    public long drawDanmakus();
-    
     public boolean isHardwareAccelerated();
-
     /**
      * 
      * @param type One of THREAD_TYPE_MAIN_THREAD, THREAD_TYPE_HIGH_PRIORITY, THREAD_TYPE_NORMAL_PRIORITY, or THREAD_TYPE_LOW_PRIORITY.
@@ -55,14 +49,12 @@ public interface IDanmakuView {
     
     // ------------- Android View方法  --------------------
     
-    public Context getContext();
-    
     public View getView();
 
     public int getWidth();
 
     public int getHeight();
-    
+
     public void setVisibility(int visibility);
     
     public boolean isShown();
@@ -91,8 +83,6 @@ public interface IDanmakuView {
     public void show();
     
     public void hide();
-    
-    public void clear();
     
     /**
      * show the danmakuview again if you called hideAndPauseDrawTask()

@@ -29,9 +29,10 @@ import android.view.TextureView;
 import android.view.View;
 
 import master.flame.danmaku.controller.DrawHandler;
+import master.flame.danmaku.controller.IDanmakuView;
+import master.flame.danmaku.controller.IDanmakuViewController;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
-import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
@@ -46,7 +47,7 @@ import java.util.Locale;
  *
  */
 @SuppressLint("NewApi")
-public class DanmakuTextureView extends TextureView implements IDanmakuView,
+public class DanmakuTextureView extends TextureView implements IDanmakuView, IDanmakuViewController,
         TextureView.SurfaceTextureListener {
 
     public static final String TAG = "DanmakuTextureView";

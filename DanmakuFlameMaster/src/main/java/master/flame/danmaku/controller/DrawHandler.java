@@ -90,7 +90,7 @@ public class DrawHandler extends Handler {
 
     public IDrawTask drawTask;
 
-    private IDanmakuView mDanmakuView;
+    private IDanmakuViewController mDanmakuView;
 
     private boolean mDanmakusVisible = true;
 
@@ -130,7 +130,7 @@ public class DrawHandler extends Handler {
 
     private boolean mIdleSleep;
 
-    public DrawHandler(Looper looper, IDanmakuView view, boolean danmakuVisibile) {
+    public DrawHandler(Looper looper, IDanmakuViewController view, boolean danmakuVisibile) {
         super(looper);
         mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
         mIdleSleep = !DeviceUtils.isProblemBoxDevice();
@@ -143,7 +143,7 @@ public class DrawHandler extends Handler {
         mDanmakusVisible = danmakuVisibile;
     }
 
-    private void bindView(IDanmakuView view) {
+    private void bindView(IDanmakuViewController view) {
         this.mDanmakuView = view;
     }
 

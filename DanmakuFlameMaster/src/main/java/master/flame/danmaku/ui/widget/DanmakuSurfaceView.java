@@ -27,9 +27,10 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import master.flame.danmaku.controller.DrawHandler;
+import master.flame.danmaku.controller.IDanmakuView;
+import master.flame.danmaku.controller.IDanmakuViewController;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
-import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
@@ -37,7 +38,7 @@ import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import java.util.LinkedList;
 import java.util.Locale;
 
-public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, SurfaceHolder.Callback {
+public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDanmakuViewController, SurfaceHolder.Callback {
 
     public static final String TAG = "DanmakuSurfaceView";
 
