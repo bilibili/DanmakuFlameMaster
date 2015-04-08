@@ -400,4 +400,11 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
         return false;
     }
 
+    @Override
+    public void clearDanmakusOnScreen() {
+        if (handler != null) {
+            handler.clearDanmakusOnScreen();
+        }
+    }
+
 }

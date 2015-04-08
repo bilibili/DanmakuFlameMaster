@@ -72,6 +72,8 @@ public class DrawHandler extends Handler {
 
     private static final int UPDATE_WHEN_PAUSED = 12;
 
+    private static final int CLEAR_DANMAKUS_ON_SCREEN = 13;
+
     private static final long INDEFINITE_TIME = 10000000;
 
     private long pausedPosition = 0;
@@ -299,6 +301,11 @@ public class DrawHandler extends Handler {
                     drawTask.requestClear();
                     mDanmakuView.drawDanmakus();
                     notifyRendering();
+                }
+                break;
+            case CLEAR_DANMAKUS_ON_SCREEN:
+                if (drawTask != null) {
+                    drawTask.clearDanmakusOnScreen(getCurrentTime());
                 }
                 break;
         }
@@ -655,6 +662,10 @@ public class DrawHandler extends Handler {
             return timer.currMillisecond - mRemainingTime;
         }
         return System.currentTimeMillis() - mTimeBase;
+    }
+
+    public void clearDanmakusOnScreen() {
+        obtainMessage(CLEAR_DANMAKUS_ON_SCREEN).sendToTarget();
     }
 
 }

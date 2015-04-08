@@ -29,6 +29,8 @@ public interface IDrawTask {
 
     public void removeAllLiveDanmakus();
 
+    public void clearDanmakusOnScreen(long currMillis);
+
     public RenderingState draw(AbsDisplayer<?> displayer);
 
     public void reset();

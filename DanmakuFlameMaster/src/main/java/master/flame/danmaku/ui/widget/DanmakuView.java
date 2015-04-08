@@ -450,4 +450,11 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         }
     }
 
+    @Override
+    public void clearDanmakusOnScreen() {
+        if (handler != null) {
+            handler.clearDanmakusOnScreen();
+        }
+    }
+
 }

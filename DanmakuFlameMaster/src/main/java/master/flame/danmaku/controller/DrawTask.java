@@ -177,6 +177,13 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     }
 
     @Override
+    public void clearDanmakusOnScreen(long currMillis) {
+        reset();
+        GlobalFlagValues.updateVisibleFlag();
+        mStartRenderTime = currMillis;
+    }
+
+    @Override
     public void start() {
         DanmakuGlobalConfig.DEFAULT.registerConfigChangedCallback(this);
     }

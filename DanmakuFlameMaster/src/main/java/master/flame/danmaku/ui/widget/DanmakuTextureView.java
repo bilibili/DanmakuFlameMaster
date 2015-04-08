@@ -413,4 +413,11 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
         return false;
     }
 
+    @Override
+    public void clearDanmakusOnScreen() {
+        if (handler != null) {
+            handler.clearDanmakusOnScreen();
+        }
+    }
+
 }
