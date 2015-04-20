@@ -12,8 +12,6 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 
 - 使用多种方式(View/SurfaceView/TextureView)实现高效绘制
 
-- A站json弹幕格式解析
-
 - B站xml弹幕格式解析
 
 - 基础弹幕精确还原绘制
@@ -64,7 +62,7 @@ Snapshots of the development version are available in [Sonatype's snapshots repo
 
 
 ### License
-    Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
+    Copyright (C) 2013-2015 Chen Hui <calmer91@gmail.com>
     Licensed under the Apache License, Version 2.0 (the "License");
 
 
