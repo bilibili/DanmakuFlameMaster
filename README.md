@@ -4,27 +4,7 @@ DanmakuFlameMaster
 android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis-ci.org/ctiao/DanmakuFlameMaster.png?branch=master)](https://travis-ci.org/ctiao/DanmakuFlameMaster)
 
 ### DFM Inside: 
-[![hacfun](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/hacfun.png?raw=true)](http://www.coolapk.com/apk/tv.ac.fun)
-[![acfun](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/acfun.png?raw=true)](http://www.coolapk.com/apk/tv.acfundanmaku.video)
 [![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
-
-- 土豆客户端 http://mobile.tudou.com
-- 优酷客户端 http://mobile.youku.com/index/wireless
-- 网易新闻客户端 http://www.163.com/newsapp
-- 猎豹浏览器 https://play.google.com/store/apps/details?id=com.ijinshan.browser
-- 小米电视/盒子视频弹幕
-- 被窝 http://mobile.beiwo.ac
-- MissEvan http://www.missevan.cn/app
-- 开讯视频 http://www.ikaixun.com/osm-web/download.html
-- echo回声 http://echo.kibey.com/default
-- 斗鱼直播客户端 http://www.douyutv.com/client
-- AcFun视频民间版 https://github.com/yrom/acfunm
-- 爱稀饭精选（AcFun主站客户端） http://www.acfun.tv/app
-- 爱稀饭动画（AcFun动画客户端） http://www.acfun.tv/app
-- 哔哩哔哩动画(B站) https://play.google.com/store/apps/details?id=tv.danmaku.bili
-- 吐槽弹幕网(C站) http://www.tucao.cc/app/
-
-以上客户端均使用DFM弹幕引擎,实际效果可安装以上app参看。
 
 ### Features
 
