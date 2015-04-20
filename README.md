@@ -6,6 +6,8 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 ### DFM Inside: 
 [![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
 
+如果你的项目使用了DFM,并且希望在此处留下链接,请使用官方邮箱与我联系:chenhui@bilibili.com
+
 ### Features
 
 - 使用多种方式(View/SurfaceView/TextureView)实现高效绘制
