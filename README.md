@@ -1,7 +1,7 @@
 DanmakuFlameMaster
 ==================
 
-android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis-ci.org/ctiao/DanmakuFlameMaster.png?branch=master)](https://travis-ci.org/ctiao/DanmakuFlameMaster)
+android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis-ci.org/Bilibili/DanmakuFlameMaster.png?branch=master)](https://travis-ci.org/Bilibili/DanmakuFlameMaster)
 
 ### DFM Inside: 
 [![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
@@ -55,7 +55,7 @@ Download the [latest version][1] or grab via Maven:
 or Gradle:
 ```groovy
 dependencies {
-    compile 'com.github.ctiao:dfm:0.3.0'
+    compile 'com.github.ctiao:dfm:0.3.1'
 }
 ```
 Snapshots of the development version are available in [Sonatype's snapshots repository][2].
