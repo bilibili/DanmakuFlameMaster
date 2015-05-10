@@ -2,6 +2,7 @@ DanmakuFlameMaster
 ==================
 
 android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis-ci.org/Bilibili/DanmakuFlameMaster.png?branch=master)](https://travis-ci.org/Bilibili/DanmakuFlameMaster)
+ [![Comment-on-Github.Party](https://img.shields.io/badge/Comment%20on-Github.Party-yellow.svg)](https://github.party/item?id=59)
 
 ### DFM Inside: 
 [![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
