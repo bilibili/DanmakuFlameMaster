@@ -44,7 +44,7 @@ public abstract class BaseDanmaku {
     /**
      * 文本
      */
-    public String text;
+    public CharSequence text;
     
     /**
      * 多行文本: 如果有包含换行符需事先拆分到lines
@@ -160,6 +160,8 @@ public abstract class BaseDanmaku {
      * 计时
      */
     protected DanmakuTimer mTimer;
+
+    public Object obj;
 
     /**
      * 透明度

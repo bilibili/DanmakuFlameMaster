@@ -24,6 +24,11 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.text.Layout;
+import android.text.Layout.Alignment;
+import android.text.Spannable;
+import android.text.Spanned;
+import android.text.StaticLayout;
 import android.text.TextPaint;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
@@ -355,7 +360,8 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                 }
             }
         } else {
-            if (hasStroke(danmaku)) {                
+            boolean isSpannable = isSpannable(danmaku);
+            if (!isSpannable && hasStroke(danmaku)) {
                 applyPaintConfig(danmaku, paint, true);
                 float strokeLeft = left;
                 float strokeTop = top - paint.ascent();
@@ -363,10 +369,24 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                     strokeLeft += sProjectionOffsetX;
                     strokeTop += sProjectionOffsetY;
                 }
-                canvas.drawText(danmaku.text, strokeLeft, strokeTop, paint);
+                canvas.drawText(danmaku.text, 0, danmaku.text.length(), strokeLeft, strokeTop, paint);
             }
             applyPaintConfig(danmaku, paint, false);
-            canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
+            if (isSpannable) {
+                Layout layout = getLayout(danmaku, paint);
+                boolean needRestore = false;
+                if (left != 0 || top != 0) {
+                    canvas.save();
+                    canvas.translate(-left, -top);
+                    needRestore = true;
+                }
+                layout.draw(canvas);
+                if (needRestore) {
+                    canvas.restore();
+                }
+            } else {
+                canvas.drawText(danmaku.text, 0, danmaku.text.length(), left, top - paint.ascent(), paint);
+            }
         }
 
         // draw underline
@@ -385,7 +405,23 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     }
     
-    private static boolean hasStroke(BaseDanmaku danmaku) {
+    private final static boolean isSpannable(BaseDanmaku danmaku) {
+        return danmaku.text instanceof Spanned || danmaku.text instanceof Spannable;
+    }
+    
+    private final static Layout getLayout(BaseDanmaku danmaku, TextPaint paint) {
+        StaticLayout layoutInner = null;
+        if(danmaku.obj == null) {
+            layoutInner = new StaticLayout(danmaku.text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text,
+                    paint), Alignment.ALIGN_NORMAL, 0.0f, 0.0f, true);
+            danmaku.obj = layoutInner;
+        } else {
+            layoutInner = (StaticLayout) danmaku.obj;
+        }
+        return layoutInner;
+    }
+
+    private final static boolean hasStroke(BaseDanmaku danmaku) {
         return (HAS_STROKE || HAS_PROJECTION) && STROKE_WIDTH > 0 && danmaku.textShadowColor != 0;
     }
 
@@ -477,23 +513,30 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             applyPaintConfig(danmaku, paint, false);
         }
     }
-    
+
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
         float w = 0;
-        Float textHeight = getTextHeight(paint);
+        Float textHeight = null;
         if (danmaku.lines == null) {
-            w = danmaku.text == null ? 0 : paint.measureText(danmaku.text);
-            setDanmakuPaintWidthAndHeight(danmaku,w,textHeight);
+            if (isSpannable(danmaku)) {
+                Layout layout = getLayout(danmaku, paint);
+                w = danmaku.text == null ? 0 : layout.getWidth();
+                textHeight = (float) layout.getHeight();
+            } else {
+                w = danmaku.text == null ? 0 : paint.measureText(danmaku.text.toString());
+                textHeight = getTextHeight(paint);
+            }
+            setDanmakuPaintWidthAndHeight(danmaku, w, textHeight);
             return;
         }
-
-        for(String tempStr : danmaku.lines){
+        
+        textHeight = getTextHeight(paint);
+        for (String tempStr : danmaku.lines) {
             if (tempStr.length() > 0) {
                 float tr = paint.measureText(tempStr);
                 w = Math.max(tr, w);
             }
         }
-
         setDanmakuPaintWidthAndHeight(danmaku,w,danmaku.lines.length * textHeight);
     }
         

@@ -338,7 +338,7 @@ public class DanmakuFilters {
     public static class DuplicateMergingFilter extends BaseDanmakuFilter<Void> {
 
         protected final IDanmakus blockedDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
-        protected final LinkedHashMap<String, BaseDanmaku> currentDanmakus = new LinkedHashMap<String, BaseDanmaku>();
+        protected final LinkedHashMap<CharSequence, BaseDanmaku> currentDanmakus = new LinkedHashMap<CharSequence, BaseDanmaku>();
         private final IDanmakus passedDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
 
         private final void removeTimeoutDanmakus(final IDanmakus danmakus, long limitTime) {
@@ -361,13 +361,13 @@ public class DanmakuFilters {
             }
         }
 
-        private void removeTimeoutDanmakus(LinkedHashMap<String, BaseDanmaku> danmakus,
+        private void removeTimeoutDanmakus(LinkedHashMap<CharSequence, BaseDanmaku> danmakus,
                 int limitTime) {
-            Iterator<Entry<String, BaseDanmaku>> it = danmakus.entrySet().iterator();
+            Iterator<Entry<CharSequence, BaseDanmaku>> it = danmakus.entrySet().iterator();
             long startTime = System.currentTimeMillis();
             while (it.hasNext()) {
                 try {
-                    Entry<String, BaseDanmaku> entry = it.next();
+                    Entry<CharSequence, BaseDanmaku> entry = it.next();
                     BaseDanmaku item = entry.getValue();
                     if (item.isTimeOut()) {
                         it.remove();

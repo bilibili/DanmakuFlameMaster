@@ -237,8 +237,7 @@ public class DanmakuFactory {
         if (TextUtils.isEmpty(text) || !text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
             return;
         }
-        
-        String[] lines = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
+        String[] lines = danmaku.text.toString().split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
         if (lines.length > 1) {
             danmaku.lines = lines;
         }
