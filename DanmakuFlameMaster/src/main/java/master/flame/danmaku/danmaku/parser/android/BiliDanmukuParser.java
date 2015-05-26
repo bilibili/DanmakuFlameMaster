@@ -19,14 +19,6 @@ package master.flame.danmaku.danmaku.parser.android;
 import android.graphics.Color;
 import android.text.TextUtils;
 
-import master.flame.danmaku.danmaku.model.AlphaValue;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.Duration;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.xml.sax.Attributes;
@@ -38,6 +30,14 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
 import java.util.Locale;
+
+import master.flame.danmaku.danmaku.model.AlphaValue;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.Duration;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
 
@@ -152,7 +152,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                 item.index = index++;
 
                 // initial specail danmaku data
-                String text = item.text.trim();
+                String text = String.valueOf(item.text).trim();
                 if (item.getType() == BaseDanmaku.TYPE_SPECIAL && text.startsWith("[")
                         && text.endsWith("]")) {
                     //text = text.substring(1, text.length() - 1);

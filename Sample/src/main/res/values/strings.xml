@@ -10,7 +10,8 @@
     <string name="show_danmaku">show</string>
     <string name="pause_danmaku">pause</string>
     <string name="resume_danmaku">resume</string>
-    <string name="send_danmaku">发送一条</string>
+    <string name="send_danmaku">发送一条(纯文字)</string>
+    <string name="send_danmaku_image_text">发送一条(图文)</string>
     <string name="send_danmakus">定时发送</string>
     <string name="cancel_sending_danmakus">取消定时</string>
 

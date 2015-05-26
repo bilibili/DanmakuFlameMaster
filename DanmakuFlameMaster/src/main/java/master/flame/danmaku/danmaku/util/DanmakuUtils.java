@@ -165,7 +165,7 @@ public class DanmakuUtils {
             return 1;
         }
 
-        int r = obj1.text.compareTo(obj2.text);
+        int r = (String.valueOf(obj1.text)).compareTo((String)obj2.text);
         if (r != 0) {
             return r;
         }

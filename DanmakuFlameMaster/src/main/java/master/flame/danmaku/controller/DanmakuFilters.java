@@ -1,12 +1,6 @@
 
 package master.flame.danmaku.controller;
 
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
-import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -15,6 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.IDanmakuIterator;
+import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
 
 public class DanmakuFilters {
 
@@ -396,12 +396,12 @@ public class DanmakuFilters {
                 return false;
             }
             if (currentDanmakus.containsKey(danmaku.text)) {
-                currentDanmakus.put(danmaku.text, danmaku);
+                currentDanmakus.put(String.valueOf(danmaku.text), danmaku);
                 blockedDanmakus.removeItem(danmaku);
                 blockedDanmakus.addItem(danmaku);
                 return true;
             } else {
-                currentDanmakus.put(danmaku.text, danmaku);
+                currentDanmakus.put(String.valueOf(danmaku.text), danmaku);
                 passedDanmakus.addItem(danmaku);
                 return false;
             }
