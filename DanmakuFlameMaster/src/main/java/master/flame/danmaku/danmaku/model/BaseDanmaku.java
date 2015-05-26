@@ -16,6 +16,10 @@
 
 package master.flame.danmaku.danmaku.model;
 
+import android.text.Spannable;
+import android.text.Spanned;
+import android.text.StaticLayout;
+
 public abstract class BaseDanmaku {
 
     public final static String DANMAKU_BR_CHAR = "/n";
@@ -45,7 +49,7 @@ public abstract class BaseDanmaku {
      * 文本
      */
     public CharSequence text;
-    
+
     /**
      * 多行文本: 如果有包含换行符需事先拆分到lines
      */
@@ -80,17 +84,17 @@ public abstract class BaseDanmaku {
      * 字体大小
      */
     public float textSize = -1;
-    
+
     /**
      * 框的颜色,0表示无框
      */
     public int borderColor = 0;
-    
+
     /**
      * 内边距(像素)
      */
     public int padding = 0;
-    
+
     /**
      * 弹幕优先级,0为低优先级,>0为高优先级不会被过滤器过滤
      */
@@ -120,12 +124,12 @@ public abstract class BaseDanmaku {
      * 是否可见
      */
     public int visibility;
-    
+
     /**
      * 重置位 visible
      */
     private int visibleResetFlag = 0;
-    
+
     /**
      * 重置位 measure
      */
@@ -135,22 +139,22 @@ public abstract class BaseDanmaku {
      * 绘制用缓存
      */
     public IDrawingCache<?> cache;
-    
+
     /**
      * 是否是直播弹幕
      */
     public boolean isLive;
-    
+
     /**
      * 弹幕发布者id, 0表示游客
      */
     public int userId = 0;
-    
+
     /**
      * 弹幕发布者id
      */
     public String userHash;
-    
+
     /**
      * 是否游客
      */
@@ -165,6 +169,11 @@ public abstract class BaseDanmaku {
      * 透明度
      */
     protected int alpha = AlphaValue.MAX;
+
+    /**
+     * 处理图文的工具类
+     */
+    public StaticLayout mStaticLayout;
 
     public long getDuration() {
         return duration.value;
@@ -211,18 +220,18 @@ public abstract class BaseDanmaku {
 
     public boolean isOutside(long ctime) {
         long dtime = ctime - time;
-        return dtime <= 0 ||  dtime >= duration.value;
+        return dtime <= 0 || dtime >= duration.value;
     }
-    
+
     public boolean isLate() {
         return mTimer == null || mTimer.currMillisecond < time;
     }
 
     public void setVisibility(boolean b) {
-        if(b){
+        if (b) {
             this.visibleResetFlag = GlobalFlagValues.VISIBLE_RESET_FLAG;
             this.visibility = VISIBLE;
-        }else
+        } else
             this.visibility = INVISIBLE;
     }
 
@@ -240,9 +249,9 @@ public abstract class BaseDanmaku {
 
     /**
      * return the type of Danmaku
-     * 
+     *
      * @return TYPE_SCROLL_RL = 0 TYPE_SCROLL_RL = 1 TYPE_SCROLL_LR = 2
-     *         TYPE_FIX_TOP = 3; TYPE_FIX_BOTTOM = 4;
+     * TYPE_FIX_TOP = 3; TYPE_FIX_BOTTOM = 4;
      */
     public abstract int getType();
 
@@ -257,5 +266,14 @@ public abstract class BaseDanmaku {
     public int getAlpha() {
         return alpha;
     }
-    
+
+    /**
+     * 判断弹幕的展示类型
+     *
+     * @return true 表示以图文方式展示
+     * false 表示只以文本方式展示
+     */
+    public boolean isSpannable() {
+        return text == null ? false : text instanceof Spanned || text instanceof Spannable;
+    }
 }

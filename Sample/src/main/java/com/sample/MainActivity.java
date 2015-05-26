@@ -128,19 +128,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mParser = createParser(null);
             mDanmakuView.setCallback(new Callback() {
-
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
-
                 }
-
                 @Override
                 public void prepared() {
                     mDanmakuView.start();
                 }
             });
             mDanmakuView.prepare(mParser);
-
             mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
             ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
