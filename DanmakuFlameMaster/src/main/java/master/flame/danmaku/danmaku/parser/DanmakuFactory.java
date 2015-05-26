@@ -238,7 +238,7 @@ public class DanmakuFactory {
             return;
         }
         
-        String[] lines = danmaku.text.split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
+        String[] lines = String.valueOf(danmaku.text).split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
         if (lines.length > 1) {
             danmaku.lines = lines;
         }
@@ -248,8 +248,7 @@ public class DanmakuFactory {
      * Initial translation data of the special danmaku
      * 
      * @param item
-     * @param dispWidth
-     * @param dispHeight
+     * @param beginX
      * @param beginX
      * @param beginY
      * @param endX

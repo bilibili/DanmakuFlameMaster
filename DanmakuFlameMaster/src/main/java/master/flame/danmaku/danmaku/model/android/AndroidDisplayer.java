@@ -24,16 +24,19 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.text.Layout;
+import android.text.SpannableStringBuilder;
+import android.text.StaticLayout;
 import android.text.TextPaint;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by MoiTempete.
@@ -43,11 +46,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     private Camera camera = new Camera();
 
     private Matrix matrix = new Matrix();
-    
-    private final static Map<Float,Float> sTextHeightCache = new HashMap<Float,Float>();
-    
+
+    private final static Map<Float, Float> sTextHeightCache = new HashMap<Float, Float>();
+
     private static float sLastScaleTextSize;
-    private final static Map<Float,Float> sCachedScaleSize = new HashMap<Float, Float>(10);
+    private final static Map<Float, Float> sCachedScaleSize = new HashMap<Float, Float>(10);
 
     @SuppressWarnings("unused")
     private int HIT_CACHE_COUNT = 0;
@@ -60,14 +63,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     private static Paint ALPHA_PAINT;
 
     private static Paint UNDERLINE_PAINT;
-    
+
     private static Paint BORDER_PAINT;
 
     /**
      * 下划线高度
      */
     public static int UNDERLINE_HEIGHT = 4;
-    
+
     /**
      * 边框厚度
      */
@@ -126,10 +129,10 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         BORDER_PAINT.setStyle(Style.STROKE);
         BORDER_PAINT.setStrokeWidth(BORDER_WIDTH);
     }
-    
+
     @SuppressLint("NewApi")
     private static final int getMaximumBitmapWidth(Canvas c) {
-        if(Build.VERSION.SDK_INT >= 14) {
+        if (Build.VERSION.SDK_INT >= 14) {
             return c.getMaximumBitmapWidth();
         } else {
             return c.getWidth();
@@ -138,23 +141,23 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     @SuppressLint("NewApi")
     private static final int getMaximumBitmapHeight(Canvas c) {
-        if(Build.VERSION.SDK_INT >= 14) {
+        if (Build.VERSION.SDK_INT >= 14) {
             return c.getMaximumBitmapHeight();
         } else {
             return c.getHeight();
         }
     }
 
-    public static void setTypeFace(Typeface font){
-        if(PAINT!=null)
+    public static void setTypeFace(Typeface font) {
+        if (PAINT != null)
             PAINT.setTypeface(font);
     }
-    
-    public static void setShadowRadius(float s){
+
+    public static void setShadowRadius(float s) {
         SHADOW_RADIUS = s;
     }
-    
-    public static void setPaintStorkeWidth(float s){
+
+    public static void setPaintStorkeWidth(float s) {
         PAINT.setStrokeWidth(s);
         STROKE_WIDTH = s;
     }
@@ -167,7 +170,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         }
     }
 
-    public static void setFakeBoldText(boolean fakeBoldText){
+    public static void setFakeBoldText(boolean fakeBoldText) {
         PAINT.setFakeBoldText(fakeBoldText);
     }
 
@@ -241,14 +244,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                 }
 
                 int alpha = danmaku.getAlpha();
-                if ( alpha != AlphaValue.MAX) {
+                if (alpha != AlphaValue.MAX) {
                     alphaPaint = ALPHA_PAINT;
                     alphaPaint.setAlpha(danmaku.getAlpha());
                 }
             }
-            
+
             // skip drawing when danmaku is transparent
-            if(alphaPaint!=null && alphaPaint.getAlpha()== AlphaValue.TRANSPARENT){
+            if (alphaPaint != null && alphaPaint.getAlpha() == AlphaValue.TRANSPARENT) {
                 return IRenderer.NOTHING_RENDERING;
             }
             // drawing cache
@@ -273,10 +276,10 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             if (needRestore) {
                 restoreCanvas(canvas);
             }
-            
+
             return result;
         }
-        
+
         return IRenderer.NOTHING_RENDERING;
     }
 
@@ -313,7 +316,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             left += BORDER_WIDTH;
             top += BORDER_WIDTH;
         }
-        
+
         HAS_STROKE = CONFIG_HAS_STROKE;
         HAS_SHADOW = CONFIG_HAS_SHADOW;
         HAS_PROJECTION = CONFIG_HAS_PROJECTION;
@@ -355,18 +358,50 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                 }
             }
         } else {
-            if (hasStroke(danmaku)) {                
+            StaticLayout staticLayout=null;
+            if (hasStroke(danmaku)) {
                 applyPaintConfig(danmaku, paint, true);
                 float strokeLeft = left;
                 float strokeTop = top - paint.ascent();
+
                 if (HAS_PROJECTION) {
                     strokeLeft += sProjectionOffsetX;
                     strokeTop += sProjectionOffsetY;
                 }
-                canvas.drawText(danmaku.text, strokeLeft, strokeTop, paint);
+                CharSequence text = danmaku.text;
+                if (text instanceof String) {
+                    canvas.drawText((String) danmaku.text, strokeLeft, strokeTop, paint);
+                } else if (text instanceof SpannableStringBuilder) {
+                    staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(text,
+                            paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+                    boolean needRestore = false;
+                    if (strokeLeft != 0 && top != 0) {
+                        canvas.save();
+                        canvas.translate(strokeLeft, top);
+                        needRestore = true;
+                    }
+                    staticLayout.draw(canvas);
+                    if (needRestore) {
+                        canvas.restore();
+                    }
+                }
             }
             applyPaintConfig(danmaku, paint, false);
-            canvas.drawText(danmaku.text, left, top - paint.ascent(), paint);
+            if (danmaku.text instanceof String) {
+                canvas.drawText((String) danmaku.text, left, top - paint.ascent(), paint);
+            } else if (danmaku.text instanceof SpannableStringBuilder) {
+                boolean needRestore = false;
+                if (left != 0 && (top) != 0) {
+                    canvas.save();
+                    canvas.translate(left, top);
+                    needRestore = true;
+                }
+                staticLayout.draw(canvas);
+                if (needRestore) {
+                    canvas.restore();
+                }
+            }
+
         }
 
         // draw underline
@@ -375,7 +410,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             float bottom = _top + danmaku.paintHeight - UNDERLINE_HEIGHT;
             canvas.drawLine(_left, bottom, _left + danmaku.paintWidth, bottom, linePaint);
         }
-        
+
         //draw border
         if (danmaku.borderColor != 0) {
             Paint borderPaint = getBorderPaint(danmaku);
@@ -384,7 +419,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         }
 
     }
-    
+
     private static boolean hasStroke(BaseDanmaku danmaku) {
         return (HAS_STROKE || HAS_PROJECTION) && STROKE_WIDTH > 0 && danmaku.textShadowColor != 0;
     }
@@ -394,11 +429,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         return BORDER_PAINT;
     }
 
-    public static Paint getUnderlinePaint(BaseDanmaku danmaku){
+    public static Paint getUnderlinePaint(BaseDanmaku danmaku) {
         UNDERLINE_PAINT.setColor(danmaku.underlineColor);
         return UNDERLINE_PAINT;
     }
-    
+
     private static TextPaint getPaint(BaseDanmaku danmaku, boolean quick) {
         TextPaint paint;
         if (quick) {
@@ -409,7 +444,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         }
         paint.setTextSize(danmaku.textSize);
         applyTextScaleConfig(danmaku, paint);
-        
+
         //ignore the transparent textShadowColor
         if (!HAS_SHADOW || SHADOW_RADIUS <= 0 || danmaku.textShadowColor == 0) {
             paint.clearShadowLayer();
@@ -423,34 +458,34 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     public static TextPaint getPaint(BaseDanmaku danmaku) {
         return getPaint(danmaku, false);
     }
-    
-    private static void applyPaintConfig(BaseDanmaku danmaku, Paint paint,boolean stroke) {
+
+    private static void applyPaintConfig(BaseDanmaku danmaku, Paint paint, boolean stroke) {
 
         if (DanmakuGlobalConfig.DEFAULT.isTranslucent) {
-            if(stroke){
+            if (stroke) {
                 paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
                 paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
                 int alpha = HAS_PROJECTION ? (int)(sProjectionAlpha * ((float)DanmakuGlobalConfig.DEFAULT.transparency / AlphaValue.MAX))
                         : DanmakuGlobalConfig.DEFAULT.transparency;
                 paint.setAlpha(alpha);
-            }else{
+            } else {
                 paint.setStyle(Style.FILL);
                 paint.setColor(danmaku.textColor & 0x00FFFFFF);
                 paint.setAlpha(DanmakuGlobalConfig.DEFAULT.transparency);
             }
         } else {
-            if(stroke){
+            if (stroke) {
                 paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
                 paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
                 int alpha = HAS_PROJECTION ? sProjectionAlpha : AlphaValue.MAX;
                 paint.setAlpha(alpha);
-            }else{
+            } else {
                 paint.setStyle(Style.FILL);
                 paint.setColor(danmaku.textColor & 0x00FFFFFF);
                 paint.setAlpha(AlphaValue.MAX);
             }
         }
-            
+
     }
 
     private static void applyTextScaleConfig(BaseDanmaku danmaku, Paint paint) {
@@ -465,7 +500,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         }
         paint.setTextSize(size);
     }
-    
+
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);
@@ -477,26 +512,39 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             applyPaintConfig(danmaku, paint, false);
         }
     }
-    
+
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
         float w = 0;
         Float textHeight = getTextHeight(paint);
+
         if (danmaku.lines == null) {
-            w = danmaku.text == null ? 0 : paint.measureText(danmaku.text);
-            setDanmakuPaintWidthAndHeight(danmaku,w,textHeight);
+            //w = danmaku.text == null ? 0 : paint.measureText((String)danmaku.text);
+            //setDanmakuPaintWidthAndHeight(danmaku,w,textHeight);
+            CharSequence text = danmaku.text;
+            if (text == null) {
+                w = 0;
+            } else if (text instanceof String) {
+                w = paint.measureText((String) danmaku.text);
+            } else if (text instanceof SpannableStringBuilder) {
+                StaticLayout staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(text,
+                        paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+                w = staticLayout.getWidth();
+                textHeight = (float) staticLayout.getLineTop(1);
+            }
+            setDanmakuPaintWidthAndHeight(danmaku, w, textHeight);
             return;
         }
 
-        for(String tempStr : danmaku.lines){
+        for (String tempStr : danmaku.lines) {
             if (tempStr.length() > 0) {
                 float tr = paint.measureText(tempStr);
                 w = Math.max(tr, w);
             }
         }
 
-        setDanmakuPaintWidthAndHeight(danmaku,w,danmaku.lines.length * textHeight);
+        setDanmakuPaintWidthAndHeight(danmaku, w, danmaku.lines.length * textHeight);
     }
-        
+
     private void setDanmakuPaintWidthAndHeight(BaseDanmaku danmaku, float w, float h) {
         float pw = w + 2 * danmaku.padding;
         float ph = h + 2 * danmaku.padding;
@@ -511,15 +559,15 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     private static float getTextHeight(TextPaint paint) {
         Float textSize = paint.getTextSize();
         Float textHeight = sTextHeightCache.get(textSize);
-        if(textHeight == null){
+        if (textHeight == null) {
             Paint.FontMetrics fontMetrics = paint.getFontMetrics();
             textHeight = fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading;
             sTextHeightCache.put(textSize, textHeight);
-        }  
+        }
         return textHeight;
     }
-    
-    public static void clearTextHeightCache(){
+
+    public static void clearTextHeightCache() {
         sTextHeightCache.clear();
         sCachedScaleSize.clear();
     }
@@ -533,7 +581,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     public void resetSlopPixel(float factor) {
         float d = Math.max(density, scaledDensity);
         d = Math.max(factor, getWidth() / (float) DanmakuFactory.BILI_PLAYER_WIDTH); //correct for low density and high resolution
-        float slop = d * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE; 
+        float slop = d * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE;
         mSlopPixel = (int) slop;
         if (factor > 1f)
             mSlopPixel = (int) (slop * factor);
@@ -588,7 +636,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     @Override
     public boolean isHardwareAccelerated() {
-        return mIsHardwareAccelerated ;
+        return mIsHardwareAccelerated;
     }
 
     @Override
