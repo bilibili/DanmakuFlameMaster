@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.View;
@@ -123,10 +124,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false);
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false)
+        .setMaximumVisibleSizeInScreen(7);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
-            mParser = createParser(null);
             mDanmakuView.setCallback(new Callback() {
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
@@ -276,13 +277,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void addDanmaKuShowTextAndImage(boolean islive){
         BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
-        String text="bitmap";
-        SpannableStringBuilder spannableStringBuilder=new SpannableStringBuilder(text);
+        String text = "bitmap";
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
         Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher);
-        drawable.setBounds(0, 0,100,100);
-        ImageSpan span=new ImageSpan(drawable, ImageSpan.ALIGN_BOTTOM);
-        spannableStringBuilder.setSpan(span,0,text.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        drawable.setBounds(0, 0, 100, 100);
+        ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BOTTOM);
+        spannableStringBuilder.setSpan(span, 0, text.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         spannableStringBuilder.append("图文混排");
+        spannableStringBuilder.setSpan(new BackgroundColorSpan(Color.parseColor("#8A2233B1")), 0, spannableStringBuilder.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         danmaku.text = spannableStringBuilder;
         danmaku.padding = 5;
         danmaku.priority = 1;
@@ -290,9 +292,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         danmaku.time = mDanmakuView.getCurrentTime() + 1200;
         danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
         danmaku.textColor = Color.RED;
-        danmaku.textShadowColor = Color.WHITE;
-        //danmaku.underlineColor = Color.GREEN;
-        /// danmaku.borderColor = Color.GREEN;
+        danmaku.textShadowColor = 0; // 重要：如果有图文混排，最好不要设置描边(设textShadowColor=0)，否则会进行两次复杂的绘制导致运行效率降低
+        danmaku.underlineColor = Color.GREEN;
         mDanmakuView.addDanmaku(danmaku);
     }
 

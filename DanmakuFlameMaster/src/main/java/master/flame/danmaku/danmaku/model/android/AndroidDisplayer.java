@@ -37,9 +37,6 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 
-/**
- * Created by MoiTempete.
- */
 public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private Camera camera = new Camera();
@@ -366,7 +363,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                     strokeLeft += sProjectionOffsetX;
                     strokeTop += sProjectionOffsetY;
                 }
-                CharSequence text = danmaku.text;
                 if (danmaku.isSpannable()) {
                     boolean needRestore = false;
                     if (strokeLeft != 0 && top != 0) {
@@ -513,26 +509,23 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
         float w = 0;
-        Float textHeight = getTextHeight(paint);
-
+        Float textHeight = 0f;
         if (danmaku.lines == null) {
-            //w = danmaku.text == null ? 0 : paint.measureText((String)danmaku.text);
-            //setDanmakuPaintWidthAndHeight(danmaku,w,textHeight);
-            CharSequence text = danmaku.text;
-            if (text == null) {
+            if(danmaku.text == null) {
                 w = 0;
             } else if (danmaku.isSpannable()) {
-                danmaku.mStaticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(text,
-                        paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+                danmaku.mStaticLayout = new StaticLayout(danmaku.text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
                 w = danmaku.mStaticLayout.getWidth();
-                textHeight = (float) danmaku.mStaticLayout.getLineTop(1);
+                textHeight = (float) danmaku.mStaticLayout.getHeight();
             } else {
-                w = paint.measureText((String) danmaku.text);
+                w = paint.measureText(danmaku.text.toString());
+                textHeight = getTextHeight(paint);
             }
             setDanmakuPaintWidthAndHeight(danmaku, w, textHeight);
             return;
         }
 
+        textHeight = getTextHeight(paint);
         for (String tempStr : danmaku.lines) {
             if (tempStr.length() > 0) {
                 float tr = paint.measureText(tempStr);
