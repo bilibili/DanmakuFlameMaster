@@ -379,7 +379,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
 
     @Override
     public boolean isShown() {
-        return !(handler == null || !isViewReady()) && handler.getVisibility();
+        return mDanmakuVisible && super.isShown();
     }
 
     @Override
