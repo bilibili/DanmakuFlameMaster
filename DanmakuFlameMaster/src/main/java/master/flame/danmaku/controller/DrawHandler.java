@@ -493,13 +493,13 @@ public class DrawHandler extends Handler {
                 displayMetrics.scaledDensity);
         mDisp.resetSlopPixel(DanmakuGlobalConfig.DEFAULT.scaleTextSize);
         mDisp.setHardwareAccelerated(isHardwareAccelerated);
-        obtainMessage(NOTIFY_DISP_SIZE_CHANGED, false).sendToTarget();
 
         IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, context, mDisp,
                 taskListener, 1024 * 1024 * AndroidUtils.getMemoryClass(context) / 3)
                 : new DrawTask(timer, context, mDisp, taskListener);
         task.setParser(mParser);
         task.prepare();
+        obtainMessage(NOTIFY_DISP_SIZE_CHANGED, false).sendToTarget();
         return task;
     }
 
