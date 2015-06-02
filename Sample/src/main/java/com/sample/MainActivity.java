@@ -74,9 +74,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private BaseDanmakuParser createParser(InputStream stream) {
         
-        if(stream==null){
+        if (stream != null) {
             return new BaseDanmakuParser() {
-                
+
                 @Override
                 protected Danmakus parse() {
                     return new Danmakus();
@@ -125,7 +125,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // DanmakuView
         mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false)
-        .setMaximumVisibleSizeInScreen(7);
+        .setMaximumVisibleSizeInScreen(80);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
@@ -244,11 +244,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
     
     Timer timer = new Timer();
+
     class AsyncAddTask extends TimerTask {
-        
+
         @Override
         public void run() {
-            for(int i = 0;i<5;i++) {
+            for (int i = 0; i < 20; i++) {
                 addDanmaku(true);
                 SystemClock.sleep(20);
             }
@@ -258,6 +259,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     //
     private void addDanmaku(boolean islive) {
         BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
+        if(danmaku == null || mDanmakuView == null) {
+            return;
+        }
         //for(int i=0;i<100;i++){
         //}
         danmaku.text = "这是一条弹幕" + System.nanoTime();

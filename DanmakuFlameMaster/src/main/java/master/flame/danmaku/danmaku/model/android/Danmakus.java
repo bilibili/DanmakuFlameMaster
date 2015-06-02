@@ -25,6 +25,7 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
@@ -178,7 +179,11 @@ public class Danmakus implements IDanmakus {
     @Override
     public IDanmakus subnew(long startTime, long endTime) {
         Collection<BaseDanmaku> subset = subset(startTime, endTime);
-        return new Danmakus(subset);
+        if (subset == null) {
+            return null;
+        }
+        LinkedList<BaseDanmaku> newSet = new LinkedList<BaseDanmaku>(subset);
+        return new Danmakus(newSet);
     }
 
     @Override

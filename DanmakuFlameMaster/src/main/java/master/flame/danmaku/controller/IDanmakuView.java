@@ -32,6 +32,10 @@ public interface IDanmakuView {
 
     public void showFPS(boolean show);
     
+    /**
+     * 如果批量添加弹幕,请在非UI线程中使用此方法
+     * @param item
+     */
     public void addDanmaku(BaseDanmaku item);
     
     public void removeAllDanmakus();
