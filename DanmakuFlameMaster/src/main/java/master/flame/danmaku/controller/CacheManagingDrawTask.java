@@ -575,7 +575,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 IDanmakuIterator itr = danmakus.iterator();
                 BaseDanmaku item = null;
                 long consumingTime = 0;
-                int count = 0;
                 int orderInScreen = 0;
                 int currScreenIndex = 0;
                 int sizeInScreen = danmakus.size();
@@ -587,7 +586,6 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                     }
                     item = itr.next();
-                    count++;
                     
                     if (last.time < mTimer.currMillisecond) {
 //                        message = "break at last.time < mTimer.currMillisecond";

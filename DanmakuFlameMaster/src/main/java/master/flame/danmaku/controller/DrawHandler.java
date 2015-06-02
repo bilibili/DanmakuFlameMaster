@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.controller;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Handler;
@@ -100,6 +101,7 @@ public class DrawHandler extends Handler {
 
     private final RenderingState mRenderingState = new RenderingState();
 
+    @SuppressLint("Deprecated")
     private int mSkipFrames;
 
     private static final int MAX_RECORD_SIZE = 500;

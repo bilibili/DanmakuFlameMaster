@@ -25,7 +25,6 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;

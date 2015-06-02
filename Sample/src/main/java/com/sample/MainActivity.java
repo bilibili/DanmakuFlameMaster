@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private View mMediaController;
 
     public PopupWindow mPopupWindow;
-    
+
     private Button mBtnRotate;
 
     private Button mBtnHideDanmaku;
@@ -61,8 +61,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private Button mBtnSendDanmakuTextAndImage;
 
-    private long mPausedPosition;
-
     private Button mBtnSendDanmakus;
 
     @Override
@@ -73,7 +71,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private BaseDanmakuParser createParser(InputStream stream) {
-        
+
         if (stream != null) {
             return new BaseDanmakuParser() {
 
@@ -83,8 +81,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
             };
         }
-            
-        
+
         ILoader loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
 
         try {
@@ -108,7 +105,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mBtnPauseDanmaku = (Button) findViewById(R.id.btn_pause);
         mBtnResumeDanmaku = (Button) findViewById(R.id.btn_resume);
         mBtnSendDanmaku = (Button) findViewById(R.id.btn_send);
-        mBtnSendDanmakuTextAndImage=(Button)findViewById(R.id.btn_send_image_text);
+        mBtnSendDanmakuTextAndImage = (Button) findViewById(R.id.btn_send_image_text);
         mBtnSendDanmakus = (Button) findViewById(R.id.btn_send_danmakus);
         mBtnRotate.setOnClickListener(this);
         mBtnHideDanmaku.setOnClickListener(this);
@@ -119,19 +116,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mBtnSendDanmaku.setOnClickListener(this);
         mBtnSendDanmakuTextAndImage.setOnClickListener(this);
         mBtnSendDanmakus.setOnClickListener(this);
-        
+
         // VideoView
         VideoView mVideoView = (VideoView) findViewById(R.id.videoview);
         // DanmakuView
         mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false)
-        .setMaximumVisibleSizeInScreen(80);
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setMaximumVisibleSizeInScreen(80);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
                 }
+
                 @Override
                 public void prepared() {
                     mDanmakuView.start();
@@ -160,7 +157,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
 
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -186,7 +183,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             mDanmakuView = null;
         }
     }
-    
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -211,29 +208,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (mDanmakuView == null || !mDanmakuView.isPrepared())
             return;
         if (v == mBtnRotate) {
-            setRequestedOrientation(getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            setRequestedOrientation(getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else if (v == mBtnHideDanmaku) {
             mDanmakuView.hide();
-            //mPausedPosition = mDanmakuView.hideAndPauseDrawTask();
+            // mPausedPosition = mDanmakuView.hideAndPauseDrawTask();
         } else if (v == mBtnShowDanmaku) {
-            mDanmakuView.show(); 
-            //mDanmakuView.showAndResumeDrawTask(mPausedPosition); // sync to the video time in your practice
+            mDanmakuView.show();
+            // mDanmakuView.showAndResumeDrawTask(mPausedPosition); // sync to the video time in your practice
         } else if (v == mBtnPauseDanmaku) {
             mDanmakuView.pause();
         } else if (v == mBtnResumeDanmaku) {
             mDanmakuView.resume();
         } else if (v == mBtnSendDanmaku) {
             addDanmaku(false);
-        }else if(v==mBtnSendDanmakuTextAndImage){
+        } else if (v == mBtnSendDanmakuTextAndImage) {
             addDanmaKuShowTextAndImage(false);
-        }
-        else if (v == mBtnSendDanmakus) {
+        } else if (v == mBtnSendDanmakus) {
             Boolean b = (Boolean) mBtnSendDanmakus.getTag();
             timer.cancel();
-            if(b == null || !b) {
+            if (b == null || !b) {
                 mBtnSendDanmakus.setText(R.string.cancel_sending_danmakus);
-                timer = new Timer();                
+                timer = new Timer();
                 timer.schedule(new AsyncAddTask(), 0, 1000);
                 mBtnSendDanmakus.setTag(true);
             } else {
@@ -242,7 +237,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-    
+
     Timer timer = new Timer();
 
     class AsyncAddTask extends TimerTask {
@@ -255,15 +250,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
     };
-    
-    //
+
     private void addDanmaku(boolean islive) {
         BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
-        if(danmaku == null || mDanmakuView == null) {
+        if (danmaku == null || mDanmakuView == null) {
             return;
         }
-        //for(int i=0;i<100;i++){
-        //}
+        // for(int i=0;i<100;i++){
+        // }
         danmaku.text = "这是一条弹幕" + System.nanoTime();
         danmaku.padding = 5;
         danmaku.priority = 1;
@@ -272,14 +266,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
         danmaku.textColor = Color.RED;
         danmaku.textShadowColor = Color.WHITE;
-        //danmaku.underlineColor = Color.GREEN;
+        // danmaku.underlineColor = Color.GREEN;
         danmaku.borderColor = Color.GREEN;
         mDanmakuView.addDanmaku(danmaku);
 
-
     }
 
-    private void addDanmaKuShowTextAndImage(boolean islive){
+    private void addDanmaKuShowTextAndImage(boolean islive) {
         BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
         String text = "bitmap";
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
