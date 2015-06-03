@@ -8,8 +8,8 @@ before_install:
   # Install base Android SDK
   - sudo apt-get update -qq
   - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch > /dev/null; fi
-  - wget http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz
-  - tar xzf android-sdk_r24.0.2-linux.tgz
+  - wget http://dl.google.com/android/android-sdk_r24.2-linux.tgz
+  - tar xzf android-sdk_r24.2-linux.tgz
   - export ANDROID_HOME=$PWD/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 
@@ -17,9 +17,9 @@ before_install:
   # For a full list, run `android list sdk -a --extended`
   # Note that sysimg-19 downloads only ARM, because only the first license query is accepted.
   - echo yes | android update sdk --filter platform-tools --no-ui --force > /dev/null
-  - echo yes | android update sdk --all --filter build-tools-21.1.2 --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter android-19 --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter sysimg-19 --no-ui --force > /dev/null
+  - echo yes | android update sdk --all --filter build-tools-22.0.1 --no-ui --force > /dev/null
+  - echo yes | android update sdk --filter android-22 --no-ui --force > /dev/null
+  - echo yes | android update sdk --filter sysimg-22 --no-ui --force > /dev/null
   - echo yes | android update sdk --filter extra-android-support --no-ui --force > /dev/null
   - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force > /dev/null
 
