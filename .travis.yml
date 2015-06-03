@@ -30,3 +30,4 @@ script:
 
 after_failure:
   - cat /home/travis/build/Bilibili/DanmakuFlameMaster/DanmakuFlameMaster/build/outputs/lint-results.html
+  - cat /home/travis/build/Bilibili/DanmakuFlameMaster/DanmakuFlameMaster/build/outputs/lint-results.xml
