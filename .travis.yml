@@ -27,3 +27,6 @@ before_install:
   
 script:
   "./gradlew check -i"
+
+after_failure:
+  - cat /home/travis/build/Bilibili/DanmakuFlameMaster/DanmakuFlameMaster/build/outputs/lint-results.html
