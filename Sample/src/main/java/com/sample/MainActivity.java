@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private BaseDanmakuParser createParser(InputStream stream) {
 
-        if (stream != null) {
+        if (stream == null) {
             return new BaseDanmakuParser() {
 
                 @Override
