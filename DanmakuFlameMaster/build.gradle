@@ -16,6 +16,8 @@
 
 apply plugin: 'com.android.library'
 
+def SourcePath = 'src/main/'
+
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
@@ -26,10 +28,14 @@ android {
         versionName VERSION_NAME
         versionCode Integer.parseInt(VERSION_CODE)
     }
-	sourceSets {
+
+    sourceSets {
         main {
-            jniLibs.srcDirs = ['src/main/libs']
+            manifest.srcFile "${SourcePath}AndroidManifest.xml"
+            java.srcDirs = ["${SourcePath}java"]
+            jniLibs.srcDirs = ["${SourcePath}libs"]
         }
+        androidTest.setRoot("${SourcePath}../androidTest")
     }
 }
 
