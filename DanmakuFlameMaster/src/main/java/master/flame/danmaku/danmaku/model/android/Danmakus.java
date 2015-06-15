@@ -349,11 +349,7 @@ public class Danmakus implements IDanmakus {
             if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) {
                 return 0;
             }
-            int result = Float.compare(obj1.getTop(), obj2.getTop());
-            if (result != 0) {
-                return result;
-            }
-            return DanmakuUtils.compare(obj1, obj2);
+            return Float.compare(obj1.getTop(), obj2.getTop());
         }
     }
 
@@ -368,11 +364,7 @@ public class Danmakus implements IDanmakus {
             if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) {
                 return 0;
             }
-            int result = Float.compare(obj2.getTop(), obj1.getTop());
-            if (result != 0) {
-                return result;
-            }
-            return DanmakuUtils.compare(obj1, obj2);
+            return Float.compare(obj2.getTop(), obj1.getTop());
         }
     }
 
