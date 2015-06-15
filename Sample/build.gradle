@@ -20,12 +20,12 @@ dependencies {
     compile project(':DanmakuFlameMaster')
 }
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 19
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 7
-        targetSdkVersion 22
+        targetSdkVersion 19
         versionCode 1
         versionName "1.0"
     }
