@@ -60,9 +60,12 @@ public class DanmakuRenderer extends Renderer {
                 break;
             }
 
+            if (!drawItem.hasPassedFilter()) {
+                DanmakuFilters.getDefault().filter(drawItem, orderInScreen, sizeInScreen, mStartTimer, false);
+            }
+
             if (drawItem.time < startRenderTime
-                    || (drawItem.priority == 0 && DanmakuFilters.getDefault().filter(drawItem,
-                            orderInScreen, sizeInScreen, mStartTimer, false))) {
+                    || (drawItem.priority == 0 && drawItem.isFiltered())) {
                 continue;
             }
             

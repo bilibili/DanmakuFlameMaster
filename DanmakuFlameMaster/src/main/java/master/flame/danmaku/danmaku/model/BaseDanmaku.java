@@ -175,6 +175,10 @@ public abstract class BaseDanmaku {
      */
     public StaticLayout mStaticLayout;
 
+    public int mFilterParam = 0;
+
+    public int filterResetFlag = -1;
+
     public long getDuration() {
         return duration.value;
     }
@@ -225,6 +229,18 @@ public abstract class BaseDanmaku {
 
     public boolean isLate() {
         return mTimer == null || mTimer.currMillisecond < time;
+    }
+
+    public boolean hasPassedFilter() {
+        if (filterResetFlag != GlobalFlagValues.FILTER_RESET_FLAG) {
+            mFilterParam = 0;
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isFiltered() {
+        return mFilterParam != 0 && filterResetFlag == GlobalFlagValues.FILTER_RESET_FLAG;
     }
 
     public void setVisibility(boolean b) {
