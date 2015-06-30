@@ -533,6 +533,7 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setDuplicateMergingEnabled(boolean enable) {
         if (mDuplicateMergingEnable != enable) {
             mDuplicateMergingEnable = enable;
+            GlobalFlagValues.updateFilterFlag();
             notifyConfigureChanged(DanmakuConfigTag.DUPLICATE_MERGING_ENABLED, enable);
         }
         return this;
