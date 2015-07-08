@@ -102,7 +102,7 @@ public class DanmakuGlobalConfig {
     
     List<String> mUserHashBlackList = new ArrayList<String>();
 
-    private ArrayList<ConfigChangedCallback> mCallbackList;
+    private List<ConfigChangedCallback> mCallbackList;
 
     private boolean mBlockGuestDanmaku = false;
 
@@ -551,7 +551,7 @@ public class DanmakuGlobalConfig {
 
     public void registerConfigChangedCallback(ConfigChangedCallback listener) {
         if (mCallbackList == null) {
-            mCallbackList = new ArrayList<ConfigChangedCallback>();
+            mCallbackList = Collections.synchronizedList(new ArrayList<ConfigChangedCallback>());
         }
         mCallbackList.add(listener);
     }
