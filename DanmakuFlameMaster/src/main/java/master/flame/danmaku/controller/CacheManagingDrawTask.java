@@ -558,7 +558,10 @@ public class CacheManagingDrawTask extends DrawTask {
                     return 0;
                 }
                 long startTime =  System.currentTimeMillis();
-                IDanmakus danmakus = danmakuList.subnew(curr, end);
+                IDanmakus danmakus = null;
+                synchronized (danmakuList) {
+                    danmakus = danmakuList.subnew(curr, end);
+                }
                 if (danmakus == null || danmakus.isEmpty()) {
                     mCacheTimer.update(end);
                     return 0;
