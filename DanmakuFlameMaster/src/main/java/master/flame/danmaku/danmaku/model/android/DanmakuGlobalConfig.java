@@ -546,11 +546,12 @@ public class DanmakuGlobalConfig {
      * 如果需要定制其他样式请扩展{@link SimpleTextCacheStuffer}|{@link SpannedCacheStuffer}
      * @param cacheStuffer
      */
-    public void setCacheStuffer(BaseCacheStuffer cacheStuffer) {
+    public DanmakuGlobalConfig setCacheStuffer(BaseCacheStuffer cacheStuffer) {
         this.mCacheStuffer = cacheStuffer;
         if (this.mCacheStuffer != null) {
             AndroidDisplayer.setCacheStuffer(this.mCacheStuffer);
         }
+        return this;
     }
     
     public boolean isDuplicateMergingEnabled() {
