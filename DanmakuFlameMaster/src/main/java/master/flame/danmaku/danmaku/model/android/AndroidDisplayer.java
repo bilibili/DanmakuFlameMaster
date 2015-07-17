@@ -24,8 +24,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.text.Layout;
-import android.text.StaticLayout;
 import android.text.TextPaint;
 
 import java.util.HashMap;
@@ -42,8 +40,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     private Camera camera = new Camera();
 
     private Matrix matrix = new Matrix();
-
-    private final static Map<Float, Float> sTextHeightCache = new HashMap<Float, Float>();
 
     private static float sLastScaleTextSize;
     private final static Map<Float, Float> sCachedScaleSize = new HashMap<Float, Float>(10);
@@ -113,6 +109,8 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     public static boolean CONFIG_ANTI_ALIAS = true;
     private static boolean ANTI_ALIAS = CONFIG_ANTI_ALIAS;
 
+    private static BaseCacheStuffer sStuffer = new SimpleTextCacheStuffer();
+
     static {
         PAINT = new TextPaint();
         PAINT.setStrokeWidth(STROKE_WIDTH);
@@ -168,6 +166,12 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     public static void setFakeBoldText(boolean fakeBoldText) {
         PAINT.setFakeBoldText(fakeBoldText);
+    }
+
+    public static void setCacheStuffer(BaseCacheStuffer cacheStuffer) {
+        if (cacheStuffer != sStuffer) {
+            sStuffer = cacheStuffer;
+        }
     }
 
     public Canvas canvas;
@@ -318,6 +322,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         HAS_PROJECTION = CONFIG_HAS_PROJECTION;
         ANTI_ALIAS = !quick && CONFIG_ANTI_ALIAS;
         TextPaint paint = getPaint(danmaku, quick);
+        sStuffer.drawBackground(danmaku, canvas, _left, _top);
         if (danmaku.lines != null) {
             String[] lines = danmaku.lines;
             if (lines.length == 1) {
@@ -329,10 +334,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                         strokeLeft += sProjectionOffsetX;
                         strokeTop += sProjectionOffsetY;
                     }
-                    canvas.drawText(lines[0], strokeLeft, strokeTop, paint);
+                    //TODO drawStroke(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
+//                    canvas.drawText(lines[0], strokeLeft, strokeTop, paint);
+                    sStuffer.drawStroke(danmaku, lines[0], canvas, strokeLeft, strokeTop, paint);
                 }
                 applyPaintConfig(danmaku, paint, false);
-                canvas.drawText(lines[0], left, top - paint.ascent(), paint);
+                //TODO drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
+//                canvas.drawText(lines[0], left, top - paint.ascent(), paint);
+                sStuffer.drawText(danmaku, lines[0], canvas, left, top - paint.ascent(), paint);
             } else {
                 float textHeight = (danmaku.paintHeight - 2 * danmaku.padding) / lines.length;
                 for (int t = 0; t < lines.length; t++) {
@@ -347,10 +356,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                             strokeLeft += sProjectionOffsetX;
                             strokeTop += sProjectionOffsetY;
                         }
-                        canvas.drawText(lines[t], strokeLeft, strokeTop, paint);
+                        //TODO drawStroke(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
+//                        canvas.drawText(lines[t], strokeLeft, strokeTop, paint);
+                        sStuffer.drawStroke(danmaku, lines[t], canvas, strokeLeft, strokeTop, paint);
                     }
                     applyPaintConfig(danmaku, paint, false);
-                    canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
+                    //TODO drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
+//                    canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
+                    sStuffer.drawText(danmaku, lines[t], canvas, left,  t * textHeight + top - paint.ascent(), paint);
                 }
             }
         } else {
@@ -363,39 +376,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                     strokeLeft += sProjectionOffsetX;
                     strokeTop += sProjectionOffsetY;
                 }
-                if (danmaku.isSpannable()) {
-                    boolean needRestore = false;
-                    if (strokeLeft != 0 && top != 0) {
-                        canvas.save();
-                        canvas.translate(strokeLeft, top);
-                        needRestore = true;
-                    }
-                    danmaku.mStaticLayout.draw(canvas);
-                    if (needRestore) {
-                        canvas.restore();
-                    }
-                } else {
-                    canvas.drawText((String) danmaku.text, strokeLeft, strokeTop, paint);
-                }
+                //TODO drawStroke(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
+                sStuffer.drawStroke(danmaku, null, canvas, strokeLeft, strokeTop, paint);
             }
 
             applyPaintConfig(danmaku, paint, false);
 
-            if (danmaku.isSpannable()) {
-                boolean needRestore = false;
-                if (left != 0 && (top) != 0) {
-                    canvas.save();
-                    canvas.translate(left, top);
-                    needRestore = true;
-                }
-                danmaku.mStaticLayout.draw(canvas);
-                if (needRestore) {
-                    canvas.restore();
-                }
-            } else {
-                canvas.drawText((String) danmaku.text, left, top - paint.ascent(), paint);
-            }
-
+            //TODO drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
+            sStuffer.drawText(danmaku, null, canvas, left, top - paint.ascent(), paint);
         }
 
         // draw underline
@@ -508,32 +496,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
     }
 
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
-        float w = 0;
-        Float textHeight = 0f;
-        if (danmaku.lines == null) {
-            if(danmaku.text == null) {
-                w = 0;
-            } else if (danmaku.isSpannable()) {
-                danmaku.mStaticLayout = new StaticLayout(danmaku.text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
-                w = danmaku.mStaticLayout.getWidth();
-                textHeight = (float) danmaku.mStaticLayout.getHeight();
-            } else {
-                w = paint.measureText(danmaku.text.toString());
-                textHeight = getTextHeight(paint);
-            }
-            setDanmakuPaintWidthAndHeight(danmaku, w, textHeight);
-            return;
-        }
-
-        textHeight = getTextHeight(paint);
-        for (String tempStr : danmaku.lines) {
-            if (tempStr.length() > 0) {
-                float tr = paint.measureText(tempStr);
-                w = Math.max(tr, w);
-            }
-        }
-
-        setDanmakuPaintWidthAndHeight(danmaku, w, danmaku.lines.length * textHeight);
+        //TODO measure(danmaku, paint);
+        sStuffer.measure(danmaku, paint);
+        setDanmakuPaintWidthAndHeight(danmaku, danmaku.paintWidth, danmaku.paintHeight);
     }
 
     private void setDanmakuPaintWidthAndHeight(BaseDanmaku danmaku, float w, float h) {
@@ -547,19 +512,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         danmaku.paintHeight = ph;
     }
 
-    private static float getTextHeight(TextPaint paint) {
-        Float textSize = paint.getTextSize();
-        Float textHeight = sTextHeightCache.get(textSize);
-        if (textHeight == null) {
-            Paint.FontMetrics fontMetrics = paint.getFontMetrics();
-            textHeight = fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading;
-            sTextHeightCache.put(textSize, textHeight);
-        }
-        return textHeight;
-    }
-
     public static void clearTextHeightCache() {
-        sTextHeightCache.clear();
+        //TODO clear(); sTextHeightCache.clear();
+        sStuffer.clearCaches();
         sCachedScaleSize.clear();
     }
 

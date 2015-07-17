@@ -16,10 +16,6 @@
 
 package master.flame.danmaku.danmaku.model;
 
-import android.text.Spannable;
-import android.text.Spanned;
-import android.text.StaticLayout;
-
 public abstract class BaseDanmaku {
 
     public final static String DANMAKU_BR_CHAR = "/n";
@@ -54,6 +50,11 @@ public abstract class BaseDanmaku {
      * 多行文本: 如果有包含换行符需事先拆分到lines
      */
     public String[] lines;
+
+    /**
+     * 可保存一些数据的引用
+     */
+    public Object obj;
 
     /**
      * 文本颜色
@@ -170,11 +171,6 @@ public abstract class BaseDanmaku {
      */
     protected int alpha = AlphaValue.MAX;
 
-    /**
-     * 处理图文的工具类
-     */
-    public StaticLayout mStaticLayout;
-
     public int mFilterParam = 0;
 
     public int filterResetFlag = -1;
@@ -283,13 +279,4 @@ public abstract class BaseDanmaku {
         return alpha;
     }
 
-    /**
-     * 判断弹幕的展示类型
-     *
-     * @return true 表示以图文方式展示
-     * false 表示只以文本方式展示
-     */
-    public boolean isSpannable() {
-        return text == null ? false : text instanceof Spanned || text instanceof Spannable;
-    }
 }

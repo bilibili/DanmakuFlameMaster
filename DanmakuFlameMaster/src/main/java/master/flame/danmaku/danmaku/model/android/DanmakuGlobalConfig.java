@@ -108,6 +108,8 @@ public class DanmakuGlobalConfig {
 
     private boolean mDuplicateMergingEnable = false;
 
+    private BaseCacheStuffer mCacheStuffer;
+
     /**
      * set typeface
      * 
@@ -537,6 +539,18 @@ public class DanmakuGlobalConfig {
             notifyConfigureChanged(DanmakuConfigTag.DUPLICATE_MERGING_ENABLED, enable);
         }
         return this;
+    }
+
+    /**
+     * 设置缓存绘制填充器，默认使用{@link SimpleTextCacheStuffer}只支持纯文字显示, 如果需要图文混排请设置{@link SpannedCacheStuffer}
+     * 如果需要定制其他样式请扩展{@link SimpleTextCacheStuffer}|{@link SpannedCacheStuffer}
+     * @param cacheStuffer
+     */
+    public void setCacheStuffer(BaseCacheStuffer cacheStuffer) {
+        this.mCacheStuffer = cacheStuffer;
+        if (this.mCacheStuffer != null) {
+            AndroidDisplayer.setCacheStuffer(this.mCacheStuffer);
+        }
     }
     
     public boolean isDuplicateMergingEnabled() {
