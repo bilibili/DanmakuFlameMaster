@@ -36,7 +36,7 @@ import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
 import master.flame.danmaku.danmaku.renderer.android.DanmakusRetainer;
 
-public class DrawTask implements IDrawTask, ConfigChangedCallback {
+public class DrawTask implements IDrawTask {
     
     protected AbsDisplayer<?> mDisp;
 
@@ -67,6 +67,12 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
     private long mLastEndMills;
 
     private boolean mIsHidden;
+    private ConfigChangedCallback mConfigChangedCallback = new ConfigChangedCallback() {
+        @Override
+        public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag, Object... values) {
+            return DrawTask.this.onDanmakuConfigChanged(config, tag, values);
+        }
+    };
 
     public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
             TaskListener taskListener) {
@@ -185,14 +191,14 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
 
     @Override
     public void start() {
-        DanmakuGlobalConfig.DEFAULT.registerConfigChangedCallback(this);
+        DanmakuGlobalConfig.DEFAULT.registerConfigChangedCallback(mConfigChangedCallback);
     }
 
     @Override
     public void quit() {
+        DanmakuGlobalConfig.DEFAULT.unregisterConfigChangedCallback(mConfigChangedCallback);
         if (mRenderer != null)
             mRenderer.release();
-        DanmakuGlobalConfig.DEFAULT.unregisterConfigChangedCallback(this);
     }
 
     public void prepare() {
@@ -270,7 +276,6 @@ public class DrawTask implements IDrawTask, ConfigChangedCallback {
         clearRetainerFlag = true;
     }
 
-    @Override
     public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
             Object... values) {
         boolean handled = handleOnDanmakuConfigChanged(config, tag, values);
