@@ -67,6 +67,28 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private Button mBtnSendDanmakus;
 
+    private static class BackgroundCacheStuffer extends SpannedCacheStuffer {
+        // 通过扩展SimpleTextCacheStuffer或SpannedCacheStuffer个性化你的弹幕样式
+        final Paint paint = new Paint();
+
+        @Override
+        public void measure(BaseDanmaku danmaku, TextPaint paint) {
+            danmaku.padding = 10;  // 在背景绘制模式下增加padding
+            super.measure(danmaku, paint);
+        }
+
+        @Override
+        public void drawBackground(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
+            paint.setColor(0x8125309b);
+            canvas.drawRect(left + 2, top + 2, left + danmaku.paintWidth - 2, top + danmaku.paintHeight - 2, paint);
+        }
+
+        @Override
+        public void drawStroke(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint) {
+            // 禁用描边绘制
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,26 +148,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // DanmakuView
         mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setMaximumVisibleSizeInScreen(80)
-        .setCacheStuffer(new SpannedCacheStuffer() {  // 通过扩展SimpleTextCacheStuffer或SpannedCacheStuffer个性化你的弹幕样式
-            final Paint paint = new Paint();
-
-            @Override
-            public void measure(BaseDanmaku danmaku, TextPaint paint) {
-                danmaku.padding = 10;  // 在背景绘制模式下增加padding
-                super.measure(danmaku, paint);
-            }
-
-            @Override
-            public void drawBackground(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
-                paint.setColor(0x8125309b);
-                canvas.drawRect(left + 2, top + 2, left + danmaku.paintWidth - 2, top + danmaku.paintHeight - 2, paint);
-            }
-
-            @Override
-            public void drawStroke(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint) {
-                // 禁用描边绘制
-            }
-        });
+        .setCacheStuffer(new BackgroundCacheStuffer());
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
