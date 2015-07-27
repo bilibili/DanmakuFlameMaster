@@ -196,7 +196,7 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void quit() {
-        DanmakuGlobalConfig.DEFAULT.unregisterConfigChangedCallback(mConfigChangedCallback);
+        DanmakuGlobalConfig.DEFAULT.unregisterAllConfigChangedCallbacks();
         if (mRenderer != null)
             mRenderer.release();
     }

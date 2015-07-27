@@ -568,13 +568,22 @@ public class DanmakuGlobalConfig {
         if (mCallbackList == null) {
             mCallbackList = Collections.synchronizedList(new ArrayList<ConfigChangedCallback>());
         }
-        mCallbackList.add(listener);
+        if (!mCallbackList.contains(listener)) {
+            mCallbackList.add(listener);
+        }
     }
 
     public void unregisterConfigChangedCallback(ConfigChangedCallback listener) {
         if (mCallbackList == null)
             return;
         mCallbackList.remove(listener);
+    }
+
+    public void unregisterAllConfigChangedCallbacks() {
+        if (mCallbackList != null) {
+            mCallbackList.clear();
+            mCallbackList = null;
+        }
     }
 
     private void notifyConfigureChanged(DanmakuConfigTag tag, Object... values) {
