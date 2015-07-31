@@ -274,7 +274,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
     public void resume() {
         if (handler != null && handler.isPrepared())
             handler.resume();
-        else {
+        else if (handler == null) {
             restart();
         }
     }

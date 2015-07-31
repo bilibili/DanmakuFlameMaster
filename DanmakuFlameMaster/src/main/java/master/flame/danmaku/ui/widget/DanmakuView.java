@@ -316,7 +316,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     public void resume() {
         if (handler != null && handler.isPrepared())
             handler.resume();
-        else {
+        else if (handler == null) {
             restart();
         }
     }

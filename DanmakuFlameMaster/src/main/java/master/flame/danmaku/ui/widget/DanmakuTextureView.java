@@ -282,9 +282,9 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
 
     @Override
     public void resume() {
-        if (handler != null && mHandlerThread != null && handler.isPrepared())
+        if (handler != null && handler.isPrepared())
             handler.resume();
-        else {
+        else if (handler == null) {
             restart();
         }
     }
