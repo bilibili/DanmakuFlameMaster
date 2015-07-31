@@ -1,6 +1,7 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,7 +103,7 @@ public class DanmakuGlobalConfig {
     
     List<String> mUserHashBlackList = new ArrayList<String>();
 
-    private List<ConfigChangedCallback> mCallbackList;
+    private List<WeakReference<ConfigChangedCallback>> mCallbackList;
 
     private boolean mBlockGuestDanmaku = false;
 
@@ -565,18 +566,26 @@ public class DanmakuGlobalConfig {
     }
 
     public void registerConfigChangedCallback(ConfigChangedCallback listener) {
-        if (mCallbackList == null) {
-            mCallbackList = Collections.synchronizedList(new ArrayList<ConfigChangedCallback>());
+        if (listener == null || mCallbackList == null) {
+            mCallbackList = Collections.synchronizedList(new ArrayList<WeakReference<ConfigChangedCallback>>());
         }
-        if (!mCallbackList.contains(listener)) {
-            mCallbackList.add(listener);
+        for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
+            if (listener.equals(configReferer.get())) {
+                return;
+            }
         }
+        mCallbackList.add(new WeakReference<ConfigChangedCallback>(listener));
     }
 
     public void unregisterConfigChangedCallback(ConfigChangedCallback listener) {
-        if (mCallbackList == null)
+        if (listener == null || mCallbackList == null)
             return;
-        mCallbackList.remove(listener);
+        for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
+            if (listener.equals(configReferer.get())) {
+                mCallbackList.remove(listener);
+                return;
+            }
+        }
     }
 
     public void unregisterAllConfigChangedCallbacks() {
@@ -588,8 +597,11 @@ public class DanmakuGlobalConfig {
 
     private void notifyConfigureChanged(DanmakuConfigTag tag, Object... values) {
         if (mCallbackList != null) {
-            for (ConfigChangedCallback cb : mCallbackList) {
-                cb.onDanmakuConfigChanged(this, tag, values);
+            for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
+                ConfigChangedCallback cb = configReferer.get();
+                if (cb != null) {
+                    cb.onDanmakuConfigChanged(this, tag, values);
+                }
             }
         }
     }
