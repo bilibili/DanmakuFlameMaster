@@ -39,4 +39,6 @@ android {
     }
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+if (rootProject.file('gradle/gradle-mvn-push.gradle').exists()) {
+    apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+}
