@@ -22,10 +22,10 @@ import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -37,7 +37,7 @@ public class Danmakus implements IDanmakus {
     public static final int ST_BY_YPOS = 1;
 
     public static final int ST_BY_YPOS_DESC = 2;
-    
+
     /**
      * this type is used to iterate/remove/insert elements, not support sub/subnew
      */
@@ -52,7 +52,7 @@ public class Danmakus implements IDanmakus {
     private BaseDanmaku endSubItem;
 
     private BaseDanmaku startSubItem;
-    
+
     private DanmakuIterator iterator;
 
     private int mSize = 0;
@@ -66,7 +66,7 @@ public class Danmakus implements IDanmakus {
     public Danmakus() {
         this(ST_BY_TIME, false);
     }
-    
+
     public Danmakus(int sortType) {
         this(sortType, false);
     }
@@ -81,7 +81,7 @@ public class Danmakus implements IDanmakus {
             comparator = new YPosDescComparator(duplicateMergingEnabled);
         }
         if(sortType == ST_BY_LIST) {
-            items = new LinkedList<BaseDanmaku>();
+            items = new ArrayList<BaseDanmaku>();
         } else {
             mDuplicateMergingEnabled = duplicateMergingEnabled;
             comparator.setDuplicateMergingEnabled(duplicateMergingEnabled);
@@ -174,24 +174,32 @@ public class Danmakus implements IDanmakus {
         endSubItem.time = endTime;
         return ((SortedSet<BaseDanmaku>) items).subSet(startSubItem, endSubItem);
     }
-    
+
     @Override
     public IDanmakus subnew(long startTime, long endTime) {
         Collection<BaseDanmaku> subset = subset(startTime, endTime);
         if (subset == null) {
             return null;
         }
-        LinkedList<BaseDanmaku> newSet = new LinkedList<BaseDanmaku>(subset);
+        ArrayList<BaseDanmaku> newSet = new ArrayList<BaseDanmaku>(subset);
         return new Danmakus(newSet);
     }
 
     @Override
     public IDanmakus sub(long startTime, long endTime) {
-        if (mSortType == ST_BY_LIST || items == null || items.size() == 0) {
+        if (items == null || items.size() == 0) {
             return null;
         }
         if (subItems == null) {
-            subItems = new Danmakus(mDuplicateMergingEnabled);
+            if(mSortType == ST_BY_LIST) {
+                subItems = new Danmakus(Danmakus.ST_BY_LIST);
+                subItems.setItems(items);
+            } else {
+                subItems = new Danmakus(mDuplicateMergingEnabled);
+            }
+        }
+        if (mSortType == ST_BY_LIST) {
+            return subItems;
         }
         if (startItem == null) {
             startItem = createItem("start");
@@ -236,7 +244,7 @@ public class Danmakus implements IDanmakus {
     public BaseDanmaku first() {
         if (items != null && !items.isEmpty()) {
             if (mSortType == ST_BY_LIST) {
-                return ((LinkedList<BaseDanmaku>) items).getFirst();
+                return ((ArrayList<BaseDanmaku>) items).get(0);
             }
             return ((SortedSet<BaseDanmaku>) items).first();
         }
@@ -247,15 +255,15 @@ public class Danmakus implements IDanmakus {
     public BaseDanmaku last() {
         if (items != null && !items.isEmpty()) {
             if (mSortType == ST_BY_LIST) {
-                return ((LinkedList<BaseDanmaku>) items).getLast();
+                return ((ArrayList<BaseDanmaku>) items).get(items.size() - 1);
             }
             return ((SortedSet<BaseDanmaku>) items).last();
         }
         return null;
     }
-    
+
     private class DanmakuIterator implements IDanmakuIterator{
-        
+
         private Collection<BaseDanmaku> mData;
         private Iterator<BaseDanmaku> it;
         private boolean mIteratorUsed;
@@ -263,7 +271,7 @@ public class Danmakus implements IDanmakus {
         public DanmakuIterator(Collection<BaseDanmaku> datas){
             setDatas(datas);
         }
-        
+
         public synchronized void reset() {
             if (!mIteratorUsed && it != null) {
                 return;
@@ -303,15 +311,15 @@ public class Danmakus implements IDanmakus {
         }
 
     }
-    
+
     private class BaseComparator implements Comparator<BaseDanmaku> {
 
         protected boolean mDuplicateMergingEnable;
-        
+
         public BaseComparator(boolean duplicateMergingEnabled) {
             setDuplicateMergingEnabled(duplicateMergingEnabled);
         }
-        
+
         public void setDuplicateMergingEnabled(boolean enable) {
             mDuplicateMergingEnable = enable;
         }
@@ -323,11 +331,11 @@ public class Danmakus implements IDanmakus {
             }
             return DanmakuUtils.compare(obj1, obj2);
         }
-        
+
     }
 
     private class TimeComparator extends BaseComparator {
-        
+
         public TimeComparator(boolean duplicateMergingEnabled) {
             super(duplicateMergingEnabled);
         }
@@ -339,7 +347,7 @@ public class Danmakus implements IDanmakus {
     }
 
     private class YPosComparator extends BaseComparator {
-        
+
         public YPosComparator(boolean duplicateMergingEnabled) {
             super(duplicateMergingEnabled);
         }
@@ -354,7 +362,7 @@ public class Danmakus implements IDanmakus {
     }
 
     private class YPosDescComparator extends BaseComparator {
-        
+
         public YPosDescComparator(boolean duplicateMergingEnabled) {
             super(duplicateMergingEnabled);
         }
