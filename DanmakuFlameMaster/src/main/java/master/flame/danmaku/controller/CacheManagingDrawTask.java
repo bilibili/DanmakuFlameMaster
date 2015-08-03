@@ -57,7 +57,7 @@ public class CacheManagingDrawTask extends DrawTask {
         NativeBitmapFactory.loadLibs();
         mMaxCacheSize = maxCacheSize;
         if (NativeBitmapFactory.isInNativeAlloc()) {
-            mMaxCacheSize = maxCacheSize * 3;
+            mMaxCacheSize = maxCacheSize * 2;
         }
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
     }
@@ -79,11 +79,8 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public RenderingState draw(AbsDisplayer<?> displayer) {
-        RenderingState result = null;
-        synchronized (danmakuList) {
-            result = super.draw(displayer);
-        }
-        synchronized(mDrawingNotify){
+        RenderingState result = super.draw(displayer);
+        synchronized (mDrawingNotify) {
             mDrawingNotify.notify();
         }
         if(result != null && mCacheManager != null) {
@@ -452,18 +449,16 @@ public class CacheManagingDrawTask extends DrawTask {
 //                        Log.i(TAG,"BUILD_CACHES:"+mCacheTimer.currMillisecond+":"+mTimer.currMillisecond);
                         break;
                     case ADD_DANMAKKU:
-                        synchronized (danmakuList) {
-                            BaseDanmaku item = (BaseDanmaku) msg.obj;
-                            if(item.isTimeOut()) {
-                                break;
-                            }
-                            if(!item.hasDrawingCache()) {
-                                buildCache(item);
-                            }
-                            if (item.isLive) {
-                                mCacheTimer.update(mTimer.currMillisecond
-                                        + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
-                            }
+                        BaseDanmaku item = (BaseDanmaku) msg.obj;
+                        if (item.isTimeOut()) {
+                            break;
+                        }
+                        if (!item.hasDrawingCache()) {
+                            buildCache(item);
+                        }
+                        if (item.isLive) {
+                            mCacheTimer.update(mTimer.currMillisecond
+                                    + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
                         }
                         break;
                     case CLEAR_TIMEOUT_CACHES:
@@ -693,7 +688,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         mCacheManager.push(item, 0);
                         return RESULT_SUCCESS;
                     }
-                    
+
                     // guess cache size
                     int cacheSize = DanmakuUtils.getCacheSize((int) item.paintWidth,
                             (int) item.paintHeight);
@@ -703,16 +698,14 @@ public class CacheManagingDrawTask extends DrawTask {
                     }
 
                     cache = mCachePool.acquire();
-                    synchronized (danmakuList) {
-                        cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache);
-                        item.cache = cache;
-                        boolean pushed = mCacheManager.push(item, sizeOf(item));
-                        if (!pushed) {
-                            releaseDanmakuCache(item, cache);
+                    cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache);
+                    item.cache = cache;
+                    boolean pushed = mCacheManager.push(item, sizeOf(item));
+                    if (!pushed) {
+                        releaseDanmakuCache(item, cache);
 //Log.e("cache", "break at push failed:" + mMaxSize);
-                        }
-                        return pushed ? RESULT_SUCCESS : RESULT_FAILED;
                     }
+                    return pushed ? RESULT_SUCCESS : RESULT_FAILED;
 
                 } catch (OutOfMemoryError e) {
 //Log.e("cache", "break at error: oom");
@@ -790,7 +783,7 @@ public class CacheManagingDrawTask extends DrawTask {
             mHandler.removeMessages(CacheHandler.CLEAR_OUTSIDE_CACHES_AND_RESET);
             mHandler.sendEmptyMessage(CacheHandler.CLEAR_OUTSIDE_CACHES_AND_RESET);
         }
-        
+
         public void requestClearTimeout() {
             if (mHandler == null) {
                 return;
