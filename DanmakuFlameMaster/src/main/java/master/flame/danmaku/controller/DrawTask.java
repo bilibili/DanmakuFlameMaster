@@ -26,9 +26,9 @@ import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
+import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.ConfigChangedCallback;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.DanmakuConfigTag;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig.ConfigChangedCallback;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
@@ -96,40 +96,36 @@ public class DrawTask implements IDrawTask {
     }
 
     @Override
-    public void addDanmaku(BaseDanmaku item) {
+    public synchronized void addDanmaku(BaseDanmaku item) {
         if (danmakuList == null)
             return;
         boolean added = false;
-        synchronized (danmakuList) {
-            if(item.isLive) {
-                removeUnusedLiveDanmakusIn(10);
-            }
-            item.index = danmakuList.size();
-            if (mLastBeginMills <= item.time && item.time <= mLastEndMills) {
-                synchronized (danmakus) {
-                    added = danmakus.addItem(item);
-                }
-            } else if(item.isLive){
-                mLastBeginMills = mLastEndMills = 0;
-            }
-            added = danmakuList.addItem(item);
+        if (item.isLive) {
+            removeUnusedLiveDanmakusIn(10);
         }
+        item.index = danmakuList.size();
+        if (mLastBeginMills <= item.time && item.time <= mLastEndMills) {
+            synchronized (danmakus) {
+                added = danmakus.addItem(item);
+            }
+        } else if (item.isLive) {
+            mLastBeginMills = mLastEndMills = 0;
+        }
+        added = danmakuList.addItem(item);
         if (added && mTaskListener != null) {
             mTaskListener.onDanmakuAdd(item);
         }
     }
     
     @Override
-    public void removeAllDanmakus() {
+    public synchronized void removeAllDanmakus() {
         if (danmakuList == null || danmakuList.isEmpty())
             return;
-        synchronized (danmakuList) {
-            danmakuList.clear();
-        }
+        danmakuList.clear();
     }
 
     @Override
-    public void removeAllLiveDanmakus() {
+    public synchronized void removeAllLiveDanmakus() {
         if (danmakus == null || danmakus.isEmpty())
             return;
         synchronized (danmakus) {
@@ -141,28 +137,28 @@ public class DrawTask implements IDrawTask {
             }
         }
     }
-    
-    protected void removeUnusedLiveDanmakusIn(int msec) {
+
+    protected synchronized void removeUnusedLiveDanmakusIn(int msec) {
         if (danmakuList == null || danmakuList.isEmpty())
             return;
-        synchronized (danmakuList) {
-            long startTime = System.currentTimeMillis();
-            IDanmakuIterator it = danmakuList.iterator();
-            while (it.hasNext()) {
-                BaseDanmaku danmaku = it.next();
-                boolean isTimeout = danmaku.isTimeOut();
-                if (isTimeout && danmaku.isLive) {
-                    it.remove();
-                }
-                if (!isTimeout || System.currentTimeMillis() - startTime > msec) {
-                    break;
-                }
+        long startTime = System.currentTimeMillis();
+        IDanmakuIterator it = danmakuList.iterator();
+        int count = 0;
+        while (it.hasNext()) {
+            BaseDanmaku danmaku = it.next();
+            boolean isTimeout = danmaku.isTimeOut();
+            if (isTimeout && danmaku.isLive) {
+                it.remove();
+                count++;
+            }
+            if (!isTimeout || System.currentTimeMillis() - startTime > msec) {
+                break;
             }
         }
     }
 
     @Override
-    public RenderingState draw(AbsDisplayer<?> displayer) {
+    public synchronized RenderingState draw(AbsDisplayer<?> displayer) {
         return drawDanmakus(displayer,mTimer);
     }
 
