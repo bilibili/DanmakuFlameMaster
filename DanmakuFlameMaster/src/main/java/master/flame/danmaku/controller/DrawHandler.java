@@ -420,12 +420,12 @@ public class DrawHandler extends Handler {
                 d = Math.max(mFrameUpdateRate, d);
                 d = Math.min(mCordonTime, d);
                 long a = d - mLastDeltaTime;
-                if (Math.abs(a) < 4 && d > mFrameUpdateRate && mLastDeltaTime > mFrameUpdateRate) {
+                if (a > 3 && a < 8  && mLastDeltaTime >= mFrameUpdateRate && mLastDeltaTime <= mCordonTime) {
                     d = mLastDeltaTime;
                 }
                 gapTime -= d;
+                mLastDeltaTime = d;
             }
-            mLastDeltaTime = d;
             mRemainingTime = gapTime;
             timer.add(d);
 //            Log.e("DrawHandler", time+"|d:" + d  + "RemaingTime:" + mRemainingTime + ",gapTime:" + gapTime + ",rtim:" + mRenderingState.consumingTime + ",average:" + averageTime);
@@ -448,7 +448,6 @@ public class DrawHandler extends Handler {
         mCordonTime = Math.max(33, (long) (averageFrameConsumingTime * 2.5f));
         mCordonTime2 = mCordonTime * 2;
         mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
-        mLastDeltaTime = mFrameUpdateRate;
         mThresholdTime = mFrameUpdateRate + 3;
 //        Log.i("DrawHandler", "initRenderingConfigs test-fps:" + averageFrameConsumingTime + "ms,mCordonTime:"
 //                + mCordonTime + ",mFrameRefreshingRate:" + mFrameUpdateRate);
