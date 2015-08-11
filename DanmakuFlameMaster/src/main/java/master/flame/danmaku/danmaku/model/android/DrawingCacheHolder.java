@@ -43,7 +43,7 @@ public class DrawingCacheHolder {
 
     public void buildCache(int w, int h, int density, boolean checkSizeEquals) {
         boolean reuse = checkSizeEquals ? (w == width && h == height) : (w <= width && h <= height);
-        if (reuse && bitmap != null && !bitmap.isRecycled()) {
+        if (reuse && bitmap != null) {
 //            canvas.drawColor(Color.TRANSPARENT);
             canvas.setBitmap(null);
             bitmap.eraseColor(Color.TRANSPARENT);
@@ -73,7 +73,7 @@ public class DrawingCacheHolder {
         eraseBitmapArray();
     }
 
-    public void recycle() {
+    public synchronized void recycle() {
         width = height = 0;
 //        if (canvas != null) {
 //            canvas = null;
@@ -89,7 +89,7 @@ public class DrawingCacheHolder {
     @SuppressLint("NewApi")
     public void splitWith(int dispWidth, int dispHeight, int maximumCacheWidth, int maximumCacheHeight) {
         recycleBitmapArray();
-        if (width <= 0 || height <= 0 || bitmap == null || bitmap.isRecycled()) {
+        if (width <= 0 || height <= 0 || bitmap == null) {
             return;
         }
         if (width <= maximumCacheWidth && height <= maximumCacheHeight) {
@@ -129,7 +129,7 @@ public class DrawingCacheHolder {
     }
 
     private void eraseBitmap(Bitmap bmp) {
-        if (bmp != null && !bmp.isRecycled()) {
+        if (bmp != null) {
             bmp.eraseColor(Color.TRANSPARENT);
         }
     }
@@ -158,12 +158,12 @@ public class DrawingCacheHolder {
         }
     }
 
-    public final boolean draw(Canvas canvas, float left, float top, Paint paint) {
+    public final synchronized boolean draw(Canvas canvas, float left, float top, Paint paint) {
         if (bitmapArray != null) {
             for (int i = 0; i < bitmapArray.length; i++) {
                 for (int j = 0; j < bitmapArray[i].length; j++) {
                     Bitmap bmp = bitmapArray[i][j];
-                    if (bmp != null && !bmp.isRecycled()) {
+                    if (bmp != null) {
                         float dleft = left + j * bmp.getWidth();
                         if (dleft > canvas.getWidth() || dleft + bmp.getWidth() < 0) {
                             continue;
@@ -177,7 +177,7 @@ public class DrawingCacheHolder {
                 }
             }
             return true;
-        } else if (bitmap != null && !bitmap.isRecycled()) {
+        } else if (bitmap != null) {
             canvas.drawBitmap(bitmap, left, top, paint);
             return true;
         }

@@ -35,7 +35,7 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
     @Override
     public DrawingCacheHolder get() {
         final DrawingCacheHolder holder = mHolder;
-        if (holder.bitmap == null || holder.bitmap.isRecycled()) {
+        if (holder.bitmap == null) {
             return null;
         }
         return mHolder;
