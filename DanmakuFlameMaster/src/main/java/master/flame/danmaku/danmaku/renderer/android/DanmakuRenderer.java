@@ -40,7 +40,7 @@ public class DanmakuRenderer extends Renderer {
     @Override
     public void release() {
         DanmakusRetainer.release();
-        DanmakuFilters.getDefault().release();
+        DanmakuFilters.getDefault().clear();
     }
     
     @Override
