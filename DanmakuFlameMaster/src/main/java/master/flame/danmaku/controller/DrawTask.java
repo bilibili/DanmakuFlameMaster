@@ -46,8 +46,6 @@ public class DrawTask implements IDrawTask {
 
     TaskListener mTaskListener;
 
-    Context mContext;
-
     IRenderer mRenderer;
 
     DanmakuTimer mTimer;
@@ -74,10 +72,9 @@ public class DrawTask implements IDrawTask {
         }
     };
 
-    public DrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
+    public DrawTask(DanmakuTimer timer, AbsDisplayer<?> disp,
             TaskListener taskListener) {
         mTaskListener = taskListener;
-        mContext = context;
         mRenderer = new DanmakuRenderer();
         mDisp = disp;
         initTimer(timer);

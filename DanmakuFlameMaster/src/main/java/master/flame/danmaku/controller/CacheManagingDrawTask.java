@@ -51,9 +51,9 @@ public class CacheManagingDrawTask extends DrawTask {
     
     private final Object mDrawingNotify = new Object();
 
-    public CacheManagingDrawTask(DanmakuTimer timer, Context context, AbsDisplayer<?> disp,
+    public CacheManagingDrawTask(DanmakuTimer timer, AbsDisplayer<?> disp,
             TaskListener taskListener, int maxCacheSize) {
-        super(timer, context, disp, taskListener);
+        super(timer, disp, taskListener);
         NativeBitmapFactory.loadLibs();
         mMaxCacheSize = maxCacheSize;
         if (NativeBitmapFactory.isInNativeAlloc()) {
