@@ -16,6 +16,7 @@ import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class DanmakuFilters {
 
@@ -117,7 +118,7 @@ public class DanmakuFilters {
             }
 
             if (totalSizeInScreen < mMaximumSize || danmaku.isShown()
-                    || (mLastSkipped != null && (danmaku.time - mLastSkipped.time > 500))) {
+                    || (mLastSkipped != null && (danmaku.time - mLastSkipped.time > DanmakuFactory.MAX_DANMAKU_DURATION / 20))) {
                 mLastSkipped = danmaku;
                 return false;
             }
