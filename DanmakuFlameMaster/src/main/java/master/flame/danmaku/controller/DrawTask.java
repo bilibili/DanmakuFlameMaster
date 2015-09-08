@@ -108,7 +108,9 @@ public class DrawTask implements IDrawTask {
         } else if (item.isLive) {
             mLastBeginMills = mLastEndMills = 0;
         }
-        added = danmakuList.addItem(item);
+        synchronized (danmakuList) {
+            added = danmakuList.addItem(item);
+        }
         if (added && mTaskListener != null) {
             mTaskListener.onDanmakuAdd(item);
         }
