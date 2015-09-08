@@ -453,6 +453,9 @@ public class CacheManagingDrawTask extends DrawTask {
                         if (item.isTimeOut()) {
                             break;
                         }
+                        if (item.priority == 0 && item.isFiltered()) {
+                            break;
+                        }
                         if (!item.hasDrawingCache()) {
                             buildCache(item);
                         }
