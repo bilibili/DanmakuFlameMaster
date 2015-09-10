@@ -178,7 +178,7 @@ public class Danmakus implements IDanmakus {
     @Override
     public IDanmakus subnew(long startTime, long endTime) {
         Collection<BaseDanmaku> subset = subset(startTime, endTime);
-        if (subset == null) {
+        if (subset == null || subset.isEmpty()) {
             return null;
         }
         ArrayList<BaseDanmaku> newSet = new ArrayList<BaseDanmaku>(subset);

@@ -123,6 +123,10 @@ public class DrawTask implements IDrawTask {
         danmakuList.clear();
     }
 
+    protected void onDanmakuRemoved(BaseDanmaku danmaku) {
+        // TODO call callback here
+    }
+
     @Override
     public synchronized void removeAllLiveDanmakus() {
         if (danmakus == null || danmakus.isEmpty())
@@ -130,8 +134,10 @@ public class DrawTask implements IDrawTask {
         synchronized (danmakus) {
             IDanmakuIterator it = danmakus.iterator();
             while (it.hasNext()) {
-                if (it.next().isLive) {
+                BaseDanmaku danmaku = it.next();
+                if (danmaku.isLive) {
                     it.remove();
+                    onDanmakuRemoved(danmaku);
                 }
             }
         }
@@ -142,13 +148,12 @@ public class DrawTask implements IDrawTask {
             return;
         long startTime = System.currentTimeMillis();
         IDanmakuIterator it = danmakuList.iterator();
-        int count = 0;
         while (it.hasNext()) {
             BaseDanmaku danmaku = it.next();
             boolean isTimeout = danmaku.isTimeOut();
             if (isTimeout && danmaku.isLive) {
                 it.remove();
-                count++;
+                onDanmakuRemoved(danmaku);
             }
             if (!isTimeout || System.currentTimeMillis() - startTime > msec) {
                 break;
