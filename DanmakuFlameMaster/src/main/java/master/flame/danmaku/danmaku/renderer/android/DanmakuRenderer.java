@@ -19,6 +19,7 @@ package master.flame.danmaku.danmaku.renderer.android;
 import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -30,7 +31,17 @@ public class DanmakuRenderer extends Renderer {
 
     private final DanmakuTimer mStartTimer = new DanmakuTimer();
     private final RenderingState mRenderingState = new RenderingState();
-    
+    private DanmakusRetainer.Verifier mVerifier = new DanmakusRetainer.Verifier() {
+        @Override
+        public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit) {
+            if (DanmakuFilters.getDefault().filterSecondary(danmaku, lines, 0, mStartTimer, willHit)) {
+                danmaku.setVisibility(false);
+                return true;
+            }
+            return false;
+        }
+    };
+
     @Override
     public void clear() {
         DanmakusRetainer.clear();
@@ -80,7 +91,7 @@ public class DanmakuRenderer extends Renderer {
             }
 
             // layout
-            DanmakusRetainer.fix(drawItem, disp);
+            DanmakusRetainer.fix(drawItem, disp, mVerifier);
 
             // draw
             if (!drawItem.isOutside() && drawItem.isShown()) {

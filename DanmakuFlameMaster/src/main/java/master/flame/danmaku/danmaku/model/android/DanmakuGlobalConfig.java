@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DanmakuFilters.IDanmakuFilter;
@@ -18,7 +19,7 @@ import android.graphics.Typeface;
 public class DanmakuGlobalConfig {
 
     public enum DanmakuConfigTag {
-        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU, DUPLICATE_MERGING_ENABLED;
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU, DUPLICATE_MERGING_ENABLED, MAXIMUN_LINES, OVERLAPPING_ENABLE;
 
         public boolean isVisibilityRelatedTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
@@ -172,8 +173,12 @@ public class DanmakuGlobalConfig {
     }
 
     private <T> void setFilterData(String tag, T data) {
+        setFilterData(tag, data, true);
+    }
+
+    private <T> void setFilterData(String tag, T data, boolean primary) {
         @SuppressWarnings("unchecked")
-        IDanmakuFilter<T> filter = (IDanmakuFilter<T>) DanmakuFilters.getDefault().get(tag);
+        IDanmakuFilter<T> filter = (IDanmakuFilter<T>) DanmakuFilters.getDefault().get(tag, primary);
         filter.setData(data);
     }
 
@@ -542,6 +547,48 @@ public class DanmakuGlobalConfig {
         return this;
     }
 
+    public boolean isDuplicateMergingEnabled() {
+        return mDuplicateMergingEnable;
+    }
+
+    /**
+     * 设置最大显示行数
+     * @param pairs map<K,V> 设置null取消行数限制
+     * K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
+     * V = 最大行数
+     * @return
+     */
+    public DanmakuGlobalConfig setMaximumLines(Map<Integer, Integer> pairs) {
+        if (pairs == null) {
+            DanmakuFilters.getDefault()
+                    .unregisterFilter(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, false);
+        } else {
+            setFilterData(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, pairs, false);
+        }
+        GlobalFlagValues.updateFilterFlag();
+        notifyConfigureChanged(DanmakuConfigTag.MAXIMUN_LINES, pairs);
+        return this;
+    }
+
+    /**
+     * 设置弹幕是否重叠
+     * @param pairs map<K,V> 设置null恢复默认设置,默认为重叠
+     * K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
+     * V = true|false 是否重叠
+     * @return
+     */
+    public DanmakuGlobalConfig setOverlapping(Map<Integer, Boolean> pairs) {
+        if (pairs == null) {
+            DanmakuFilters.getDefault()
+                    .unregisterFilter(DanmakuFilters.TAG_OVERLAPPING_FILTER, false);
+        } else {
+            setFilterData(DanmakuFilters.TAG_OVERLAPPING_FILTER, pairs, false);
+        }
+        GlobalFlagValues.updateFilterFlag();
+        notifyConfigureChanged(DanmakuConfigTag.OVERLAPPING_ENABLE, pairs);
+        return this;
+    }
+
     /**
      * 设置缓存绘制填充器，默认使用{@link SimpleTextCacheStuffer}只支持纯文字显示, 如果需要图文混排请设置{@link SpannedCacheStuffer}
      * 如果需要定制其他样式请扩展{@link SimpleTextCacheStuffer}|{@link SpannedCacheStuffer}
@@ -554,11 +601,6 @@ public class DanmakuGlobalConfig {
         }
         return this;
     }
-    
-    public boolean isDuplicateMergingEnabled() {
-        return mDuplicateMergingEnable;
-    }
-    
     
     public interface ConfigChangedCallback {
         public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
