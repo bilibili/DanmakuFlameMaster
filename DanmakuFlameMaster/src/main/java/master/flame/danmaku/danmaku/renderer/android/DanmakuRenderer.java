@@ -76,7 +76,9 @@ public class DanmakuRenderer extends Renderer {
             }
 
             if (drawItem.time < startRenderTime
-                    || (drawItem.priority == 0 && drawItem.isFiltered())) {
+                    || (drawItem.priority == 0 && drawItem.isFiltered())
+                    || drawItem.isFilteredBy(DanmakuFilters.FILTER_TYPE_OVERLAPPING)
+                    || drawItem.isFilteredBy(DanmakuFilters.FILTER_TYPE_MAXIMUM_LINES)) {
                 continue;
             }
             

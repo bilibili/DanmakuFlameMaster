@@ -236,7 +236,11 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isFiltered() {
-        return mFilterParam != 0 && filterResetFlag == GlobalFlagValues.FILTER_RESET_FLAG;
+        return filterResetFlag == GlobalFlagValues.FILTER_RESET_FLAG && mFilterParam != 0;
+    }
+
+    public boolean isFilteredBy(int flag) {
+        return filterResetFlag == GlobalFlagValues.FILTER_RESET_FLAG && (mFilterParam & flag) == flag;
     }
 
     public void setVisibility(boolean b) {
