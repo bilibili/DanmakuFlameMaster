@@ -570,14 +570,19 @@ public class DanmakuGlobalConfig {
         return this;
     }
 
+    @Deprecated
+    public DanmakuGlobalConfig setOverlapping(Map<Integer, Boolean> pairs) {
+        return preventOverlapping(pairs);
+    }
+
     /**
-     * 设置弹幕是否重叠
-     * @param pairs map<K,V> 设置null恢复默认设置,默认为重叠
+     * 设置防弹幕重叠
+     * @param pairs map<K,V> 设置null恢复默认设置,默认为允许重叠
      * K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
      * V = true|false 是否重叠
      * @return
      */
-    public DanmakuGlobalConfig setOverlapping(Map<Integer, Boolean> pairs) {
+    public DanmakuGlobalConfig preventOverlapping(Map<Integer, Boolean> pairs) {
         if (pairs == null) {
             DanmakuFilters.getDefault()
                     .unregisterFilter(DanmakuFilters.TAG_OVERLAPPING_FILTER, false);

@@ -160,7 +160,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setMaximumVisibleSizeInScreen(0)
         .setCacheStuffer(new BackgroundCacheStuffer())
         .setMaximumLines(maxLinesPair)
-        .setOverlapping(overlappingEnablePair);
+        .preventOverlapping(overlappingEnablePair);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
