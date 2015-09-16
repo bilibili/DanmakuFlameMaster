@@ -34,7 +34,7 @@ public class DanmakuRenderer extends Renderer {
     private DanmakusRetainer.Verifier mVerifier = new DanmakusRetainer.Verifier() {
         @Override
         public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit) {
-            if (DanmakuFilters.getDefault().filterSecondary(danmaku, lines, 0, mStartTimer, willHit)) {
+            if (danmaku.priority == 0 && DanmakuFilters.getDefault().filterSecondary(danmaku, lines, 0, mStartTimer, willHit)) {
                 danmaku.setVisibility(false);
                 return true;
             }
@@ -76,9 +76,7 @@ public class DanmakuRenderer extends Renderer {
             }
 
             if (drawItem.time < startRenderTime
-                    || (drawItem.priority == 0 && drawItem.isFiltered())
-                    || drawItem.isFilteredBy(DanmakuFilters.FILTER_TYPE_OVERLAPPING)
-                    || drawItem.isFilteredBy(DanmakuFilters.FILTER_TYPE_MAXIMUM_LINES)) {
+                    || (drawItem.priority == 0 && drawItem.isFiltered())) {
                 continue;
             }
             
