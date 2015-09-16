@@ -68,6 +68,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private Button mBtnSendDanmakus;
 
+    /**
+     * 绘制背景(自定义弹幕样式)
+     */
     private static class BackgroundCacheStuffer extends SpannedCacheStuffer {
         // 通过扩展SimpleTextCacheStuffer或SpannedCacheStuffer个性化你的弹幕样式
         final Paint paint = new Paint();
@@ -150,15 +153,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         // 设置最大显示行数
         HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
-        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 3); // 滚动弹幕最大显示3行
+        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 5); // 滚动弹幕最大显示3行
         // 设置是否禁止重叠
         HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<Integer, Boolean>();
         overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
 
         mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setMaximumVisibleSizeInScreen(0)
-        .setCacheStuffer(new BackgroundCacheStuffer())
+        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setScrollSpeedFactor(1.2f).setScaleTextSize(1.2f)
+        .setCacheStuffer(new SpannedCacheStuffer()) // 图文混排使用SpannedCacheStuffer
+//        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
         .setMaximumLines(maxLinesPair)
         .preventOverlapping(overlappingEnablePair);
         if (mDanmakuView != null) {
@@ -299,7 +303,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // }
         danmaku.text = "这是一条弹幕" + System.nanoTime();
         danmaku.padding = 5;
-        danmaku.priority = 1;
+        danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
         danmaku.isLive = islive;
         danmaku.time = mDanmakuView.getCurrentTime() + 1200;
         danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
@@ -323,7 +327,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         spannableStringBuilder.setSpan(new BackgroundColorSpan(Color.parseColor("#8A2233B1")), 0, spannableStringBuilder.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         danmaku.text = spannableStringBuilder;
         danmaku.padding = 5;
-        danmaku.priority = 1;
+        danmaku.priority = 1;  // 一定会显示, 一般用于本机发送的弹幕
         danmaku.isLive = islive;
         danmaku.time = mDanmakuView.getCurrentTime() + 1200;
         danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
