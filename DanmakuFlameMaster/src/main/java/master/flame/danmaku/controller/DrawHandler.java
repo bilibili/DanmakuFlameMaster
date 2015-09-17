@@ -25,7 +25,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 
-import tv.cjump.jni.DeviceUtils;
+import java.util.LinkedList;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -38,8 +38,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.AndroidUtils;
-
-import java.util.LinkedList;
+import tv.cjump.jni.DeviceUtils;
 
 public class DrawHandler extends Handler {
 
@@ -348,7 +347,7 @@ public class DrawHandler extends Handler {
         } else if (mRenderingState.nothingRendered && mIdleSleep) {
             long dTime = mRenderingState.endTime - timer.currMillisecond;
             if (dTime > 500) {
-                waitRendering(dTime - 400);
+                waitRendering(dTime - 10);
                 return;
             }
         }
@@ -390,7 +389,7 @@ public class DrawHandler extends Handler {
                         dTime = mRenderingState.endTime - timer.currMillisecond;
                         if (dTime > 500) {
                             notifyRendering();
-                            waitRendering(dTime - 400);
+                            waitRendering(dTime - 10);
                         }
                     }
                 }
