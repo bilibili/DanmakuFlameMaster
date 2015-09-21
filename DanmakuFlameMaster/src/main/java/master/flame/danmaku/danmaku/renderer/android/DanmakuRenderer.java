@@ -41,6 +41,7 @@ public class DanmakuRenderer extends Renderer {
             return false;
         }
     };
+    private boolean mVerifierEnabled;
 
     @Override
     public void clear() {
@@ -53,7 +54,12 @@ public class DanmakuRenderer extends Renderer {
         DanmakusRetainer.release();
         DanmakuFilters.getDefault().clear();
     }
-    
+
+    @Override
+    public void setVerifierEnabled(boolean enabled) {
+        mVerifierEnabled = enabled;
+    }
+
     @Override
     public RenderingState draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
         int lastTotalDanmakuCount = mRenderingState.totalDanmakuCount;
@@ -91,7 +97,7 @@ public class DanmakuRenderer extends Renderer {
             }
 
             // layout
-            DanmakusRetainer.fix(drawItem, disp, mVerifier);
+            DanmakusRetainer.fix(drawItem, disp, mVerifierEnabled ? mVerifier : null);
 
             // draw
             if (!drawItem.isOutside() && drawItem.isShown()) {

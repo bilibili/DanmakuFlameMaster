@@ -25,7 +25,7 @@ public interface IRenderer {
     
     public static final int NOTHING_RENDERING = 0;
     public static final int CACHE_RENDERING = 1;
-    public static final int TEXT_RENDERING = 2;    
+    public static final int TEXT_RENDERING = 2;
 
     public class Area {
 
@@ -130,5 +130,7 @@ public interface IRenderer {
     public void clear();
 
     public void release();
+
+    public void setVerifierEnabled(boolean enabled);
 
 }

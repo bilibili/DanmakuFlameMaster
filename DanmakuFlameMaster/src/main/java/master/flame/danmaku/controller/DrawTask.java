@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.controller;
 
-import android.content.Context;
 import android.graphics.Canvas;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
@@ -76,6 +75,7 @@ public class DrawTask implements IDrawTask {
             TaskListener taskListener) {
         mTaskListener = taskListener;
         mRenderer = new DanmakuRenderer();
+        mRenderer.setVerifierEnabled(DanmakuGlobalConfig.DEFAULT.isPreventOverlappingEnabled() || DanmakuGlobalConfig.DEFAULT.isMaxLinesLimited());
         mDisp = disp;
         initTimer(timer);
         Boolean enable = DanmakuGlobalConfig.DEFAULT.isDuplicateMergingEnabled();
@@ -302,6 +302,11 @@ public class DrawTask implements IDrawTask {
         } else if (DanmakuConfigTag.SCALE_TEXTSIZE.equals(tag) || DanmakuConfigTag.SCROLL_SPEED_FACTOR.equals(tag)) {
             requestClearRetainer();
             handled = false;
+        } else if (DanmakuConfigTag.MAXIMUN_LINES.equals(tag) || DanmakuConfigTag.OVERLAPPING_ENABLE.equals(tag)) {
+            if (mRenderer != null) {
+                mRenderer.setVerifierEnabled(values != null);
+            }
+            handled = true;
         }
         return handled;
     }

@@ -112,6 +112,10 @@ public class DanmakuGlobalConfig {
 
     private BaseCacheStuffer mCacheStuffer;
 
+    private boolean mIsMaxLinesLimited;
+
+    private boolean mIsPreventOverlappingEnabled;
+
     /**
      * set typeface
      * 
@@ -559,6 +563,7 @@ public class DanmakuGlobalConfig {
      * @return
      */
     public DanmakuGlobalConfig setMaximumLines(Map<Integer, Integer> pairs) {
+        mIsMaxLinesLimited = (pairs != null);
         if (pairs == null) {
             DanmakuFilters.getDefault()
                     .unregisterFilter(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, false);
@@ -583,6 +588,7 @@ public class DanmakuGlobalConfig {
      * @return
      */
     public DanmakuGlobalConfig preventOverlapping(Map<Integer, Boolean> pairs) {
+        mIsPreventOverlappingEnabled = (pairs != null);
         if (pairs == null) {
             DanmakuFilters.getDefault()
                     .unregisterFilter(DanmakuFilters.TAG_OVERLAPPING_FILTER, false);
@@ -592,6 +598,14 @@ public class DanmakuGlobalConfig {
         GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.OVERLAPPING_ENABLE, pairs);
         return this;
+    }
+
+    public boolean isMaxLinesLimited() {
+        return mIsMaxLinesLimited;
+    }
+
+    public boolean isPreventOverlappingEnabled() {
+        return mIsPreventOverlappingEnabled;
     }
 
     /**
