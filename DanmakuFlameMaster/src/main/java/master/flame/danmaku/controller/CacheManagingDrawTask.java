@@ -16,10 +16,10 @@
 
 package master.flame.danmaku.controller;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.os.SystemClock;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -559,15 +559,22 @@ public class CacheManagingDrawTask extends DrawTask {
 
             private long prepareCaches(boolean repositioned) {
                 long curr = mCacheTimer.currMillisecond;
-                long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize * 3;
+                long end = curr + DanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize;
                 if (end < mTimer.currMillisecond) {
                     return 0;
                 }
-                long startTime =  System.currentTimeMillis();
+                long startTime = System.currentTimeMillis();
                 IDanmakus danmakus = null;
-                synchronized (danmakuList) {
-                    danmakus = danmakuList.subnew(curr, end);
-                }
+                int tryCount = 0;
+                boolean hasException = false;
+                do {
+                    try {
+                        danmakus = danmakuList.subnew(curr, end);
+                    } catch (Exception e) {
+                        hasException = true;
+                        SystemClock.sleep(10);
+                    }
+                } while (++tryCount < 3 && danmakus == null && hasException);
                 if (danmakus == null) {
                     mCacheTimer.update(end);
                     return 0;
