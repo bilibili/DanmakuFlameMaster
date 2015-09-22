@@ -304,7 +304,7 @@ public class DrawTask implements IDrawTask {
             handled = false;
         } else if (DanmakuConfigTag.MAXIMUN_LINES.equals(tag) || DanmakuConfigTag.OVERLAPPING_ENABLE.equals(tag)) {
             if (mRenderer != null) {
-                mRenderer.setVerifierEnabled(values != null);
+                mRenderer.setVerifierEnabled(DanmakuGlobalConfig.DEFAULT.isPreventOverlappingEnabled() || DanmakuGlobalConfig.DEFAULT.isMaxLinesLimited());
             }
             handled = true;
         }

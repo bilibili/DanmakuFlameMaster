@@ -31,7 +31,8 @@ public class DanmakuRenderer extends Renderer {
 
     private final DanmakuTimer mStartTimer = new DanmakuTimer();
     private final RenderingState mRenderingState = new RenderingState();
-    private DanmakusRetainer.Verifier mVerifier = new DanmakusRetainer.Verifier() {
+    private DanmakusRetainer.Verifier mVerifier;
+    private final DanmakusRetainer.Verifier verifier = new DanmakusRetainer.Verifier() {
         @Override
         public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit) {
             if (danmaku.priority == 0 && DanmakuFilters.getDefault().filterSecondary(danmaku, lines, 0, mStartTimer, willHit)) {
@@ -41,7 +42,6 @@ public class DanmakuRenderer extends Renderer {
             return false;
         }
     };
-    private boolean mVerifierEnabled;
 
     @Override
     public void clear() {
@@ -57,7 +57,7 @@ public class DanmakuRenderer extends Renderer {
 
     @Override
     public void setVerifierEnabled(boolean enabled) {
-        mVerifierEnabled = enabled;
+        mVerifier = (enabled ? verifier : null);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class DanmakuRenderer extends Renderer {
             }
 
             // layout
-            DanmakusRetainer.fix(drawItem, disp, mVerifierEnabled ? mVerifier : null);
+            DanmakusRetainer.fix(drawItem, disp, mVerifier);
 
             // draw
             if (!drawItem.isOutside() && drawItem.isShown()) {
