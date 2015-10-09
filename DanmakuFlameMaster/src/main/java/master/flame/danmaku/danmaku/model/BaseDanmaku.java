@@ -44,12 +44,17 @@ public abstract class BaseDanmaku {
     /**
      * 文本
      */
-    public String text;
-    
+    public CharSequence text;
+
     /**
      * 多行文本: 如果有包含换行符需事先拆分到lines
      */
     public String[] lines;
+
+    /**
+     * 可保存一些数据的引用
+     */
+    public Object obj;
 
     /**
      * 文本颜色
@@ -80,17 +85,17 @@ public abstract class BaseDanmaku {
      * 字体大小
      */
     public float textSize = -1;
-    
+
     /**
      * 框的颜色,0表示无框
      */
     public int borderColor = 0;
-    
+
     /**
      * 内边距(像素)
      */
     public int padding = 0;
-    
+
     /**
      * 弹幕优先级,0为低优先级,>0为高优先级不会被过滤器过滤
      */
@@ -120,12 +125,12 @@ public abstract class BaseDanmaku {
      * 是否可见
      */
     public int visibility;
-    
+
     /**
      * 重置位 visible
      */
     private int visibleResetFlag = 0;
-    
+
     /**
      * 重置位 measure
      */
@@ -135,22 +140,22 @@ public abstract class BaseDanmaku {
      * 绘制用缓存
      */
     public IDrawingCache<?> cache;
-    
+
     /**
      * 是否是直播弹幕
      */
     public boolean isLive;
-    
+
     /**
      * 弹幕发布者id, 0表示游客
      */
     public int userId = 0;
-    
+
     /**
      * 弹幕发布者id
      */
     public String userHash;
-    
+
     /**
      * 是否游客
      */
@@ -166,6 +171,10 @@ public abstract class BaseDanmaku {
      */
     protected int alpha = AlphaValue.MAX;
 
+    public int mFilterParam = 0;
+
+    public int filterResetFlag = -1;
+
     public long getDuration() {
         return duration.value;
     }
@@ -174,8 +183,8 @@ public abstract class BaseDanmaku {
         this.duration = duration;
     }
 
-    public void draw(IDisplayer displayer) {
-        displayer.draw(this);
+    public int draw(IDisplayer displayer) {
+        return displayer.draw(this);
     }
 
     public boolean isMeasured() {
@@ -211,18 +220,34 @@ public abstract class BaseDanmaku {
 
     public boolean isOutside(long ctime) {
         long dtime = ctime - time;
-        return dtime <= 0 ||  dtime >= duration.value;
+        return dtime <= 0 || dtime >= duration.value;
     }
-    
+
     public boolean isLate() {
         return mTimer == null || mTimer.currMillisecond < time;
     }
 
+    public boolean hasPassedFilter() {
+        if (filterResetFlag != GlobalFlagValues.FILTER_RESET_FLAG) {
+            mFilterParam = 0;
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isFiltered() {
+        return filterResetFlag == GlobalFlagValues.FILTER_RESET_FLAG && mFilterParam != 0;
+    }
+
+    public boolean isFilteredBy(int flag) {
+        return filterResetFlag == GlobalFlagValues.FILTER_RESET_FLAG && (mFilterParam & flag) == flag;
+    }
+
     public void setVisibility(boolean b) {
-        if(b){
+        if (b) {
             this.visibleResetFlag = GlobalFlagValues.VISIBLE_RESET_FLAG;
             this.visibility = VISIBLE;
-        }else
+        } else
             this.visibility = INVISIBLE;
     }
 
@@ -240,9 +265,9 @@ public abstract class BaseDanmaku {
 
     /**
      * return the type of Danmaku
-     * 
+     *
      * @return TYPE_SCROLL_RL = 0 TYPE_SCROLL_RL = 1 TYPE_SCROLL_LR = 2
-     *         TYPE_FIX_TOP = 3; TYPE_FIX_BOTTOM = 4;
+     * TYPE_FIX_TOP = 3; TYPE_FIX_BOTTOM = 4;
      */
     public abstract int getType();
 
@@ -257,5 +282,5 @@ public abstract class BaseDanmaku {
     public int getAlpha() {
         return alpha;
     }
-    
+
 }

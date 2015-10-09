@@ -50,26 +50,27 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
         }
         for (int i = 0; i < danmakuListData.length(); i++) {
             try {
-                JSONArray danmakuArray = danmakuListData.getJSONArray(i);
+                JSONObject danmakuArray = danmakuListData.getJSONObject(i);
                 if (danmakuArray != null) {
                     danmakus = _parse(danmakuArray, danmakus);
                 }
             } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
         return danmakus;
     }
 
-    private Danmakus _parse(JSONArray jsonArray, Danmakus danmakus) {
+    private Danmakus _parse(JSONObject jsonObject, Danmakus danmakus) {
         if (danmakus == null) {
             danmakus = new Danmakus();
         }
-        if (jsonArray == null || jsonArray.length() == 0) {
+        if (jsonObject == null || jsonObject.length() == 0) {
             return danmakus;
         }
-        for (int i = 0; i < jsonArray.length(); i++) {
+        for (int i = 0; i < jsonObject.length(); i++) {
             try {
-                JSONObject obj = jsonArray.getJSONObject(i);
+                JSONObject obj = jsonObject;
                 String c = obj.getString("c");
                 String[] values = c.split(",");
                 if (values.length > 0) {

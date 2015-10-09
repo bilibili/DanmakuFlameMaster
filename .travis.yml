@@ -1,29 +1,23 @@
-language: java
-jdk:
-  - oraclejdk7
-  - openjdk7
-  - openjdk6
+language: android
+jdk: oraclejdk7
+env:
+  matrix:
+    - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
 
-before_install:
-  # Install base Android SDK
-  - sudo apt-get update -qq
-  - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch > /dev/null; fi
-  - wget http://dl.google.com/android/android-sdk_r22.3-linux.tgz
-  - tar xzf android-sdk_r22.3-linux.tgz
-  - export ANDROID_HOME=$PWD/android-sdk-linux
-  - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+android:
+  components:
+    - build-tools-19.1.0
 
-  # Install required components.
-  # For a full list, run `android list sdk -a --extended`
-  # Note that sysimg-19 downloads only ARM, because only the first license query is accepted.
-  - echo yes | android update sdk --filter platform-tools --no-ui --force > /dev/null
-  - echo yes | android update sdk --all --filter build-tools-19.0.0 --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter android-19 --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter sysimg-19 --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter extra-android-support --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force > /dev/null
-
-  - chmod +x gradlew
+before_script:
+  # Create and start emulator
+  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - adb wait-for-device
+  - adb shell input keyevent 82 &
   
 script:
   "./gradlew check -i"
+
+after_failure:
+  - cat /home/travis/build/Bilibili/DanmakuFlameMaster/DanmakuFlameMaster/build/outputs/lint-results.html
+  - cat /home/travis/build/Bilibili/DanmakuFlameMaster/DanmakuFlameMaster/build/outputs/lint-results.xml

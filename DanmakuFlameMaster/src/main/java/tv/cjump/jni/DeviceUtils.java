@@ -4,6 +4,7 @@ package tv.cjump.jni;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,10 +12,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 
-public class CpuInfo {
+public class DeviceUtils {
 
     public static final String ABI_X86 = "x86";
-    
+
     public static final String ABI_MIPS = "mips";
 
     public static enum ARCH {
@@ -54,6 +55,7 @@ public class CpuInfo {
                         sArch = ARCH.ARM64;
                         break;
                     default:
+                        Log.e("NativeBitmapFactory", "libc.so is unknown arch: " + Integer.toHexString(machine));
                         break;
                 }
             } catch (FileNotFoundException e) {
@@ -109,7 +111,7 @@ public class CpuInfo {
     public static boolean supportX86() {
         return supportABI(ABI_X86);
     }
-    
+
     public static boolean supportMips() {
         return supportABI(ABI_MIPS);
     }
@@ -117,6 +119,34 @@ public class CpuInfo {
     public static boolean isARMSimulatedByX86() {
         ARCH arch = getMyCpuArch();
         return !supportX86() && ARCH.X86.equals(arch);
+    }
+
+    public static boolean isMiBox2Device() {
+        String manufacturer = Build.MANUFACTURER;
+        String productName = Build.PRODUCT;
+        return manufacturer.equalsIgnoreCase("Xiaomi")
+            && productName.equalsIgnoreCase("dredd");
+    }
+
+    public static boolean isMagicBoxDevice() {
+        String manufacturer = Build.MANUFACTURER;
+        String productName = Build.PRODUCT;
+        return manufacturer.equalsIgnoreCase("MagicBox")
+            && productName.equalsIgnoreCase("MagicBox");
+    }
+
+    public static boolean isProblemBoxDevice() {
+        return isMiBox2Device() || isMagicBoxDevice();
+    }
+
+    public static boolean isRealARMArch() {
+        ARCH arch = getMyCpuArch();
+        return (supportABI("armeabi-v7a") || supportABI("armeabi")) && ARCH.ARM.equals(arch);
+    }
+
+    public static boolean isRealX86Arch() {
+        ARCH arch = getMyCpuArch();
+        return supportABI(ABI_X86) || ARCH.X86.equals(arch);
     }
 
 }

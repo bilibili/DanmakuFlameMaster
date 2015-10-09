@@ -6,14 +6,14 @@ import master.flame.danmaku.danmaku.model.objectpool.Poolable;
 
 public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable<DrawingCache> {
 
-    private DrawingCacheHolder mHolder;
+    private final DrawingCacheHolder mHolder;
 
     private int mSize = 0;
 
     private DrawingCache mNextElement;
 
     private boolean mIsPooled;
-    
+
     private int referenceCount = 0;
 
     public DrawingCache() {
@@ -22,28 +22,20 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
 
     @Override
     public void build(int w, int h, int density, boolean checkSizeEquals) {
-        DrawingCacheHolder holder = mHolder;
-        if (holder == null) {
-            holder = new DrawingCacheHolder(w, h, density);
-        } else {
-            holder.buildCache(w, h, density, checkSizeEquals);
-        }
-        mHolder = holder;
+        final DrawingCacheHolder holder = mHolder;
+        holder.buildCache(w, h, density, checkSizeEquals);
         mSize = mHolder.bitmap.getRowBytes() * mHolder.bitmap.getHeight();
     }
-    
+
     @Override
     public void erase() {
-        final DrawingCacheHolder holder = mHolder;
-        if (holder == null) {
-            return;
-        }
-        holder.erase();
+        mHolder.erase();
     }
 
     @Override
     public DrawingCacheHolder get() {
-        if (mHolder == null || mHolder.bitmap == null) {
+        final DrawingCacheHolder holder = mHolder;
+        if (holder.bitmap == null) {
             return null;
         }
         return mHolder;
@@ -60,10 +52,7 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
 
     @Override
     public int size() {
-        if (mHolder != null) {
-            return mSize;
-        }
-        return 0;
+        return mSize;
     }
 
     @Override
@@ -87,34 +76,28 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
     }
 
     @Override
-    public boolean hasReferences() {
+    public synchronized boolean hasReferences() {
         return referenceCount > 0;
     }
 
     @Override
-    public void increaseReference() {
+    public synchronized void increaseReference() {
         referenceCount++;
     }
 
     @Override
-    public void decreaseReference() {
+    public synchronized void decreaseReference() {
         referenceCount--;
     }
 
     @Override
     public int width() {
-        if (mHolder != null) {
-            return mHolder.width;
-        }
-        return 0;
+        return mHolder.width;
     }
 
     @Override
     public int height() {
-        if (mHolder != null) {
-            return mHolder.height;
-        }
-        return 0;
+        return mHolder.height;
     }
 
 }

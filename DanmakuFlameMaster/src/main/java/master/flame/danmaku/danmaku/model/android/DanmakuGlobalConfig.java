@@ -1,9 +1,11 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DanmakuFilters.IDanmakuFilter;
@@ -17,7 +19,7 @@ import android.graphics.Typeface;
 public class DanmakuGlobalConfig {
 
     public enum DanmakuConfigTag {
-        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU;
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU, DUPLICATE_MERGING_ENABLED, MAXIMUN_LINES, OVERLAPPING_ENABLE;
 
         public boolean isVisibilityRelatedTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
@@ -26,10 +28,6 @@ public class DanmakuGlobalConfig {
                     || this.equals(USER_ID_BLACK_LIST);
         }
     }
-
-    /*
-     * TODO 选项：合并异色同字弹幕缓存
-     */
 
     public static DanmakuGlobalConfig DEFAULT = new DanmakuGlobalConfig();
 
@@ -94,6 +92,7 @@ public class DanmakuGlobalConfig {
     public final static int DANMAKU_STYLE_NONE = 0; // 无
     public final static int DANMAKU_STYLE_SHADOW = 1; // 阴影
     public final static int DANMAKU_STYLE_STROKEN = 2; // 描边
+    public final static int DANMAKU_STYLE_PROJECTION = 3; // 投影
 
     public BorderType shadowType = BorderType.SHADOW;
 
@@ -105,9 +104,17 @@ public class DanmakuGlobalConfig {
     
     List<String> mUserHashBlackList = new ArrayList<String>();
 
-    private ArrayList<ConfigChangedCallback> mCallbackList;
+    private List<WeakReference<ConfigChangedCallback>> mCallbackList;
 
     private boolean mBlockGuestDanmaku = false;
+
+    private boolean mDuplicateMergingEnable = false;
+
+    private BaseCacheStuffer mCacheStuffer;
+
+    private boolean mIsMaxLinesLimited;
+
+    private boolean mIsPreventOverlappingEnabled;
 
     /**
      * set typeface
@@ -139,6 +146,7 @@ public class DanmakuGlobalConfig {
             scaleTextSize = p;
             AndroidDisplayer.clearTextHeightCache();
             GlobalFlagValues.updateMeasureFlag();
+            GlobalFlagValues.updateVisibleFlag();
             notifyConfigureChanged(DanmakuConfigTag.SCALE_TEXTSIZE, p);
         }
         isTextScaled = (scaleTextSize != 1f);
@@ -160,6 +168,7 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setFTDanmakuVisibility(boolean visible) {
         setDanmakuVisible(visible, BaseDanmaku.TYPE_FIX_TOP);
         setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+        GlobalFlagValues.updateFilterFlag();
         if (FTDanmakuVisibility != visible) {
             FTDanmakuVisibility = visible;
             notifyConfigureChanged(DanmakuConfigTag.FT_DANMAKU_VISIBILITY, visible);
@@ -168,8 +177,12 @@ public class DanmakuGlobalConfig {
     }
 
     private <T> void setFilterData(String tag, T data) {
+        setFilterData(tag, data, true);
+    }
+
+    private <T> void setFilterData(String tag, T data, boolean primary) {
         @SuppressWarnings("unchecked")
-        IDanmakuFilter<T> filter = (IDanmakuFilter<T>) DanmakuFilters.getDefault().get(tag);
+        IDanmakuFilter<T> filter = (IDanmakuFilter<T>) DanmakuFilters.getDefault().get(tag, primary);
         filter.setData(data);
     }
 
@@ -196,6 +209,7 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setFBDanmakuVisibility(boolean visible) {
         setDanmakuVisible(visible, BaseDanmaku.TYPE_FIX_BOTTOM);
         setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+        GlobalFlagValues.updateFilterFlag();
         if (FBDanmakuVisibility != visible) {
             FBDanmakuVisibility = visible;
             notifyConfigureChanged(DanmakuConfigTag.FB_DANMAKU_VISIBILITY, visible);
@@ -218,6 +232,7 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setL2RDanmakuVisibility(boolean visible) {
         setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_LR);
         setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+        GlobalFlagValues.updateFilterFlag();
         if(L2RDanmakuVisibility != visible){
             L2RDanmakuVisibility = visible;
             notifyConfigureChanged(DanmakuConfigTag.L2R_DANMAKU_VISIBILITY, visible);
@@ -240,6 +255,7 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setR2LDanmakuVisibility(boolean visible) {
         setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_RL);
         setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+        GlobalFlagValues.updateFilterFlag();
         if (R2LDanmakuVisibility != visible) {
             R2LDanmakuVisibility = visible;
             notifyConfigureChanged(DanmakuConfigTag.R2L_DANMAKU_VISIBILIY, visible);
@@ -262,6 +278,7 @@ public class DanmakuGlobalConfig {
     public DanmakuGlobalConfig setSpecialDanmakuVisibility(boolean visible) {
         setDanmakuVisible(visible, BaseDanmaku.TYPE_SPECIAL);
         setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
+        GlobalFlagValues.updateFilterFlag();
         if (SecialDanmakuVisibility != visible) {
             SecialDanmakuVisibility = visible;
             notifyConfigureChanged(DanmakuConfigTag.SPECIAL_DANMAKU_VISIBILITY, visible);
@@ -295,6 +312,7 @@ public class DanmakuGlobalConfig {
             return this;
         }
         setFilterData(DanmakuFilters.TAG_QUANTITY_DANMAKU_FILTER, maxSize);
+        GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN, maxSize);
         return this;
     }
@@ -302,30 +320,45 @@ public class DanmakuGlobalConfig {
     /**
      * 设置描边样式
      * 
-     * @param type DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or
-     *            DANMAKU_STYLE_STROKEN
-     * @param size
+     * @param style DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or
+     *            DANMAKU_STYLE_STROKEN or DANMAKU_STYLE_PROJECTION
+     * @param values
+     *        DANMAKU_STYLE_SHADOW 阴影模式下，values传入阴影半径
+     *        DANMAKU_STYLE_STROKEN 描边模式下，values传入描边宽度
+     *        DANMAKU_STYLE_PROJECTION
+     *            投影模式下，values传入offsetX, offsetY, alpha
+     *                offsetX/offsetY: x/y 方向上的偏移量
+     *                alpha: 投影透明度 [0...255]
      * @return
      */
-    public DanmakuGlobalConfig setDanmakuStyle(int style, float size) {
+    public DanmakuGlobalConfig setDanmakuStyle(int style, float... values) {
         switch (style) {
             case DANMAKU_STYLE_NONE:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = false;
                 AndroidDisplayer.CONFIG_HAS_STROKE = false;
+                AndroidDisplayer.CONFIG_HAS_PROJECTION = false;
                 break;
             case DANMAKU_STYLE_SHADOW:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = true;
                 AndroidDisplayer.CONFIG_HAS_STROKE = false;
-                AndroidDisplayer.setShadowRadius(size);
+                AndroidDisplayer.CONFIG_HAS_PROJECTION = false;
+                AndroidDisplayer.setShadowRadius(values[0]);
                 break;
             case DANMAKU_STYLE_DEFAULT:
             case DANMAKU_STYLE_STROKEN:
                 AndroidDisplayer.CONFIG_HAS_SHADOW = false;
                 AndroidDisplayer.CONFIG_HAS_STROKE = true;
-                AndroidDisplayer.setPaintStorkeWidth(size);
+                AndroidDisplayer.CONFIG_HAS_PROJECTION = false;
+                AndroidDisplayer.setPaintStorkeWidth(values[0]);
+                break;
+            case DANMAKU_STYLE_PROJECTION:
+                AndroidDisplayer.CONFIG_HAS_SHADOW = false;
+                AndroidDisplayer.CONFIG_HAS_STROKE = false;
+                AndroidDisplayer.CONFIG_HAS_PROJECTION = true;
+                AndroidDisplayer.setProjectionConfig(values[0], values[1], (int)values[2]);
                 break;
         }
-        notifyConfigureChanged(DanmakuConfigTag.DANMAKU_STYLE, style, size);
+        notifyConfigureChanged(DanmakuConfigTag.DANMAKU_STYLE, style, values[0]);
         return this;
     }
 
@@ -355,6 +388,7 @@ public class DanmakuGlobalConfig {
             Collections.addAll(mColorValueWhiteList, colors);
             setFilterData(DanmakuFilters.TAG_TEXT_COLOR_DANMAKU_FILTER, mColorValueWhiteList);
         }
+        GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.COLOR_VALUE_WHITE_LIST, mColorValueWhiteList);
         return this;
     }
@@ -377,6 +411,7 @@ public class DanmakuGlobalConfig {
             Collections.addAll(mUserHashBlackList, hashes);
             setFilterData(DanmakuFilters.TAG_USER_HASH_FILTER, mUserHashBlackList);
         }
+        GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
         return this;
     }
@@ -389,6 +424,7 @@ public class DanmakuGlobalConfig {
             mUserHashBlackList.remove(hash);
         }
         setFilterData(DanmakuFilters.TAG_USER_HASH_FILTER, mUserHashBlackList);
+        GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
         return this;
     }
@@ -404,6 +440,7 @@ public class DanmakuGlobalConfig {
         }
         Collections.addAll(mUserHashBlackList, hashes);
         setFilterData(DanmakuFilters.TAG_USER_HASH_FILTER, mUserHashBlackList);
+        GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
         return this;
     }
@@ -427,6 +464,7 @@ public class DanmakuGlobalConfig {
             Collections.addAll(mUserIdBlackList, ids);
             setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
         }
+        GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
     }
@@ -439,6 +477,7 @@ public class DanmakuGlobalConfig {
             mUserIdBlackList.remove(id);
         }
         setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
+        GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
     }
@@ -454,6 +493,7 @@ public class DanmakuGlobalConfig {
         }
         Collections.addAll(mUserIdBlackList, ids);
         setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
+        GlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
     }
@@ -468,16 +508,18 @@ public class DanmakuGlobalConfig {
      * @return
      */
     public DanmakuGlobalConfig blockGuestDanmaku(boolean block) {
-        mBlockGuestDanmaku = block;
-        if (block) {
-            setFilterData(DanmakuFilters.TAG_GUEST_FILTER, block);
-        } else {
-            DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_GUEST_FILTER);
+        if (mBlockGuestDanmaku != block) {
+            mBlockGuestDanmaku = block;
+            if (block) {
+                setFilterData(DanmakuFilters.TAG_GUEST_FILTER, block);
+            } else {
+                DanmakuFilters.getDefault().unregisterFilter(DanmakuFilters.TAG_GUEST_FILTER);
+            }
+            GlobalFlagValues.updateFilterFlag();
+            notifyConfigureChanged(DanmakuConfigTag.BLOCK_GUEST_DANMAKU, block);
         }
-        notifyConfigureChanged(DanmakuConfigTag.BLOCK_GUEST_DANMAKU, block);
         return this;
     }
-    
     
     /**
      * 设置弹幕滚动速度系数,只对滚动弹幕有效
@@ -489,34 +531,138 @@ public class DanmakuGlobalConfig {
             scrollSpeedFactor = p;
             DanmakuFactory.updateDurationFactor(p);
             GlobalFlagValues.updateMeasureFlag();
+            GlobalFlagValues.updateVisibleFlag();
             notifyConfigureChanged(DanmakuConfigTag.SCROLL_SPEED_FACTOR, p);
         }
         return this;
     }
     
+    /**
+     * 设置是否启用合并重复弹幕
+     * @param enable
+     * @return
+     */
+    public DanmakuGlobalConfig setDuplicateMergingEnabled(boolean enable) {
+        if (mDuplicateMergingEnable != enable) {
+            mDuplicateMergingEnable = enable;
+            GlobalFlagValues.updateFilterFlag();
+            notifyConfigureChanged(DanmakuConfigTag.DUPLICATE_MERGING_ENABLED, enable);
+        }
+        return this;
+    }
+
+    public boolean isDuplicateMergingEnabled() {
+        return mDuplicateMergingEnable;
+    }
+
+    /**
+     * 设置最大显示行数
+     * @param pairs map<K,V> 设置null取消行数限制
+     * K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
+     * V = 最大行数
+     * @return
+     */
+    public DanmakuGlobalConfig setMaximumLines(Map<Integer, Integer> pairs) {
+        mIsMaxLinesLimited = (pairs != null);
+        if (pairs == null) {
+            DanmakuFilters.getDefault()
+                    .unregisterFilter(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, false);
+        } else {
+            setFilterData(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, pairs, false);
+        }
+        GlobalFlagValues.updateFilterFlag();
+        notifyConfigureChanged(DanmakuConfigTag.MAXIMUN_LINES, pairs);
+        return this;
+    }
+
+    @Deprecated
+    public DanmakuGlobalConfig setOverlapping(Map<Integer, Boolean> pairs) {
+        return preventOverlapping(pairs);
+    }
+
+    /**
+     * 设置防弹幕重叠
+     * @param pairs map<K,V> 设置null恢复默认设置,默认为允许重叠
+     * K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
+     * V = true|false 是否重叠
+     * @return
+     */
+    public DanmakuGlobalConfig preventOverlapping(Map<Integer, Boolean> pairs) {
+        mIsPreventOverlappingEnabled = (pairs != null);
+        if (pairs == null) {
+            DanmakuFilters.getDefault()
+                    .unregisterFilter(DanmakuFilters.TAG_OVERLAPPING_FILTER, false);
+        } else {
+            setFilterData(DanmakuFilters.TAG_OVERLAPPING_FILTER, pairs, false);
+        }
+        GlobalFlagValues.updateFilterFlag();
+        notifyConfigureChanged(DanmakuConfigTag.OVERLAPPING_ENABLE, pairs);
+        return this;
+    }
+
+    public boolean isMaxLinesLimited() {
+        return mIsMaxLinesLimited;
+    }
+
+    public boolean isPreventOverlappingEnabled() {
+        return mIsPreventOverlappingEnabled;
+    }
+
+    /**
+     * 设置缓存绘制填充器，默认使用{@link SimpleTextCacheStuffer}只支持纯文字显示, 如果需要图文混排请设置{@link SpannedCacheStuffer}
+     * 如果需要定制其他样式请扩展{@link SimpleTextCacheStuffer}|{@link SpannedCacheStuffer}
+     * @param cacheStuffer
+     */
+    public DanmakuGlobalConfig setCacheStuffer(BaseCacheStuffer cacheStuffer) {
+        this.mCacheStuffer = cacheStuffer;
+        if (this.mCacheStuffer != null) {
+            AndroidDisplayer.setCacheStuffer(this.mCacheStuffer);
+        }
+        return this;
+    }
     
     public interface ConfigChangedCallback {
-        public void onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
+        public boolean onDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag,
                 Object... value);
     }
 
     public void registerConfigChangedCallback(ConfigChangedCallback listener) {
-        if (mCallbackList == null) {
-            mCallbackList = new ArrayList<ConfigChangedCallback>();
+        if (listener == null || mCallbackList == null) {
+            mCallbackList = Collections.synchronizedList(new ArrayList<WeakReference<ConfigChangedCallback>>());
         }
-        mCallbackList.add(listener);
+        for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
+            if (listener.equals(configReferer.get())) {
+                return;
+            }
+        }
+        mCallbackList.add(new WeakReference<ConfigChangedCallback>(listener));
     }
 
     public void unregisterConfigChangedCallback(ConfigChangedCallback listener) {
-        if (mCallbackList == null)
+        if (listener == null || mCallbackList == null)
             return;
-        mCallbackList.remove(listener);
+        for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
+            if (listener.equals(configReferer.get())) {
+                mCallbackList.remove(listener);
+                return;
+            }
+        }
+    }
+
+    public void unregisterAllConfigChangedCallbacks() {
+        if (mCallbackList != null) {
+            mCallbackList.clear();
+            mCallbackList = null;
+        }
     }
 
     private void notifyConfigureChanged(DanmakuConfigTag tag, Object... values) {
         if (mCallbackList != null) {
-            for (ConfigChangedCallback cb : mCallbackList) {
-                cb.onDanmakuConfigChanged(this, tag, values);
+            for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
+                ConfigChangedCallback cb = configReferer.get();
+                if (cb != null) {
+                    cb.onDanmakuConfigChanged(this, tag, values);
+                }
             }
         }
     }

@@ -91,6 +91,10 @@ public class DanmakuUtils {
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
             AndroidDisplayer.drawDanmaku(danmaku, holder.canvas, 0, 0, false);
+            if(disp.isHardwareAccelerated()) {
+                holder.splitWith(disp.getWidth(), disp.getHeight(), disp.getMaximumCacheWidth(),
+                        disp.getMaximumCacheHeight());
+            }
         }
         return cache;
     }
@@ -98,8 +102,29 @@ public class DanmakuUtils {
     public static int getCacheSize(int w, int h) {
         return (w) * (h) * 4;
     }
+    
+    public final static boolean isDuplicate(BaseDanmaku obj1, BaseDanmaku obj2) {
+        if(obj1 == obj2) {
+            return false;
+        }
+//        if(obj1.isTimeOut() || obj2.isTimeOut()) {
+//            return false;
+//        }
+//        long dtime = Math.abs(obj1.time - obj2.time);
+//        if(dtime > obj1.getDuration()) {
+//            return false;
+//        }
+        if (obj1.text == obj2.text) {
+            return true;
+        }
+        if (obj1.text != null && obj1.text.equals(obj2.text)) {
+            return true;
+        }
+        return false;
+    }
 
-    public static int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
+    public final static int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
+        
         if (obj1 == obj2) {
             return 0;
         }
@@ -140,7 +165,7 @@ public class DanmakuUtils {
             return 1;
         }
 
-        int r = obj1.text.compareTo(obj2.text);
+        int r = (String.valueOf(obj1.text)).compareTo((String)obj2.text);
         if (r != 0) {
             return r;
         }
@@ -155,6 +180,10 @@ public class DanmakuUtils {
 
         r = obj1.hashCode() - obj1.hashCode();
         return r;
+    }
+
+    public final static boolean isOverSize(IDisplayer disp, BaseDanmaku item) {
+        return disp.isHardwareAccelerated() && (item.paintWidth > disp.getMaximumCacheWidth() || item.paintHeight > disp.getMaximumCacheHeight());
     }
 
 }

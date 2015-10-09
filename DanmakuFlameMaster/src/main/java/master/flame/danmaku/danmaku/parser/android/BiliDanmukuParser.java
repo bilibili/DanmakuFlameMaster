@@ -19,14 +19,6 @@ package master.flame.danmaku.danmaku.parser.android;
 import android.graphics.Color;
 import android.text.TextUtils;
 
-import master.flame.danmaku.danmaku.model.AlphaValue;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.Duration;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.xml.sax.Attributes;
@@ -38,6 +30,14 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
 import java.util.Locale;
+
+import master.flame.danmaku.danmaku.model.AlphaValue;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.Duration;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
 
@@ -102,6 +102,15 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
             String tagName = localName.length() != 0 ? localName : qName;
             tagName = tagName.toLowerCase(Locale.getDefault()).trim();
             if (tagName.equals("d")) {
+                // <d p="23.826000213623,1,25,16777215,1422201084,0,057075e9,757076900">我从未见过如此厚颜无耻之猴</d>
+                // 0:时间(弹幕出现时间)
+                // 1:类型(1从左至右滚动弹幕|6从右至左滚动弹幕|5顶端固定弹幕|4底端固定弹幕|7高级弹幕|8脚本弹幕)
+                // 2:字号
+                // 3:颜色
+                // 4:时间戳 ?
+                // 5:弹幕池id
+                // 6:用户hash
+                // 7:弹幕id
                 String pValue = attributes.getValue("p");
                 // parse p value to danmaku
                 String[] values = pValue.split(",");
@@ -143,7 +152,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                 item.index = index++;
 
                 // initial specail danmaku data
-                String text = item.text.trim();
+                String text = String.valueOf(item.text).trim();
                 if (item.getType() == BaseDanmaku.TYPE_SPECIAL && text.startsWith("[")
                         && text.endsWith("]")) {
                     //text = text.substring(1, text.length() - 1);

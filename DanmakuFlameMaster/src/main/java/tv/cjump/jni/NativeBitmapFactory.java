@@ -16,9 +16,13 @@ public class NativeBitmapFactory {
     static Field nativeIntField = null;
 
     static boolean nativeLibLoaded = false;
+    
+    public static boolean isInNativeAlloc() {
+        return android.os.Build.VERSION.SDK_INT < 11 || (nativeLibLoaded && nativeIntField != null);
+    }
 
     public static void loadLibs() {
-        if (CpuInfo.isARMSimulatedByX86() || CpuInfo.supportX86() || CpuInfo.supportMips()) {
+        if (!(DeviceUtils.isRealARMArch() || DeviceUtils.isRealX86Arch())) {
             nativeLibLoaded = false;
             return;
         }

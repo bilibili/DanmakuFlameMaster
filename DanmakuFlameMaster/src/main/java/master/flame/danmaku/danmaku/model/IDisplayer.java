@@ -27,31 +27,31 @@ public interface IDisplayer {
 
     public abstract int getDensityDpi();
 
-    public abstract void draw(BaseDanmaku danmaku);
+    public abstract int draw(BaseDanmaku danmaku);
 
     public abstract float getScaledDensity();
 
     public abstract int getSlopPixel();
-    
+
     public abstract void measure(BaseDanmaku danmaku);
-    
-    public abstract long getAverageRenderingTime();
-    
-    public abstract long getLastFrameRenderingTime();
-    
+
     public abstract float getStrokeWidth();
+
+    public abstract void setHardwareAccelerated(boolean enable);
+
+    public abstract boolean isHardwareAccelerated();
+
+    public abstract int getMaximumCacheWidth();
+
+    public abstract int getMaximumCacheHeight();
 
 
     ////////////////// setter ///////////////////////////
-    
-    public abstract void resetSlopPixel(float factor);
-    
-    public abstract void setDensities(float density, int densityDpi, float scaledDensity);
-    
-    public abstract void setSize(int width, int height);
 
-    public abstract void setAverageRenderingTime(long ms);
-    
-    public abstract void setLastFrameRenderingTime(long ms);
+    public abstract void resetSlopPixel(float factor);
+
+    public abstract void setDensities(float density, int densityDpi, float scaledDensity);
+
+    public abstract void setSize(int width, int height);
 
 }

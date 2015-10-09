@@ -1,7 +1,6 @@
 
 package master.flame.danmaku.controller;
 
-import android.content.Context;
 import android.view.View;
 
 import java.util.List;
@@ -21,11 +20,10 @@ public interface IDanmakuView {
     
 
     public boolean isPrepared();
-
-    public boolean isViewReady();
-
-    public long drawDanmakus();
     
+    public boolean isPaused();
+
+    public boolean isHardwareAccelerated();
     /**
      * 
      * @param type One of THREAD_TYPE_MAIN_THREAD, THREAD_TYPE_HIGH_PRIORITY, THREAD_TYPE_NORMAL_PRIORITY, or THREAD_TYPE_LOW_PRIORITY.
@@ -38,6 +36,10 @@ public interface IDanmakuView {
 
     public void showFPS(boolean show);
     
+    /**
+     * 如果批量添加弹幕,请在非UI线程中使用此方法
+     * @param item
+     */
     public void addDanmaku(BaseDanmaku item);
     
     public void removeAllDanmakus();
@@ -57,14 +59,12 @@ public interface IDanmakuView {
     
     // ------------- Android View方法  --------------------
     
-    public Context getContext();
-    
     public View getView();
 
     public int getWidth();
 
     public int getHeight();
-    
+
     public void setVisibility(int visibility);
     
     public boolean isShown();
@@ -94,8 +94,6 @@ public interface IDanmakuView {
     
     public void hide();
     
-    public void clear();
-    
     /**
      * show the danmakuview again if you called hideAndPauseDrawTask()
      * @param position The position you want to resume
@@ -110,11 +108,14 @@ public interface IDanmakuView {
      */
     public long hideAndPauseDrawTask();
 
-    // ------------- Click Listener -------------------
+    public void clearDanmakusOnScreen();
+
+ // ------------- Click Listener -------------------
     public interface OnDanmakuClickListener {
         void onDanmakuClick(BaseDanmaku danmaku);
     }
 
     public void setOnDanmakuClickListener(OnDanmakuClickListener listener);
     public OnDanmakuClickListener getOnDanmakuClickListener();
+
 }

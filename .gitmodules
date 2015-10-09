@@ -1,3 +1,1 @@
-[submodule "jni/NDKBitmap"]
-	path = jni/NDKBitmap
-	url = https://github.com/ctiao/NativeBitmapFactory.git
+

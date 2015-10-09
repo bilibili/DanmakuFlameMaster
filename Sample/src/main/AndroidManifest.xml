@@ -6,7 +6,9 @@
 
     <uses-sdk
         android:minSdkVersion="7"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="22" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"

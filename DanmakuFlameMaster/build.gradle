@@ -14,17 +14,35 @@
  * limitations under the License.
  */
 
-
-//apply plugin: 'android'
 apply plugin: 'com.android.library'
+
+def SourcePath = 'src/main/'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         minSdkVersion 7
         targetSdkVersion 19
+        versionName VERSION_NAME
+        versionCode Integer.parseInt(VERSION_CODE)
     }
-	
+
+    sourceSets {
+        main {
+            manifest.srcFile "${SourcePath}AndroidManifest.xml"
+            java.srcDirs = ["${SourcePath}java"]
+            jniLibs.srcDirs = ["${SourcePath}libs"]
+        }
+        androidTest.setRoot("${SourcePath}../androidTest")
+    }
+}
+
+if (rootProject.file('gradle/gradle-mvn-push.gradle').exists()) {
+    apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+}
+
+if (rootProject.file('gradle/gradle-bintray-upload.gradle').exists()) {
+    apply from: rootProject.file('gradle/gradle-bintray-upload.gradle')
 }
