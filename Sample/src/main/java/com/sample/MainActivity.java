@@ -160,11 +160,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
 
         mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
-        DanmakuGlobalConfig.DEFAULT.setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setScrollSpeedFactor(1.2f).setScaleTextSize(1.2f)
-        .setCacheStuffer(new SpannedCacheStuffer()) // 图文混排使用SpannedCacheStuffer
-//        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
-        .setMaximumLines(maxLinesPair)
-        .preventOverlapping(overlappingEnablePair);
+        DanmakuGlobalConfig.DEFAULT
+                .setDanmakuStyle(DanmakuGlobalConfig.DANMAKU_STYLE_STROKEN, 3)
+                .setDuplicateMergingEnabled(false)
+                .setScrollSpeedFactor(1.2f)
+                .setScaleTextSize(1.2f)
+                .setCacheStuffer(new SpannedCacheStuffer()) // 图文混排使用SpannedCacheStuffer
+//              .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
+                .setMaximumLines(maxLinesPair)
+                .preventOverlapping(overlappingEnablePair);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new Callback() {
@@ -292,7 +296,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 SystemClock.sleep(20);
             }
         }
-    };
+    }
+
+    ;
 
     private void addDanmaku(boolean islive) {
         BaseDanmaku danmaku = DanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);

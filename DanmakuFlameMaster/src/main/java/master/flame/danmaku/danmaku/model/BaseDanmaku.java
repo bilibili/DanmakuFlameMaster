@@ -16,6 +16,10 @@
 
 package master.flame.danmaku.danmaku.model;
 
+/**
+ * 弹幕对象基类
+ */
+
 public abstract class BaseDanmaku {
 
     public final static String DANMAKU_BR_CHAR = "/n";
@@ -173,7 +177,7 @@ public abstract class BaseDanmaku {
 
     public int mFilterParam = 0;
 
-    public int filterResetFlag = -1;
+    public int filterResetFlag = -1;//是否运行过过滤
 
     public long getDuration() {
         return duration.value;

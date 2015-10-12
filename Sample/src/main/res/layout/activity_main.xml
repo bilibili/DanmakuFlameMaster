@@ -31,7 +31,10 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
     
-<ImageView android:src="@drawable/ic_launcher" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<ImageView
+        android:src="@drawable/ic_launcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <master.flame.danmaku.ui.widget.DanmakuView
         android:id="@+id/sv_danmaku"

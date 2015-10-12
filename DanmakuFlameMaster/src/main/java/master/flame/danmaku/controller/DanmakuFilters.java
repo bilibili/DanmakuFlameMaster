@@ -20,16 +20,16 @@ import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class DanmakuFilters {
 
-    public static final int FILTER_TYPE_TYPE = 1;
-    public static final int FILYER_TYPE_QUANTITY = 2;
-    public static final int FILTER_TYPE_ELAPSED_TIME = 4;
-    public static final int FILTER_TYPE_TEXTCOLOR = 8;
-    public static final int FILTER_TYPE_USER_ID = 16;
-    public static final int FILTER_TYPE_USER_HASH = 32;
-    public static final int FILTER_TYPE_USER_GUEST = 64;
-    public static final int FILTER_TYPE_DUPLICATE_MERGE = 128;
-    public static final int FILTER_TYPE_MAXIMUM_LINES = 256;
-    public static final int FILTER_TYPE_OVERLAPPING = 512;
+    public static final int FILTER_TYPE_TYPE = 1;           //0000000001
+    public static final int FILYER_TYPE_QUANTITY = 2;       //0000000010
+    public static final int FILTER_TYPE_ELAPSED_TIME = 4;   //0000000100
+    public static final int FILTER_TYPE_TEXTCOLOR = 8;      //0000001000
+    public static final int FILTER_TYPE_USER_ID = 16;       //0000010000
+    public static final int FILTER_TYPE_USER_HASH = 32;     //0000100000
+    public static final int FILTER_TYPE_USER_GUEST = 64;    //0001000000
+    public static final int FILTER_TYPE_DUPLICATE_MERGE = 128;//001000000
+    public static final int FILTER_TYPE_MAXIMUM_LINES = 256;//0100000000
+    public static final int FILTER_TYPE_OVERLAPPING = 512;  //1000000000
 
 
     public static interface IDanmakuFilter<T> {
@@ -37,7 +37,7 @@ public class DanmakuFilters {
          * 是否过滤
          */
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                DanmakuTimer timer, boolean fromCachingTask);
+                              DanmakuTimer timer, boolean fromCachingTask);
 
         public void setData(T data);
 
@@ -58,7 +58,7 @@ public class DanmakuFilters {
 
     /**
      * 根据弹幕类型过滤
-     * 
+     *
      * @author ch
      */
     public static class TypeDanmakuFilter extends BaseDanmakuFilter<List<Integer>> {
@@ -104,7 +104,7 @@ public class DanmakuFilters {
 
     /**
      * 根据同屏数量过滤弹幕
-     * 
+     *
      * @author ch
      */
     public static class QuantityDanmakuFilter extends BaseDanmakuFilter<Integer> {
@@ -114,7 +114,7 @@ public class DanmakuFilters {
         protected BaseDanmaku mLastSkipped = null;
 
         private boolean needFilter(BaseDanmaku danmaku, int orderInScreen,
-                                 int totalSizeInScreen, DanmakuTimer timer, boolean fromCachingTask) {
+                                   int totalSizeInScreen, DanmakuTimer timer, boolean fromCachingTask) {
 
             if (mMaximumSize <= 0 || danmaku.getType() != BaseDanmaku.TYPE_SCROLL_RL) {
                 return false;
@@ -166,7 +166,7 @@ public class DanmakuFilters {
 
     /**
      * 根据绘制耗时过滤弹幕
-     * 
+     *
      * @author ch
      */
     public static class ElapsedTimeFilter extends BaseDanmakuFilter<Object> {
@@ -174,7 +174,7 @@ public class DanmakuFilters {
         long mMaxTime = 20; // 绘制超过20ms就跳过 ，默认保持接近50fps
 
         private synchronized boolean needFilter(BaseDanmaku danmaku, int orderInScreen,
-                                   int totalsizeInScreen, DanmakuTimer timer, boolean fromCachingTask) {
+                                                int totalsizeInScreen, DanmakuTimer timer, boolean fromCachingTask) {
             if (timer == null || !danmaku.isOutside()) {
                 return false;
             }
@@ -215,7 +215,7 @@ public class DanmakuFilters {
 
     /**
      * 根据文本颜色白名单过滤
-     * 
+     *
      * @author ch
      */
     public static class TextColorFilter extends BaseDanmakuFilter<List<Integer>> {
@@ -257,7 +257,7 @@ public class DanmakuFilters {
 
     /**
      * 根据用户标识黑名单过滤
-     * 
+     *
      * @author ch
      */
     public static abstract class UserFilter<T> extends BaseDanmakuFilter<List<T>> {
@@ -272,7 +272,7 @@ public class DanmakuFilters {
 
         @Override
         public abstract boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                DanmakuTimer timer, boolean fromCachingTask);
+                                       DanmakuTimer timer, boolean fromCachingTask);
 
         @Override
         public void setData(List<T> data) {
@@ -293,7 +293,7 @@ public class DanmakuFilters {
 
     /**
      * 根据用户Id黑名单过滤
-     * 
+     *
      * @author ch
      */
     public static class UserIdFilter extends UserFilter<Integer> {
@@ -312,7 +312,7 @@ public class DanmakuFilters {
 
     /**
      * 根据用户hash黑名单过滤
-     * 
+     *
      * @author ch
      */
     public static class UserHashFilter extends UserFilter<String> {
@@ -331,7 +331,7 @@ public class DanmakuFilters {
 
     /**
      * 屏蔽游客弹幕
-     * 
+     *
      * @author ch
      */
     public static class GuestFilter extends BaseDanmakuFilter<Boolean> {
@@ -387,7 +387,7 @@ public class DanmakuFilters {
         }
 
         private void removeTimeoutDanmakus(LinkedHashMap<String, BaseDanmaku> danmakus,
-                int limitTime) {
+                                           int limitTime) {
             Iterator<Entry<String, BaseDanmaku>> it = danmakus.entrySet().iterator();
             long startTime = System.currentTimeMillis();
             while (it.hasNext()) {
@@ -409,7 +409,7 @@ public class DanmakuFilters {
         }
 
         public synchronized boolean needFilter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                DanmakuTimer timer, boolean fromCachingTask) {
+                                               DanmakuTimer timer, boolean fromCachingTask) {
             removeTimeoutDanmakus(blockedDanmakus, 2);
             removeTimeoutDanmakus(passedDanmakus, 2);
             removeTimeoutDanmakus(currentDanmakus, 3);
@@ -546,7 +546,7 @@ public class DanmakuFilters {
         for (IDanmakuFilter<?> f : mFilterArray) {
             if (f != null) {
                 boolean filtered = f.filter(danmaku, index, totalsizeInScreen, timer, fromCachingTask);
-                danmaku.filterResetFlag = GlobalFlagValues.FILTER_RESET_FLAG;
+                danmaku.filterResetFlag = GlobalFlagValues.FILTER_RESET_FLAG;//运行过过滤模块
                 if (filtered) {
                     break;
                 }
