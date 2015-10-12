@@ -175,7 +175,7 @@ public abstract class BaseDanmaku {
      */
     protected int alpha = AlphaValue.MAX;
 
-    public int mFilterParam = 0;
+    public int mFilterParam = 0;//过滤标志位{@link DanmakuFilters}
 
     public int filterResetFlag = -1;//是否运行过过滤
 
@@ -231,6 +231,10 @@ public abstract class BaseDanmaku {
         return mTimer == null || mTimer.currMillisecond < time;
     }
 
+    /**
+     * 是否通过过滤器（没被过滤）
+     * @return
+     */
     public boolean hasPassedFilter() {
         if (filterResetFlag != GlobalFlagValues.FILTER_RESET_FLAG) {
             mFilterParam = 0;
