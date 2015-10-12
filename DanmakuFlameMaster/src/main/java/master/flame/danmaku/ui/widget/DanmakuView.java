@@ -24,19 +24,21 @@ import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 import master.flame.danmaku.controller.DrawHandler;
-import master.flame.danmaku.controller.IDanmakuView;
-import master.flame.danmaku.controller.IDanmakuViewController;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
+import master.flame.danmaku.controller.IDanmakuView;
+import master.flame.danmaku.controller.IDanmakuViewController;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
-
-import java.util.LinkedList;
-import java.util.Locale;
 
 public class DanmakuView extends View implements IDanmakuView, IDanmakuViewController {
 
@@ -51,6 +53,10 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     private boolean isSurfaceCreated;
 
     private boolean mEnableDanmakuDrwaingCache = true;
+
+    private OnDanmakuClickListener mOnDanmakuClickListener;
+
+    private DanmakuTouchHelper mTouchHelper;
     
     private boolean mShowFps;
 
@@ -76,6 +82,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         setBackgroundColor(Color.TRANSPARENT);
         setDrawingCacheBackgroundColor(Color.TRANSPARENT);
         DrawHelper.useDrawColorToClearCanvas(true, false);
+        mTouchHelper = DanmakuTouchHelper.instance(this);
     }
 
     public DanmakuView(Context context, AttributeSet attrs) {
@@ -106,6 +113,15 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         if (handler != null) {
             handler.removeAllLiveDanmakus();
         }
+    }
+
+    @Override
+    public List<BaseDanmaku> getCurrentVisibleDanmakus() {
+        if (handler != null) {
+            return handler.getCurrentVisibleDanmakus();
+        }
+
+        return null;
     }
 
     public void setCallback(Callback callback) {
@@ -349,6 +365,15 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (null != mTouchHelper) {
+            mTouchHelper.onTouchEvent(event);
+        }
+
+        return super.onTouchEvent(event);
+    }
+
     public void seekTo(Long ms) {
         if(handler != null){
             handler.seekTo(ms);
@@ -455,6 +480,16 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         if (handler != null) {
             handler.clearDanmakusOnScreen();
         }
+    }
+
+    @Override
+    public void setOnDanmakuClickListener(OnDanmakuClickListener listener) {
+        mOnDanmakuClickListener = listener;
+    }
+
+    @Override
+    public OnDanmakuClickListener getOnDanmakuClickListener() {
+        return mOnDanmakuClickListener;
     }
 
 }
