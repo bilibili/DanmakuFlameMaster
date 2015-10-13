@@ -35,6 +35,7 @@ import master.flame.danmaku.danmaku.loader.IllegalDataException;
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
@@ -180,8 +181,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
             });
             mDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
                 @Override
-                public void onDanmakuClick(BaseDanmaku danmaku) {
-                    Log.d("DFM", "onDanmakuClick text:" + danmaku.text);
+                public void onDanmakuClick(BaseDanmaku latest) {
+                    Log.d("DFM", "onDanmakuClick text:" + latest.text);
+                }
+
+                @Override
+                public void onDanmakuClick(IDanmakus danmakus) {
+                    Log.d("DFM", "onDanmakuClick danmakus size:" + danmakus.size());
                 }
             });
 

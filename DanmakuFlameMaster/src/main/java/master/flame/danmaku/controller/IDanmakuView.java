@@ -3,11 +3,8 @@ package master.flame.danmaku.controller;
 
 import android.view.View;
 
-import java.util.List;
-
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
@@ -46,7 +43,7 @@ public interface IDanmakuView {
     
     public void removeAllLiveDanmakus();
 
-    public List<BaseDanmaku> getCurrentVisibleDanmakus();
+    public IDanmakus getCurrentVisibleDanmakus();
     
     public void setCallback(Callback callback);
     
@@ -112,7 +109,17 @@ public interface IDanmakuView {
 
  // ------------- Click Listener -------------------
     public interface OnDanmakuClickListener {
-        void onDanmakuClick(BaseDanmaku danmaku);
+     /**
+      *
+      * @param latest the latest one is clicked
+      */
+      void onDanmakuClick(BaseDanmaku latest);
+
+     /**
+      *
+      * @param danmakus all to be clicked
+      */
+        void onDanmakuClick(IDanmakus danmakus);
     }
 
     public void setOnDanmakuClickListener(OnDanmakuClickListener listener);

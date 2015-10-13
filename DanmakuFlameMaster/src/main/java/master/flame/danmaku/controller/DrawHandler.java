@@ -40,7 +40,6 @@ import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.AndroidUtils;
 import tv.cjump.jni.DeviceUtils;
-import java.util.List;
 
 public class DrawHandler extends Handler {
 
@@ -660,7 +659,7 @@ public class DrawHandler extends Handler {
         }
     }
 
-    public List<BaseDanmaku> getCurrentVisibleDanmakus() {
+    public IDanmakus getCurrentVisibleDanmakus() {
         if (drawTask != null) {
             return drawTask.getVisibleDanmakusOnTime(getCurrentTime());
         }

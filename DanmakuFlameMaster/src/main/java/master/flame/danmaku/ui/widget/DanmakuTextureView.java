@@ -29,19 +29,18 @@ import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 
+import java.util.LinkedList;
+import java.util.Locale;
+
 import master.flame.danmaku.controller.DrawHandler;
-import master.flame.danmaku.controller.IDanmakuView;
-import master.flame.danmaku.controller.IDanmakuViewController;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
+import master.flame.danmaku.controller.IDanmakuView;
+import master.flame.danmaku.controller.IDanmakuViewController;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * DanmakuTextureView需要开启GPU加速才能显示弹幕
@@ -123,7 +122,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     }
 
     @Override
-    public List<BaseDanmaku> getCurrentVisibleDanmakus() {
+    public IDanmakus getCurrentVisibleDanmakus() {
         if (handler != null) {
             return handler.getCurrentVisibleDanmakus();
         }

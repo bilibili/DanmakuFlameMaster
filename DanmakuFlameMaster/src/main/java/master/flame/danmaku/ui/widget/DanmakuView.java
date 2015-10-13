@@ -28,7 +28,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 
 import master.flame.danmaku.controller.DrawHandler;
@@ -37,6 +36,7 @@ import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.controller.IDanmakuViewController;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 
@@ -116,7 +116,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     }
 
     @Override
-    public List<BaseDanmaku> getCurrentVisibleDanmakus() {
+    public IDanmakus getCurrentVisibleDanmakus() {
         if (handler != null) {
             return handler.getCurrentVisibleDanmakus();
         }
