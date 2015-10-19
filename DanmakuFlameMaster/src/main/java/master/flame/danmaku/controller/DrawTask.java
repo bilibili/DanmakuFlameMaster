@@ -162,6 +162,25 @@ public class DrawTask implements IDrawTask {
     }
 
     @Override
+    public IDanmakus getVisibleDanmakusOnTime(long time) {
+        long beginMills = time - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
+        long endMills = time + DanmakuFactory.MAX_DANMAKU_DURATION;
+        IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
+        IDanmakus visibleDanmakus = new Danmakus();
+        if (null != subDanmakus && !subDanmakus.isEmpty()) {
+            IDanmakuIterator iterator = subDanmakus.iterator();
+            while (iterator.hasNext()) {
+                BaseDanmaku danmaku = iterator.next();
+                if (danmaku.isShown() && !danmaku.isOutside()) {
+                    visibleDanmakus.addItem(danmaku);
+                }
+            }
+        }
+
+        return visibleDanmakus;
+    }
+
+    @Override
     public synchronized RenderingState draw(AbsDisplayer<?> displayer) {
         return drawDanmakus(displayer,mTimer);
     }

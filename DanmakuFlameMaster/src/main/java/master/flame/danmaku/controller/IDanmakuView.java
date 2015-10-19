@@ -5,6 +5,7 @@ import android.view.View;
 
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 public interface IDanmakuView {
@@ -41,6 +42,8 @@ public interface IDanmakuView {
     public void removeAllDanmakus();
     
     public void removeAllLiveDanmakus();
+
+    public IDanmakus getCurrentVisibleDanmakus();
     
     public void setCallback(Callback callback);
     
@@ -103,4 +106,23 @@ public interface IDanmakuView {
     public long hideAndPauseDrawTask();
 
     public void clearDanmakusOnScreen();
+
+ // ------------- Click Listener -------------------
+    public interface OnDanmakuClickListener {
+     /**
+      *
+      * @param latest the latest one is clicked
+      */
+      void onDanmakuClick(BaseDanmaku latest);
+
+     /**
+      *
+      * @param danmakus all to be clicked
+      */
+        void onDanmakuClick(IDanmakus danmakus);
+    }
+
+    public void setOnDanmakuClickListener(OnDanmakuClickListener listener);
+    public OnDanmakuClickListener getOnDanmakuClickListener();
+
 }

@@ -37,12 +37,14 @@ android {
         }
         androidTest.setRoot("${SourcePath}../androidTest")
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
-
 if (rootProject.file('gradle/gradle-mvn-push.gradle').exists()) {
     apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 }
-
 if (rootProject.file('gradle/gradle-bintray-upload.gradle').exists()) {
     apply from: rootProject.file('gradle/gradle-bintray-upload.gradle')
 }

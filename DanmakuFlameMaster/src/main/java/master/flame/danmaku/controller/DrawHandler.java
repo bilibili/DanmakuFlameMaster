@@ -31,6 +31,7 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
+import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuGlobalConfig;
@@ -656,6 +657,14 @@ public class DrawHandler extends Handler {
         if (drawTask != null) {
             drawTask.removeAllLiveDanmakus();
         }
+    }
+
+    public IDanmakus getCurrentVisibleDanmakus() {
+        if (drawTask != null) {
+            return drawTask.getVisibleDanmakusOnTime(getCurrentTime());
+        }
+
+        return null;
     }
 
     public long getCurrentTime() {

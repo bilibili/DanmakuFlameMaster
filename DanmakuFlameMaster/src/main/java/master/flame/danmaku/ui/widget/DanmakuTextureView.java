@@ -25,20 +25,22 @@ import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 
-import master.flame.danmaku.controller.DrawHandler;
-import master.flame.danmaku.controller.IDanmakuView;
-import master.flame.danmaku.controller.IDanmakuViewController;
-import master.flame.danmaku.controller.DrawHandler.Callback;
-import master.flame.danmaku.controller.DrawHelper;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
-
 import java.util.LinkedList;
 import java.util.Locale;
+
+import master.flame.danmaku.controller.DrawHandler;
+import master.flame.danmaku.controller.DrawHandler.Callback;
+import master.flame.danmaku.controller.DrawHelper;
+import master.flame.danmaku.controller.IDanmakuView;
+import master.flame.danmaku.controller.IDanmakuViewController;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 
 /**
  * DanmakuTextureView需要开启GPU加速才能显示弹幕
@@ -62,6 +64,10 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
 
     private boolean mEnableDanmakuDrwaingCache = true;
 
+	private OnDanmakuClickListener mOnDanmakuClickListener;
+
+    private DanmakuTouchHelper mTouchHelper;
+
     private boolean mShowFps;
 
     private boolean mDanmakuVisible = true;
@@ -82,7 +88,8 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
         setWillNotDraw(true);
         setSurfaceTextureListener(this);
         DrawHelper.useDrawColorToClearCanvas(true, true);
-    }
+		mTouchHelper = DanmakuTouchHelper.instance(this);    
+	}
 
     public DanmakuTextureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -112,6 +119,15 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
         if (handler != null) {
             handler.removeAllLiveDanmakus();
         }
+    }
+
+    @Override
+    public IDanmakus getCurrentVisibleDanmakus() {
+        if (handler != null) {
+            return handler.getCurrentVisibleDanmakus();
+        }
+
+        return null;
     }
 
     public void setCallback(Callback callback) {
@@ -317,6 +333,15 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
         handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
     }
 
+	@Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (null != mTouchHelper) {
+            mTouchHelper.onTouchEvent(event);
+        }
+
+        return super.onTouchEvent(event);
+    }
+
     public void seekTo(Long ms) {
         if (handler != null) {
             handler.seekTo(ms);
@@ -372,6 +397,16 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
             return 0;
         }
         return handler.hideDanmakus(true);
+    }
+
+    @Override
+    public void setOnDanmakuClickListener(OnDanmakuClickListener listener) {
+        mOnDanmakuClickListener = listener;
+    }
+
+    @Override
+    public OnDanmakuClickListener getOnDanmakuClickListener() {
+        return mOnDanmakuClickListener;
     }
 
     @Override
