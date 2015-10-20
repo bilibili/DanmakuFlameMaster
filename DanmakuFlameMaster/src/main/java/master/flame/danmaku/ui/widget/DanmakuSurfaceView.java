@@ -392,6 +392,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
     @Override
     public void setOnDanmakuClickListener(OnDanmakuClickListener listener) {
         mOnDanmakuClickListener = listener;
+        setClickable(null != listener);
     }
 
     @Override
