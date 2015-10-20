@@ -30,9 +30,12 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+/**
+ * 字幕集合类，由工厂解析产生
+ */
 public class Danmakus implements IDanmakus {
 
-    public static final int ST_BY_TIME = 0;
+    public static final int ST_BY_TIME = 0;//过滤类型，按时间排序
 
     public static final int ST_BY_YPOS = 1;
 
@@ -61,7 +64,7 @@ public class Danmakus implements IDanmakus {
 
     private BaseComparator mComparator;
 
-    private boolean mDuplicateMergingEnabled;
+    private boolean mDuplicateMergingEnabled;//启用相同弹幕合并
 
     public Danmakus() {
         this(ST_BY_TIME, false);
@@ -106,8 +109,7 @@ public class Danmakus implements IDanmakus {
             this.items.clear();
             this.items.addAll(items);
             items = this.items;
-        }
-        else {
+        }else {
             this.items = items;
         }
         if (items instanceof List) {
@@ -156,6 +158,12 @@ public class Danmakus implements IDanmakus {
         return false;
     }
 
+    /**
+     * 返回集合中的指定时段的字幕
+     * @param startTime
+     * @param endTime
+     * @return
+     */
     private Collection<BaseDanmaku> subset(long startTime, long endTime) {
         if (mSortType == ST_BY_LIST || items == null || items.size() == 0) {
             return null;

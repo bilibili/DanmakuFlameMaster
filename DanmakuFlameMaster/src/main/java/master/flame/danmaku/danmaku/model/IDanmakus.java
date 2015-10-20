@@ -16,6 +16,9 @@
 
 package master.flame.danmaku.danmaku.model;
 
+/**
+ * Danmakus 事件接口
+ */
 public interface IDanmakus {
 
     public boolean addItem(BaseDanmaku item);

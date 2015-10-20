@@ -22,6 +22,11 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
+/**
+ * 保持器
+ *
+ * fix, clear, release
+ */
 public class DanmakusRetainer {
 
     private static IDanmakusRetainer rldrInstance = null;
@@ -90,6 +95,10 @@ public class DanmakusRetainer {
         fbdrInstance = null;
     }
 
+    /**固定弹幕专用
+     *
+     * FB FT DanmukusRetainer 调用
+     */
     public interface Verifier {
 
         public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit);

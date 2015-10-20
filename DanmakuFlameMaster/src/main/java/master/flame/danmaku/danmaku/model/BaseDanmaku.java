@@ -17,7 +17,7 @@
 package master.flame.danmaku.danmaku.model;
 
 /**
- * 弹幕对象基类
+ * 弹幕对象Model基类
  */
 
 public abstract class BaseDanmaku {
@@ -274,8 +274,12 @@ public abstract class BaseDanmaku {
     /**
      * return the type of Danmaku
      *
-     * @return TYPE_SCROLL_RL = 0 TYPE_SCROLL_RL = 1 TYPE_SCROLL_LR = 2
-     * TYPE_FIX_TOP = 3; TYPE_FIX_BOTTOM = 4;
+     * @return
+     * TYPE_SCROLL_RL = 0
+     * TYPE_SCROLL_RL = 1
+     * TYPE_SCROLL_LR = 2
+     * TYPE_FIX_TOP = 3;
+     * TYPE_FIX_BOTTOM = 4;
      */
     public abstract int getType();
 
