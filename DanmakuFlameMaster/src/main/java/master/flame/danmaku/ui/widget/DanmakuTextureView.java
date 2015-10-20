@@ -402,6 +402,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     @Override
     public void setOnDanmakuClickListener(OnDanmakuClickListener listener) {
         mOnDanmakuClickListener = listener;
+        setClickable(null != listener);
     }
 
     @Override

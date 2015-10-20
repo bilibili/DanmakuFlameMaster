@@ -485,6 +485,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     @Override
     public void setOnDanmakuClickListener(OnDanmakuClickListener listener) {
         mOnDanmakuClickListener = listener;
+        setClickable(null != listener);
     }
 
     @Override
