@@ -8,11 +8,13 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 
 /**
  * Created by ch on 15-7-16.
+ *
+ * 缓存填充器
  */
 public abstract class BaseCacheStuffer {
 
     /**
-     * set paintWidth, paintHeight to danmaku
+     * set paintWidth, paintHeight to danmaku  是整个画的高度，多行的即多行的高度
      * @param danmaku
      */
     public abstract void measure(BaseDanmaku danmaku, TextPaint paint);

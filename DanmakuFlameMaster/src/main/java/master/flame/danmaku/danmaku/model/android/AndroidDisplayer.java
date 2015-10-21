@@ -226,6 +226,12 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         return densityDpi;
     }
 
+    /**
+     * @param danmaku
+     * @return NOTHING_RENDERING = 0;
+     * CACHE_RENDERING = 1;
+     * TEXT_RENDERING = 2;
+     */
     @Override
     public int draw(BaseDanmaku danmaku) {
         float top = danmaku.getTop();
@@ -234,6 +240,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
             Paint alphaPaint = null;
             boolean needRestore = false;
+            //TODO  特殊弹幕是什么？
             if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
                 if (danmaku.getAlpha() == AlphaValue.TRANSPARENT) {
                     return IRenderer.NOTHING_RENDERING;
@@ -320,13 +327,16 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         HAS_STROKE = CONFIG_HAS_STROKE;
         HAS_SHADOW = CONFIG_HAS_SHADOW;
         HAS_PROJECTION = CONFIG_HAS_PROJECTION;
-        ANTI_ALIAS = !quick && CONFIG_ANTI_ALIAS;
+        ANTI_ALIAS = !quick && CONFIG_ANTI_ALIAS;//抗锯齿 且 非快速 才认为启用抗锯齿，如果是快速弹幕，抗锯齿无效
         TextPaint paint = getPaint(danmaku, quick);
         sStuffer.drawBackground(danmaku, canvas, _left, _top);
         if (danmaku.lines != null) {
+            //是否有多行
             String[] lines = danmaku.lines;
             if (lines.length == 1) {
+                //行数为1，单行
                 if (hasStroke(danmaku)) {
+                    //描边
                     applyPaintConfig(danmaku, paint, true);
                     float strokeLeft = left;
                     float strokeTop = top - paint.ascent();
@@ -343,6 +353,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 //                canvas.drawText(lines[0], left, top - paint.ascent(), paint);
                 sStuffer.drawText(danmaku, lines[0], canvas, left, top - paint.ascent(), paint);
             } else {
+                //多行
                 float textHeight = (danmaku.paintHeight - 2 * danmaku.padding) / lines.length;
                 for (int t = 0; t < lines.length; t++) {
                     if (lines[t] == null || lines[t].length() == 0) {
@@ -363,10 +374,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                     applyPaintConfig(danmaku, paint, false);
                     //TODO drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
 //                    canvas.drawText(lines[t], left, t * textHeight + top - paint.ascent(), paint);
-                    sStuffer.drawText(danmaku, lines[t], canvas, left,  t * textHeight + top - paint.ascent(), paint);
+                    sStuffer.drawText(danmaku, lines[t], canvas, left, t * textHeight + top - paint.ascent(), paint);
                 }
             }
         } else {
+            //单行
             if (hasStroke(danmaku)) {
                 applyPaintConfig(danmaku, paint, true);
                 float strokeLeft = left;
@@ -416,6 +428,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         return UNDERLINE_PAINT;
     }
 
+    /**
+     * @param danmaku
+     * @param quick   TODO  有区别吗？
+     * @return
+     */
     private static TextPaint getPaint(BaseDanmaku danmaku, boolean quick) {
         TextPaint paint;
         if (quick) {
@@ -425,7 +442,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
             paint = PAINT;
         }
         paint.setTextSize(danmaku.textSize);
-        applyTextScaleConfig(danmaku, paint);
+        applyTextScaleConfig(danmaku, paint);//根据字体大小设置Paint size
 
         //ignore the transparent textShadowColor
         if (!HAS_SHADOW || SHADOW_RADIUS <= 0 || danmaku.textShadowColor == 0) {
@@ -441,10 +458,19 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         return getPaint(danmaku, false);
     }
 
+    /**
+     * 设定画笔风格，透明度
+     *
+     * @param danmaku
+     * @param paint
+     * @param stroke
+     */
     private static void applyPaintConfig(BaseDanmaku danmaku, Paint paint, boolean stroke) {
 
         if (DanmakuGlobalConfig.DEFAULT.isTranslucent) {
+            //全局基调：半透明
             if (stroke) {
+                //描边
                 paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
                 paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
                 int alpha = HAS_PROJECTION ? (int) (sProjectionAlpha * ((float) DanmakuGlobalConfig.DEFAULT.transparency / AlphaValue.MAX))
@@ -456,6 +482,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
                 paint.setAlpha(DanmakuGlobalConfig.DEFAULT.transparency);
             }
         } else {
+            //全局基调：非透明
             if (stroke) {
                 paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
                 paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
@@ -470,6 +497,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     }
 
+    /**
+     * 设定字体缩放，缓存对应缩放值
+     * @param danmaku
+     * @param paint
+     */
     private static void applyTextScaleConfig(BaseDanmaku danmaku, Paint paint) {
         if (!DanmakuGlobalConfig.DEFAULT.isTextScaled) {
             return;
@@ -483,6 +515,10 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
         paint.setTextSize(size);
     }
 
+    /**
+     * TODO BUG 2句一样
+     * @param danmaku
+     */
     @Override
     public void measure(BaseDanmaku danmaku) {
         TextPaint paint = getPaint(danmaku);

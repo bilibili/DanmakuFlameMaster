@@ -60,12 +60,19 @@ public class DanmakuRenderer extends Renderer {
         mVerifier = (enabled ? verifier : null);
     }
 
+    /**
+     * {@link master.flame.danmaku.controller.DrawTask}调用
+     * @param disp
+     * @param danmakus
+     * @param startRenderTime
+     * @return
+     */
     @Override
     public RenderingState draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime) {
         int lastTotalDanmakuCount = mRenderingState.totalDanmakuCount;
         mRenderingState.reset();       
         IDanmakuIterator itr = danmakus.iterator();
-        int orderInScreen = 0;        
+        int orderInScreen = 0;      //fixme 什么鬼???
         mStartTimer.update(System.currentTimeMillis());
         int sizeInScreen = danmakus.size();
         BaseDanmaku drawItem = null;

@@ -20,7 +20,7 @@ import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 /**
  *
- * 一个专门为了工厂模式的对象类，感觉没必要，直接用BaseDanmaku就可以
+ * TODO 一个专门为了工厂模式的对象类，感觉没必要，直接用BaseDanmaku就可以
  */
 
 public class Danmaku extends BaseDanmaku {

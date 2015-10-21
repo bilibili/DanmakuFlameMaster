@@ -31,6 +31,11 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
                 text = new SpannedString(danmaku.text);
             }
             if (text != null) {
+                //处理文本宽高 TextView 自动换行原理也是用StaticLayout；这里不换行
+//                1.0f 相对行间距，相对字体大小，1.5f表示行间距为1.5倍的字体高度。
+//                0.0f 在基础行距上添加多少
+//                实际行间距等于这两者的和。
+//                http://ithtw.com/875.html
                 StaticLayout staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
                 danmaku.paintWidth = staticLayout.getWidth();
                 danmaku.paintHeight = staticLayout.getHeight();

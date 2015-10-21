@@ -16,6 +16,12 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
 
     private final static Map<Float, Float> sTextHeightCache = new HashMap<Float, Float>();
 
+    /**
+     * 根据Paint 设置获得缓存的TextHeight像素高度
+     * @param danmaku
+     * @param paint
+     * @return
+     */
     protected Float getCacheHeight(BaseDanmaku danmaku, Paint paint) {
         Float textSize = paint.getTextSize();
         Float textHeight = sTextHeightCache.get(textSize);

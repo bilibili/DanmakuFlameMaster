@@ -16,7 +16,9 @@
 
 package master.flame.danmaku.danmaku.model;
 
-
+/**
+ * 定义与显示相关的接口事件
+ */
 public interface IDisplayer {
 
     public abstract int getWidth();
