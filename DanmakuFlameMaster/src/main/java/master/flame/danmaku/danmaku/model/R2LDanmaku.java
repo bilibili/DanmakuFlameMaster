@@ -28,7 +28,7 @@ public class R2LDanmaku extends BaseDanmaku {
 
     protected float y = -1;
 
-    protected int mDistance;
+    protected int mDistance;//ÒÆ¶¯¾àÀë£¬×ÖÄ»View¿í+×ÖÄ»Î»¿í
 
     protected float[] RECT = null;
 

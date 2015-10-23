@@ -16,6 +16,9 @@
 
 package master.flame.danmaku.danmaku.model;
 
+/**
+ * ¹ì¼£µ¯Ä»
+ */
 public class SpecialDanmaku extends BaseDanmaku {
     
     private class Point {

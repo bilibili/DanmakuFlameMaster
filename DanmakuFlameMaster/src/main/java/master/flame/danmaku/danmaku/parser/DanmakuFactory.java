@@ -179,11 +179,9 @@ public class DanmakuFactory {
                 || CURRENT_DISP_HEIGHT != (int) viewportHeight
                 || CURRENT_DISP_SIZE_FACTOR != viewportSizeFactor) {
             sizeChanged = true;
-            REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (viewportSizeFactor
-                    * viewportWidth / BILI_PLAYER_WIDTH));
-            REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY,
-                    REAL_DANMAKU_DURATION);
-            REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
+            REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (viewportSizeFactor * viewportWidth / BILI_PLAYER_WIDTH)); //基准存活时间 682px   3.8秒
+            REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY,REAL_DANMAKU_DURATION);  //存活时间 （最小）4 <= x <= 9（大屏）
+            REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);//模拟器720*1280 density = 2时，此处为5094（横屏），2865（竖屏）取4秒
             
             CURRENT_DISP_WIDTH = (int) viewportWidth;
             CURRENT_DISP_HEIGHT = (int) viewportHeight;
@@ -214,8 +212,8 @@ public class DanmakuFactory {
     }
 
     public static void updateMaxDanmakuDuration() {
-        long maxScrollDuration = (MAX_Duration_Scroll_Danmaku == null ? 0: MAX_Duration_Scroll_Danmaku.value), 
-              maxFixDuration = (MAX_Duration_Fix_Danmaku == null ? 0 : MAX_Duration_Fix_Danmaku.value), 
+        long maxScrollDuration = (MAX_Duration_Scroll_Danmaku == null ? 0: MAX_Duration_Scroll_Danmaku.value), //MainActivity      中 .setScrollSpeedFactor(1.2f)，增加弹幕存活时间
+                maxFixDuration = (MAX_Duration_Fix_Danmaku == null ? 0 : MAX_Duration_Fix_Danmaku.value),
               maxSpecialDuration = (MAX_Duration_Special_Danmaku == null ? 0: MAX_Duration_Special_Danmaku.value);
 
         MAX_DANMAKU_DURATION = Math.max(maxScrollDuration, maxFixDuration);

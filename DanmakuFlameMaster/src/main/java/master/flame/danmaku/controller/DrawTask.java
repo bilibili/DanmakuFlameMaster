@@ -18,6 +18,7 @@ package master.flame.danmaku.controller;
 
 import android.graphics.Canvas;
 
+import android.util.Log;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
@@ -231,9 +232,14 @@ public class DrawTask implements IDrawTask {
             if (mIsHidden) {
                 return mRenderingState;
             }
-            long beginMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;
+            long beginMills = timer.currMillisecond - DanmakuFactory.MAX_DANMAKU_DURATION - 100;//每2段 DanmakuFactory.MAX_DANMAKU_DURATION 的取出来画，相当于缓存
             long endMills = timer.currMillisecond + DanmakuFactory.MAX_DANMAKU_DURATION;
+
+            Log.d(DrawTask.class.getSimpleName(), "mLastBeginMills---->mLastEndMills : "+mLastBeginMills+"----->"+mLastEndMills);
+            Log.d(DrawTask.class.getSimpleName(), "beginMills---->endMills : "+beginMills+"----->"+endMills);
+
             if(mLastBeginMills > beginMills || timer.currMillisecond > mLastEndMills) {
+                Log.d(DrawTask.class.getSimpleName(), "update current Time: "+timer.currMillisecond);
                 IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
                 if(subDanmakus != null) {
                     danmakus = subDanmakus;

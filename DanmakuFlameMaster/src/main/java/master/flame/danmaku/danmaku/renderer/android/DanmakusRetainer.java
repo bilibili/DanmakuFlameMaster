@@ -95,7 +95,11 @@ public class DanmakusRetainer {
         fbdrInstance = null;
     }
 
-    /**固定弹幕专用
+    /**启用防止弹幕重叠或者限制最大行数时生效
+     *
+     * 固定弹幕专用
+     *
+     *
      *
      * FB FT DanmukusRetainer 调用
      */

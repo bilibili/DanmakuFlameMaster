@@ -176,11 +176,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     public Canvas canvas;
 
-    private int width;
+    private int width;//整个显示区的宽度
 
-    private int height;
+    private int height;//整个显示区的高度
 
-    private float density = 1;
+    private float density = 1;//在DrawHandler中会更新为物理屏幕的值，如红米2 为2
 
     private int densityDpi = 160;
 
