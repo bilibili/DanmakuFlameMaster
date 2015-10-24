@@ -12,11 +12,10 @@ import java.util.TreeMap;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class DanmakuFilters {
 
@@ -32,18 +31,18 @@ public class DanmakuFilters {
     public static final int FILTER_TYPE_OVERLAPPING = 512;
 
 
-    public static interface IDanmakuFilter<T> {
+    public interface IDanmakuFilter<T> {
         /*
          * 是否过滤
          */
-        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                DanmakuTimer timer, boolean fromCachingTask);
+        boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
+                       DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config);
 
-        public void setData(T data);
+        void setData(T data);
 
-        public void reset();
+        void reset();
 
-        public void clear();
+        void clear();
 
     }
 
@@ -77,7 +76,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen, int totalsizeInScreen,
-                              DanmakuTimer timer, boolean fromCachingTask) {
+                              DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config) {
             boolean filtered = danmaku != null && mFilterTypes.contains(danmaku.getType());
             if (filtered) {
                 danmaku.mFilterParam |= FILTER_TYPE_TYPE;
@@ -114,14 +113,14 @@ public class DanmakuFilters {
         protected BaseDanmaku mLastSkipped = null;
 
         private boolean needFilter(BaseDanmaku danmaku, int orderInScreen,
-                                 int totalSizeInScreen, DanmakuTimer timer, boolean fromCachingTask) {
+                                 int totalSizeInScreen, DanmakuTimer timer, boolean fromCachingTask, DanmakuContext context) {
 
             if (mMaximumSize <= 0 || danmaku.getType() != BaseDanmaku.TYPE_SCROLL_RL) {
                 return false;
             }
 
             if (totalSizeInScreen < mMaximumSize || danmaku.isShown()
-                    || (mLastSkipped != null && (danmaku.time - mLastSkipped.time > DanmakuFactory.MAX_DANMAKU_DURATION / 20))) {
+                    || (mLastSkipped != null && (danmaku.time - mLastSkipped.time > context.mDanmakuFactory.MAX_DANMAKU_DURATION / 20))) {
                 mLastSkipped = danmaku;
                 return false;
             }
@@ -135,8 +134,8 @@ public class DanmakuFilters {
 
         @Override
         public synchronized boolean filter(BaseDanmaku danmaku, int orderInScreen,
-                                           int totalsizeInScreen, DanmakuTimer timer, boolean fromCachingTask) {
-            boolean filtered = needFilter(danmaku, orderInScreen, totalsizeInScreen, timer, fromCachingTask);
+                                           int totalsizeInScreen, DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config) {
+            boolean filtered = needFilter(danmaku, orderInScreen, totalsizeInScreen, timer, fromCachingTask, config);
             if (filtered) {
                 danmaku.mFilterParam |= FILYER_TYPE_QUANTITY;
             }
@@ -188,7 +187,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int orderInScreen,
-                              int totalsizeInScreen, DanmakuTimer timer, boolean fromCachingTask) {
+                              int totalsizeInScreen, DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config) {
             boolean filtered = needFilter(danmaku, orderInScreen, totalsizeInScreen, timer, fromCachingTask);
             if (filtered) {
                 danmaku.mFilterParam |= FILTER_TYPE_ELAPSED_TIME;
@@ -230,7 +229,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                              DanmakuTimer timer, boolean fromCachingTask) {
+                              DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config) {
             boolean filtered = danmaku != null && !mWhiteList.contains(danmaku.textColor);
             if (filtered) {
                 danmaku.mFilterParam |= FILTER_TYPE_TEXTCOLOR;
@@ -272,7 +271,7 @@ public class DanmakuFilters {
 
         @Override
         public abstract boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                DanmakuTimer timer, boolean fromCachingTask);
+                                       DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config);
 
         @Override
         public void setData(List<T> data) {
@@ -300,7 +299,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                              DanmakuTimer timer, boolean fromCachingTask) {
+                              DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config) {
             boolean filtered = danmaku != null && mBlackList.contains(danmaku.userId);
             if (filtered) {
                 danmaku.mFilterParam |= FILTER_TYPE_USER_ID;
@@ -319,7 +318,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                              DanmakuTimer timer, boolean fromCachingTask) {
+                              DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config) {
             boolean filtered = danmaku != null && mBlackList.contains(danmaku.userHash);
             if (filtered) {
                 danmaku.mFilterParam |= FILTER_TYPE_USER_HASH;
@@ -340,7 +339,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                              DanmakuTimer timer, boolean fromCachingTask) {
+                              DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config) {
             boolean filtered = mBlock && danmaku.isGuest;
             if (filtered) {
                 danmaku.mFilterParam |= FILTER_TYPE_USER_GUEST;
@@ -434,7 +433,7 @@ public class DanmakuFilters {
 
         @Override
         public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                              DanmakuTimer timer, boolean fromCachingTask) {
+                              DanmakuTimer timer, boolean fromCachingTask, DanmakuContext config) {
             boolean filtered = needFilter(danmaku, index, totalsizeInScreen, timer, fromCachingTask);
             if (filtered) {
                 danmaku.mFilterParam |= FILTER_TYPE_DUPLICATE_MERGE;
@@ -466,7 +465,7 @@ public class DanmakuFilters {
         private Map<Integer, Integer> mMaximumLinesPairs;
 
         @Override
-        public boolean filter(BaseDanmaku danmaku, int lines, int totalsizeInScreen, DanmakuTimer timer, boolean willHit) {
+        public boolean filter(BaseDanmaku danmaku, int lines, int totalsizeInScreen, DanmakuTimer timer, boolean willHit, DanmakuContext config) {
             boolean filtered = false;
             if (mMaximumLinesPairs != null) {
                 Integer maxLines = mMaximumLinesPairs.get(danmaku.getType());
@@ -494,7 +493,7 @@ public class DanmakuFilters {
         private Map<Integer, Boolean> mEnabledPairs;
 
         @Override
-        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen, DanmakuTimer timer, boolean willHit) {
+        public boolean filter(BaseDanmaku danmaku, int index, int totalsizeInScreen, DanmakuTimer timer, boolean willHit, DanmakuContext config) {
             boolean filtered = false;
             if (mEnabledPairs != null) {
                 Boolean enabledValue = mEnabledPairs.get(danmaku.getType());
@@ -529,24 +528,22 @@ public class DanmakuFilters {
 
     public final static String TAG_USER_HASH_FILTER = "1015_Filter";
 
-    public static final String TAG_GUEST_FILTER = "1016_Filter";
+    public final static String TAG_GUEST_FILTER = "1016_Filter";
 
-    public static final String TAG_DUPLICATE_FILTER = "1017_Filter";
+    public final static String TAG_DUPLICATE_FILTER = "1017_Filter";
 
-    public static final String TAG_MAXIMUN_LINES_FILTER = "1018_Filter";
+    public final static String TAG_MAXIMUN_LINES_FILTER = "1018_Filter";
 
-    public static final String TAG_OVERLAPPING_FILTER = "1019_Filter";
-
-    private static DanmakuFilters instance = null;
+    public final static String TAG_OVERLAPPING_FILTER = "1019_Filter";
 
     public final Exception filterException = new Exception("not suuport this filter tag");
 
     public void filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
-                       DanmakuTimer timer, boolean fromCachingTask) {
+                       DanmakuTimer timer, boolean fromCachingTask, DanmakuContext context) {
         for (IDanmakuFilter<?> f : mFilterArray) {
             if (f != null) {
-                boolean filtered = f.filter(danmaku, index, totalsizeInScreen, timer, fromCachingTask);
-                danmaku.filterResetFlag = GlobalFlagValues.FILTER_RESET_FLAG;
+                boolean filtered = f.filter(danmaku, index, totalsizeInScreen, timer, fromCachingTask, context);
+                danmaku.filterResetFlag = context.mGlobalFlagValues.FILTER_RESET_FLAG;
                 if (filtered) {
                     break;
                 }
@@ -555,11 +552,11 @@ public class DanmakuFilters {
     }
 
     public boolean filterSecondary(BaseDanmaku danmaku, int lines, int totalsizeInScreen,
-                                   DanmakuTimer timer, boolean willHit) {
+                                   DanmakuTimer timer, boolean willHit, DanmakuContext context) {
         for (IDanmakuFilter<?> f : mFilterArraySecondary) {
             if (f != null) {
-                boolean filtered = f.filter(danmaku, lines, totalsizeInScreen, timer, willHit);
-                danmaku.filterResetFlag = GlobalFlagValues.FILTER_RESET_FLAG;
+                boolean filtered = f.filter(danmaku, lines, totalsizeInScreen, timer, willHit, context);
+                danmaku.filterResetFlag = context.mGlobalFlagValues.FILTER_RESET_FLAG;
                 if (filtered) {
                     return true;
                 }
@@ -568,9 +565,9 @@ public class DanmakuFilters {
         return false;
     }
 
-    private final static Map<String, IDanmakuFilter<?>> filters = Collections
+    private final Map<String, IDanmakuFilter<?>> filters = Collections
             .synchronizedSortedMap(new TreeMap<String, IDanmakuFilter<?>>());
-    private final static Map<String, IDanmakuFilter<?>> filtersSecondary = Collections
+    private final Map<String, IDanmakuFilter<?>> filtersSecondary = Collections
             .synchronizedSortedMap(new TreeMap<String, IDanmakuFilter<?>>());
     IDanmakuFilter<?>[] mFilterArray = new IDanmakuFilter[0];
     IDanmakuFilter<?>[] mFilterArraySecondary = new IDanmakuFilter[0];
@@ -686,13 +683,6 @@ public class DanmakuFilters {
             throw filterException;
         } catch (Exception e) {
         }
-    }
-
-    public static DanmakuFilters getDefault() {
-        if (instance == null) {
-            instance = new DanmakuFilters();
-        }
-        return instance;
     }
 
 }

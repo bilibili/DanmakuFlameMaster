@@ -38,6 +38,7 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
 
@@ -120,7 +121,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     float textSize = Float.parseFloat(values[2]); // 字体大小
                     int color = Integer.parseInt(values[3]) | 0xFF000000; // 颜色
                     // int poolType = Integer.parseInt(values[5]); // 弹幕池类型（忽略
-                    item = DanmakuFactory.createDanmaku(type, mDisp);
+                    item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
                     if (item != null) {
                         item.time = time;
                         item.textSize = textSize * (mDispDensity - 0.6f);
@@ -148,7 +149,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         @Override
         public void characters(char[] ch, int start, int length)  {
             if (item != null) {
-                DanmakuFactory.fillText(item, decodeXmlString(new String(ch, start, length)));
+                DanmakuUtils.fillText(item, decodeXmlString(new String(ch, start, length)));
                 item.index = index++;
 
                 // initial specail danmaku data
@@ -203,9 +204,9 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     item.duration = new Duration(alphaDuraion);
                     item.rotationZ = rotateZ;
                     item.rotationY = rotateY;
-                    DanmakuFactory.fillTranslationData(item, beginX,
+                    mContext.mDanmakuFactory.fillTranslationData(item, beginX,
                             beginY, endX, endY, translationDuration, translationStartDelay, mDispScaleX, mDispScaleY);
-                    DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
+                    mContext.mDanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
                     
                     if (textArr.length >= 12) {
                         // 是否有描边

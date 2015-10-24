@@ -16,13 +16,12 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
-import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
@@ -31,11 +30,12 @@ public class DanmakuRenderer extends Renderer {
 
     private final DanmakuTimer mStartTimer = new DanmakuTimer();
     private final RenderingState mRenderingState = new RenderingState();
+    private final DanmakuContext mContext;
     private DanmakusRetainer.Verifier mVerifier;
     private final DanmakusRetainer.Verifier verifier = new DanmakusRetainer.Verifier() {
         @Override
         public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit) {
-            if (danmaku.priority == 0 && DanmakuFilters.getDefault().filterSecondary(danmaku, lines, 0, mStartTimer, willHit)) {
+            if (danmaku.priority == 0 && mContext.mDanmakuFilters.filterSecondary(danmaku, lines, 0, mStartTimer, willHit, mContext)) {
                 danmaku.setVisibility(false);
                 return true;
             }
@@ -43,16 +43,20 @@ public class DanmakuRenderer extends Renderer {
         }
     };
 
+    public DanmakuRenderer(DanmakuContext config) {
+        mContext = config;
+    }
+
     @Override
     public void clear() {
         DanmakusRetainer.clear();
-        DanmakuFilters.getDefault().clear();
+        mContext.mDanmakuFilters.clear();
     }
 
     @Override
     public void release() {
         DanmakusRetainer.release();
-        DanmakuFilters.getDefault().clear();
+        mContext.mDanmakuFilters.clear();
     }
 
     @Override
@@ -78,7 +82,7 @@ public class DanmakuRenderer extends Renderer {
             }
 
             if (!drawItem.hasPassedFilter()) {
-                DanmakuFilters.getDefault().filter(drawItem, orderInScreen, sizeInScreen, mStartTimer, false);
+                mContext.mDanmakuFilters.filter(drawItem, orderInScreen, sizeInScreen, mStartTimer, false, mContext);
             }
 
             if (drawItem.time < startRenderTime

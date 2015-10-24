@@ -16,12 +16,12 @@
 
 package master.flame.danmaku.danmaku.model;
 
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class Danmaku extends BaseDanmaku {
 
     public Danmaku(String text) {
-        DanmakuFactory.fillText(this, text);
+        DanmakuUtils.fillText(this, text);
     }
 
     @Override

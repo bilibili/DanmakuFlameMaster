@@ -39,6 +39,7 @@ import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.controller.IDanmakuViewController;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 
@@ -220,8 +221,9 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     }
 
     @Override
-    public void prepare(BaseDanmakuParser parser) {
+    public void prepare(BaseDanmakuParser parser, DanmakuContext config) {
         prepare();
+        handler.setConfig(config);
         handler.setParser(parser);
         handler.setCallback(mCallback);
         handler.prepare();
@@ -230,6 +232,14 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     @Override
     public boolean isPrepared() {
         return handler != null && handler.isPrepared();
+    }
+
+    @Override
+    public DanmakuContext getConfig() {
+        if (handler == null) {
+            return null;
+        }
+        return handler.getConfig();
     }
 
     @Override

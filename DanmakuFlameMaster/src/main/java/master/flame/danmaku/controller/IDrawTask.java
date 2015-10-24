@@ -34,7 +34,7 @@ public interface IDrawTask {
 
 	public IDanmakus getVisibleDanmakusOnTime(long time);
 
-    public RenderingState draw(AbsDisplayer<?> displayer);
+    public RenderingState draw(AbsDisplayer displayer);
 
     public void reset();
 

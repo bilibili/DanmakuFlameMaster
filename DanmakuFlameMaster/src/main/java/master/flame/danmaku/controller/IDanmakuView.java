@@ -6,6 +6,7 @@ import android.view.View;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 public interface IDanmakuView {
@@ -52,7 +53,8 @@ public interface IDanmakuView {
      * @return
      */
     public long getCurrentTime();
-    
+
+    public DanmakuContext getConfig();
     
     // ------------- Android View方法  --------------------
     
@@ -69,7 +71,7 @@ public interface IDanmakuView {
 
     // ------------- 播放控制 -------------------
     
-    public void prepare(BaseDanmakuParser parser);
+    public void prepare(BaseDanmakuParser parser, DanmakuContext config);
 
     public void seekTo(Long ms);
 
