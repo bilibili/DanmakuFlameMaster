@@ -125,6 +125,8 @@ public class DrawHandler extends Handler {
 
     private boolean mInSeekingAction;
 
+    private long mDesireSeekingTime;
+
     private long mRemainingTime;
 
     private boolean mInSyncAction;
@@ -511,6 +513,7 @@ public class DrawHandler extends Handler {
 
     public void seekTo(Long ms) {
         mInSeekingAction = true;
+        mDesireSeekingTime = ms;
         removeMessages(DrawHandler.UPDATE);
         removeMessages(DrawHandler.RESUME);
         removeMessages(DrawHandler.SEEK_POS);
@@ -673,6 +676,9 @@ public class DrawHandler extends Handler {
     }
 
     public long getCurrentTime() {
+        if (mInSeekingAction) {
+            return mDesireSeekingTime;
+        }
         if (quitFlag || !mInWaitingState) {
             return timer.currMillisecond - mRemainingTime;
         }
