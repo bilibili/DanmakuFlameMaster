@@ -186,7 +186,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas> {
 
     private float scaledDensity = 1;
 
-    private int mSlopPixel = 0;
+    private int mSlopPixel = 0;//TODO 缓存字体大小差距在？内，可以重用?
 
     private boolean mIsHardwareAccelerated = true;
 

@@ -21,6 +21,9 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 
+/**
+ * 画图相关事务
+ */
 public interface IDrawTask {
 
     public void addDanmaku(BaseDanmaku item);

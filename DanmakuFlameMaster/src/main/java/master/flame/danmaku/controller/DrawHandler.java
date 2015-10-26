@@ -496,7 +496,7 @@ public class DrawHandler extends Handler {
         mDisp.setHardwareAccelerated(isHardwareAccelerated);
 
         IDrawTask task = useDrwaingCache ? new CacheManagingDrawTask(timer, mDisp,
-                taskListener, 1024 * 1024 * AndroidUtils.getMemoryClass(context) / 3)
+                taskListener, 1024 * 1024 * AndroidUtils.getMemoryClass(context) / 3)//硬引用缓存容量，为系统可用内存的1/3
                 : new DrawTask(timer, mDisp, taskListener);
         task.setParser(mParser);
         task.prepare();

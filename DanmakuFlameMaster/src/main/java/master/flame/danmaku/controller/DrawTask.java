@@ -238,7 +238,7 @@ public class DrawTask implements IDrawTask {
             Log.d(DrawTask.class.getSimpleName(), "mLastBeginMills---->mLastEndMills : "+mLastBeginMills+"----->"+mLastEndMills);
             Log.d(DrawTask.class.getSimpleName(), "beginMills---->endMills : "+beginMills+"----->"+endMills);
 
-            if(mLastBeginMills > beginMills || timer.currMillisecond > mLastEndMills) {
+            if(mLastBeginMills > beginMills || timer.currMillisecond > mLastEndMills) {//随着播放的进行，不停更新前移
                 Log.d(DrawTask.class.getSimpleName(), "update current Time: "+timer.currMillisecond);
                 IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
                 if(subDanmakus != null) {
@@ -290,7 +290,7 @@ public class DrawTask implements IDrawTask {
         }
         return handled;
     }
-
+//TODO handled 没有使用到？
     protected boolean handleOnDanmakuConfigChanged(DanmakuGlobalConfig config, DanmakuConfigTag tag, Object[] values) {
         boolean handled = false;
         if (tag == null || DanmakuConfigTag.MAXIMUM_NUMS_IN_SCREEN.equals(tag)) {
