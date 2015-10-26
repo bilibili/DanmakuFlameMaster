@@ -129,6 +129,8 @@ public interface IRenderer {
 
     public void clear();
 
+    public void clearRetainer();
+
     public void release();
 
     public void setVerifierEnabled(boolean enabled);

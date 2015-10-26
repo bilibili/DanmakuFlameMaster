@@ -42,20 +42,27 @@ public class DanmakuRenderer extends Renderer {
             return false;
         }
     };
+    private final DanmakusRetainer mDanmakusRetainer;
 
     public DanmakuRenderer(DanmakuContext config) {
         mContext = config;
+        mDanmakusRetainer = new DanmakusRetainer();
     }
 
     @Override
     public void clear() {
-        DanmakusRetainer.clear();
+        clearRetainer();
         mContext.mDanmakuFilters.clear();
     }
 
     @Override
+    public void clearRetainer() {
+        mDanmakusRetainer.clear();
+    }
+
+    @Override
     public void release() {
-        DanmakusRetainer.release();
+        mDanmakusRetainer.release();
         mContext.mDanmakuFilters.clear();
     }
 
@@ -101,7 +108,7 @@ public class DanmakuRenderer extends Renderer {
             }
 
             // layout
-            DanmakusRetainer.fix(drawItem, disp, mVerifier);
+            mDanmakusRetainer.fix(drawItem, disp, mVerifier);
 
             // draw
             if (!drawItem.isOutside() && drawItem.isShown()) {

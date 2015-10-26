@@ -31,7 +31,6 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
-import master.flame.danmaku.danmaku.renderer.android.DanmakusRetainer;
 
 public class DrawTask implements IDrawTask {
 
@@ -256,7 +255,7 @@ public class DrawTask implements IDrawTask {
 
     protected RenderingState drawDanmakus(AbsDisplayer disp, DanmakuTimer timer) {
         if (clearRetainerFlag) {
-            DanmakusRetainer.clear();
+            mRenderer.clearRetainer();
             clearRetainerFlag = false;
         }
         if (danmakuList != null) {
