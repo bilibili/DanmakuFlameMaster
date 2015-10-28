@@ -168,7 +168,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         private int mRealSize;
 
-        private int mScreenSize = 3;//TODO 什么鬼？
+        private int mScreenSize = 3;//TODO 什么鬼？  缓存几个屏幕的字幕？？
 
         private CacheHandler mHandler;
 
@@ -374,6 +374,12 @@ public class CacheManagingDrawTask extends DrawTask {
             }
         }
 
+        /**
+         *
+         * @param refDanmaku
+         * @param strictMode 严格模式，true只找完全一样的，false 从timeout && no-refrerence 的caches中找出差距不大的可用缓存
+         * @return
+         */
         private BaseDanmaku findReuseableCache(BaseDanmaku refDanmaku,
                                                boolean strictMode) {
             IDanmakuIterator it = mCaches.iterator();
@@ -384,7 +390,7 @@ public class CacheManagingDrawTask extends DrawTask {
             while (it.hasNext()) {
                 BaseDanmaku danmaku = it.next();
                 if (!danmaku.hasDrawingCache()) {
-                    //没有缓存的，不能用
+                    //没有缓存过的，不能用
                     continue;
                 }
                 if (danmaku.paintWidth == refDanmaku.paintWidth
@@ -577,12 +583,14 @@ public class CacheManagingDrawTask extends DrawTask {
                 //TODO 如果firstcache大于当前时间超过半屏并且水位在0.5f以下,
                 long gapTime = firstCache != null ? firstCache.time - mTimer.currMillisecond : 0;
                 long doubleScreenDuration = DanmakuFactory.MAX_DANMAKU_DURATION * 2;
+                //最早的弹幕已经超出屏幕，且水位在0.6以下
                 if (level < 0.6f && gapTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
                     mCacheTimer.update(mTimer.currMillisecond);
                     removeMessages(BUILD_CACHES);
                     sendEmptyMessage(BUILD_CACHES);
                     return 0;
                 } else if (level > 0.4f && gapTime < -doubleScreenDuration) {
+                    //最早的弹幕还在2个屏幕之外，且水位大于0.4
                     // clear timeout caches
                     removeMessages(CLEAR_TIMEOUT_CACHES);
                     sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
@@ -590,9 +598,11 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
 
                 if (level >= 0.9f) {
+                    //水位逼近0.9 不响应
                     return 0;
                 }
                 // check cache time
+                //同步时间 缓存时间比当前时间（TODO 播放时间？）慢了，需要更新缓存时间
                 long deltaTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
                 if (deltaTime < 0) {
                     mCacheTimer.update(mTimer.currMillisecond);
@@ -630,6 +640,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 IDanmakus danmakus = null;
                 int tryCount = 0;
                 boolean hasException = false;
+                //失败的话，尝试4次
                 do {
                     try {
                         danmakus = danmakuList.subnew(curr, end);
@@ -649,9 +660,10 @@ public class CacheManagingDrawTask extends DrawTask {
                     return 0;
                 }
                 long deltaTime = first.time - mTimer.currMillisecond;
-                long sleepTime = 30 + 10 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;
+                long sleepTime = 30 + 10 * deltaTime / DanmakuFactory.MAX_DANMAKU_DURATION;//比如字幕存活时间6秒，每差6秒延迟增加10毫秒
                 sleepTime = Math.min(100, sleepTime);
                 if (repositioned) {
+                    //重定位的立即 执行？？
                     sleepTime = 0;
                 }
 
@@ -694,7 +706,9 @@ public class CacheManagingDrawTask extends DrawTask {
 
                     if (item.getType() == BaseDanmaku.TYPE_SCROLL_RL) {
                         // 同屏弹幕密度只对滚动弹幕有效
-                        int screenIndex = (int) ((item.time - curr) / DanmakuFactory.MAX_DANMAKU_DURATION);
+
+                        //TODO screenIndex 表示弹幕在第几屏幕（screenSize*实际屏幕  curr--->end）的显示位置
+                        int screenIndex = (int) ((item.time - curr) / DanmakuFactory.MAX_DANMAKU_DURATION);//取整数，在屏幕内0，屏幕外（之后1）
                         if (currScreenIndex == screenIndex)
                             orderInScreen++;
                         else {
@@ -781,6 +795,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
                 DrawingCache cache = null;
                 try {
+                    //先找严格一致的，找不到再找不严格一致的
                     // try to find reuseable cache
                     BaseDanmaku danmaku = findReuseableCache(item, true);
                     if (danmaku != null) {

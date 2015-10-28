@@ -99,6 +99,7 @@ public class DanmakuUtils {
         return cache;
     }
 
+    //一个像素4个字节ARGB 8888
     public static int getCacheSize(int w, int h) {
         return (w) * (h) * 4;
     }

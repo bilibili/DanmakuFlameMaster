@@ -47,11 +47,11 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     private HandlerThread mHandlerThread;
 
     private DrawHandler handler;
-    
+
     private boolean isSurfaceCreated;
 
     private boolean mEnableDanmakuDrwaingCache = true;
-    
+
     private boolean mShowFps;
 
     private boolean mDanmakuVisible = true;
@@ -74,7 +74,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     private void init() {
         mUiThreadId = Thread.currentThread().getId();
         setBackgroundColor(Color.TRANSPARENT);
-        setDrawingCacheBackgroundColor(Color.TRANSPARENT);
+        setDrawingCacheBackgroundColor(Color.TRANSPARENT);//http://blog.sina.com.cn/s/blog_5da93c8f010106bb.html 使得缓存是ARGB8888 4个字节
         DrawHelper.useDrawColorToClearCanvas(true, false);
     }
 
@@ -93,14 +93,14 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
             handler.addDanmaku(item);
         }
     }
-    
+
     @Override
     public void removeAllDanmakus() {
         if (handler != null) {
             handler.removeAllDanmakus();
         }
     }
-    
+
     @Override
     public void removeAllLiveDanmakus() {
         if (handler != null) {
@@ -141,13 +141,13 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
             mHandlerThread = null;
         }
     }
-    
+
     protected Looper getLooper(int type){
         if (mHandlerThread != null) {
             mHandlerThread.quit();
             mHandlerThread = null;
         }
-        
+
         int priority;
         switch (type) {
             case THREAD_TYPE_MAIN_THREAD:
@@ -216,7 +216,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         lockCanvas();
         return System.currentTimeMillis() - stime;
     }
-    
+
     @SuppressLint("NewApi")
     private void postInvalidateCompat() {
         mRequestRender = true;
@@ -231,7 +231,23 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         if(mDanmakuVisible == false) {
             return;
         }
-        postInvalidateCompat();
+        postInvalidateCompat();//        设置 mRequestRender = true; --->invalidate触发onDraw(画完后mRequestRender = false; //复位 并unlockCanvasAndPost();)
+//                                                                   --->unlockCanvasAndPost中  mDrawFinished = true; 标志画完
+
+
+
+  /*      synchronized(obj) {
+            while(!condition) {
+                obj.wait();
+            }
+            obj.doSomething();
+        }
+        当线程A获得了obj锁后，发现条件condition不满足，无法继续下一处理，于是线程A就wait() , 放弃对象锁.
+                之后在另一线程B中，如果B更改了某些条件，使得线程A的condition条件满足了，就可以唤醒线程A：
+        synchronized(obj) {
+            condition = true;
+            obj.notify();
+        }*/
         synchronized (mDrawMonitor) {
             while ((!mDrawFinished) && (handler != null)) {
                 try {
@@ -244,22 +260,22 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
                     }
                 }
             }
-            mDrawFinished = false;
+            mDrawFinished = false;//复位
         }
     }
-    
+
     private void lockCanvasAndClear() {
         mClearFlag = true;
         lockCanvas();
     }
-    
+
     private void unlockCanvasAndPost() {
         synchronized (mDrawMonitor) {
             mDrawFinished = true;
             mDrawMonitor.notifyAll();
         }
     }
-    
+
     @Override
     protected void onDraw(Canvas canvas) {
         if ((!mDanmakuVisible) && (!mRequestRender)) {
@@ -282,10 +298,10 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
                 }
             }
         }
-        mRequestRender = false;
+        mRequestRender = false; //复位
         unlockCanvasAndPost();
     }
-    
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
@@ -320,7 +336,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
             restart();
         }
     }
-    
+
     @Override
     public boolean isPaused() {
         if(handler != null) {
@@ -374,12 +390,12 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     public View getView() {
         return this;
     }
-      
+
     @Override
     public void show() {
         showAndResumeDrawTask(null);
     }
-    
+
     @Override
     public void showAndResumeDrawTask(Long position) {
         mDanmakuVisible = true;
@@ -398,7 +414,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         }
         handler.hideDanmakus(false);
     }
-    
+
     @Override
     public long hideAndPauseDrawTask() {
         mDanmakuVisible = false;
