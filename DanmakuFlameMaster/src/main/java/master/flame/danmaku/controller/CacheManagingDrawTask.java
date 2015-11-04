@@ -360,6 +360,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 if (val.isTimeOut()) {
                     synchronized (mDrawingNotify) {
                         try {
+                            //在CacheHandler中调用此方法，DrawHandler 调用this Task的draw方法，会mDrawingNotify.notifyAll，释放对象锁
                             mDrawingNotify.wait(30);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -583,14 +584,14 @@ public class CacheManagingDrawTask extends DrawTask {
                 //TODO 如果firstcache大于当前时间超过半屏并且水位在0.5f以下,
                 long gapTime = firstCache != null ? firstCache.time - mTimer.currMillisecond : 0;
                 long doubleScreenDuration = DanmakuFactory.MAX_DANMAKU_DURATION * 2;
-                //最早的弹幕已经超出屏幕，且水位在0.6以下
+                //最早的弹幕还没进入屏幕，且水位在0.6以下
                 if (level < 0.6f && gapTime > DanmakuFactory.MAX_DANMAKU_DURATION) {
                     mCacheTimer.update(mTimer.currMillisecond);
                     removeMessages(BUILD_CACHES);
                     sendEmptyMessage(BUILD_CACHES);
                     return 0;
                 } else if (level > 0.4f && gapTime < -doubleScreenDuration) {
-                    //最早的弹幕还在2个屏幕之外，且水位大于0.4
+                    //最早的弹幕已经在2个屏幕之外，且水位大于0.4，需要清除
                     // clear timeout caches
                     removeMessages(CLEAR_TIMEOUT_CACHES);
                     sendEmptyMessage(CLEAR_TIMEOUT_CACHES);
