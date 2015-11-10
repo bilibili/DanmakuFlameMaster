@@ -31,10 +31,7 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
                 text = new SpannedString(danmaku.text);
             }
             if (text != null) {
-                StaticLayout staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
-                danmaku.paintWidth = staticLayout.getWidth();
-                danmaku.paintHeight = staticLayout.getHeight();
-                danmaku.obj = new SoftReference<StaticLayout>(staticLayout);
+                createStaticLayout(danmaku);
                 return;
             }
         }
@@ -57,8 +54,7 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
         SoftReference<StaticLayout> reference = (SoftReference<StaticLayout>) danmaku.obj;
         StaticLayout staticLayout = reference.get();
         if (staticLayout == null) {
-            super.drawText(danmaku, lineText, canvas, left, top, paint);
-            return;
+            createStaticLayout(danmaku);
         }
         boolean needRestore = false;
         if (left != 0 && top != 0) {
@@ -76,5 +72,12 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
     public void clearCaches() {
         super.clearCaches();
         System.gc();
+    }
+
+    private void createAndMeasureStaticLayout(BaseDanmaku danmaku){
+        StaticLayout staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+        danmaku.paintWidth = staticLayout.getWidth();
+        danmaku.paintHeight = staticLayout.getHeight();
+        danmaku.obj = new SoftReference<StaticLayout>(staticLayout);
     }
 }
