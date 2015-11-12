@@ -63,7 +63,7 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
     }
 
     @Override
-    public void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint) {
+    public void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, TextPaint paint) {
         if (lineText != null) {
             canvas.drawText(lineText, left, top, paint);
         } else {
