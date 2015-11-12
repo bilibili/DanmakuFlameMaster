@@ -177,6 +177,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
 
                 @Override
+                public void drawingFinished() {
+
+                }
+
+                @Override
                 public void prepared() {
                     mDanmakuView.start();
                 }

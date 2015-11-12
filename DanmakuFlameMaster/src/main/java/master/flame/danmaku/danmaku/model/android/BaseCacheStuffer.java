@@ -37,7 +37,7 @@ public abstract class BaseCacheStuffer {
      * @param top
      * @param paint
      */
-    public abstract void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
+    public abstract void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, TextPaint paint);
 
     /**
      * clear caches which created by this stuffer
