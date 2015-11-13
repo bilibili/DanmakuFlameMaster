@@ -686,6 +686,9 @@ public class DrawHandler extends Handler {
     }
 
     public long getCurrentTime() {
+        if (!mReady) {
+            return 0;
+        }
         if (mInSeekingAction) {
             return mDesireSeekingTime;
         }
