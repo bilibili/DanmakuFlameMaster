@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.controller;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Handler;
@@ -103,12 +102,9 @@ public class DrawHandler extends Handler {
 
     private final RenderingState mRenderingState = new RenderingState();
 
-    @SuppressLint("Deprecated")
-    private int mSkipFrames;
-
     private static final int MAX_RECORD_SIZE = 500;
 
-    private LinkedList<Long> mDrawTimes = new LinkedList<Long>();
+    private LinkedList<Long> mDrawTimes = new LinkedList<>();
 
     private UpdateThread mThread;
 
@@ -116,7 +112,6 @@ public class DrawHandler extends Handler {
 
     private long mCordonTime = 30;
 
-    @SuppressWarnings("unused")
     private long mCordonTime2 = 60;
 
     private long mFrameUpdateRate = 16;
@@ -287,7 +282,6 @@ public class DrawHandler extends Handler {
                 }
                 quitFlag = true;
                 syncTimerIfNeeded();
-                mSkipFrames = 0;
                 if (mThread != null) {
                     notifyRendering();
                     quitUpdateThread();
@@ -350,6 +344,10 @@ public class DrawHandler extends Handler {
         }
         d = mDanmakuView.drawDanmakus();
         removeMessages(UPDATE);
+        if (d > mCordonTime2) {  // this situation may be cuased by ui-thread waiting of DanmakuView, so we sync-timer at once
+            timer.add(d);
+            mDrawTimes.clear();
+        }
         if (!mDanmakusVisible) {
             waitRendering(INDEFINITE_TIME);
             return;
@@ -392,6 +390,10 @@ public class DrawHandler extends Handler {
                         continue;
                     }
                     d = mDanmakuView.drawDanmakus();
+                    if (d > mCordonTime2) {  // this situation may be cuased by ui-thread waiting of DanmakuView, so we sync-timer at once
+                        timer.add(d);
+                        mDrawTimes.clear();
+                    }
                     if (!mDanmakusVisible) {
                         waitRendering(INDEFINITE_TIME);
                     } else if (mRenderingState.nothingRendered && mIdleSleep) {
@@ -589,7 +591,6 @@ public class DrawHandler extends Handler {
         if(drawTask != null) {
             drawTask.requestClear();
         }
-        mSkipFrames = 0;
         if (mUpdateInNewThread) {
             synchronized (this) {
                 mDrawTimes.clear();
