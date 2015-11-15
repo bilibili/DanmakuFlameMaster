@@ -49,14 +49,14 @@ Download the [latest version][1] or grab via Maven:
 <dependency>
   <groupId>com.github.ctiao</groupId>
   <artifactId>dfm</artifactId>
-  <version>0.3.7</version>
+  <version>0.3.8</version>
 </dependency>
 ```
 
 or Gradle:
 ```groovy
 dependencies {
-    compile 'com.github.ctiao:dfm:0.3.7'
+    compile 'com.github.ctiao:dfm:0.3.8'
 }
 ```
 Snapshots of the development version are available in [Sonatype's snapshots repository][2].
