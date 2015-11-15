@@ -368,13 +368,15 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         private BaseDanmaku findReuseableCache(BaseDanmaku refDanmaku,
-                                               boolean strictMode) {
+                                               boolean strictMode,
+                                               int maximumTimes) {
             IDanmakuIterator it = mCaches.iterator();
             int slopPixel = 0;
             if (!strictMode) {
                 slopPixel = mDisp.getSlopPixel() * 2;
             }
-            while (it.hasNext()) {
+            int count = 0;
+            while (it.hasNext() && count++ < maximumTimes) {  // limit maximum times
                 BaseDanmaku danmaku = it.next();
                 if (!danmaku.hasDrawingCache()) {
                     continue;
@@ -719,7 +721,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 DrawingCache cache = null;
                 try {
                     // try to find reuseable cache
-                    BaseDanmaku danmaku = findReuseableCache(item, true);
+                    BaseDanmaku danmaku = findReuseableCache(item, true, 50);
                     if (danmaku != null) {
                         cache = (DrawingCache) danmaku.cache;
                     }
@@ -730,8 +732,8 @@ public class CacheManagingDrawTask extends DrawTask {
                         return RESULT_SUCCESS;
                     }
 
-                    // try to find reuseable cache from timeout && no-refrerence caches
-                    danmaku = findReuseableCache(item, false);
+                    // try to find reuseable cache from timeout || no-refrerence caches
+                    danmaku = findReuseableCache(item, false, 100);
                     if (danmaku != null) {
                         cache = (DrawingCache) danmaku.cache;
                     }
