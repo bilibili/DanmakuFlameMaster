@@ -17,17 +17,18 @@
 package master.flame.danmaku.danmaku.renderer;
 
 
+import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 
 public interface IRenderer {
     
-    public static final int NOTHING_RENDERING = 0;
-    public static final int CACHE_RENDERING = 1;
-    public static final int TEXT_RENDERING = 2;
+    int NOTHING_RENDERING = 0;
+    int CACHE_RENDERING = 1;
+    int TEXT_RENDERING = 2;
 
-    public class Area {
+    class Area {
 
         public final float[] mRefreshRect = new float[4];
         private int mMaxHeight;
@@ -125,14 +126,16 @@ public interface IRenderer {
         }
     }
 
-    public RenderingState draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime);
+    RenderingState draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime);
 
-    public void clear();
+    void clear();
 
-    public void clearRetainer();
+    void clearRetainer();
 
-    public void release();
+    void release();
 
-    public void setVerifierEnabled(boolean enabled);
+    void setVerifierEnabled(boolean enabled);
+
+    void setCacheManager(ICacheManager cacheManager);
 
 }

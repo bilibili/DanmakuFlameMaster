@@ -24,6 +24,7 @@ import android.os.SystemClock;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDrawingCache;
@@ -59,6 +60,7 @@ public class CacheManagingDrawTask extends DrawTask {
             mMaxCacheSize = maxCacheSize * 2;
         }
         mCacheManager = new CacheManager(maxCacheSize, MAX_CACHE_SCREEN_SIZE);
+        mRenderer.setCacheManager(mCacheManager);
     }
 
     @Override
@@ -124,6 +126,7 @@ public class CacheManagingDrawTask extends DrawTask {
         if (mCacheManager == null) {
             mCacheManager = new CacheManager(mMaxCacheSize, MAX_CACHE_SCREEN_SIZE);
             mCacheManager.begin();
+            mRenderer.setCacheManager(mCacheManager);
         } else {
             mCacheManager.resume();
         }
@@ -133,6 +136,7 @@ public class CacheManagingDrawTask extends DrawTask {
     public void quit() {
         super.quit();
         reset();
+        mRenderer.setCacheManager(null);
         if (mCacheManager != null) {
             mCacheManager.end();
             mCacheManager = null;
@@ -147,7 +151,7 @@ public class CacheManagingDrawTask extends DrawTask {
         mCacheManager.begin();
     }
 
-    public class CacheManager {
+    public class CacheManager implements ICacheManager {
 
         @SuppressWarnings("unused")
         private static final String TAG = "CacheManager";
@@ -188,6 +192,7 @@ public class CacheManagingDrawTask extends DrawTask {
             mHandler.obtainMessage(CacheHandler.SEEK, mills).sendToTarget();
         }
 
+        @Override
         public void addDanmaku(BaseDanmaku danmaku) {
             if (mHandler != null) {
                 if (danmaku.isLive) {

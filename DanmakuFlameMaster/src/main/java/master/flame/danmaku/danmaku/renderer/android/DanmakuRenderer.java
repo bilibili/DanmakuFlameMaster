@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
+import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
@@ -43,6 +44,7 @@ public class DanmakuRenderer extends Renderer {
         }
     };
     private final DanmakusRetainer mDanmakusRetainer;
+    private ICacheManager mCacheManager;
 
     public DanmakuRenderer(DanmakuContext config) {
         mContext = config;
@@ -120,6 +122,7 @@ public class DanmakuRenderer extends Renderer {
                     mRenderingState.cacheHitCount++;
                 } else if(renderingType == IRenderer.TEXT_RENDERING) {
                     mRenderingState.cacheMissCount++;
+                    requestCreateCache(drawItem);
                 }
                 mRenderingState.addCount(drawItem.getType(), 1);
                 mRenderingState.addTotalCount(1);
@@ -136,5 +139,15 @@ public class DanmakuRenderer extends Renderer {
         mRenderingState.consumingTime = mStartTimer.update(System.currentTimeMillis());
         return mRenderingState;
     }
-    
+
+    public void setCacheManager(ICacheManager cacheManager) {
+        mCacheManager = cacheManager;
+    }
+
+    private void requestCreateCache(BaseDanmaku drawItem) {
+        if (mCacheManager != null) {
+            mCacheManager.addDanmaku(drawItem);
+        }
+    }
+
 }

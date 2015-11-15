@@ -44,7 +44,7 @@ public class DrawTask implements IDrawTask {
 
     TaskListener mTaskListener;
 
-    IRenderer mRenderer;
+    final IRenderer mRenderer;
 
     DanmakuTimer mTimer;
 
