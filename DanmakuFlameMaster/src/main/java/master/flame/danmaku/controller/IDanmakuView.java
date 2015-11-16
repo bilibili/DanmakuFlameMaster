@@ -1,7 +1,6 @@
 
 package master.flame.danmaku.controller;
 
-import android.support.annotation.WorkerThread;
 import android.view.View;
 
 import master.flame.danmaku.controller.DrawHandler.Callback;
@@ -36,11 +35,9 @@ public interface IDanmakuView {
     public void showFPS(boolean show);
     
     /**
-     * 在非UI线程中使用此方法,避免可能卡住主线程
-     * call this method on the worker-thread
+     * 如果批量添加弹幕,请在非UI线程中使用此方法
      * @param item
      */
-    @WorkerThread
     public void addDanmaku(BaseDanmaku item);
 
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure);

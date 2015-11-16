@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 apply plugin: 'com.android.library'
+
 def SourcePath = 'src/main/'
+
 android {
     compileSdkVersion 19
     buildToolsVersion '19.1.0'
@@ -44,7 +47,4 @@ if (rootProject.file('gradle/gradle-mvn-push.gradle').exists()) {
 }
 if (rootProject.file('gradle/gradle-bintray-upload.gradle').exists()) {
     apply from: rootProject.file('gradle/gradle-bintray-upload.gradle')
-}
-dependencies {
-    compile 'com.android.support:support-annotations:23.1.0'
 }
