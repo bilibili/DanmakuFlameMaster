@@ -128,6 +128,7 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure) {
+        item.obj = null;
         if (remeasure) {
             item.paintWidth = -1;
             item.paintHeight = -1;
