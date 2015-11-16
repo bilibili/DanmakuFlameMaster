@@ -488,9 +488,7 @@ public class DrawHandler extends Handler {
 
                         @Override
                         public void onDanmakuConfigChanged() {
-                            if (quitFlag && mDanmakusVisible) {
-                                obtainMessage(UPDATE_WHEN_PAUSED).sendToTarget();
-                            }
+                            redrawIfNeeded();
                         }
                     });
         } else {
@@ -541,6 +539,13 @@ public class DrawHandler extends Handler {
         }
     }
 
+    public void invalidateDanmaku(BaseDanmaku item, boolean remeasure) {
+        if (drawTask != null) {
+            drawTask.invalidateDanmaku(item, remeasure);
+        }
+        redrawIfNeeded();
+    }
+
     public void resume() {
         sendEmptyMessage(DrawHandler.RESUME);
     }
@@ -582,6 +587,12 @@ public class DrawHandler extends Handler {
         mRenderingState.set(drawTask.draw(mDisp));
         recordRenderingTime();
         return mRenderingState;
+    }
+
+    private void redrawIfNeeded() {
+        if (quitFlag && mDanmakusVisible) {
+            obtainMessage(UPDATE_WHEN_PAUSED).sendToTarget();
+        }
     }
 
     private void notifyRendering() {

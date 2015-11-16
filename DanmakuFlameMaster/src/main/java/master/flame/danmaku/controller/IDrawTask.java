@@ -50,6 +50,8 @@ public interface IDrawTask {
 
     public void setParser(BaseDanmakuParser parser);
 
+    void invalidateDanmaku(BaseDanmaku item, boolean remeasure);
+
     public interface TaskListener {
         public void ready();
 

@@ -39,6 +39,8 @@ public interface IDanmakuView {
      * @param item
      */
     public void addDanmaku(BaseDanmaku item);
+
+    public void invalidateDanmaku(BaseDanmaku item, boolean remeasure);
     
     public void removeAllDanmakus();
     
