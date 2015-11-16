@@ -57,7 +57,7 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
         SoftReference<StaticLayout> reference = (SoftReference<StaticLayout>) danmaku.obj;
         StaticLayout staticLayout = reference.get();
         if (staticLayout == null) {
-            staticLayout = new StaticLayout(danmaku.text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+            staticLayout = new StaticLayout(danmaku.text, paint, (int) danmaku.paintWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
             danmaku.obj = new SoftReference<>(staticLayout);
         }
         boolean needRestore = false;
