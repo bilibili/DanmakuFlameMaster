@@ -77,5 +77,12 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
         super.clearCaches();
         System.gc();
     }
-    
+
+    @Override
+    public void clearCache(BaseDanmaku danmaku) {
+        super.clearCache(danmaku);
+        if (danmaku.obj instanceof SoftReference<?>) {
+            ((SoftReference<?>) danmaku.obj).clear();
+        }
+    }
 }

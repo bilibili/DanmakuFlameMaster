@@ -52,4 +52,9 @@ public abstract class BaseCacheStuffer {
      * @param top
      */
     public abstract void drawBackground(BaseDanmaku danmaku, Canvas canvas, float left, float top);
+
+    public void clearCache(BaseDanmaku danmaku) {
+
+    }
+
 }

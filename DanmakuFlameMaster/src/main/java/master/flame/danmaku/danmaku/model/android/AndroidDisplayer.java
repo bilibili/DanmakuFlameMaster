@@ -185,6 +185,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         }
     }
 
+    @Override
+    public BaseCacheStuffer getCacheStuffer() {
+        return sStuffer;
+    }
+
     public Canvas canvas;
 
     private int width;

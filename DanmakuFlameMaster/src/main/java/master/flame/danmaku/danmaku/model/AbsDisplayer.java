@@ -26,4 +26,6 @@ public abstract class AbsDisplayer<T, F> implements IDisplayer {
     public abstract void setScaleTextSizeFactor(float factor);
 
     public abstract void setCacheStuffer(BaseCacheStuffer cacheStuffer);
+
+    public abstract BaseCacheStuffer getCacheStuffer();
 }
