@@ -17,6 +17,7 @@
 package master.flame.danmaku.controller;
 
 import android.graphics.Canvas;
+import android.os.SystemClock;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -165,7 +166,7 @@ public class DrawTask implements IDrawTask {
     protected synchronized void removeUnusedLiveDanmakusIn(int msec) {
         if (danmakuList == null || danmakuList.isEmpty())
             return;
-        long startTime = System.currentTimeMillis();
+        long startTime = SystemClock.uptimeMillis();
         IDanmakuIterator it = danmakuList.iterator();
         while (it.hasNext()) {
             BaseDanmaku danmaku = it.next();
@@ -174,7 +175,7 @@ public class DrawTask implements IDrawTask {
                 it.remove();
                 onDanmakuRemoved(danmaku);
             }
-            if (!isTimeout || System.currentTimeMillis() - startTime > msec) {
+            if (!isTimeout || SystemClock.uptimeMillis() - startTime > msec) {
                 break;
             }
         }

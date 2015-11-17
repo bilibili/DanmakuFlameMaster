@@ -21,6 +21,7 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -248,7 +249,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
     private static final int ONE_SECOND = 1000;
     private LinkedList<Long> mDrawTimes;
     private float fps() {
-        long lastTime = System.currentTimeMillis();
+        long lastTime = SystemClock.uptimeMillis();
         mDrawTimes.addLast(lastTime);
         float dtime = lastTime - mDrawTimes.getFirst();
         int frames = mDrawTimes.size();
@@ -263,7 +264,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
             return 0;
         if (!isShown())
             return -1;
-        long stime = System.currentTimeMillis();
+        long stime = SystemClock.uptimeMillis();
         long dtime = 0;
         Canvas canvas = mSurfaceHolder.lockCanvas();
         if (canvas != null){
@@ -272,7 +273,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
                 if (mShowFps) {
                     if (mDrawTimes == null)
                         mDrawTimes = new LinkedList<Long>();
-                    dtime = System.currentTimeMillis() - stime;
+                    dtime = SystemClock.uptimeMillis() - stime;
                     String fps = String.format(Locale.getDefault(),
                             "fps %.2f,time:%d s,cache:%d,miss:%d", fps(), getCurrentTime() / 1000,
                             rs.cacheHitCount, rs.cacheMissCount);
@@ -282,7 +283,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
             if (isSurfaceCreated)
                 mSurfaceHolder.unlockCanvasAndPost(canvas);
         }
-        dtime = System.currentTimeMillis() - stime;
+        dtime = SystemClock.uptimeMillis() - stime;
         return dtime;
     }
 

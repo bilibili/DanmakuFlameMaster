@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -230,7 +231,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
 
     private boolean mClearFlag;
     private float fps() {
-        long lastTime = System.currentTimeMillis();
+        long lastTime = SystemClock.uptimeMillis();
         mDrawTimes.addLast(lastTime);
         float dtime = lastTime - mDrawTimes.getFirst();
         int frames = mDrawTimes.size();
@@ -245,9 +246,9 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
             return 0;
         if (!isShown())
             return -1;
-        long stime = System.currentTimeMillis();
+        long stime = SystemClock.uptimeMillis();
         lockCanvas();
-        return System.currentTimeMillis() - stime;
+        return SystemClock.uptimeMillis() - stime;
     }
     
     @SuppressLint("NewApi")

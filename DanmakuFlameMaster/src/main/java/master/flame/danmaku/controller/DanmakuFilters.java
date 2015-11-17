@@ -1,6 +1,8 @@
 
 package master.flame.danmaku.controller;
 
+import android.os.SystemClock;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -178,7 +180,7 @@ public class DanmakuFilters {
                 return false;
             }
 
-            long elapsedTime = System.currentTimeMillis() - timer.currMillisecond;
+            long elapsedTime = SystemClock.uptimeMillis() - timer.currMillisecond;
             if (elapsedTime >= mMaxTime) {
                 return true;
             }
@@ -367,7 +369,7 @@ public class DanmakuFilters {
 
         private final void removeTimeoutDanmakus(final IDanmakus danmakus, long limitTime) {
             IDanmakuIterator it = danmakus.iterator();
-            long startTime = System.currentTimeMillis();
+            long startTime = SystemClock.uptimeMillis();
             while (it.hasNext()) {
                 try {
                     BaseDanmaku item = it.next();
@@ -379,7 +381,7 @@ public class DanmakuFilters {
                 } catch (Exception e) {
                     break;
                 }
-                if (System.currentTimeMillis() - startTime > limitTime) {
+                if (SystemClock.uptimeMillis() - startTime > limitTime) {
                     break;
                 }
             }
@@ -388,7 +390,7 @@ public class DanmakuFilters {
         private void removeTimeoutDanmakus(LinkedHashMap<String, BaseDanmaku> danmakus,
                 int limitTime) {
             Iterator<Entry<String, BaseDanmaku>> it = danmakus.entrySet().iterator();
-            long startTime = System.currentTimeMillis();
+            long startTime = SystemClock.uptimeMillis();
             while (it.hasNext()) {
                 try {
                     Entry<String, BaseDanmaku> entry = it.next();
@@ -401,7 +403,7 @@ public class DanmakuFilters {
                 } catch (Exception e) {
                     break;
                 }
-                if (System.currentTimeMillis() - startTime > limitTime) {
+                if (SystemClock.uptimeMillis() - startTime > limitTime) {
                     break;
                 }
             }

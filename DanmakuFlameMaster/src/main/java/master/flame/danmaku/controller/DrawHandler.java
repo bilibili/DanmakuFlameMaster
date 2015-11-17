@@ -201,7 +201,7 @@ public class DrawHandler extends Handler {
                 if (mReady) {
                     mRenderingState.reset();
                     mDrawTimes.clear();
-                    mTimeBase = System.currentTimeMillis() - pausedPosition;
+                    mTimeBase = SystemClock.uptimeMillis() - pausedPosition;
                     timer.update(pausedPosition);
                     removeMessages(RESUME);
                     sendEmptyMessage(UPDATE);
@@ -218,7 +218,7 @@ public class DrawHandler extends Handler {
                 Long position = (Long) msg.obj;
                 long deltaMs = position - timer.currMillisecond;
                 mTimeBase -= deltaMs;
-                timer.update(System.currentTimeMillis() - mTimeBase);
+                timer.update(SystemClock.uptimeMillis() - mTimeBase);
                 if (drawTask != null)
                     drawTask.seek(timer.currMillisecond);
                 pausedPosition = timer.currMillisecond;
@@ -335,7 +335,7 @@ public class DrawHandler extends Handler {
         if (quitFlag) {
             return;
         }
-        long startMS = System.currentTimeMillis();
+        long startMS = SystemClock.uptimeMillis();
         long d = syncTimer(startMS);
         if (d < 0) {
             removeMessages(UPDATE);
@@ -373,11 +373,11 @@ public class DrawHandler extends Handler {
         mThread = new UpdateThread("DFM Update") {
             @Override
             public void run() {
-                long lastTime = System.currentTimeMillis();
+                long lastTime = SystemClock.uptimeMillis();
                 long dTime = 0;
                 while (!isQuited() && !quitFlag) {
-                    long startMS = System.currentTimeMillis();
-                    dTime = System.currentTimeMillis() - lastTime;
+                    long startMS = SystemClock.uptimeMillis();
+                    dTime = SystemClock.uptimeMillis() - lastTime;
                     long diffTime = mFrameUpdateRate - dTime;
                     if (diffTime > 1) {
                         SystemClock.sleep(1);
@@ -449,7 +449,7 @@ public class DrawHandler extends Handler {
 
     private void syncTimerIfNeeded() {
         if (mInWaitingState) {
-            syncTimer(System.currentTimeMillis());
+            syncTimer(SystemClock.uptimeMillis());
         }
     }
 
@@ -618,7 +618,7 @@ public class DrawHandler extends Handler {
     }
 
     private void waitRendering(long dTime) {
-        mRenderingState.sysTime = System.currentTimeMillis();
+        mRenderingState.sysTime = SystemClock.uptimeMillis();
         mInWaitingState = true;
         if (mUpdateInNewThread) {
             try {
@@ -654,7 +654,7 @@ public class DrawHandler extends Handler {
     }
 
     private synchronized void recordRenderingTime() {
-        long lastTime = System.currentTimeMillis();
+        long lastTime = SystemClock.uptimeMillis();
         mDrawTimes.addLast(lastTime);
         int frames = mDrawTimes.size();
         if (frames > MAX_RECORD_SIZE) {
@@ -707,7 +707,7 @@ public class DrawHandler extends Handler {
         if (quitFlag || !mInWaitingState) {
             return timer.currMillisecond - mRemainingTime;
         }
-        return System.currentTimeMillis() - mTimeBase;
+        return SystemClock.uptimeMillis() - mTimeBase;
     }
 
     public void clearDanmakusOnScreen() {

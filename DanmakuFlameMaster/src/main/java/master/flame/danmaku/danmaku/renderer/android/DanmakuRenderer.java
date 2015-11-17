@@ -16,6 +16,8 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
+import android.os.SystemClock;
+
 import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
@@ -79,7 +81,7 @@ public class DanmakuRenderer extends Renderer {
         mRenderingState.reset();       
         IDanmakuIterator itr = danmakus.iterator();
         int orderInScreen = 0;        
-        mStartTimer.update(System.currentTimeMillis());
+        mStartTimer.update(SystemClock.uptimeMillis());
         int sizeInScreen = danmakus.size();
         BaseDanmaku drawItem = null;
         while (itr.hasNext()) {
@@ -136,7 +138,7 @@ public class DanmakuRenderer extends Renderer {
             mRenderingState.beginTime = RenderingState.UNKNOWN_TIME;
         }
         mRenderingState.incrementCount = mRenderingState.totalDanmakuCount - lastTotalDanmakuCount;
-        mRenderingState.consumingTime = mStartTimer.update(System.currentTimeMillis());
+        mRenderingState.consumingTime = mStartTimer.update(SystemClock.uptimeMillis());
         return mRenderingState;
     }
 

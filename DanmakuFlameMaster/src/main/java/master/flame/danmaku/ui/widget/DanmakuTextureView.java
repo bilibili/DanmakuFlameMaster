@@ -24,6 +24,7 @@ import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.TextureView;
@@ -257,7 +258,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     private static final int ONE_SECOND = 1000;
     private LinkedList<Long> mDrawTimes;
     private float fps() {
-        long lastTime = System.currentTimeMillis();
+        long lastTime = SystemClock.uptimeMillis();
         mDrawTimes.addLast(lastTime);
         float dtime = lastTime - mDrawTimes.getFirst();
         int frames = mDrawTimes.size();
@@ -271,7 +272,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     public synchronized long drawDanmakus() {
         if (!isSurfaceCreated)
             return 0;
-        long stime = System.currentTimeMillis();
+        long stime = SystemClock.uptimeMillis();
         if (!isShown())
             return -1;
         long dtime = 0;
@@ -282,7 +283,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
                 if (mShowFps) {
                     if (mDrawTimes == null)
                         mDrawTimes = new LinkedList<Long>();
-                    dtime = System.currentTimeMillis() - stime;
+                    dtime = SystemClock.uptimeMillis() - stime;
                     String fps = String.format(Locale.getDefault(),
                             "fps %.2f,time:%d s,cache:%d,miss:%d", fps(), getCurrentTime() / 1000,
                             rs.cacheHitCount, rs.cacheMissCount);
@@ -292,7 +293,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
             if (isSurfaceCreated)
                 unlockCanvasAndPost(canvas);
         }
-        dtime = System.currentTimeMillis() - stime;
+        dtime = SystemClock.uptimeMillis() - stime;
         return dtime;
     }
 
