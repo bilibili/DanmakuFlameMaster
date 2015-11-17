@@ -185,7 +185,7 @@ public class DrawTask implements IDrawTask {
     public IDanmakus getVisibleDanmakusOnTime(long time) {
         long beginMills = time - mContext.mDanmakuFactory.MAX_DANMAKU_DURATION - 100;
         long endMills = time + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION;
-        IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
+        IDanmakus subDanmakus = danmakuList.subnew(beginMills, endMills);
         IDanmakus visibleDanmakus = new Danmakus();
         if (null != subDanmakus && !subDanmakus.isEmpty()) {
             IDanmakuIterator iterator = subDanmakus.iterator();
