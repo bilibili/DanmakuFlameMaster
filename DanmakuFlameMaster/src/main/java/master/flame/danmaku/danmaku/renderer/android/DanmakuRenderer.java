@@ -87,10 +87,6 @@ public class DanmakuRenderer extends Renderer {
         while (itr.hasNext()) {
 
             drawItem = itr.next();
-            
-            if (drawItem.isLate()) {
-                break;
-            }
 
             if (!drawItem.hasPassedFilter()) {
                 mContext.mDanmakuFilters.filter(drawItem, orderInScreen, sizeInScreen, mStartTimer, false, mContext);
@@ -99,6 +95,14 @@ public class DanmakuRenderer extends Renderer {
             if (drawItem.time < startRenderTime
                     || (drawItem.priority == 0 && drawItem.isFiltered())) {
                 continue;
+            }
+
+            if (drawItem.isLate()) {
+                if (mCacheManager != null && !drawItem.hasDrawingCache()) {
+                    mCacheManager.addDanmaku(drawItem);
+                    continue;
+                }
+                break;
             }
             
             if (drawItem.getType() == BaseDanmaku.TYPE_SCROLL_RL){
