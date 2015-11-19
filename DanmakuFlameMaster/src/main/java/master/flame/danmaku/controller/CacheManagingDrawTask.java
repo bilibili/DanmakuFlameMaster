@@ -814,13 +814,10 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             private final void addDanmakuAndBuildCache(BaseDanmaku danmaku) {
-                if (danmaku.isTimeOut()) {
+                if (danmaku.isTimeOut() || danmaku.time > mCacheTimer.currMillisecond + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION) {
                     return;
                 }
                 if (danmaku.priority == 0 && danmaku.isFiltered()) {
-                    return;
-                }
-                if (!danmaku.isLive && danmaku.isLate() && danmaku.time > mCacheTimer.currMillisecond + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION) {
                     return;
                 }
                 if (!danmaku.hasDrawingCache()) {
