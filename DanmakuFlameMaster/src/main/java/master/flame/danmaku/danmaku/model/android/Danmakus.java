@@ -307,6 +307,7 @@ public class Danmakus implements IDanmakus {
             mIteratorUsed = true;
             if (it != null) {
                 it.remove();
+                mSize--;
             }
         }
 
