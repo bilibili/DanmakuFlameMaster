@@ -11,11 +11,24 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
  */
 public abstract class BaseCacheStuffer {
 
+    public static abstract class Callback {
+        /**
+         * 在弹幕显示前使用新的text,使用新的text
+         * @param danmaku
+         * @param fromWorkerThread 是否在工作(非UI)线程,在true的情况下可以做一些耗时操作(例如更新Span的drawblae或者其他IO操作)
+         * @return 如果不需重置，直接返回danmaku.text
+         */
+        public abstract void onPrepareDrawing(BaseDanmaku danmaku, boolean fromWorkerThread);
+    }
+
+    protected Callback mCallback;
+
     /**
      * set paintWidth, paintHeight to danmaku
      * @param danmaku
+     * @param fromWorkerThread
      */
-    public abstract void measure(BaseDanmaku danmaku, TextPaint paint);
+    public abstract void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread);
 
     /**
      * draw the danmaku-stroke on canvas with the given params
@@ -36,8 +49,9 @@ public abstract class BaseCacheStuffer {
      * @param left
      * @param top
      * @param paint
+     * @param fromWorkerThread
      */
-    public abstract void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, TextPaint paint);
+    public abstract void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, TextPaint paint, boolean fromWorkerThread);
 
     /**
      * clear caches which created by this stuffer
@@ -55,6 +69,10 @@ public abstract class BaseCacheStuffer {
 
     public void clearCache(BaseDanmaku danmaku) {
 
+    }
+
+    public void setAdapter(Callback adapter) {
+        mCallback = adapter;
     }
 
 }

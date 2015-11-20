@@ -18,9 +18,9 @@ package master.flame.danmaku.danmaku.renderer.android;
 
 import android.os.SystemClock;
 
-import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -112,7 +112,7 @@ public class DanmakuRenderer extends Renderer {
 
             // measure
             if (!drawItem.isMeasured()) {
-                drawItem.measure(disp);
+                drawItem.measure(disp, false);
             }
 
             // layout
@@ -128,7 +128,10 @@ public class DanmakuRenderer extends Renderer {
                     mRenderingState.cacheHitCount++;
                 } else if(renderingType == IRenderer.TEXT_RENDERING) {
                     mRenderingState.cacheMissCount++;
-                    requestCreateCache(drawItem);
+                    if (mCacheManager != null) {
+                        drawItem.borderColor = 0xffff0000;
+                        mCacheManager.addDanmaku(drawItem);
+                    }
                 }
                 mRenderingState.addCount(drawItem.getType(), 1);
                 mRenderingState.addTotalCount(1);
@@ -148,12 +151,6 @@ public class DanmakuRenderer extends Renderer {
 
     public void setCacheManager(ICacheManager cacheManager) {
         mCacheManager = cacheManager;
-    }
-
-    private void requestCreateCache(BaseDanmaku drawItem) {
-        if (mCacheManager != null) {
-            mCacheManager.addDanmaku(drawItem);
-        }
     }
 
 }

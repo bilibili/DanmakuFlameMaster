@@ -219,6 +219,7 @@ public class DrawHandler extends Handler {
                 long deltaMs = position - timer.currMillisecond;
                 mTimeBase -= deltaMs;
                 timer.update(SystemClock.uptimeMillis() - mTimeBase);
+                mContext.mGlobalFlagValues.updateMeasureFlag();
                 if (drawTask != null)
                     drawTask.seek(timer.currMillisecond);
                 pausedPosition = timer.currMillisecond;
@@ -540,7 +541,7 @@ public class DrawHandler extends Handler {
     }
 
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure) {
-        if (drawTask != null) {
+        if (drawTask != null && item != null) {
             drawTask.invalidateDanmaku(item, remeasure);
         }
         redrawIfNeeded();

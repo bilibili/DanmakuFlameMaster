@@ -285,7 +285,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
                 } else {
                     resetPaintAlpha(PAINT);
                 }
-                drawDanmaku(danmaku, canvas, left, top, true);
+                drawDanmaku(danmaku, canvas, left, top, false);
                 result = IRenderer.TEXT_RENDERING;
             }
 
@@ -324,7 +324,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
     @Override
     public void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
-                            boolean quickly) {
+                            boolean fromWorkerThread) {
         float _left = left;
         float _top = top;
         left += danmaku.padding;
@@ -337,8 +337,8 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         HAS_STROKE = CONFIG_HAS_STROKE;
         HAS_SHADOW = CONFIG_HAS_SHADOW;
         HAS_PROJECTION = CONFIG_HAS_PROJECTION;
-        ANTI_ALIAS = !quickly && CONFIG_ANTI_ALIAS;
-        TextPaint paint = getPaint(danmaku, quickly);
+        ANTI_ALIAS = fromWorkerThread && CONFIG_ANTI_ALIAS;
+        TextPaint paint = getPaint(danmaku, !fromWorkerThread);
         sStuffer.drawBackground(danmaku, canvas, _left, _top);
         if (danmaku.lines != null) {
             String[] lines = danmaku.lines;
@@ -354,7 +354,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
                     sStuffer.drawStroke(danmaku, lines[0], canvas, strokeLeft, strokeTop, paint);
                 }
                 applyPaintConfig(danmaku, paint, false);
-                sStuffer.drawText(danmaku, lines[0], canvas, left, top - paint.ascent(), paint);
+                sStuffer.drawText(danmaku, lines[0], canvas, left, top - paint.ascent(), paint, fromWorkerThread);
             } else {
                 float textHeight = (danmaku.paintHeight - 2 * danmaku.padding) / lines.length;
                 for (int t = 0; t < lines.length; t++) {
@@ -372,7 +372,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
                         sStuffer.drawStroke(danmaku, lines[t], canvas, strokeLeft, strokeTop, paint);
                     }
                     applyPaintConfig(danmaku, paint, false);
-                    sStuffer.drawText(danmaku, lines[t], canvas, left, t * textHeight + top - paint.ascent(), paint);
+                    sStuffer.drawText(danmaku, lines[t], canvas, left, t * textHeight + top - paint.ascent(), paint, fromWorkerThread);
                 }
             }
         } else {
@@ -389,7 +389,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
             }
 
             applyPaintConfig(danmaku, paint, false);
-            sStuffer.drawText(danmaku, null, canvas, left, top - paint.ascent(), paint);
+            sStuffer.drawText(danmaku, null, canvas, left, top - paint.ascent(), paint, fromWorkerThread);
         }
 
         // draw underline
@@ -490,19 +490,19 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
     }
 
     @Override
-    public void measure(BaseDanmaku danmaku) {
+    public void measure(BaseDanmaku danmaku, boolean fromWorkerThread) {
         TextPaint paint = getPaint(danmaku);
         if (HAS_STROKE) {
             applyPaintConfig(danmaku, paint, true);
         }
-        calcPaintWH(danmaku, paint);
+        calcPaintWH(danmaku, paint, fromWorkerThread);
         if (HAS_STROKE) {
             applyPaintConfig(danmaku, paint, false);
         }
     }
 
-    private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint) {
-        sStuffer.measure(danmaku, paint);
+    private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
+        sStuffer.measure(danmaku, paint, fromWorkerThread);
         setDanmakuPaintWidthAndHeight(danmaku, danmaku.paintWidth, danmaku.paintHeight);
     }
 

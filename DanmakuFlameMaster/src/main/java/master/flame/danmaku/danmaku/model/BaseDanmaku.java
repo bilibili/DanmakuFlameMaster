@@ -36,6 +36,9 @@ public abstract class BaseDanmaku {
 
     public final static int VISIBLE = 1;
 
+    public final static int FLAG_REQUEST_REMEASURE = 0x1;
+    public final static int FLAG_REQUEST_INVALIDATE = 0x2;
+
     /**
      * 显示时间(毫秒)
      */
@@ -177,6 +180,8 @@ public abstract class BaseDanmaku {
 
     public GlobalFlagValues flags = null;
 
+    public int requestFlags = 0;
+
     public long getDuration() {
         return duration.value;
     }
@@ -194,8 +199,8 @@ public abstract class BaseDanmaku {
                 && measureResetFlag == flags.MEASURE_RESET_FLAG;
     }
 
-    public void measure(IDisplayer displayer) {
-        displayer.measure(this);
+    public void measure(IDisplayer displayer, boolean fromWorkerThread) {
+        displayer.measure(this, fromWorkerThread);
         this.measureResetFlag = flags.MEASURE_RESET_FLAG;
     }
 

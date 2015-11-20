@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.Pair;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -80,10 +81,11 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure) {
-        super.invalidateDanmaku(item, remeasure);
-        if (mCacheManager == null)
+        if (mCacheManager == null) {
+            super.invalidateDanmaku(item, remeasure);
             return;
-        mCacheManager.invalidateDanmaku(item);
+        }
+        mCacheManager.invalidateDanmaku(item, remeasure);
     }
 
     @Override
@@ -214,9 +216,11 @@ public class CacheManagingDrawTask extends DrawTask {
             }
         }
 
-        public void invalidateDanmaku(BaseDanmaku danmaku) {
-            if (mHandler != null && danmaku.hasDrawingCache()) {
-                mHandler.obtainMessage(CacheHandler.REBUILD_CACHE, danmaku).sendToTarget();
+        public void invalidateDanmaku(BaseDanmaku danmaku, boolean remeasure) {
+            if (mHandler != null) {
+                mHandler.requestCancelCaching();
+                Pair<BaseDanmaku, Boolean> pair = new Pair<>(danmaku, remeasure);
+                mHandler.obtainMessage(CacheHandler.REBUILD_CACHE, pair).sendToTarget();
             }
         }
 
@@ -505,13 +509,20 @@ public class CacheManagingDrawTask extends DrawTask {
                         addDanmakuAndBuildCache(item);
                         break;
                     case REBUILD_CACHE:
-                        BaseDanmaku cacheitem = (BaseDanmaku) msg.obj;
-                        if (cacheitem.isLive) {
-                            clearCache(cacheitem);
-                            createCache(cacheitem);
-                        } else {
-                            entryRemoved(true, cacheitem, null);
-                            addDanmakuAndBuildCache(cacheitem);
+                        Pair<BaseDanmaku, Boolean> pair = (Pair<BaseDanmaku, Boolean>) msg.obj;
+                        if (pair != null) {
+                            BaseDanmaku cacheitem = pair.first;
+                            if (pair.second) {
+                                cacheitem.requestFlags |= BaseDanmaku.FLAG_REQUEST_REMEASURE;
+                            }
+                            cacheitem.requestFlags |= BaseDanmaku.FLAG_REQUEST_INVALIDATE;
+                            if (cacheitem.isLive) {
+                                clearCache(cacheitem);
+                                createCache(cacheitem);
+                            } else {
+                                entryRemoved(true, cacheitem, null);
+                                addDanmakuAndBuildCache(cacheitem);
+                            }
                         }
                         break;
                     case CLEAR_TIMEOUT_CACHES:
@@ -721,7 +732,7 @@ public class CacheManagingDrawTask extends DrawTask {
             public boolean createCache(BaseDanmaku item) {
                 // measure
                 if (!item.isMeasured()) {
-                    item.measure(mDisp);
+                    item.measure(mDisp, true);
                 }
                 DrawingCache cache = null;
                 try {
@@ -750,7 +761,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
                 // measure
                 if (!item.isMeasured()) {
-                    item.measure(mDisp);
+                    item.measure(mDisp, true);
                 }
 
                 DrawingCache cache = null;

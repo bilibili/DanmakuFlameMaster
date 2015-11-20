@@ -13,6 +13,7 @@ import android.text.TextPaint;
 import java.lang.ref.SoftReference;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 /**
  * Created by ch on 15-7-16.
@@ -20,16 +21,12 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
 
     @Override
-    public void measure(BaseDanmaku danmaku, TextPaint paint) {
+    public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
         if (danmaku.text instanceof Spanned) {
-            CharSequence text = null;
-            if (danmaku.text instanceof SpannableStringBuilder) {
-                text = new SpannableStringBuilder(danmaku.text);
-            } else if (danmaku.text instanceof Spannable) {
-                text = Spannable.Factory.getInstance().newSpannable(danmaku.text);
-            } else if (danmaku.text instanceof SpannedString) {
-                text = new SpannedString(danmaku.text);
+            if (mCallback != null) {
+                mCallback.onPrepareDrawing(danmaku, fromWorkerThread);
             }
+            CharSequence text = createNewSpan(danmaku, danmaku.text);
             if (text != null) {
                 StaticLayout staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
                 danmaku.paintWidth = staticLayout.getWidth();
@@ -38,7 +35,7 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
                 return;
             }
         }
-        super.measure(danmaku, paint);
+        super.measure(danmaku, paint, fromWorkerThread);
     }
 
     @Override
@@ -49,28 +46,36 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
     }
 
     @Override
-    public void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, TextPaint paint) {
+    public void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, TextPaint paint, boolean fromWorkerThread) {
         if (danmaku.obj == null) {
-            super.drawText(danmaku, lineText, canvas, left, top, paint);
+            super.drawText(danmaku, lineText, canvas, left, top, paint, fromWorkerThread);
             return;
         }
         SoftReference<StaticLayout> reference = (SoftReference<StaticLayout>) danmaku.obj;
         StaticLayout staticLayout = reference.get();
-        if (staticLayout == null) {
-            CharSequence text = null;
-            if (danmaku.text instanceof SpannableStringBuilder) {
-                text = new SpannableStringBuilder(danmaku.text);
-            } else if (danmaku.text instanceof Spannable) {
-                text = Spannable.Factory.getInstance().newSpannable(danmaku.text);
-            } else if (danmaku.text instanceof SpannedString) {
-                text = new SpannedString(danmaku.text);
+        boolean requestRemeasure = 0 != (danmaku.requestFlags & BaseDanmaku.FLAG_REQUEST_REMEASURE);
+        boolean requestInvalidate = 0 != (danmaku.requestFlags & BaseDanmaku.FLAG_REQUEST_INVALIDATE);
+
+        if (requestInvalidate || staticLayout == null) {
+            if (requestInvalidate) {
+                danmaku.requestFlags &= ~BaseDanmaku.FLAG_REQUEST_INVALIDATE;
+            } else if (mCallback != null) {
+                mCallback.onPrepareDrawing(danmaku, fromWorkerThread);
             }
-            if (text == null) {
-                super.drawText(danmaku, lineText, canvas, left, top, paint);
+            CharSequence text = createNewSpan(danmaku, danmaku.text);
+            if (text != null) {
+                if (requestRemeasure) {
+                    staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+                    danmaku.paintWidth = staticLayout.getWidth();
+                    danmaku.paintHeight = staticLayout.getHeight();
+                    danmaku.requestFlags &= ~BaseDanmaku.FLAG_REQUEST_REMEASURE;
+                } else {
+                    staticLayout = new StaticLayout(text, paint, (int) danmaku.paintWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+                }
+                danmaku.obj = new SoftReference<>(staticLayout);
+            } else {
                 return;
             }
-            staticLayout = new StaticLayout(text, paint, (int) danmaku.paintWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
-            danmaku.obj = new SoftReference<>(staticLayout);
         }
         boolean needRestore = false;
         if (left != 0 && top != 0) {
@@ -96,5 +101,22 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
         if (danmaku.obj instanceof SoftReference<?>) {
             ((SoftReference<?>) danmaku.obj).clear();
         }
+    }
+
+    private CharSequence createNewSpan(BaseDanmaku danmaku, CharSequence text) {
+        if (text instanceof SpannableStringBuilder) {
+            text = new SpannableStringBuilder(text);
+        } else if (text instanceof Spannable) {
+            text = Spannable.Factory.getInstance().newSpannable(text);
+        } else if (text instanceof SpannedString) {
+            text = new SpannedString(text);
+        } else {
+            if (text != danmaku.text) {
+                DanmakuUtils.fillText(danmaku, text);
+            }
+            danmaku.obj = null;
+            return null;
+        }
+        return text;
     }
 }

@@ -93,7 +93,7 @@ public class DanmakuUtils {
         cache.build((int) Math.ceil(danmaku.paintWidth), (int) Math.ceil(danmaku.paintHeight), disp.getDensityDpi(), false);
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
-            ((AbsDisplayer) disp).drawDanmaku(danmaku, holder.canvas, 0, 0, false);
+            ((AbsDisplayer) disp).drawDanmaku(danmaku, holder.canvas, 0, 0, true);
             if(disp.isHardwareAccelerated()) {
                 holder.splitWith(disp.getWidth(), disp.getHeight(), disp.getMaximumCacheWidth(),
                         disp.getMaximumCacheHeight());
@@ -189,9 +189,9 @@ public class DanmakuUtils {
         return disp.isHardwareAccelerated() && (item.paintWidth > disp.getMaximumCacheWidth() || item.paintHeight > disp.getMaximumCacheHeight());
     }
 
-    public static void fillText(BaseDanmaku danmaku, String text) {
+    public static void fillText(BaseDanmaku danmaku, CharSequence text) {
         danmaku.text = text;
-        if (TextUtils.isEmpty(text) || !text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
+        if (TextUtils.isEmpty(text) || !text.toString().contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
             return;
         }
 
