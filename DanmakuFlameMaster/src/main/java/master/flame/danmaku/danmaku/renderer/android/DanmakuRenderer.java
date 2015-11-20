@@ -129,7 +129,6 @@ public class DanmakuRenderer extends Renderer {
                 } else if(renderingType == IRenderer.TEXT_RENDERING) {
                     mRenderingState.cacheMissCount++;
                     if (mCacheManager != null) {
-                        drawItem.borderColor = 0xffff0000;
                         mCacheManager.addDanmaku(drawItem);
                     }
                 }
