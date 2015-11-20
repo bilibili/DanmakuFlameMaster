@@ -583,10 +583,10 @@ public class DanmakuContext {
      * @param cacheStuffer
      * @param cacheStufferAdapter
      */
-    public DanmakuContext setCacheStuffer(BaseCacheStuffer cacheStuffer, BaseCacheStuffer.Callback cacheStufferAdapter) {
+    public DanmakuContext setCacheStuffer(BaseCacheStuffer cacheStuffer, BaseCacheStuffer.Proxy cacheStufferAdapter) {
         this.mCacheStuffer = cacheStuffer;
         if (this.mCacheStuffer != null) {
-            this.mCacheStuffer.setAdapter(cacheStufferAdapter);
+            this.mCacheStuffer.setProxy(cacheStufferAdapter);
             mDisplayer.setCacheStuffer(this.mCacheStuffer);
         }
         return this;

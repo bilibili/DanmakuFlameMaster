@@ -319,6 +319,9 @@ public class CacheManagingDrawTask extends DrawTask {
             if (oldValue.cache != null) {
                 IDrawingCache<?> cache = oldValue.cache;
                 long releasedSize = clearCache(oldValue);
+                if (oldValue.isTimeOut()) {
+                    mContext.getDisplayer().getCacheStuffer().releaseResource(oldValue);
+                }
                 if (releasedSize <= 0) return;
                 mRealSize -= releasedSize;
                 mCachePool.release((DrawingCache) cache);

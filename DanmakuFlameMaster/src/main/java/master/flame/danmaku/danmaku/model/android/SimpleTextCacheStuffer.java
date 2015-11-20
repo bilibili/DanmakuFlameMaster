@@ -29,8 +29,8 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
 
     @Override
     public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
-        if (mCallback != null) {
-            mCallback.onPrepareDrawing(danmaku, fromWorkerThread);
+        if (mProxy != null) {
+            mProxy.prepareDrawing(danmaku, fromWorkerThread);
         }
         float w = 0;
         Float textHeight = 0f;

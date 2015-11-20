@@ -23,10 +23,10 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
     @Override
     public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
         if (danmaku.text instanceof Spanned) {
-            if (mCallback != null) {
-                mCallback.onPrepareDrawing(danmaku, fromWorkerThread);
+            if (mProxy != null) {
+                mProxy.prepareDrawing(danmaku, fromWorkerThread);
             }
-            CharSequence text = createNewSpan(danmaku, danmaku.text);
+            CharSequence text = danmaku.text;
             if (text != null) {
                 StaticLayout staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
                 danmaku.paintWidth = staticLayout.getWidth();
@@ -59,10 +59,10 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
         if (requestInvalidate || staticLayout == null) {
             if (requestInvalidate) {
                 danmaku.requestFlags &= ~BaseDanmaku.FLAG_REQUEST_INVALIDATE;
-            } else if (mCallback != null) {
-                mCallback.onPrepareDrawing(danmaku, fromWorkerThread);
+            } else if (mProxy != null) {
+                mProxy.prepareDrawing(danmaku, fromWorkerThread);
             }
-            CharSequence text = createNewSpan(danmaku, danmaku.text);
+            CharSequence text = danmaku.text;
             if (text != null) {
                 if (requestRemeasure) {
                     staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
@@ -103,20 +103,9 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
         }
     }
 
-    private CharSequence createNewSpan(BaseDanmaku danmaku, CharSequence text) {
-        if (text instanceof SpannableStringBuilder) {
-            text = new SpannableStringBuilder(text);
-        } else if (text instanceof Spannable) {
-            text = Spannable.Factory.getInstance().newSpannable(text);
-        } else if (text instanceof SpannedString) {
-            text = new SpannedString(text);
-        } else {
-            if (text != danmaku.text) {
-                DanmakuUtils.fillText(danmaku, text);
-            }
-            danmaku.obj = null;
-            return null;
-        }
-        return text;
+    @Override
+    public void releaseResource(BaseDanmaku danmaku) {
+        clearCache(danmaku);
+        super.releaseResource(danmaku);
     }
 }

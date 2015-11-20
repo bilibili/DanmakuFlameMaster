@@ -77,12 +77,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private Button mBtnSendDanmakus;
     private DanmakuContext mContext;
-    private BaseCacheStuffer.Callback mCacheStufferAdapter = new BaseCacheStuffer.Callback() {
+    private BaseCacheStuffer.Proxy mCacheStufferAdapter = new BaseCacheStuffer.Proxy() {
 
         private Drawable mDrawable;
 
         @Override
-        public void onPrepareDrawing(final BaseDanmaku danmaku, boolean fromWorkerThread) {
+        public void prepareDrawing(final BaseDanmaku danmaku, boolean fromWorkerThread) {
             if (danmaku.text instanceof Spanned) { // 根据你的条件检查是否需要需要更新弹幕
                 // FIXME 这里只是简单启个线程来加载远程url图片，请使用你自己的异步线程池，最好加上你的缓存池
                 new Thread() {
@@ -118,6 +118,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 }.start();
             }
+        }
+
+        @Override
+        public void releaseResource(BaseDanmaku danmaku) {
+            // TODO 重要:清理含有ImageSpan的text中的一些占用内存的资源 例如drawable
         }
     };
 

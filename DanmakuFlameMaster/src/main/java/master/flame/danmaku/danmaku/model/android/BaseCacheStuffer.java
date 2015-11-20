@@ -11,17 +11,19 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
  */
 public abstract class BaseCacheStuffer {
 
-    public static abstract class Callback {
+    public static abstract class Proxy {
         /**
          * 在弹幕显示前使用新的text,使用新的text
          * @param danmaku
          * @param fromWorkerThread 是否在工作(非UI)线程,在true的情况下可以做一些耗时操作(例如更新Span的drawblae或者其他IO操作)
          * @return 如果不需重置，直接返回danmaku.text
          */
-        public abstract void onPrepareDrawing(BaseDanmaku danmaku, boolean fromWorkerThread);
+        public abstract void prepareDrawing(BaseDanmaku danmaku, boolean fromWorkerThread);
+
+        public abstract void releaseResource(BaseDanmaku danmaku);
     }
 
-    protected Callback mCallback;
+    protected Proxy mProxy;
 
     /**
      * set paintWidth, paintHeight to danmaku
@@ -71,8 +73,14 @@ public abstract class BaseCacheStuffer {
 
     }
 
-    public void setAdapter(Callback adapter) {
-        mCallback = adapter;
+    public void setProxy(Proxy adapter) {
+        mProxy = adapter;
+    }
+
+    public void releaseResource(BaseDanmaku danmaku) {
+        if (mProxy != null) {
+            mProxy.releaseResource(danmaku);
+        }
     }
 
 }
