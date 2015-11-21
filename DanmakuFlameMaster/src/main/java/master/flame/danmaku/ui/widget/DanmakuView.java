@@ -152,6 +152,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     }
 
     private void stopDraw() {
+        unlockCanvasAndPost();
         if (handler != null) {
             handler.quit();
             handler = null;
