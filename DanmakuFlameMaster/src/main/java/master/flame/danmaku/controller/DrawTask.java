@@ -83,6 +83,15 @@ public class DrawTask implements IDrawTask {
         mDisp = context.getDisplayer();
         mTaskListener = taskListener;
         mRenderer = new DanmakuRenderer(context);
+        mRenderer.setOnDanmakuShownListener(new IRenderer.OnDanmakuShownListener() {
+
+            @Override
+            public void onDanmakuShown(BaseDanmaku danmaku) {
+                if (mTaskListener != null) {
+                    mTaskListener.onDanmakuShown(danmaku);
+                }
+            }
+        });
         mRenderer.setVerifierEnabled(mContext.isPreventOverlappingEnabled() || mContext.isMaxLinesLimited());
         initTimer(timer);
         Boolean enable = mContext.isDuplicateMergingEnabled();
@@ -372,5 +381,4 @@ public class DrawTask implements IDrawTask {
     public void requestHide() {
         mIsHidden = true;
     }
-
 }
