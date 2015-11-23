@@ -319,16 +319,17 @@ public class DrawHandler extends Handler {
 
     private void quitUpdateThread() {
         if (mThread != null) {
+            final UpdateThread thread = mThread;
+            mThread = null;
             synchronized (drawTask) {
                 drawTask.notifyAll();
             }
-            mThread.quit();
+            thread.quit();
             try {
-                mThread.join();
+                thread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            mThread = null;
         }
     }
 
@@ -622,6 +623,9 @@ public class DrawHandler extends Handler {
         mRenderingState.sysTime = SystemClock.uptimeMillis();
         mInWaitingState = true;
         if (mUpdateInNewThread) {
+            if (mThread == null) {
+                return;
+            }
             try {
                 synchronized (drawTask) {
                     if (dTime == INDEFINITE_TIME) {
