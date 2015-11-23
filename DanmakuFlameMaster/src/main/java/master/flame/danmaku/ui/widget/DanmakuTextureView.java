@@ -186,13 +186,14 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
             handler = null;
         }
         if (mHandlerThread != null) {
+            HandlerThread handlerThread = this.mHandlerThread;
+            mHandlerThread = null;
             try {
-                mHandlerThread.join();
+                handlerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            mHandlerThread.quit();
-            mHandlerThread = null;
+            handlerThread.quit();
         }
     }
     
