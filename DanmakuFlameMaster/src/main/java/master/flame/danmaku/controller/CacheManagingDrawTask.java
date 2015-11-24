@@ -419,7 +419,6 @@ public class CacheManagingDrawTask extends DrawTask {
                         && danmaku.borderColor == refDanmaku.borderColor
                         && danmaku.textColor == refDanmaku.textColor
                         && danmaku.text.equals(refDanmaku.text)) {
-                    danmaku.firstShownFlag = -1;
                     return danmaku;
                 }
                 if (strictMode) {
@@ -435,7 +434,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 float heightGap = danmaku.cache.height() - refDanmaku.paintHeight;
                 if (widthGap >= 0 && widthGap <= slopPixel &&
                         heightGap >= 0 && heightGap <= slopPixel) {
-                    danmaku.firstShownFlag = -1;
                     return danmaku;
                 }
             }

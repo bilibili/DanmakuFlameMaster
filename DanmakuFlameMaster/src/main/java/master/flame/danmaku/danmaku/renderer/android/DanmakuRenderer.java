@@ -138,8 +138,8 @@ public class DanmakuRenderer extends Renderer {
                 mRenderingState.addTotalCount(1);
 
                 if (mOnDanmakuShownListener != null
-                        && drawItem.firstShownFlag != GlobalFlagValues.FIRST_SHOWN_RESET_FLAG) {
-                    drawItem.firstShownFlag = GlobalFlagValues.FIRST_SHOWN_RESET_FLAG;
+                        && drawItem.firstShownFlag != mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG) {
+                    drawItem.firstShownFlag = mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG;
                     mOnDanmakuShownListener.onDanmakuShown(drawItem);
                 }
             }

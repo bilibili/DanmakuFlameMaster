@@ -227,6 +227,7 @@ public class DrawTask implements IDrawTask {
         reset();
 //        requestClear();
         mContext.mGlobalFlagValues.updateVisibleFlag();
+        mContext.mGlobalFlagValues.updateFirstShownFlag();
         mStartRenderTime = mills < 1000 ? 0 : mills;
     }
 
@@ -234,6 +235,7 @@ public class DrawTask implements IDrawTask {
     public void clearDanmakusOnScreen(long currMillis) {
         reset();
         mContext.mGlobalFlagValues.updateVisibleFlag();
+        mContext.mGlobalFlagValues.updateFirstShownFlag();
         mStartRenderTime = currMillis;
     }
 
