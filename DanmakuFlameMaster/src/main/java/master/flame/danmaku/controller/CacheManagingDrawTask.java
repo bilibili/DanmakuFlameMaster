@@ -519,6 +519,10 @@ public class CacheManagingDrawTask extends DrawTask {
                                 cacheitem.requestFlags |= BaseDanmaku.FLAG_REQUEST_REMEASURE;
                             }
                             cacheitem.requestFlags |= BaseDanmaku.FLAG_REQUEST_INVALIDATE;
+                            if (!pair.second && cacheitem.hasDrawingCache()) {
+                                DanmakuUtils.buildDanmakuDrawingCache(cacheitem, mDisp, (DrawingCache) cacheitem.cache);
+                                return;
+                            }
                             if (cacheitem.isLive) {
                                 clearCache(cacheitem);
                                 createCache(cacheitem);
