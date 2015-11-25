@@ -182,6 +182,11 @@ public abstract class BaseDanmaku {
 
     public int requestFlags = 0;
 
+    /**
+     * 标记是否首次显示，首次显示后将置为FIRST_SHOWN_RESET_FLAG
+     */
+    public int firstShownFlag = -1;
+
     public long getDuration() {
         return duration.value;
     }

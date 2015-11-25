@@ -46,6 +46,8 @@ public class DrawHandler extends Handler {
 
         public void updateTimer(DanmakuTimer timer);
 
+        public void danmakuShown(BaseDanmaku danmaku);
+
         public void drawingFinished();
 
     }
@@ -479,6 +481,13 @@ public class DrawHandler extends Handler {
                         @Override
                         public void onDanmakuAdd(BaseDanmaku danmaku) {
                             obtainMessage(NOTIFY_RENDERING).sendToTarget();
+                        }
+
+                        @Override
+                        public void onDanmakuShown(BaseDanmaku danmaku) {
+                            if (mCallback != null) {
+                                mCallback.danmakuShown(danmaku);
+                            }
                         }
 
                         @Override
