@@ -480,7 +480,15 @@ public class DrawHandler extends Handler {
 
                         @Override
                         public void onDanmakuAdd(BaseDanmaku danmaku) {
-                            obtainMessage(NOTIFY_RENDERING).sendToTarget();
+                            if (danmaku.isTimeOut()) {
+                                return;
+                            }
+                            long delay = danmaku.time - timer.currMillisecond;
+                            if (delay > 0) {
+                                sendEmptyMessageDelayed(NOTIFY_RENDERING, delay);
+                            } else if (mInWaitingState) {
+                                notifyRendering();
+                            }
                         }
 
                         @Override
