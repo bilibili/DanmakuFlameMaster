@@ -20,6 +20,7 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 
 public interface IDrawTask {
@@ -56,6 +57,8 @@ public interface IDrawTask {
         public void ready();
 
         public void onDanmakuAdd(BaseDanmaku danmaku);
+
+        public void onDanmakuShown(BaseDanmaku danmaku);
 
         public void onDanmakuConfigChanged();
 

@@ -28,6 +28,10 @@ public interface IRenderer {
     int CACHE_RENDERING = 1;
     int TEXT_RENDERING = 2;
 
+    interface OnDanmakuShownListener {
+        void onDanmakuShown(BaseDanmaku danmaku);
+    }
+
     class Area {
 
         public final float[] mRefreshRect = new float[4];
@@ -137,5 +141,9 @@ public interface IRenderer {
     void setVerifierEnabled(boolean enabled);
 
     void setCacheManager(ICacheManager cacheManager);
+
+    void setOnDanmakuShownListener(OnDanmakuShownListener onDanmakuShownListener);
+
+    void removeOnDanmakuShownListener();
 
 }

@@ -20,6 +20,7 @@ import android.os.SystemClock;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
@@ -47,6 +48,7 @@ public class DanmakuRenderer extends Renderer {
     };
     private final DanmakusRetainer mDanmakusRetainer;
     private ICacheManager mCacheManager;
+    private OnDanmakuShownListener mOnDanmakuShownListener;
 
     public DanmakuRenderer(DanmakuContext config) {
         mContext = config;
@@ -134,6 +136,12 @@ public class DanmakuRenderer extends Renderer {
                 }
                 mRenderingState.addCount(drawItem.getType(), 1);
                 mRenderingState.addTotalCount(1);
+
+                if (mOnDanmakuShownListener != null
+                        && drawItem.firstShownFlag != mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG) {
+                    drawItem.firstShownFlag = mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG;
+                    mOnDanmakuShownListener.onDanmakuShown(drawItem);
+                }
             }
 
         }
@@ -152,4 +160,13 @@ public class DanmakuRenderer extends Renderer {
         mCacheManager = cacheManager;
     }
 
+    @Override
+    public void setOnDanmakuShownListener(OnDanmakuShownListener onDanmakuShownListener) {
+        mOnDanmakuShownListener = onDanmakuShownListener;
+    }
+
+    @Override
+    public void removeOnDanmakuShownListener() {
+        mOnDanmakuShownListener = null;
+    }
 }
