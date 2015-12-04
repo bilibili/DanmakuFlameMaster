@@ -15,7 +15,6 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 
 public class DanmakuContext {
 
@@ -112,7 +111,7 @@ public class DanmakuContext {
 
     public final DanmakuFilters mDanmakuFilters = new DanmakuFilters();
 
-    public final DanmakuFactory mDanmakuFactory = new DanmakuFactory();
+    public final DanmakuFactory mDanmakuFactory = DanmakuFactory.create();
 
     public AbsDisplayer getDisplayer() {
         return mDisplayer;

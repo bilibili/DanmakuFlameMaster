@@ -37,7 +37,7 @@ import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
@@ -232,7 +232,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                                     points[i][0] = Float.parseFloat(pointArray[0]);
                                     points[i][1] = Float.parseFloat(pointArray[1]);
                                 }
-                                DanmakuFactory.fillLinePathData(item, points, mDispScaleX,
+                                mContext.mDanmakuFactory.fillLinePathData(item, points, mDispScaleX,
                                         mDispScaleY);
                             }
                         }

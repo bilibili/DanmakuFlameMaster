@@ -36,7 +36,6 @@ import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCachePoolManager;
 import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Pools;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 import tv.cjump.jni.NativeBitmapFactory;
@@ -721,7 +720,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
                     if (!repositioned) {
                         consumingTime = SystemClock.uptimeMillis() - startTime;
-                        if (consumingTime >= DanmakuFactory.COMMON_DANMAKU_DURATION * mScreenSize) {
+                        if (consumingTime >= mContext.mDanmakuFactory.COMMON_DANMAKU_DURATION * mScreenSize) {
 //                            message = "break at consumingTime out:" + consumingTime;
                             break;
                         }
