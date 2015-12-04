@@ -112,25 +112,28 @@ public class DrawTask implements IDrawTask {
     public synchronized void addDanmaku(BaseDanmaku item) {
         if (danmakuList == null)
             return;
-        boolean added = false;
         if (item.isLive) {
             removeUnusedLiveDanmakusIn(10);
         }
         item.index = danmakuList.size();
+        boolean subAdded = true;
         if (mLastBeginMills <= item.time && item.time <= mLastEndMills) {
             synchronized (danmakus) {
-                added = danmakus.addItem(item);
+                subAdded = danmakus.addItem(item);
             }
         } else if (item.isLive) {
-            mLastBeginMills = mLastEndMills = 0;
+            subAdded = false;
         }
+        boolean added = false;
         synchronized (danmakuList) {
             added = danmakuList.addItem(item);
+        }
+        if (!subAdded) {
+            mLastBeginMills = mLastEndMills = 0;
         }
         if (added && mTaskListener != null) {
             mTaskListener.onDanmakuAdd(item);
         }
-
         if (mLastDanmaku == null || (item != null && mLastDanmaku != null && item.time > mLastDanmaku.time)) {
             mLastDanmaku = item;
         }
