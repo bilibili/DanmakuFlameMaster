@@ -539,9 +539,17 @@ public class CacheManagingDrawTask extends DrawTask {
                     case SEEK:
                         Long seekMills = (Long) msg.obj;
                         if (seekMills != null) {
-                            mCacheTimer.update(seekMills.longValue());
+                            long seekCacheTime = seekMills.longValue();
+                            long oldCacheTime = mCacheTimer.currMillisecond;
+                            mCacheTimer.update(seekCacheTime);
                             mSeekedFlag = true;
-                            evictAllNotInScreen();
+                            long firstCacheTime = getFirstCacheTime();
+                            if (seekCacheTime > oldCacheTime || firstCacheTime - seekCacheTime > mContext.mDanmakuFactory.MAX_DANMAKU_DURATION) {
+                                evictAllNotInScreen();
+                            } else {
+                                clearTimeOutCaches();
+                            }
+                            prepareCaches(true);
                             resume();
                         }
                         break;
@@ -592,7 +600,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
                 // check cache time
                 long deltaTime = mCacheTimer.currMillisecond - mTimer.currMillisecond;
-                if (deltaTime < 0) {
+                if (firstCache != null && firstCache.isTimeOut() && deltaTime < -mContext.mDanmakuFactory.MAX_DANMAKU_DURATION) {
                     mCacheTimer.update(mTimer.currMillisecond);
                     sendEmptyMessage(CLEAR_OUTSIDE_CACHES);
                     sendEmptyMessage(BUILD_CACHES);
