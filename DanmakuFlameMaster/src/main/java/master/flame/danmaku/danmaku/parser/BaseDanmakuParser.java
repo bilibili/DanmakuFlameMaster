@@ -98,6 +98,9 @@ public abstract class BaseDanmakuParser {
     }
 
     public BaseDanmakuParser setConfig(DanmakuContext config) {
+        if (mContext != null && mContext != config) {
+            mDanmakus = null; // call re-parse() under different context
+        }
         mContext = config;
         return this;
     }

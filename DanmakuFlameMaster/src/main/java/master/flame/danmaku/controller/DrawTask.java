@@ -257,6 +257,7 @@ public class DrawTask implements IDrawTask {
     public void prepare() {
         assert (mParser != null);
         loadDanmakus(mParser);
+        mLastBeginMills = mLastEndMills = 0;
         if (mTaskListener != null) {
             mTaskListener.ready();
             mReadyState = true;
