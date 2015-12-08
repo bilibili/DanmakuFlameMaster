@@ -88,6 +88,14 @@ public class CacheManagingDrawTask extends DrawTask {
     }
 
     @Override
+    public void removeAllDanmakus() {
+        super.removeAllDanmakus();
+        if (mCacheManager != null) {
+            mCacheManager.requestClearAll();
+        }
+    }
+
+    @Override
     protected void onDanmakuRemoved(BaseDanmaku danmaku) {
         super.onDanmakuRemoved(danmaku);
         if (danmaku.hasDrawingCache()) {
