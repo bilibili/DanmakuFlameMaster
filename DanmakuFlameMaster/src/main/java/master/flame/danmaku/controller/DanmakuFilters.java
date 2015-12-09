@@ -1,7 +1,7 @@
 
 package master.flame.danmaku.controller;
 
-import android.os.SystemClock;
+import master.flame.danmaku.danmaku.util.SystemClock;
 
 import java.util.ArrayList;
 import java.util.Collections;

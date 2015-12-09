@@ -21,7 +21,7 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.os.SystemClock;
+import master.flame.danmaku.danmaku.util.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;

@@ -21,7 +21,7 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
+import master.flame.danmaku.danmaku.util.SystemClock;
 import android.util.DisplayMetrics;
 
 import java.util.LinkedList;

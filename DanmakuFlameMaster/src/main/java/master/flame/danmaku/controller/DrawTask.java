@@ -17,7 +17,7 @@
 package master.flame.danmaku.controller;
 
 import android.graphics.Canvas;
-import android.os.SystemClock;
+import master.flame.danmaku.danmaku.util.SystemClock;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;

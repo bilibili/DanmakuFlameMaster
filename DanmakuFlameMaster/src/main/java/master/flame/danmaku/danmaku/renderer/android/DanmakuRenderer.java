@@ -16,7 +16,7 @@
 
 package master.flame.danmaku.danmaku.renderer.android;
 
-import android.os.SystemClock;
+import master.flame.danmaku.danmaku.util.SystemClock;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;

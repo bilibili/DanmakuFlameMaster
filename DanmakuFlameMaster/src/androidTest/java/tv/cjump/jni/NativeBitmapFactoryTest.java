@@ -8,7 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Debug;
-import android.os.SystemClock;
+import master.flame.danmaku.danmaku.util.SystemClock;
 import android.test.InstrumentationTestCase;
 import android.util.Log;
 

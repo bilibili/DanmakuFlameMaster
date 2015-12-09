@@ -19,7 +19,7 @@ package master.flame.danmaku.controller;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.os.SystemClock;
+import master.flame.danmaku.danmaku.util.SystemClock;
 import android.util.Pair;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
