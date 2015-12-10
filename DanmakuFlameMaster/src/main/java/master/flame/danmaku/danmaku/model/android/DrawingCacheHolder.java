@@ -45,7 +45,7 @@ public class DrawingCacheHolder {
         boolean reuse = checkSizeEquals ? (w == width && h == height) : (w <= width && h <= height);
         if (reuse && bitmap != null) {
 //            canvas.drawColor(Color.TRANSPARENT);
-            canvas.setBitmap(null);
+//            canvas.setBitmap(null);
             bitmap.eraseColor(Color.TRANSPARENT);
             canvas.setBitmap(bitmap);
             recycleBitmapArray();
