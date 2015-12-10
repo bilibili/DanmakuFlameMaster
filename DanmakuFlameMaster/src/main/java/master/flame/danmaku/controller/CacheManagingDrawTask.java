@@ -133,6 +133,9 @@ public class CacheManagingDrawTask extends DrawTask {
     @Override
     public void seek(long mills) {
         super.seek(mills);
+        if (mCacheManager == null) {
+            start();
+        }
         mCacheManager.seek(mills);
     }
 
@@ -232,6 +235,7 @@ public class CacheManagingDrawTask extends DrawTask {
         }
 
         public void begin() {
+            mEndFlag = false;
             if (mThread == null) {
                 mThread = new HandlerThread("DFM Cache-Building Thread");
                 mThread.start();

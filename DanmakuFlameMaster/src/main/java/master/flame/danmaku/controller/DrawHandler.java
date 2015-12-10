@@ -243,6 +243,7 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case SHOW_DANMAKUS:
+                mDanmakusVisible = true;
                 Long start = (Long) msg.obj;
                 if(drawTask != null) {
                     if (start == null) {
@@ -255,7 +256,6 @@ public class DrawHandler extends Handler {
                         obtainMessage(START, start).sendToTarget();
                     }
                 }
-                mDanmakusVisible = true;
                 if(quitFlag && mDanmakuView != null) {
                     mDanmakuView.drawDanmakus();
                 }
@@ -581,6 +581,7 @@ public class DrawHandler extends Handler {
     public void showDanmakus(Long position) {
         if (mDanmakusVisible)
             return;
+        mDanmakusVisible = true;
         removeMessages(SHOW_DANMAKUS);
         removeMessages(HIDE_DANMAKUS);
         obtainMessage(SHOW_DANMAKUS, position).sendToTarget();
@@ -589,6 +590,7 @@ public class DrawHandler extends Handler {
     public long hideDanmakus(boolean quitDrawTask) {
         if (!mDanmakusVisible)
             return timer.currMillisecond;
+        mDanmakusVisible = false;
         removeMessages(SHOW_DANMAKUS);
         removeMessages(HIDE_DANMAKUS);
         obtainMessage(HIDE_DANMAKUS, quitDrawTask).sendToTarget();
