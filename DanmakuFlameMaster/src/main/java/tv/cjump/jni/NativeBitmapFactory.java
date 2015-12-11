@@ -27,6 +27,7 @@ public class NativeBitmapFactory {
             return;
         }
         if (!(DeviceUtils.isRealARMArch() || DeviceUtils.isRealX86Arch())) {
+            notLoadAgain = true;
             nativeLibLoaded = false;
             return;
         }
@@ -34,7 +35,7 @@ public class NativeBitmapFactory {
             return;
         }
         try {
-            if (android.os.Build.VERSION.SDK_INT >= 11) {
+            if (android.os.Build.VERSION.SDK_INT >= 11 && android.os.Build.VERSION.SDK_INT < 23) {
                 System.loadLibrary("ndkbitmap");
                 nativeLibLoaded = true;
             } else {
