@@ -215,14 +215,7 @@ public class CacheManagingDrawTask extends DrawTask {
         @Override
         public void addDanmaku(BaseDanmaku danmaku) {
             if (mHandler != null) {
-                if (danmaku.isLive) {
-                    if (danmaku.isTimeOut()) {
-                        return;
-                    }
-                    mHandler.createCache(danmaku);
-                } else {
-                    mHandler.obtainMessage(CacheHandler.ADD_DANMAKKU, danmaku).sendToTarget();
-                }
+                mHandler.obtainMessage(CacheHandler.ADD_DANMAKKU, danmaku).sendToTarget();
             }
         }
 
@@ -853,7 +846,7 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             private final void addDanmakuAndBuildCache(BaseDanmaku danmaku) {
-                if (danmaku.isTimeOut() || danmaku.time > mCacheTimer.currMillisecond + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION) {
+                if (danmaku.isTimeOut() || (danmaku.time > mCacheTimer.currMillisecond + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION && !danmaku.isLive)) {
                     return;
                 }
                 if (danmaku.priority == 0 && danmaku.isFiltered()) {
