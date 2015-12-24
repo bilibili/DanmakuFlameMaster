@@ -21,7 +21,6 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import master.flame.danmaku.danmaku.util.SystemClock;
 import android.util.DisplayMetrics;
 
 import java.util.LinkedList;
@@ -35,6 +34,7 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.AndroidUtils;
+import master.flame.danmaku.danmaku.util.SystemClock;
 import tv.cjump.jni.DeviceUtils;
 
 public class DrawHandler extends Handler {
@@ -191,6 +191,28 @@ public class DrawHandler extends Handler {
                     });
                 }
                 break;
+            case SHOW_DANMAKUS:
+                mDanmakusVisible = true;
+                Long start = (Long) msg.obj;
+                boolean resume = false;
+                if (drawTask != null) {
+                    if (start == null) {
+                        timer.update(getCurrentTime());
+                        drawTask.requestClear();
+                    } else {
+                        drawTask.start();
+                        drawTask.seek(start);
+                        drawTask.requestClear();
+                        resume = true;
+                    }
+                }
+                if (quitFlag && mDanmakuView != null) {
+                    mDanmakuView.drawDanmakus();
+                }
+                notifyRendering();
+                if (!resume) {
+                    break;
+                }
             case START:
                 Long startTime = (Long) msg.obj;
                 if (startTime != null) {
@@ -241,25 +263,6 @@ public class DrawHandler extends Handler {
                 if (updateFlag != null && updateFlag) {
                     mContext.mGlobalFlagValues.updateMeasureFlag();
                 }
-                break;
-            case SHOW_DANMAKUS:
-                mDanmakusVisible = true;
-                Long start = (Long) msg.obj;
-                if(drawTask != null) {
-                    if (start == null) {
-                        timer.update(getCurrentTime());
-                        drawTask.requestClear();
-                    } else {
-                        drawTask.start();
-                        drawTask.seek(start);
-                        drawTask.requestClear();
-                        obtainMessage(START, start).sendToTarget();
-                    }
-                }
-                if(quitFlag && mDanmakuView != null) {
-                    mDanmakuView.drawDanmakus();
-                }
-                notifyRendering();
                 break;
             case HIDE_DANMAKUS:
                 mDanmakusVisible = false;
