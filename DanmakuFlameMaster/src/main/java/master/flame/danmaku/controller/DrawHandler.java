@@ -220,6 +220,19 @@ public class DrawHandler extends Handler {
                 } else {
                     pausedPosition = 0;
                 }
+            case SEEK_POS:
+                if (what == SEEK_POS) {
+                    quitFlag = true;
+                    quitUpdateThread();
+                    Long position = (Long) msg.obj;
+                    long deltaMs = position - timer.currMillisecond;
+                    mTimeBase -= deltaMs;
+                    timer.update(SystemClock.uptimeMillis() - mTimeBase);
+                    mContext.mGlobalFlagValues.updateMeasureFlag();
+                    if (drawTask != null)
+                        drawTask.seek(timer.currMillisecond);
+                    pausedPosition = timer.currMillisecond;
+                }
             case RESUME:
                 quitFlag = false;
                 if (mReady) {
@@ -235,20 +248,6 @@ public class DrawHandler extends Handler {
                 } else {
                     sendEmptyMessageDelayed(RESUME, 100);
                 }
-                break;
-            case SEEK_POS:
-                quitFlag = true;
-                quitUpdateThread();
-                Long position = (Long) msg.obj;
-                long deltaMs = position - timer.currMillisecond;
-                mTimeBase -= deltaMs;
-                timer.update(SystemClock.uptimeMillis() - mTimeBase);
-                mContext.mGlobalFlagValues.updateMeasureFlag();
-                if (drawTask != null)
-                    drawTask.seek(timer.currMillisecond);
-                pausedPosition = timer.currMillisecond;
-                removeMessages(RESUME);
-                sendEmptyMessage(RESUME);
                 break;
             case UPDATE:
                 if (mUpdateInNewThread) {
