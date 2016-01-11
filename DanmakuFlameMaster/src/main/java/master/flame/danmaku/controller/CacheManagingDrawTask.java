@@ -855,10 +855,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 if (!danmaku.hasDrawingCache()) {
                     buildCache(danmaku, true);
                 }
-                if (danmaku.isLive) {
-                    mCacheTimer.update(mTimer.currMillisecond
-                            + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION * mScreenSize);
-                }
             }
 
             public void begin() {
