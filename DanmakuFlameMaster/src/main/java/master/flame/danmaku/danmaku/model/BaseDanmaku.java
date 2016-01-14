@@ -137,7 +137,7 @@ public abstract class BaseDanmaku {
     /**
      * 重置位 measure
      */
-    private int measureResetFlag = 0;
+    public int measureResetFlag = 0;
 
     /**
      * 绘制用缓存
