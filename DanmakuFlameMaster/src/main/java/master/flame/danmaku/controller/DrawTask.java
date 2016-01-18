@@ -152,7 +152,12 @@ public class DrawTask implements IDrawTask {
     public synchronized void removeAllDanmakus() {
         if (danmakuList == null || danmakuList.isEmpty())
             return;
-        danmakuList.clear();
+        long beginMills = mTimer.currMillisecond - mContext.mDanmakuFactory.MAX_DANMAKU_DURATION - 100;
+        long endMills = mTimer.currMillisecond + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION;
+        synchronized (danmakuList) {
+            danmakus = danmakuList.subnew(beginMills, endMills);
+            danmakuList.clear();
+        }
     }
 
     protected void onDanmakuRemoved(BaseDanmaku danmaku) {
@@ -306,8 +311,11 @@ public class DrawTask implements IDrawTask {
                 IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
                 if(subDanmakus != null) {
                     danmakus = subDanmakus;
-                } else {
-                    danmakus.clear();
+                } else if (danmakus != null) {
+                    BaseDanmaku last = danmakus.last();
+                    if (last == null || last.isTimeOut()) {
+                        danmakus.clear();
+                    }
                 }
                 mLastBeginMills = beginMills;
                 mLastEndMills = endMills;
