@@ -177,12 +177,14 @@ public class DrawHandler extends Handler {
         int what = msg.what;
         switch (what) {
             case PREPARE:
+                mTimeBase = SystemClock.uptimeMillis();
                 if (mParser == null || !mDanmakuView.isViewReady()) {
                     sendEmptyMessageDelayed(PREPARE, 100);
                 } else {
                     prepare(new Runnable() {
                         @Override
                         public void run() {
+                            pausedPosition = 0;
                             mReady = true;
                             if (mCallback != null) {
                                 mCallback.prepared();

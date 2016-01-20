@@ -237,6 +237,10 @@ public class DrawTask implements IDrawTask {
         mContext.mGlobalFlagValues.updateVisibleFlag();
         mContext.mGlobalFlagValues.updateFirstShownFlag();
         mStartRenderTime = mills < 1000 ? 0 : mills;
+        if (mRenderingState != null) {
+            mRenderingState.reset();
+            mRenderingState.endTime = mStartRenderTime;
+        }
     }
 
     @Override
