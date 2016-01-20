@@ -322,7 +322,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
     }
 
     @Override
-    public void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
+    public synchronized void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
                             boolean fromWorkerThread) {
         float _left = left;
         float _top = top;
