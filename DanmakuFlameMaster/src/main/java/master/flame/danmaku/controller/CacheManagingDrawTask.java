@@ -215,7 +215,11 @@ public class CacheManagingDrawTask extends DrawTask {
         @Override
         public void addDanmaku(BaseDanmaku danmaku) {
             if (mHandler != null) {
-                mHandler.obtainMessage(CacheHandler.ADD_DANMAKKU, danmaku).sendToTarget();
+                if (danmaku.isLive) {
+                    mHandler.createCache(danmaku);
+                } else {
+                    mHandler.obtainMessage(CacheHandler.ADD_DANMAKKU, danmaku).sendToTarget();
+                }
             }
         }
 
