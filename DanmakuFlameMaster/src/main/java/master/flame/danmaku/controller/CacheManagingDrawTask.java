@@ -216,7 +216,9 @@ public class CacheManagingDrawTask extends DrawTask {
         public void addDanmaku(BaseDanmaku danmaku) {
             if (mHandler != null) {
                 if (danmaku.isLive) {
-                    mHandler.createCache(danmaku);
+                    if (!danmaku.isTimeOut()) {
+                        mHandler.createCache(danmaku);
+                    }
                 } else {
                     mHandler.obtainMessage(CacheHandler.ADD_DANMAKKU, danmaku).sendToTarget();
                 }
