@@ -17,7 +17,6 @@
 package master.flame.danmaku.controller;
 
 import android.graphics.Canvas;
-import master.flame.danmaku.danmaku.util.SystemClock;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -32,6 +31,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.renderer.android.DanmakuRenderer;
+import master.flame.danmaku.danmaku.util.SystemClock;
 
 public class DrawTask implements IDrawTask {
 
@@ -66,6 +66,8 @@ public class DrawTask implements IDrawTask {
     private boolean mIsHidden;
 
     private BaseDanmaku mLastDanmaku;
+
+    private Danmakus mLiveDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
 
     private ConfigChangedCallback mConfigChangedCallback = new ConfigChangedCallback() {
         @Override
@@ -113,6 +115,7 @@ public class DrawTask implements IDrawTask {
         if (danmakuList == null)
             return;
         if (item.isLive) {
+            mLiveDanmakus.addItem(item);
             removeUnusedLiveDanmakusIn(10);
         }
         item.index = danmakuList.size();
@@ -181,16 +184,19 @@ public class DrawTask implements IDrawTask {
     }
 
     protected synchronized void removeUnusedLiveDanmakusIn(int msec) {
-        if (danmakuList == null || danmakuList.isEmpty())
+        if (danmakuList == null || danmakuList.isEmpty() || mLiveDanmakus.isEmpty())
             return;
         long startTime = SystemClock.uptimeMillis();
-        IDanmakuIterator it = danmakuList.iterator();
+        IDanmakuIterator it = mLiveDanmakus.iterator();
         while (it.hasNext()) {
             BaseDanmaku danmaku = it.next();
             boolean isTimeout = danmaku.isTimeOut();
-            if (isTimeout && danmaku.isLive) {
+            if (isTimeout) {
                 it.remove();
+                danmakuList.removeItem(danmaku);
                 onDanmakuRemoved(danmaku);
+            } else {
+                break;
             }
             if (!isTimeout || SystemClock.uptimeMillis() - startTime > msec) {
                 break;
