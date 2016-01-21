@@ -588,6 +588,12 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             private long dispatchAction() {
+                if (mCacheTimer.currMillisecond <= mTimer.currMillisecond - mContext.mDanmakuFactory.MAX_DANMAKU_DURATION) {
+                    evictAllNotInScreen();
+                    mCacheTimer.update(mTimer.currMillisecond);
+                    sendEmptyMessage(BUILD_CACHES);
+                    return 0;
+                }
                 float level = getPoolPercent();
                 BaseDanmaku firstCache = mCaches.first();
                 //TODO 如果firstcache大于当前时间超过半屏并且水位在0.5f以下,
