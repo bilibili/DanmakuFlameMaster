@@ -705,9 +705,9 @@ public class DrawHandler extends Handler {
         }
     }
 
-    public void removeAllDanmakus() {
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen) {
         if (drawTask != null) {
-            drawTask.removeAllDanmakus();
+            drawTask.removeAllDanmakus(isClearDanmakusOnScreen);
         }
     }
 

@@ -152,13 +152,17 @@ public class DrawTask implements IDrawTask {
     }
     
     @Override
-    public synchronized void removeAllDanmakus() {
+    public synchronized void removeAllDanmakus(boolean isClearDanmakusOnScreen) {
         if (danmakuList == null || danmakuList.isEmpty())
             return;
-        long beginMills = mTimer.currMillisecond - mContext.mDanmakuFactory.MAX_DANMAKU_DURATION - 100;
-        long endMills = mTimer.currMillisecond + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION;
         synchronized (danmakuList) {
-            danmakus = danmakuList.subnew(beginMills, endMills);
+            if (!isClearDanmakusOnScreen) {
+                long beginMills = mTimer.currMillisecond - mContext.mDanmakuFactory.MAX_DANMAKU_DURATION - 100;
+                long endMills = mTimer.currMillisecond + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION;
+                IDanmakus tempDanmakus = danmakuList.subnew(beginMills, endMills);
+                if (tempDanmakus != null)
+                    danmakus = tempDanmakus;
+            }
             danmakuList.clear();
         }
     }

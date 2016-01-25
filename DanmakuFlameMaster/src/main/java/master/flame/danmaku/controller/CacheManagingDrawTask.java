@@ -19,7 +19,6 @@ package master.flame.danmaku.controller;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import master.flame.danmaku.danmaku.util.SystemClock;
 import android.util.Pair;
 
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
@@ -38,6 +37,7 @@ import master.flame.danmaku.danmaku.model.objectpool.Pool;
 import master.flame.danmaku.danmaku.model.objectpool.Pools;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
+import master.flame.danmaku.danmaku.util.SystemClock;
 import tv.cjump.jni.NativeBitmapFactory;
 
 public class CacheManagingDrawTask extends DrawTask {
@@ -88,8 +88,8 @@ public class CacheManagingDrawTask extends DrawTask {
     }
 
     @Override
-    public void removeAllDanmakus() {
-        super.removeAllDanmakus();
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen) {
+        super.removeAllDanmakus(isClearDanmakusOnScreen);
         if (mCacheManager != null) {
             mCacheManager.requestClearAll();
         }

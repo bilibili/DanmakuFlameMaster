@@ -23,7 +23,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Looper;
-import master.flame.danmaku.danmaku.util.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,6 +40,7 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
+import master.flame.danmaku.danmaku.util.SystemClock;
 
 public class DanmakuView extends View implements IDanmakuView, IDanmakuViewController {
 
@@ -111,9 +111,9 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     }
 
     @Override
-    public void removeAllDanmakus() {
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen) {
         if (handler != null) {
-            handler.removeAllDanmakus();
+            handler.removeAllDanmakus(isClearDanmakusOnScreen);
         }
     }
     

@@ -21,7 +21,6 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.HandlerThread;
 import android.os.Looper;
-import master.flame.danmaku.danmaku.util.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -41,6 +40,7 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
+import master.flame.danmaku.danmaku.util.SystemClock;
 
 public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDanmakuViewController, SurfaceHolder.Callback {
 
@@ -109,9 +109,9 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
     }
 
     @Override
-    public void removeAllDanmakus() {
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen) {
         if (handler != null) {
-            handler.removeAllDanmakus();
+            handler.removeAllDanmakus(isClearDanmakusOnScreen);
         }
     }
     

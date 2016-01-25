@@ -24,7 +24,6 @@ import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Looper;
-import master.flame.danmaku.danmaku.util.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.TextureView;
@@ -43,6 +42,7 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
+import master.flame.danmaku.danmaku.util.SystemClock;
 
 /**
  * DanmakuTextureView需要开启GPU加速才能显示弹幕
@@ -117,9 +117,9 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     }
 
     @Override
-    public void removeAllDanmakus() {
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen) {
         if (handler != null) {
-            handler.removeAllDanmakus();
+            handler.removeAllDanmakus(isClearDanmakusOnScreen);
         }
     }
     
