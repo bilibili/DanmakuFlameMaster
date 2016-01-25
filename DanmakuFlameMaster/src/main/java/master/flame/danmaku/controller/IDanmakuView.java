@@ -42,7 +42,7 @@ public interface IDanmakuView {
 
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure);
     
-    public void removeAllDanmakus();
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen);
     
     public void removeAllLiveDanmakus();
 
