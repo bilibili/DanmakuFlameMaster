@@ -28,7 +28,7 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
             }
             CharSequence text = danmaku.text;
             if (text != null) {
-                StaticLayout staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+                StaticLayout staticLayout = new StaticLayout(text, paint, (int) Math.ceil(StaticLayout.getDesiredWidth(danmaku.text, paint)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
                 danmaku.paintWidth = staticLayout.getWidth();
                 danmaku.paintHeight = staticLayout.getHeight();
                 danmaku.obj = new SoftReference<>(staticLayout);
@@ -65,7 +65,7 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
             CharSequence text = danmaku.text;
             if (text != null) {
                 if (requestRemeasure) {
-                    staticLayout = new StaticLayout(text, paint, (int) StaticLayout.getDesiredWidth(danmaku.text, paint), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
+                    staticLayout = new StaticLayout(text, paint, (int) Math.ceil(StaticLayout.getDesiredWidth(danmaku.text, paint)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
                     danmaku.paintWidth = staticLayout.getWidth();
                     danmaku.paintHeight = staticLayout.getHeight();
                     danmaku.requestFlags &= ~BaseDanmaku.FLAG_REQUEST_REMEASURE;
