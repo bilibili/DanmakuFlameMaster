@@ -150,6 +150,11 @@ public abstract class BaseDanmaku {
     public boolean isLive;
 
     /**
+     * 临时, 是否在同线程创建缓存
+     */
+    public boolean forceBuildCacheInSameThread;
+
+    /**
      * 弹幕发布者id, 0表示游客
      */
     public int userId = 0;

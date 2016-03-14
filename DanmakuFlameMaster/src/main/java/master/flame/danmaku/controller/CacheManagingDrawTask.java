@@ -216,8 +216,12 @@ public class CacheManagingDrawTask extends DrawTask {
         public void addDanmaku(BaseDanmaku danmaku) {
             if (mHandler != null) {
                 if (danmaku.isLive) {
-                    if (!danmaku.isTimeOut()) {
-                        mHandler.createCache(danmaku);
+                    if (danmaku.forceBuildCacheInSameThread) {
+                        if (!danmaku.isTimeOut()) {
+                            mHandler.createCache(danmaku);
+                        }
+                    } else {
+                        mHandler.obtainMessage(CacheHandler.BIND_CACHE, danmaku).sendToTarget();
                     }
                 } else {
                     mHandler.obtainMessage(CacheHandler.ADD_DANMAKKU, danmaku).sendToTarget();
@@ -474,6 +478,8 @@ public class CacheManagingDrawTask extends DrawTask {
 
             public static final int REBUILD_CACHE = 0x11;
 
+            public static final int BIND_CACHE = 0x12;
+
             private boolean mPause;
 
             private boolean mSeekedFlag;
@@ -520,6 +526,12 @@ public class CacheManagingDrawTask extends DrawTask {
                     case ADD_DANMAKKU:
                         BaseDanmaku item = (BaseDanmaku) msg.obj;
                         addDanmakuAndBuildCache(item);
+                        break;
+                    case BIND_CACHE:
+                        BaseDanmaku danmaku = (BaseDanmaku) msg.obj;
+                        if (!danmaku.isTimeOut()) {
+                            createCache(danmaku);
+                        }
                         break;
                     case REBUILD_CACHE:
                         Pair<BaseDanmaku, Boolean> pair = (Pair<BaseDanmaku, Boolean>) msg.obj;

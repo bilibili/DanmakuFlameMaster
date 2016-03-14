@@ -421,7 +421,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         return UNDERLINE_PAINT;
     }
 
-    private TextPaint getPaint(BaseDanmaku danmaku, boolean fromWorkerThread) {
+    private synchronized TextPaint getPaint(BaseDanmaku danmaku, boolean fromWorkerThread) {
         TextPaint paint;
         if (fromWorkerThread) {
             paint = PAINT;
