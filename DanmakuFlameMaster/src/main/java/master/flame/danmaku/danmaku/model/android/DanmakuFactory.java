@@ -131,6 +131,8 @@ public class DanmakuFactory {
      */
     public BaseDanmaku createDanmaku(int type, float viewportWidth, float viewportHeight,
             float viewportSizeFactor, float scrollSpeedFactor) {
+        int oldDispWidth = CURRENT_DISP_WIDTH;
+        int oldDispHeight = CURRENT_DISP_HEIGHT;
         boolean sizeChanged = updateViewportState(viewportWidth, viewportHeight, viewportSizeFactor);
         if (MAX_Duration_Scroll_Danmaku == null) {
             MAX_Duration_Scroll_Danmaku = new Duration(REAL_DANMAKU_DURATION);
@@ -138,7 +140,7 @@ public class DanmakuFactory {
         } else if (sizeChanged) {
             MAX_Duration_Scroll_Danmaku.setValue(REAL_DANMAKU_DURATION);
         }
-        
+
         if (MAX_Duration_Fix_Danmaku == null) {
             MAX_Duration_Fix_Danmaku = new Duration(COMMON_DANMAKU_DURATION);
         }
@@ -147,9 +149,9 @@ public class DanmakuFactory {
             updateMaxDanmakuDuration();
             float scaleX = 1f;
             float scaleY = 1f;
-            if (CURRENT_DISP_WIDTH > 0 && CURRENT_DISP_HEIGHT > 0) {
-                scaleX = viewportWidth / (float) CURRENT_DISP_WIDTH;
-                scaleY = viewportHeight / (float) CURRENT_DISP_HEIGHT;
+            if (oldDispWidth > 0 && oldDispHeight > 0) {
+                scaleX = viewportWidth / (float) oldDispWidth;
+                scaleY = viewportHeight / (float) oldDispHeight;
             }
             if (viewportHeight > 0) {
                 updateSpecialDanmakusDate(scaleX, scaleY);
