@@ -37,7 +37,8 @@ import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.DanmakuFactory;
+import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
+import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
 
@@ -120,7 +121,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     float textSize = Float.parseFloat(values[2]); // 字体大小
                     int color = Integer.parseInt(values[3]) | 0xFF000000; // 颜色
                     // int poolType = Integer.parseInt(values[5]); // 弹幕池类型（忽略
-                    item = DanmakuFactory.createDanmaku(type, mDisp);
+                    item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
                     if (item != null) {
                         item.time = time;
                         item.textSize = textSize * (mDispDensity - 0.6f);
@@ -148,7 +149,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         @Override
         public void characters(char[] ch, int start, int length)  {
             if (item != null) {
-                DanmakuFactory.fillText(item, decodeXmlString(new String(ch, start, length)));
+                DanmakuUtils.fillText(item, decodeXmlString(new String(ch, start, length)));
                 item.index = index++;
 
                 // initial specail danmaku data
@@ -166,7 +167,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    
+
                     if (textArr == null || textArr.length < 5) {
                         item = null;
                         return;
@@ -200,13 +201,25 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                             translationStartDelay = (long) (Float.parseFloat(textArr[10]));
                         }
                     }
+                    if (isPercentageNumber(beginX)) {
+                        beginX *= DanmakuFactory.BILI_PLAYER_WIDTH;
+                    }
+                    if (isPercentageNumber(beginY)) {
+                        beginY *= DanmakuFactory.BILI_PLAYER_HEIGHT;
+                    }
+                    if (isPercentageNumber(endX)) {
+                        endX *= DanmakuFactory.BILI_PLAYER_WIDTH;
+                    }
+                    if (isPercentageNumber(endY)) {
+                        endY *= DanmakuFactory.BILI_PLAYER_HEIGHT;
+                    }
                     item.duration = new Duration(alphaDuraion);
                     item.rotationZ = rotateZ;
                     item.rotationY = rotateY;
-                    DanmakuFactory.fillTranslationData(item, beginX,
+                    mContext.mDanmakuFactory.fillTranslationData(item, beginX,
                             beginY, endX, endY, translationDuration, translationStartDelay, mDispScaleX, mDispScaleY);
-                    DanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
-                    
+                    mContext.mDanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
+
                     if (textArr.length >= 12) {
                         // 是否有描边
                         if (!TextUtils.isEmpty(textArr[11]) && TRUE_STRING.equals(textArr[11])) {
@@ -217,7 +230,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         //TODO 字体 textArr[12]
                     }
                     if (textArr.length >= 14) {
-                        //TODO 是否有加速
+                        //TODO 是否有动画缓冲(easing)
                     }
                     if (textArr.length >= 15) {
                         // 路径数据
@@ -231,7 +244,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                                     points[i][0] = Float.parseFloat(pointArray[0]);
                                     points[i][1] = Float.parseFloat(pointArray[1]);
                                 }
-                                DanmakuFactory.fillLinePathData(item, points, mDispScaleX,
+                                mContext.mDanmakuFactory.fillLinePathData(item, points, mDispScaleX,
                                         mDispScaleY);
                             }
                         }
@@ -258,7 +271,11 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         }
 
     }
-    
+
+    private boolean isPercentageNumber(float number) {
+        return number >= 0f && number <= 1f;
+    }
+
     @Override
     public BaseDanmakuParser setDisplayer(IDisplayer disp) {
         super.setDisplayer(disp);

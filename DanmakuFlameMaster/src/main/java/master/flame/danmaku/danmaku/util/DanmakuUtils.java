@@ -16,6 +16,9 @@
 
 package master.flame.danmaku.danmaku.util;
 
+import android.text.TextUtils;
+
+import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
@@ -90,7 +93,7 @@ public class DanmakuUtils {
         cache.build((int) Math.ceil(danmaku.paintWidth), (int) Math.ceil(danmaku.paintHeight), disp.getDensityDpi(), false);
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
-            AndroidDisplayer.drawDanmaku(danmaku, holder.canvas, 0, 0, false);
+            ((AbsDisplayer) disp).drawDanmaku(danmaku, holder.canvas, 0, 0, true);
             if(disp.isHardwareAccelerated()) {
                 holder.splitWith(disp.getWidth(), disp.getHeight(), disp.getMaximumCacheWidth(),
                         disp.getMaximumCacheHeight());
@@ -165,7 +168,7 @@ public class DanmakuUtils {
             return 1;
         }
 
-        int r = (String.valueOf(obj1.text)).compareTo((String)obj2.text);
+        int r = obj1.text.toString().compareTo(obj2.text.toString());
         if (r != 0) {
             return r;
         }
@@ -186,4 +189,15 @@ public class DanmakuUtils {
         return disp.isHardwareAccelerated() && (item.paintWidth > disp.getMaximumCacheWidth() || item.paintHeight > disp.getMaximumCacheHeight());
     }
 
+    public static void fillText(BaseDanmaku danmaku, CharSequence text) {
+        danmaku.text = text;
+        if (TextUtils.isEmpty(text) || !text.toString().contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
+            return;
+        }
+
+        String[] lines = String.valueOf(danmaku.text).split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
+        if (lines.length > 1) {
+            danmaku.lines = lines;
+        }
+    }
 }

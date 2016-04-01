@@ -6,7 +6,7 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 ### DFM Inside: 
 [![bili](https://raw.github.com/ctiao/ctiao.github.io/master/images/apps/bili.png?raw=true)](https://play.google.com/store/apps/details?id=tv.danmaku.bili)
 
-- 如果你的项目使用了DFM,并且希望在此处留下链接,请使用官方邮箱与我联系:chenhui#bilibili.com
+- libndkbitmap.so(ndk)源码：https://github.com/Bilibili/NativeBitmapFactory
 - 开发交流群：314468823 (加入请注明DFM开发交流)
 
 ### Features
@@ -49,14 +49,14 @@ Download the [latest version][1] or grab via Maven:
 <dependency>
   <groupId>com.github.ctiao</groupId>
   <artifactId>dfm</artifactId>
-  <version>0.3.5</version>
+  <version>0.4.1</version>
 </dependency>
 ```
 
 or Gradle:
 ```groovy
 dependencies {
-    compile 'com.github.ctiao:dfm:0.3.5'
+    compile 'com.github.ctiao:dfm:0.4.2'
 }
 ```
 Snapshots of the development version are available in [Sonatype's snapshots repository][2].

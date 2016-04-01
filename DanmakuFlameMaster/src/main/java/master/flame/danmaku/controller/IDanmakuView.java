@@ -5,6 +5,8 @@ import android.view.View;
 
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 public interface IDanmakuView {
@@ -33,14 +35,18 @@ public interface IDanmakuView {
     public void showFPS(boolean show);
     
     /**
-     * 如果批量添加弹幕,请在非UI线程中使用此方法
+     * danmaku.isLive == true的情况下,请在非UI线程中使用此方法,避免可能卡住主线程
      * @param item
      */
     public void addDanmaku(BaseDanmaku item);
+
+    public void invalidateDanmaku(BaseDanmaku item, boolean remeasure);
     
-    public void removeAllDanmakus();
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen);
     
     public void removeAllLiveDanmakus();
+
+    public IDanmakus getCurrentVisibleDanmakus();
     
     public void setCallback(Callback callback);
     
@@ -49,7 +55,8 @@ public interface IDanmakuView {
      * @return
      */
     public long getCurrentTime();
-    
+
+    public DanmakuContext getConfig();
     
     // ------------- Android View方法  --------------------
     
@@ -66,7 +73,7 @@ public interface IDanmakuView {
 
     // ------------- 播放控制 -------------------
     
-    public void prepare(BaseDanmakuParser parser);
+    public void prepare(BaseDanmakuParser parser, DanmakuContext config);
 
     public void seekTo(Long ms);
 
@@ -103,4 +110,23 @@ public interface IDanmakuView {
     public long hideAndPauseDrawTask();
 
     public void clearDanmakusOnScreen();
+
+ // ------------- Click Listener -------------------
+    public interface OnDanmakuClickListener {
+     /**
+      *
+      * @param latest the latest one is clicked
+      */
+      void onDanmakuClick(BaseDanmaku latest);
+
+     /**
+      *
+      * @param danmakus all to be clicked
+      */
+        void onDanmakuClick(IDanmakus danmakus);
+    }
+
+    public void setOnDanmakuClickListener(OnDanmakuClickListener listener);
+    public OnDanmakuClickListener getOnDanmakuClickListener();
+
 }

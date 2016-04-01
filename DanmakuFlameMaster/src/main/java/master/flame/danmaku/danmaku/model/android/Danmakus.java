@@ -231,12 +231,15 @@ public class Danmakus implements IDanmakus {
 
     @Override
     public void clear() {
-        if (items != null){
+        if (items != null) {
             items.clear();
             mSize = 0;
+            iterator = new DanmakuIterator(items);
         }
         if (subItems != null) {
-            subItems.clear();
+            subItems = null;
+            startItem = createItem("start");
+            endItem = createItem("end");
         }
     }
 
@@ -281,6 +284,7 @@ public class Danmakus implements IDanmakus {
             } else {
                 it = null;
             }
+            mIteratorUsed = false;
         }
 
         public synchronized void setDatas(Collection<BaseDanmaku> datas){
@@ -307,6 +311,7 @@ public class Danmakus implements IDanmakus {
             mIteratorUsed = true;
             if (it != null) {
                 it.remove();
+                mSize--;
             }
         }
 

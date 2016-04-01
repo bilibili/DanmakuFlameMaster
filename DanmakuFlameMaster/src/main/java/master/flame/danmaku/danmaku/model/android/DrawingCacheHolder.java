@@ -45,7 +45,7 @@ public class DrawingCacheHolder {
         boolean reuse = checkSizeEquals ? (w == width && h == height) : (w <= width && h <= height);
         if (reuse && bitmap != null) {
 //            canvas.drawColor(Color.TRANSPARENT);
-            canvas.setBitmap(null);
+//            canvas.setBitmap(null);
             bitmap.eraseColor(Color.TRANSPARENT);
             canvas.setBitmap(bitmap);
             recycleBitmapArray();
@@ -74,13 +74,11 @@ public class DrawingCacheHolder {
     }
 
     public synchronized void recycle() {
+        Bitmap bitmapReserve = bitmap;
+        bitmap = null;
         width = height = 0;
-//        if (canvas != null) {
-//            canvas = null;
-//        }
-        if (bitmap != null) {
-            bitmap.recycle();
-            bitmap = null;
+        if (bitmapReserve != null) {
+            bitmapReserve.recycle();
         }
         recycleBitmapArray();
         extra = null;
@@ -145,16 +143,17 @@ public class DrawingCacheHolder {
     }
 
     private void recycleBitmapArray() {
-        if (bitmapArray != null) {
-            for (int i = 0; i < bitmapArray.length; i++) {
-                for (int j = 0; j < bitmapArray[i].length; j++) {
-                    if (bitmapArray[i][j] != null) {
-                        bitmapArray[i][j].recycle();
-                        bitmapArray[i][j] = null;
+        Bitmap[][] bitmapArrayReserve = bitmapArray;
+        bitmapArray = null;
+        if (bitmapArrayReserve != null) {
+            for (int i = 0; i < bitmapArrayReserve.length; i++) {
+                for (int j = 0; j < bitmapArrayReserve[i].length; j++) {
+                    if (bitmapArrayReserve[i][j] != null) {
+                        bitmapArrayReserve[i][j].recycle();
+                        bitmapArrayReserve[i][j] = null;
                     }
                 }
             }
-            bitmapArray = null;
         }
     }
 

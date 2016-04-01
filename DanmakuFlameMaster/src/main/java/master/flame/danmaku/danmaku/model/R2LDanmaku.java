@@ -109,8 +109,8 @@ public class R2LDanmaku extends BaseDanmaku {
     }
     
     @Override
-    public void measure(IDisplayer displayer) {
-        super.measure(displayer);
+    public void measure(IDisplayer displayer, boolean fromWorkerThread) {
+        super.measure(displayer, fromWorkerThread);
         mDistance = (int) (displayer.getWidth() + paintWidth);
         mStepX = mDistance / (float) duration.value;
     }

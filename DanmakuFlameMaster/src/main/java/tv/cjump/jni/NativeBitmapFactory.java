@@ -16,13 +16,18 @@ public class NativeBitmapFactory {
     static Field nativeIntField = null;
 
     static boolean nativeLibLoaded = false;
+    static boolean notLoadAgain = false;
     
     public static boolean isInNativeAlloc() {
         return android.os.Build.VERSION.SDK_INT < 11 || (nativeLibLoaded && nativeIntField != null);
     }
 
     public static void loadLibs() {
+        if (notLoadAgain) {
+            return;
+        }
         if (!(DeviceUtils.isRealARMArch() || DeviceUtils.isRealX86Arch())) {
+            notLoadAgain = true;
             nativeLibLoaded = false;
             return;
         }
@@ -30,23 +35,27 @@ public class NativeBitmapFactory {
             return;
         }
         try {
-            if (android.os.Build.VERSION.SDK_INT >= 11) {
+            if (android.os.Build.VERSION.SDK_INT >= 11 && android.os.Build.VERSION.SDK_INT < 23) {
                 System.loadLibrary("ndkbitmap");
                 nativeLibLoaded = true;
             } else {
+                notLoadAgain = true;
                 nativeLibLoaded = false;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            notLoadAgain = true;
             nativeLibLoaded = false;
         } catch (Error e) {
             e.printStackTrace();
+            notLoadAgain = true;
             nativeLibLoaded = false;
         }
         if (nativeLibLoaded) {
             boolean libInit = init();
             if (!libInit) {
                 release();
+                notLoadAgain = true;
                 nativeLibLoaded = false;
             } else {
                 initField();
@@ -54,6 +63,7 @@ public class NativeBitmapFactory {
                 if (!confirm) {
                     // 测试so文件函数是否调用失败
                     release();
+                    notLoadAgain = true;
                     nativeLibLoaded = false;
                 }
             }

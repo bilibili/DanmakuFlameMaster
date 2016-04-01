@@ -36,6 +36,9 @@ public abstract class BaseDanmaku {
 
     public final static int VISIBLE = 1;
 
+    public final static int FLAG_REQUEST_REMEASURE = 0x1;
+    public final static int FLAG_REQUEST_INVALIDATE = 0x2;
+
     /**
      * 显示时间(毫秒)
      */
@@ -134,7 +137,7 @@ public abstract class BaseDanmaku {
     /**
      * 重置位 measure
      */
-    private int measureResetFlag = 0;
+    public int measureResetFlag = 0;
 
     /**
      * 绘制用缓存
@@ -145,6 +148,11 @@ public abstract class BaseDanmaku {
      * 是否是直播弹幕
      */
     public boolean isLive;
+
+    /**
+     * 临时, 是否在同线程创建缓存
+     */
+    public boolean forceBuildCacheInSameThread;
 
     /**
      * 弹幕发布者id, 0表示游客
@@ -175,6 +183,15 @@ public abstract class BaseDanmaku {
 
     public int filterResetFlag = -1;
 
+    public GlobalFlagValues flags = null;
+
+    public int requestFlags = 0;
+
+    /**
+     * 标记是否首次显示，首次显示后将置为FIRST_SHOWN_RESET_FLAG
+     */
+    public int firstShownFlag = -1;
+
     public long getDuration() {
         return duration.value;
     }
@@ -188,13 +205,13 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isMeasured() {
-        return paintWidth >= 0 && paintHeight >= 0
-                && measureResetFlag == GlobalFlagValues.MEASURE_RESET_FLAG;
+        return paintWidth > -1 && paintHeight > -1
+                && measureResetFlag == flags.MEASURE_RESET_FLAG;
     }
 
-    public void measure(IDisplayer displayer) {
-        displayer.measure(this);
-        this.measureResetFlag = GlobalFlagValues.MEASURE_RESET_FLAG;
+    public void measure(IDisplayer displayer, boolean fromWorkerThread) {
+        displayer.measure(this, fromWorkerThread);
+        this.measureResetFlag = flags.MEASURE_RESET_FLAG;
     }
 
     public boolean hasDrawingCache() {
@@ -203,7 +220,7 @@ public abstract class BaseDanmaku {
 
     public boolean isShown() {
         return this.visibility == VISIBLE
-                && visibleResetFlag == GlobalFlagValues.VISIBLE_RESET_FLAG;
+                && visibleResetFlag == flags.VISIBLE_RESET_FLAG;
     }
 
     public boolean isTimeOut() {
@@ -228,7 +245,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean hasPassedFilter() {
-        if (filterResetFlag != GlobalFlagValues.FILTER_RESET_FLAG) {
+        if (filterResetFlag != flags.FILTER_RESET_FLAG) {
             mFilterParam = 0;
             return false;
         }
@@ -236,16 +253,16 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isFiltered() {
-        return filterResetFlag == GlobalFlagValues.FILTER_RESET_FLAG && mFilterParam != 0;
+        return filterResetFlag == flags.FILTER_RESET_FLAG && mFilterParam != 0;
     }
 
     public boolean isFilteredBy(int flag) {
-        return filterResetFlag == GlobalFlagValues.FILTER_RESET_FLAG && (mFilterParam & flag) == flag;
+        return filterResetFlag == flags.FILTER_RESET_FLAG && (mFilterParam & flag) == flag;
     }
 
     public void setVisibility(boolean b) {
         if (b) {
-            this.visibleResetFlag = GlobalFlagValues.VISIBLE_RESET_FLAG;
+            this.visibleResetFlag = flags.VISIBLE_RESET_FLAG;
             this.visibility = VISIBLE;
         } else
             this.visibility = INVISIBLE;

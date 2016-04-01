@@ -24,15 +24,15 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class DanmakusRetainer {
 
-    private static IDanmakusRetainer rldrInstance = null;
+    private IDanmakusRetainer rldrInstance = null;
 
-    private static IDanmakusRetainer lrdrInstance = null;
+    private IDanmakusRetainer lrdrInstance = null;
 
-    private static IDanmakusRetainer ftdrInstance = null;
+    private IDanmakusRetainer ftdrInstance = null;
 
-    private static IDanmakusRetainer fbdrInstance = null;
+    private IDanmakusRetainer fbdrInstance = null;
 
-    public static void fix(BaseDanmaku danmaku, IDisplayer disp, Verifier verifier) {
+    public void fix(BaseDanmaku danmaku, IDisplayer disp, Verifier verifier) {
 
         int type = danmaku.getType();
         switch (type) {
@@ -67,7 +67,7 @@ public class DanmakusRetainer {
 
     }
 
-    public static void clear() {
+    public void clear() {
         if (rldrInstance != null) {
             rldrInstance.clear();
         }
@@ -82,7 +82,7 @@ public class DanmakusRetainer {
         }
     }
     
-    public static void release(){
+    public void release(){
         clear();
         rldrInstance = null;
         lrdrInstance = null;

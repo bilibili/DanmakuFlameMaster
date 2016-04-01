@@ -19,39 +19,47 @@ package master.flame.danmaku.danmaku.model;
 
 public interface IDisplayer {
 
-    public abstract int getWidth();
+    int DANMAKU_STYLE_DEFAULT = -1; // 自动
+    int DANMAKU_STYLE_NONE = 0; // 无
+    int DANMAKU_STYLE_SHADOW = 1; // 阴影
+    int DANMAKU_STYLE_STROKEN = 2; // 描边
+    int DANMAKU_STYLE_PROJECTION = 3; // 投影
 
-    public abstract int getHeight();
+    int getWidth();
 
-    public abstract float getDensity();
+    int getHeight();
 
-    public abstract int getDensityDpi();
+    float getDensity();
 
-    public abstract int draw(BaseDanmaku danmaku);
+    int getDensityDpi();
 
-    public abstract float getScaledDensity();
+    int draw(BaseDanmaku danmaku);
 
-    public abstract int getSlopPixel();
+    float getScaledDensity();
 
-    public abstract void measure(BaseDanmaku danmaku);
+    int getSlopPixel();
 
-    public abstract float getStrokeWidth();
+    void measure(BaseDanmaku danmaku, boolean fromWorkerThread);
 
-    public abstract void setHardwareAccelerated(boolean enable);
+    float getStrokeWidth();
 
-    public abstract boolean isHardwareAccelerated();
+    void setHardwareAccelerated(boolean enable);
 
-    public abstract int getMaximumCacheWidth();
+    boolean isHardwareAccelerated();
 
-    public abstract int getMaximumCacheHeight();
+    int getMaximumCacheWidth();
+
+    int getMaximumCacheHeight();
 
 
     ////////////////// setter ///////////////////////////
 
-    public abstract void resetSlopPixel(float factor);
+    void resetSlopPixel(float factor);
 
-    public abstract void setDensities(float density, int densityDpi, float scaledDensity);
+    void setDensities(float density, int densityDpi, float scaledDensity);
 
-    public abstract void setSize(int width, int height);
+    void setSize(int width, int height);
+
+    void setDanmakuStyle(int style, float[] data);
 
 }

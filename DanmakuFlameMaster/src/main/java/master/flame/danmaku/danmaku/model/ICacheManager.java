@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.application'
+package master.flame.danmaku.danmaku.model;
 
-dependencies {
-    compile project(':DanmakuFlameMaster')
-}
-android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
-
-    defaultConfig {
-        minSdkVersion 7
-        targetSdkVersion 19
-        versionCode 1
-        versionName "1.0"
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
+/**
+ * Created by ch on 15-11-15.
+ */
+public interface ICacheManager {
+    void addDanmaku(BaseDanmaku danmaku);
 }
