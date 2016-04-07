@@ -46,7 +46,7 @@ public class DanmakuUtils {
             return false;
         }
         long dTime = d2.time - d1.time;
-        if (dTime < 0)
+        if (dTime <= 0)
             return true;
         if (Math.abs(dTime) >= duration || d1.isTimeOut() || d2.isTimeOut()) {
             return false;
