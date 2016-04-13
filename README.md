@@ -56,7 +56,7 @@ Download the [latest version][1] or grab via Maven:
 or Gradle:
 ```groovy
 dependencies {
-    compile 'com.github.ctiao:dfm:0.4.2'
+    compile 'com.github.ctiao:DanmakuFlameMaster:0.4.2'
 }
 ```
 Snapshots of the development version are available in [Sonatype's snapshots repository][2].
