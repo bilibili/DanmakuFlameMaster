@@ -235,7 +235,7 @@ public class DrawTask implements IDrawTask {
     @Override
     public void reset() {
         if (danmakus != null)
-            danmakus.clear();
+            danmakus = new Danmakus();
         if (mRenderer != null)
             mRenderer.clear();
     }
@@ -336,7 +336,7 @@ public class DrawTask implements IDrawTask {
                 RenderingState renderingState = mRenderingState = mRenderer.draw(mDisp, danmakus, mStartRenderTime);
                 if (renderingState.nothingRendered) {
                     if(mLastDanmaku != null && mLastDanmaku.isTimeOut()) {
-                        danmakus.clear();
+                        danmakus = new Danmakus();
                         if (mTaskListener != null) {
                             mTaskListener.onDanmakusDrawingFinished();
                         }
