@@ -49,14 +49,14 @@ Download the [latest version][1] or grab via Maven:
 <dependency>
   <groupId>com.github.ctiao</groupId>
   <artifactId>dfm</artifactId>
-  <version>0.4.3</version>
+  <version>0.4.4</version>
 </dependency>
 ```
 
 or Gradle:
 ```groovy
 dependencies {
-    compile 'com.github.ctiao:DanmakuFlameMaster:0.4.3'
+    compile 'com.github.ctiao:DanmakuFlameMaster:0.4.4'
 }
 ```
 Snapshots of the development version are available in [Sonatype's snapshots repository][2].
