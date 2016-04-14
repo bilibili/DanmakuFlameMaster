@@ -325,11 +325,6 @@ public class DrawTask implements IDrawTask {
                 IDanmakus subDanmakus = danmakuList.sub(beginMills, endMills);
                 if(subDanmakus != null) {
                     danmakus = subDanmakus;
-                } else if (danmakus != null) {
-                    BaseDanmaku last = danmakus.last();
-                    if (last == null || last.isTimeOut()) {
-                        danmakus.clear();
-                    }
                 }
                 mLastBeginMills = beginMills;
                 mLastEndMills = endMills;
@@ -340,8 +335,11 @@ public class DrawTask implements IDrawTask {
             if (danmakus != null && !danmakus.isEmpty()) {
                 RenderingState renderingState = mRenderingState = mRenderer.draw(mDisp, danmakus, mStartRenderTime);
                 if (renderingState.nothingRendered) {
-                    if(mTaskListener != null && mLastDanmaku != null && mLastDanmaku.isTimeOut()) {
-                        mTaskListener.onDanmakusDrawingFinished();
+                    if(mLastDanmaku != null && mLastDanmaku.isTimeOut()) {
+                        danmakus.clear();
+                        if (mTaskListener != null) {
+                            mTaskListener.onDanmakusDrawingFinished();
+                        }
                     }
                     if (renderingState.beginTime == RenderingState.UNKNOWN_TIME) {
                         renderingState.beginTime = beginMills;
