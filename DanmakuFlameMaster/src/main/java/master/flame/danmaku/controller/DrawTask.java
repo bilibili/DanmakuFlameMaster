@@ -243,13 +243,18 @@ public class DrawTask implements IDrawTask {
     @Override
     public void seek(long mills) {
         reset();
-//        requestClear();
         mContext.mGlobalFlagValues.updateVisibleFlag();
         mContext.mGlobalFlagValues.updateFirstShownFlag();
         mStartRenderTime = mills < 1000 ? 0 : mills;
         if (mRenderingState != null) {
             mRenderingState.reset();
             mRenderingState.endTime = mStartRenderTime;
+        }
+        if (danmakuList != null) {
+            BaseDanmaku last = danmakuList.last();
+            if (last != null && !last.isTimeOut()) {
+                mLastDanmaku = last;
+            }
         }
     }
 
@@ -336,7 +341,7 @@ public class DrawTask implements IDrawTask {
                 RenderingState renderingState = mRenderingState = mRenderer.draw(mDisp, danmakus, mStartRenderTime);
                 if (renderingState.nothingRendered) {
                     if(mLastDanmaku != null && mLastDanmaku.isTimeOut()) {
-                        danmakus = new Danmakus();
+                        mLastDanmaku = null;
                         if (mTaskListener != null) {
                             mTaskListener.onDanmakusDrawingFinished();
                         }

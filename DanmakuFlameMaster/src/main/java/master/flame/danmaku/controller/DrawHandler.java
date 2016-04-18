@@ -229,11 +229,11 @@ public class DrawHandler extends Handler {
                     Long position = (Long) msg.obj;
                     long deltaMs = position - timer.currMillisecond;
                     mTimeBase -= deltaMs;
-                    timer.update(SystemClock.uptimeMillis() - mTimeBase);
+                    timer.update(position);
                     mContext.mGlobalFlagValues.updateMeasureFlag();
                     if (drawTask != null)
-                        drawTask.seek(timer.currMillisecond);
-                    pausedPosition = timer.currMillisecond;
+                        drawTask.seek(position);
+                    pausedPosition = position;
                 }
             case RESUME:
                 quitFlag = false;
