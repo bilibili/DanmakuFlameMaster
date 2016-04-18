@@ -55,6 +55,10 @@ Download the [latest version][1] or grab via Maven:
 
 or Gradle:
 ```groovy
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile 'com.github.ctiao:DanmakuFlameMaster:0.4.4'
 }
