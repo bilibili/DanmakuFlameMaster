@@ -146,15 +146,8 @@ public class DanmakuUtils {
         } else if (val < 0) {
             return -1;
         }
-        
-        int result = obj1.index - obj2.index;
-        if (result > 0) {
-            return 1;
-        } else if (result < 0) {
-            return -1;
-        }
 
-        result = obj1.getType() - obj2.getType();
+        int result = obj1.getType() - obj2.getType();
         if (result > 0) {
             return 1;
         } else if (result < 0) {
