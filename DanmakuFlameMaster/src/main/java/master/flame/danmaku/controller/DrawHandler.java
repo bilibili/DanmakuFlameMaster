@@ -289,11 +289,11 @@ public class DrawHandler extends Handler {
                 }
                 quitFlag = true;
                 syncTimerIfNeeded();
+                pausedPosition = timer.currMillisecond;
                 if (mThread != null) {
                     notifyRendering();
                     quitUpdateThread();
                 }
-                pausedPosition = timer.currMillisecond;
                 if (what == QUIT){
                     if (this.drawTask != null){
                         this.drawTask.quit();
