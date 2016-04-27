@@ -32,32 +32,35 @@ public class DanmakusRetainer {
 
     private IDanmakusRetainer fbdrInstance = null;
 
+    public DanmakusRetainer(boolean alignBottom) {
+        alignBottom(alignBottom);
+    }
+
+    public void alignBottom(boolean alignBottom) {
+        rldrInstance = alignBottom ? new AlignBottomRetainer() : new AlignTopRetainer();
+        lrdrInstance = alignBottom ? new AlignBottomRetainer() : new AlignTopRetainer();
+        if (ftdrInstance == null) {
+            ftdrInstance = new FTDanmakusRetainer();
+        }
+        if (fbdrInstance == null) {
+            fbdrInstance = new AlignBottomRetainer();
+        }
+    }
+
     public void fix(BaseDanmaku danmaku, IDisplayer disp, Verifier verifier) {
 
         int type = danmaku.getType();
         switch (type) {
             case BaseDanmaku.TYPE_SCROLL_RL:
-                if (rldrInstance == null) {
-                    rldrInstance = new RLDanmakusRetainer();
-                }
                 rldrInstance.fix(danmaku, disp, verifier);
                 break;
             case BaseDanmaku.TYPE_SCROLL_LR:
-                if (lrdrInstance == null) {
-                    lrdrInstance = new RLDanmakusRetainer();
-                }
                 lrdrInstance.fix(danmaku, disp, verifier);
                 break;
             case BaseDanmaku.TYPE_FIX_TOP:
-                if (ftdrInstance == null) {
-                    ftdrInstance = new FTDanmakusRetainer();
-                }
                 ftdrInstance.fix(danmaku, disp, verifier);
                 break;
             case BaseDanmaku.TYPE_FIX_BOTTOM:
-                if (fbdrInstance == null) {
-                    fbdrInstance = new FBDanmakusRetainer();
-                }
                 fbdrInstance.fix(danmaku, disp, verifier);
                 break;
             case BaseDanmaku.TYPE_SPECIAL:
@@ -104,7 +107,7 @@ public class DanmakusRetainer {
 
     }
 
-    private static class RLDanmakusRetainer implements IDanmakusRetainer {
+    private static class AlignTopRetainer implements IDanmakusRetainer {
 
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
         protected boolean mCancelFixingFlag = false;
@@ -115,9 +118,9 @@ public class DanmakusRetainer {
                 return;
             float topPos = 0;
             int lines = 0;
-            boolean willHit = !drawItem.isShown() && !mVisibleDanmakus.isEmpty();
-            boolean isOutOfVertialEdge = false;
             boolean shown = drawItem.isShown();
+            boolean willHit = !shown && !mVisibleDanmakus.isEmpty();
+            boolean isOutOfVertialEdge = false;
             BaseDanmaku removeItem = null;
             if (!shown) {
                 mCancelFixingFlag = false;
@@ -232,7 +235,7 @@ public class DanmakusRetainer {
 
     }
 
-    private static class FTDanmakusRetainer extends RLDanmakusRetainer {
+    private static class FTDanmakusRetainer extends AlignTopRetainer {
 
         @Override
         protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
@@ -245,7 +248,7 @@ public class DanmakusRetainer {
 
     }
 
-    private static class FBDanmakusRetainer extends FTDanmakusRetainer {
+    private static class AlignBottomRetainer extends FTDanmakusRetainer {
 
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS_DESC);
 
@@ -254,9 +257,9 @@ public class DanmakusRetainer {
             if (drawItem.isOutside())
                 return;
             boolean shown = drawItem.isShown();
-            float topPos = drawItem.getTop();
+            float topPos = shown ? drawItem.getTop() : -1;
             int lines = 0;
-            boolean willHit = !drawItem.isShown() && !mVisibleDanmakus.isEmpty();
+            boolean willHit = !shown && !mVisibleDanmakus.isEmpty();
             boolean isOutOfVerticalEdge = false;
             if (topPos < 0) {
                 topPos = disp.getHeight() - drawItem.paintHeight;

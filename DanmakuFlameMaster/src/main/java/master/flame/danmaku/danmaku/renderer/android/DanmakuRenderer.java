@@ -50,7 +50,7 @@ public class DanmakuRenderer extends Renderer {
 
     public DanmakuRenderer(DanmakuContext config) {
         mContext = config;
-        mDanmakusRetainer = new DanmakusRetainer();
+        mDanmakusRetainer = new DanmakusRetainer(config.isAlignBottom());
     }
 
     @Override
@@ -165,5 +165,11 @@ public class DanmakuRenderer extends Renderer {
     @Override
     public void removeOnDanmakuShownListener() {
         mOnDanmakuShownListener = null;
+    }
+
+    public void alignBottom(boolean enable) {
+        if (mDanmakusRetainer != null) {
+            mDanmakusRetainer.alignBottom(enable);
+        }
     }
 }

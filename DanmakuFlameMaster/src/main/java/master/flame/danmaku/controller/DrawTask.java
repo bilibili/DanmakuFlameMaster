@@ -404,6 +404,14 @@ public class DrawTask implements IDrawTask {
                 mRenderer.setVerifierEnabled(mContext.isPreventOverlappingEnabled() || mContext.isMaxLinesLimited());
             }
             handled = true;
+        } else if (DanmakuConfigTag.ALIGN_BOTTOM.equals(tag)) {
+            Boolean enable = (Boolean) values[0];
+            if (enable != null) {
+                if (mRenderer != null) {
+                    mRenderer.alignBottom(enable);
+                }
+                handled = true;
+            }
         }
         return handled;
     }

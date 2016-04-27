@@ -146,4 +146,6 @@ public interface IRenderer {
 
     void removeOnDanmakuShownListener();
 
+    void alignBottom(boolean enable);
+
 }
