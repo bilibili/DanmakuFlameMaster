@@ -48,6 +48,8 @@ public interface IDrawTask {
 
     public void requestClear();
 
+    void requestClearRetainer();
+
     public void setParser(BaseDanmakuParser parser);
 
     void invalidateDanmaku(BaseDanmaku item, boolean remeasure);

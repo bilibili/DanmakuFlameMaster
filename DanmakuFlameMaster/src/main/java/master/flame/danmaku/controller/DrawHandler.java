@@ -263,6 +263,8 @@ public class DrawHandler extends Handler {
                 Boolean updateFlag = (Boolean) msg.obj;
                 if (updateFlag != null && updateFlag) {
                     mContext.mGlobalFlagValues.updateMeasureFlag();
+                    mContext.mGlobalFlagValues.updateVisibleFlag();
+                    drawTask.requestClearRetainer();
                 }
                 break;
             case HIDE_DANMAKUS:
