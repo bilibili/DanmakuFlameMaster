@@ -196,6 +196,9 @@ public class DanmakusRetainer {
                 if (isOutOfVertialEdge) {
                     topPos = 0;
                     willHit = true;
+                    lines = 1;
+                } else if (removeItem != null) {
+                    lines--;
                 }
                 if (topPos == 0) {
                     shown = false;
@@ -306,8 +309,14 @@ public class DanmakusRetainer {
                 if (isOutOfVerticalEdge) {
                     topPos = disp.getHeight() - drawItem.paintHeight;
                     willHit = true;
-                } else if (topPos >= 0) {
-                    willHit = false;
+                    lines = 1;
+                } else {
+                    if (topPos >= 0) {
+                        willHit = false;
+                    }
+                    if (removeItem != null) {
+                        lines--;
+                    }
                 }
 
             }
