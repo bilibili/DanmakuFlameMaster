@@ -553,7 +553,7 @@ public class DanmakuContext {
      * 设置防弹幕重叠
      * @param pairs map<K,V> 设置null恢复默认设置,默认为允许重叠
      * K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
-     * V = true|false 是否重叠
+     * V = true|false 是否允许弹幕重叠
      * @return
      */
     public DanmakuContext preventOverlapping(Map<Integer, Boolean> pairs) {
