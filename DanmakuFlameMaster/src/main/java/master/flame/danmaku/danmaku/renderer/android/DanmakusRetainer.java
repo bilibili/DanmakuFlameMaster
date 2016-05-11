@@ -87,10 +87,6 @@ public class DanmakusRetainer {
     
     public void release(){
         clear();
-        rldrInstance = null;
-        lrdrInstance = null;
-        ftdrInstance = null;
-        fbdrInstance = null;
     }
 
     public interface Verifier {
