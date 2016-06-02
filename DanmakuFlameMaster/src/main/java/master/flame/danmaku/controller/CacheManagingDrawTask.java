@@ -524,6 +524,9 @@ public class CacheManagingDrawTask extends DrawTask {
                         BaseDanmaku danmaku = (BaseDanmaku) msg.obj;
                         if (!danmaku.isTimeOut()) {
                             createCache(danmaku);
+                            if (danmaku.cache != null) {
+                                push(danmaku, danmaku.cache.size(), true);
+                            }
                         }
                         break;
                     case REBUILD_CACHE:
