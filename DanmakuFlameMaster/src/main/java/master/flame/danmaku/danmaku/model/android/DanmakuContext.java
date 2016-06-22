@@ -56,7 +56,7 @@ public class DanmakuContext {
 
     public boolean R2LDanmakuVisibility = true;
 
-    public boolean SecialDanmakuVisibility = true;
+    public boolean SpecialDanmakuVisibility = true;
     
     List<Integer> mFilterTypes = new ArrayList<Integer>();
 
@@ -269,8 +269,8 @@ public class DanmakuContext {
     /**
      * @return 是否显示特殊弹幕
      */
-    public boolean getSecialDanmakuVisibility() {
-        return SecialDanmakuVisibility;
+    public boolean getSpecialDanmakuVisibility() {
+        return SpecialDanmakuVisibility;
     }
 
     /**
@@ -282,8 +282,8 @@ public class DanmakuContext {
         setDanmakuVisible(visible, BaseDanmaku.TYPE_SPECIAL);
         setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
         mGlobalFlagValues.updateFilterFlag();
-        if (SecialDanmakuVisibility != visible) {
-            SecialDanmakuVisibility = visible;
+        if (SpecialDanmakuVisibility != visible) {
+            SpecialDanmakuVisibility = visible;
             notifyConfigureChanged(DanmakuConfigTag.SPECIAL_DANMAKU_VISIBILITY, visible);
         }
         return this;
