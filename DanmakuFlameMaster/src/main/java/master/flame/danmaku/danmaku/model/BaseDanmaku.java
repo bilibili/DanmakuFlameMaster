@@ -222,10 +222,7 @@ public abstract class BaseDanmaku {
     }
 
     public IDrawingCache<?> getDrawingCache() {
-        if (cache != null) {
-            return cache;
-        }
-        return null;
+        return cache;
     }
 
     public boolean isShown() {
