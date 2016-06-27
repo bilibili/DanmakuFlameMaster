@@ -168,7 +168,7 @@ public class DrawTask implements IDrawTask {
     }
 
     protected void onDanmakuRemoved(BaseDanmaku danmaku) {
-        // TODO call callback here
+        // override by CacheManagingDrawTask
     }
 
     @Override

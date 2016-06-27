@@ -221,8 +221,11 @@ public abstract class BaseDanmaku {
         this.measureResetFlag = flags.MEASURE_RESET_FLAG;
     }
 
-    public boolean hasDrawingCache() {
-        return cache != null && cache.get() != null;
+    public IDrawingCache<?> getDrawingCache() {
+        if (cache != null) {
+            return cache;
+        }
+        return null;
     }
 
     public boolean isShown() {

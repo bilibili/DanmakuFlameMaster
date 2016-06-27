@@ -22,6 +22,7 @@ import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.Renderer;
@@ -98,7 +99,8 @@ public class DanmakuRenderer extends Renderer {
             }
 
             if (drawItem.isLate()) {
-                if (mCacheManager != null && !drawItem.hasDrawingCache()) {
+                IDrawingCache<?> cache = drawItem.getDrawingCache();
+                if (mCacheManager != null && (cache == null || cache.get() == null)) {
                     mCacheManager.addDanmaku(drawItem);
                 }
                 break;
