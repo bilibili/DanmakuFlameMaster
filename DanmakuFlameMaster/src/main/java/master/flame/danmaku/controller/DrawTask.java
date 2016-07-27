@@ -63,6 +63,8 @@ public class DrawTask implements IDrawTask {
 
     private long mLastEndMills;
 
+    protected int mPlayState;
+
     private boolean mIsHidden;
 
     private BaseDanmaku mLastDanmaku;
@@ -286,6 +288,11 @@ public class DrawTask implements IDrawTask {
             mTaskListener.ready();
             mReadyState = true;
         }
+    }
+
+    @Override
+    public void onPlayStateChanged(int state) {
+        mPlayState = state;
     }
 
     protected void loadDanmakus(BaseDanmakuParser parser) {

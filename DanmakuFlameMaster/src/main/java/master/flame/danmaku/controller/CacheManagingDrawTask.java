@@ -173,6 +173,14 @@ public class CacheManagingDrawTask extends DrawTask {
         mCacheManager.begin();
     }
 
+    @Override
+    public void onPlayStateChanged(int state) {
+        super.onPlayStateChanged(state);
+        if (mCacheManager != null) {
+            mCacheManager.onPlayStateChanged(state);
+        }
+    }
+
     public class CacheManager implements ICacheManager {
 
         @SuppressWarnings("unused")
@@ -275,6 +283,12 @@ public class CacheManagingDrawTask extends DrawTask {
                 mHandler.resume();
             } else {
                 begin();
+            }
+        }
+
+        public void onPlayStateChanged(int state) {
+            if (mHandler != null) {
+                mHandler.onPlayStateChanged(state == IDrawTask.PLAY_STATE_PLAYING);
             }
         }
 
@@ -487,7 +501,11 @@ public class CacheManagingDrawTask extends DrawTask {
 
             public static final int BIND_CACHE = 0x12;
 
+            public static final int DISABLE_CANCEL_FLAG = 0x13;
+
             private boolean mPause;
+
+            private boolean mIsPlayerPause;
 
             private boolean mSeekedFlag;
 
@@ -608,6 +626,9 @@ public class CacheManagingDrawTask extends DrawTask {
                         evictAllNotInScreen(true);
                         mCacheTimer.update(mTimer.currMillisecond);
                         requestClear();
+                        break;
+                    case DISABLE_CANCEL_FLAG:
+                        mCancelFlag = false;
                         break;
                 }
             }
@@ -751,7 +772,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
                     }
 
-                    if (!repositioned) {
+                    if (!repositioned && !mIsPlayerPause) {
                         try {
                             synchronized (mDrawingNotify) {
                                 mDrawingNotify.wait(sleepTime);
@@ -907,7 +928,7 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             public void resume() {
-                mCancelFlag = false;
+                sendEmptyMessage(DISABLE_CANCEL_FLAG);
                 mPause = false;
                 removeMessages(DISPATCH_ACTIONS);
                 sendEmptyMessage(DISPATCH_ACTIONS);
@@ -921,9 +942,13 @@ public class CacheManagingDrawTask extends DrawTask {
             public void requestBuildCacheAndDraw(long correctionTime) {
                 removeMessages(CacheHandler.BUILD_CACHES);
                 mSeekedFlag = true;
-                mCancelFlag = false;
+                sendEmptyMessage(DISABLE_CANCEL_FLAG);
                 mCacheTimer.update(mTimer.currMillisecond + correctionTime);
                 sendEmptyMessage(CacheHandler.BUILD_CACHES);
+            }
+
+            public void onPlayStateChanged(boolean isPlaying) {
+                mIsPlayerPause = !isPlaying;
             }
         }
 
@@ -948,6 +973,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 return;
             }
             mHandler.removeMessages(CacheHandler.BUILD_CACHES);
+            mHandler.removeMessages(CacheHandler.DISABLE_CANCEL_FLAG);
             mHandler.requestCancelCaching();
             mHandler.removeMessages(CacheHandler.CLEAR_ALL_CACHES);
             mHandler.sendEmptyMessage(CacheHandler.CLEAR_ALL_CACHES);

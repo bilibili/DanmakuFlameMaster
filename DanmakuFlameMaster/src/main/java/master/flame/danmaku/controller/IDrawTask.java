@@ -23,6 +23,8 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 
 public interface IDrawTask {
+    public static final int PLAY_STATE_PLAYING = 1;
+    public static final int PLAY_STATE_PAUSE = 2;
 
     public void addDanmaku(BaseDanmaku item);
 
@@ -45,6 +47,8 @@ public interface IDrawTask {
     public void quit();
 
     public void prepare();
+
+    public void onPlayStateChanged(int state);
 
     public void requestClear();
 

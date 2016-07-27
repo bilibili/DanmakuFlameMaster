@@ -247,6 +247,9 @@ public class DrawHandler extends Handler {
                     drawTask.start();
                     notifyRendering();
                     mInSeekingAction = false;
+                    if (drawTask != null) {
+                        drawTask.onPlayStateChanged(IDrawTask.PLAY_STATE_PLAYING);
+                    }
                 } else {
                     sendEmptyMessageDelayed(RESUME, 100);
                 }
@@ -285,6 +288,9 @@ public class DrawHandler extends Handler {
                 }
             case PAUSE:
                 removeMessages(UPDATE);
+                if (drawTask != null) {
+                    drawTask.onPlayStateChanged(IDrawTask.PLAY_STATE_PAUSE);
+                }
             case QUIT:
                 if (what == QUIT) {
                     removeCallbacksAndMessages(null);
