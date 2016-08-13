@@ -3,17 +3,13 @@ package master.flame.danmaku.danmaku.model.android;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.text.Layout;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.SpannedString;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 
 import java.lang.ref.SoftReference;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 /**
  * Created by ch on 15-7-16.

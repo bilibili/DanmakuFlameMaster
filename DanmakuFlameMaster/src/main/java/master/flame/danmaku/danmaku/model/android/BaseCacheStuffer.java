@@ -11,6 +11,7 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
  */
 public abstract class BaseCacheStuffer {
 
+
     public static abstract class Proxy {
         /**
          * 在弹幕显示前使用新的text,使用新的text
@@ -21,6 +22,7 @@ public abstract class BaseCacheStuffer {
         public abstract void prepareDrawing(BaseDanmaku danmaku, boolean fromWorkerThread);
 
         public abstract void releaseResource(BaseDanmaku danmaku);
+
     }
 
     protected Proxy mProxy;
@@ -33,41 +35,13 @@ public abstract class BaseCacheStuffer {
     public abstract void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread);
 
     /**
-     * draw the danmaku-stroke on canvas with the given params
-     * @param danmaku
-     * @param lineText
-     * @param canvas
-     * @param left
-     * @param top
-     * @param paint
-     */
-    public abstract void drawStroke(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint);
-
-    /**
-     * draw the danmaku-text on canvas with the given params
-     * @param danmaku
-     * @param lineText
-     * @param canvas
-     * @param left
-     * @param top
-     * @param paint
-     * @param fromWorkerThread
-     */
-    public abstract void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, TextPaint paint, boolean fromWorkerThread);
-
-    /**
      * clear caches which created by this stuffer
      */
     public abstract void clearCaches();
 
-    /**
-     * draw the background in rect (left, top, left + danmaku.paintWidth, top + danmaku.paintHeight)
-     * @param danmaku
-     * @param canvas
-     * @param left
-     * @param top
-     */
-    public abstract void drawBackground(BaseDanmaku danmaku, Canvas canvas, float left, float top);
+    public abstract void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplayer.DisplayerConfig displayerConfig);
+
+    public abstract boolean drawCache(BaseDanmaku danmaku, Canvas canvas, float left, float top, Paint alphaPaint, TextPaint paint);
 
     public void clearCache(BaseDanmaku danmaku) {
 

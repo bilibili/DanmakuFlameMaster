@@ -13,7 +13,7 @@ public abstract class AbsDisplayer<T, F> implements IDisplayer {
         return false;
     }
 
-    public abstract void drawDanmaku(BaseDanmaku danmaku, T canvas, float left, float top, boolean quickly);
+    public abstract void drawDanmaku(BaseDanmaku danmaku, T canvas, float left, float top, boolean fromWorkerThread);
 
     public abstract void clearTextHeightCache();
 
