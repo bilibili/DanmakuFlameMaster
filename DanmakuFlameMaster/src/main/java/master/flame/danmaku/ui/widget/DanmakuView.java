@@ -406,11 +406,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (null != mTouchHelper) {
-            mTouchHelper.onTouchEvent(event);
-        }
-
-        return super.onTouchEvent(event);
+        return mTouchHelper.onTouchEvent(event);
     }
 
     public void seekTo(Long ms) {

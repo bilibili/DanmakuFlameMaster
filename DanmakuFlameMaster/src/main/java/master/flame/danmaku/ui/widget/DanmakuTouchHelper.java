@@ -31,20 +31,19 @@ public class DanmakuTouchHelper {
             case MotionEvent.ACTION_UP:
                 IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
                 BaseDanmaku newestDanmaku = null;
+                boolean isEventConsumed = false;
                 if (null != clickDanmakus && !clickDanmakus.isEmpty()) {
+                    isEventConsumed = true;
                     performClick(clickDanmakus);
                     newestDanmaku = fetchLatestOne(clickDanmakus);
                 }
-
                 if (null != newestDanmaku) {
                     performClickWithlatest(newestDanmaku);
                 }
-                break;
+                return isEventConsumed;
             default:
-                break;
+                return false;
         }
-
-        return false;
     }
 
     private void performClickWithlatest(BaseDanmaku newest) {
