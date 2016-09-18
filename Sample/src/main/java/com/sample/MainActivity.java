@@ -385,7 +385,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         danmaku.padding = 5;
         danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
         danmaku.isLive = islive;
-        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
+        danmaku.setTime(mDanmakuView.getCurrentTime() + 1200);
         danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
         danmaku.textColor = Color.RED;
         danmaku.textShadowColor = Color.WHITE;
@@ -404,7 +404,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         danmaku.padding = 5;
         danmaku.priority = 1;  // 一定会显示, 一般用于本机发送的弹幕
         danmaku.isLive = islive;
-        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
+        danmaku.setTime(mDanmakuView.getCurrentTime() + 1200);
         danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
         danmaku.textColor = Color.RED;
         danmaku.textShadowColor = 0; // 重要：如果有图文混排，最好不要设置描边(设textShadowColor=0)，否则会进行两次复杂的绘制导致运行效率降低
