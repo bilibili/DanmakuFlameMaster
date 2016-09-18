@@ -35,6 +35,8 @@ public interface IDisplayer {
 
     int draw(BaseDanmaku danmaku);
 
+    void recycle(BaseDanmaku danmaku);
+
     float getScaledDensity();
 
     int getSlopPixel();

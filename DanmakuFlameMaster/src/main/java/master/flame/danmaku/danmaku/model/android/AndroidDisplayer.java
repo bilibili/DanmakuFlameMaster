@@ -429,6 +429,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         return IRenderer.NOTHING_RENDERING;
     }
 
+    @Override
+    public void recycle(BaseDanmaku danmaku) {
+        if (sStuffer != null) {
+            sStuffer.releaseResource(danmaku);
+        }
+    }
+
     private void resetPaintAlpha(Paint paint) {
         if (paint.getAlpha() != AlphaValue.MAX) {
             paint.setAlpha(AlphaValue.MAX);

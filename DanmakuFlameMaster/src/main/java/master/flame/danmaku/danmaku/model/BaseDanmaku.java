@@ -42,7 +42,12 @@ public abstract class BaseDanmaku {
     /**
      * 显示时间(毫秒)
      */
-    public long time;
+    private long time;
+
+    /**
+     * 偏移时间
+     */
+    public long timeOffset;
 
     /**
      * 文本
@@ -147,6 +152,11 @@ public abstract class BaseDanmaku {
     public int measureResetFlag = 0;
 
     /**
+     * 重置位 offset time
+     */
+    public int syncTimeOffsetResetFlag = 0;
+
+    /**
      * 绘制用缓存
      */
     public IDrawingCache<?> cache;
@@ -198,6 +208,8 @@ public abstract class BaseDanmaku {
      * 标记是否首次显示，首次显示后将置为FIRST_SHOWN_RESET_FLAG
      */
     public int firstShownFlag = -1;
+    private long realTime;
+    public boolean isOffset;
 
     public long getDuration() {
         return duration.value;
@@ -235,7 +247,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isTimeOut(long ctime) {
-        return ctime - time >= duration.value;
+        return ctime - getActualTime() >= duration.value;
     }
 
     public boolean isOutside() {
@@ -243,12 +255,12 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isOutside(long ctime) {
-        long dtime = ctime - time;
+        long dtime = ctime - getActualTime();
         return dtime <= 0 || dtime >= duration.value;
     }
 
     public boolean isLate() {
-        return mTimer == null || mTimer.currMillisecond < time;
+        return mTimer == null || mTimer.currMillisecond < getActualTime();
     }
 
     public boolean hasPassedFilter() {
@@ -311,4 +323,31 @@ public abstract class BaseDanmaku {
         this.tag = tag;
     }
 
+    public void setTimeOffset(long timeOffset) {
+        this.timeOffset = timeOffset;
+        this.syncTimeOffsetResetFlag = flags.SYNC_TIME_OFFSET_RESET_FLAG;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+        this.timeOffset = 0;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public long getActualTime() {
+        if (flags == null || flags.SYNC_TIME_OFFSET_RESET_FLAG != this.syncTimeOffsetResetFlag) {
+            return time;
+        }
+        return time + timeOffset;
+    }
+
+    public boolean isOffset() {
+        if (flags == null || flags.SYNC_TIME_OFFSET_RESET_FLAG != this.syncTimeOffsetResetFlag) {
+            return false;
+        }
+        return isOffset;
+    }
 }

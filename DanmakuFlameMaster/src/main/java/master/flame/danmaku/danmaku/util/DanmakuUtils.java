@@ -21,7 +21,6 @@ import android.text.TextUtils;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.AndroidDisplayer;
 import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCacheHolder;
 
@@ -45,7 +44,7 @@ public class DanmakuUtils {
         if(d1.isOutside()){
             return false;
         }
-        long dTime = d2.time - d1.time;
+        long dTime = d2.getActualTime() - d1.getActualTime();
         if (dTime <= 0)
             return true;
         if (Math.abs(dTime) >= duration || d1.isTimeOut() || d2.isTimeOut()) {
@@ -57,7 +56,7 @@ public class DanmakuUtils {
         }
 
         return checkHitAtTime(disp, d1, d2, currTime) 
-                || checkHitAtTime(disp, d1, d2,  d1.time + d1.getDuration());
+                || checkHitAtTime(disp, d1, d2,  d1.getActualTime() + d1.getDuration());
     }
     
     private static boolean checkHitAtTime(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2, long time){
@@ -140,7 +139,7 @@ public class DanmakuUtils {
             return 1;
         }
 
-        long val = obj1.time - obj2.time;
+        long val = obj1.getTime() - obj2.getTime();
         if (val > 0) {
             return 1;
         } else if (val < 0) {

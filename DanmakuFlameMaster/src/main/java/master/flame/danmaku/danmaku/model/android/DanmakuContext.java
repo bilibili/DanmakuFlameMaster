@@ -11,6 +11,7 @@ import java.util.Map;
 
 import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DanmakuFilters.IDanmakuFilter;
+import master.flame.danmaku.danmaku.model.AbsDanmakuSync;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -84,6 +85,8 @@ public class DanmakuContext {
     }
 
     public BorderType shadowType = BorderType.SHADOW;
+
+    public AbsDanmakuSync danmakuSync;
 
     public int shadowRadius = 3;
 
@@ -603,6 +606,11 @@ public class DanmakuContext {
             this.mCacheStuffer.setProxy(cacheStufferAdapter);
             mDisplayer.setCacheStuffer(this.mCacheStuffer);
         }
+        return this;
+    }
+
+    public DanmakuContext setDanmakuSync(AbsDanmakuSync danmakuSync) {
+        this.danmakuSync = danmakuSync;
         return this;
     }
     

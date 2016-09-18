@@ -101,7 +101,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         if (!isMeasured())
             return null;
 
-        long deltaTime = currTime - time;
+        long deltaTime = currTime - getActualTime();
 
         // caculate alpha
         if (alphaDuration > 0 && deltaAlpha != 0) {

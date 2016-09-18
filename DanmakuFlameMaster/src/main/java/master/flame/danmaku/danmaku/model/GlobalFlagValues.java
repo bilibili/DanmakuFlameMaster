@@ -6,6 +6,7 @@ public class GlobalFlagValues {
     public int VISIBLE_RESET_FLAG = 0;
     public int FILTER_RESET_FLAG = 0;
     public int FIRST_SHOWN_RESET_FLAG = 0;
+    public int SYNC_TIME_OFFSET_RESET_FLAG = 0;
 
     public void resetAll() {
         VISIBLE_RESET_FLAG = 0;
@@ -28,5 +29,9 @@ public class GlobalFlagValues {
 
     public void updateFirstShownFlag() {
         FIRST_SHOWN_RESET_FLAG++;
+    }
+
+    public void updateSyncOffsetTimeFlag() {
+        SYNC_TIME_OFFSET_RESET_FLAG++;
     }
 }

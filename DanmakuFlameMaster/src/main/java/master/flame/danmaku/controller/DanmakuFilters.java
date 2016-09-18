@@ -122,7 +122,7 @@ public class DanmakuFilters {
             }
 
             if (totalSizeInScreen < mMaximumSize || danmaku.isShown()
-                    || (mLastSkipped != null && (danmaku.time - mLastSkipped.time > context.mDanmakuFactory.MAX_DANMAKU_DURATION / 20))) {
+                    || (mLastSkipped != null && (danmaku.getActualTime() - mLastSkipped.getActualTime() > context.mDanmakuFactory.MAX_DANMAKU_DURATION / 20))) {
                 mLastSkipped = danmaku;
                 return false;
             }

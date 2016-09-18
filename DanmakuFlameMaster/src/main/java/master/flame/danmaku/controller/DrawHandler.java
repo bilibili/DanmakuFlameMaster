@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.AbsDanmakuSync;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
@@ -495,7 +496,7 @@ public class DrawHandler extends Handler {
                             if (danmaku.isTimeOut()) {
                                 return;
                             }
-                            long delay = danmaku.time - timer.currMillisecond;
+                            long delay = danmaku.getActualTime() - timer.currMillisecond;
                             if (delay > 0) {
                                 sendEmptyMessageDelayed(NOTIFY_RENDERING, delay);
                             } else if (mInWaitingState) {
@@ -616,6 +617,21 @@ public class DrawHandler extends Handler {
     public RenderingState draw(Canvas canvas) {
         if (drawTask == null)
             return mRenderingState;
+
+        if(!quitFlag && !mInWaitingState) {
+            AbsDanmakuSync danmakuSync = mContext.danmakuSync;
+            if (danmakuSync != null && danmakuSync.getSyncState() == AbsDanmakuSync.SYNC_STATE_PLAYING) {
+                long fromTime = timer.currMillisecond;
+                long toTime = danmakuSync.getUptimeMillis();
+                long offset = toTime - fromTime;
+                if (Math.abs(offset) > danmakuSync.getThresholdTimeMills()) {
+                    drawTask.requestSync(fromTime, toTime, offset);
+                    timer.update(toTime);
+                    mTimeBase = SystemClock.uptimeMillis() - toTime;
+                    mRemainingTime = 0;
+                }
+            }
+        }
         mDisp.setExtraData(canvas);
         mRenderingState.set(drawTask.draw(mDisp));
         recordRenderingTime();

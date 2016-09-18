@@ -84,7 +84,7 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                     float textSize = Float.parseFloat(values[3]); // 字体大小
                     BaseDanmaku item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
                     if (item != null) {
-                        item.time = time;
+                        item.setTime(time);
                         item.textSize = textSize * (mDispDensity - 0.6f);
                         item.textColor = color;
                         item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
