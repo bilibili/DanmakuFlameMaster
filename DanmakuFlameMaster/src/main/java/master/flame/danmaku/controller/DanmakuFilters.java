@@ -113,6 +113,7 @@ public class DanmakuFilters {
         protected int mMaximumSize = -1;
 
         protected BaseDanmaku mLastSkipped = null;
+        private float mFilterFactor = 1f;
 
         private boolean needFilter(BaseDanmaku danmaku, int orderInScreen,
                                  int totalSizeInScreen, DanmakuTimer timer, boolean fromCachingTask, DanmakuContext context) {
@@ -121,13 +122,16 @@ public class DanmakuFilters {
                 return false;
             }
 
-            if (totalSizeInScreen < mMaximumSize || danmaku.isShown()
-                    || (mLastSkipped != null && (danmaku.getActualTime() - mLastSkipped.getActualTime() > context.mDanmakuFactory.MAX_DANMAKU_DURATION / 20))) {
+            if (mLastSkipped == null || mLastSkipped.isTimeOut()) {
                 mLastSkipped = danmaku;
                 return false;
             }
 
-            if (orderInScreen > mMaximumSize && !danmaku.isTimeOut()) {
+            if (danmaku.getActualTime() - mLastSkipped.getActualTime() < (context.mDanmakuFactory.MAX_Duration_Scroll_Danmaku.value * mFilterFactor)) {
+                return true;
+            }
+
+            if (orderInScreen > mMaximumSize) {
                 return true;
             }
             mLastSkipped = danmaku;
@@ -150,7 +154,8 @@ public class DanmakuFilters {
             if (data == null)
                 return;
             if (data != mMaximumSize) {
-                mMaximumSize = data;
+                mMaximumSize = data + data / 5;
+                mFilterFactor = 1f / (float) mMaximumSize;
             }
         }
 
