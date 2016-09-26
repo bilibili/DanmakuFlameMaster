@@ -111,19 +111,16 @@ public interface IDanmakuView {
 
     public void clearDanmakusOnScreen();
 
- // ------------- Click Listener -------------------
-    public interface OnDanmakuClickListener {
-     /**
-      *
-      * @param latest the latest one is clicked
-      */
-      void onDanmakuClick(BaseDanmaku latest);
+    // ------------- Click Listener -------------------
+     public interface OnDanmakuClickListener {
+         /**
+          * @param danmakus all to be clicked, this value may be empty;
+          *                 danmakus.last() is the latest danmaku which may be null;
+          * @return True if the event was handled, false otherwise.
+          */
+         boolean onDanmakuClick(IDanmakus danmakus);
 
-     /**
-      *
-      * @param danmakus all to be clicked
-      */
-        void onDanmakuClick(IDanmakus danmakus);
+         boolean onViewClick(IDanmakuView view);
     }
 
     public void setOnDanmakuClickListener(OnDanmakuClickListener listener);

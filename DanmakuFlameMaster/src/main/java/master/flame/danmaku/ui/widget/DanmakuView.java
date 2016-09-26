@@ -58,6 +58,8 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
 
     private OnDanmakuClickListener mOnDanmakuClickListener;
 
+    private OnClickListener mOnClickListener;
+
     private DanmakuTouchHelper mTouchHelper;
     
     private boolean mShowFps;
@@ -406,7 +408,11 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return mTouchHelper.onTouchEvent(event);
+        boolean isEventConsumed = mTouchHelper.onTouchEvent(event);
+        if (!isEventConsumed) {
+            return super.onTouchEvent(event);
+        }
+        return isEventConsumed;
     }
 
     public void seekTo(Long ms) {
@@ -520,7 +526,6 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     @Override
     public void setOnDanmakuClickListener(OnDanmakuClickListener listener) {
         mOnDanmakuClickListener = listener;
-        setClickable(null != listener);
     }
 
     @Override

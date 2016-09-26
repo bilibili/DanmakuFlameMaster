@@ -1,7 +1,9 @@
 package master.flame.danmaku.ui.widget;
 
 import android.graphics.RectF;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -14,12 +16,34 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
  */
 public class DanmakuTouchHelper {
 
+    private final GestureDetector mTouchDelegate;
     private IDanmakuView danmakuView;
     private RectF mDanmakuBounds;
+
+    private final android.view.GestureDetector.OnGestureListener mOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent event) {
+            IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
+            boolean isEventConsumed = false;
+            if (null != clickDanmakus && !clickDanmakus.isEmpty()) {
+                isEventConsumed = performDanmakuClick(clickDanmakus);
+            }
+            if (!isEventConsumed) {
+                isEventConsumed = performViewClick();
+            }
+            return isEventConsumed;
+        }
+    };
 
     private DanmakuTouchHelper(IDanmakuView danmakuView) {
         this.danmakuView = danmakuView;
         this.mDanmakuBounds = new RectF();
+        this.mTouchDelegate = new GestureDetector(((View)danmakuView).getContext(), mOnGestureListener);
     }
 
     public static synchronized DanmakuTouchHelper instance(IDanmakuView danmakuView) {
@@ -27,35 +51,23 @@ public class DanmakuTouchHelper {
     }
 
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_UP:
-                IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
-                BaseDanmaku newestDanmaku = null;
-                boolean isEventConsumed = false;
-                if (null != clickDanmakus && !clickDanmakus.isEmpty()) {
-                    isEventConsumed = true;
-                    performClick(clickDanmakus);
-                    newestDanmaku = fetchLatestOne(clickDanmakus);
-                }
-                if (null != newestDanmaku) {
-                    performClickWithlatest(newestDanmaku);
-                }
-                return isEventConsumed;
-            default:
-                return false;
-        }
+        return mTouchDelegate.onTouchEvent(event);
     }
 
-    private void performClickWithlatest(BaseDanmaku newest) {
-        if (danmakuView.getOnDanmakuClickListener() != null) {
-            danmakuView.getOnDanmakuClickListener().onDanmakuClick(newest);
+    private boolean performDanmakuClick(IDanmakus danmakus) {
+        IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
+        if (onDanmakuClickListener != null) {
+            return onDanmakuClickListener.onDanmakuClick(danmakus);
         }
+        return false;
     }
 
-    private void performClick(IDanmakus danmakus) {
-        if (danmakuView.getOnDanmakuClickListener() != null) {
-            danmakuView.getOnDanmakuClickListener().onDanmakuClick(danmakus);
+    private boolean performViewClick() {
+        IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
+        if (onDanmakuClickListener != null) {
+            return onDanmakuClickListener.onViewClick(danmakuView);
         }
+        return false;
     }
 
     private IDanmakus touchHitDanmaku(float x, float y) {
@@ -77,14 +89,6 @@ public class DanmakuTouchHelper {
         }
 
         return hitDanmakus;
-    }
-
-    private BaseDanmaku fetchLatestOne(IDanmakus danmakus) {
-        if (danmakus.isEmpty()) {
-            return null;
-        }
-
-        return danmakus.last();
     }
 
 }

@@ -247,26 +247,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
             });
             mDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
+
                 @Override
-                public void onDanmakuClick(BaseDanmaku latest) {
-                    Log.d("DFM", "onDanmakuClick text:" + latest.text);
+                public boolean onDanmakuClick(IDanmakus danmakus) {
+                    Log.d("DFM", "onDanmakuClick: danmakus size:" + danmakus.size());
+                    BaseDanmaku latest = danmakus.last();
+                    if (null != latest) {
+                        Log.d("DFM", "onDanmakuClick: text of latest danmaku:" + latest.text);
+                        return true;
+                    }
+                    return false;
                 }
 
                 @Override
-                public void onDanmakuClick(IDanmakus danmakus) {
-                    Log.d("DFM", "onDanmakuClick danmakus size:" + danmakus.size());
+                public boolean onViewClick(IDanmakuView view) {
+                    mMediaController.setVisibility(View.VISIBLE);
+                    return false;
                 }
             });
             mDanmakuView.prepare(mParser, mContext);
             mDanmakuView.showFPS(true);
             mDanmakuView.enableDanmakuDrawingCache(true);
-            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    mMediaController.setVisibility(View.VISIBLE);
-                }
-            });
         }
 
         if (mVideoView != null) {

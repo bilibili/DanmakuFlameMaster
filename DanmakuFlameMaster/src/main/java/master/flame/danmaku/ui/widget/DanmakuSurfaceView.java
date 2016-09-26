@@ -344,7 +344,11 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
 
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
-        return mTouchHelper.onTouchEvent(event);
+        boolean isEventConsumed = mTouchHelper.onTouchEvent(event);
+        if (!isEventConsumed) {
+            return super.onTouchEvent(event);
+        }
+        return isEventConsumed;
     }
 
     public void seekTo(Long ms) {
@@ -407,7 +411,6 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
     @Override
     public void setOnDanmakuClickListener(OnDanmakuClickListener listener) {
         mOnDanmakuClickListener = listener;
-        setClickable(null != listener);
     }
 
     @Override
