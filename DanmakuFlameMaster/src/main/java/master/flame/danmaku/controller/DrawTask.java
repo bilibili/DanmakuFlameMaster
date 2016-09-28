@@ -253,6 +253,7 @@ public class DrawTask implements IDrawTask {
         mContext.mGlobalFlagValues.updateVisibleFlag();
         mContext.mGlobalFlagValues.updateFirstShownFlag();
         mContext.mGlobalFlagValues.updateSyncOffsetTimeFlag();
+        mContext.mGlobalFlagValues.updatePrepareFlag();
         mRunningDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
         mStartRenderTime = mills < 1000 ? 0 : mills;
         mRenderingState.reset();
