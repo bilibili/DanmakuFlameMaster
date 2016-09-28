@@ -30,9 +30,6 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
 
     @Override
     public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
-        if (mProxy != null) {
-            mProxy.prepareDrawing(danmaku, fromWorkerThread);
-        }
         float w = 0;
         Float textHeight = 0f;
         if (danmaku.lines == null) {
@@ -162,18 +159,6 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
                     borderPaint);
         }
 
-    }
-
-    @Override
-    public boolean drawCache(BaseDanmaku danmaku, Canvas canvas, float left, float top, Paint alphaPaint, TextPaint paint) {
-        IDrawingCache<?> cache = danmaku.getDrawingCache();
-        if (cache != null) {
-            DrawingCacheHolder holder = (DrawingCacheHolder) cache.get();
-            if (holder != null) {
-                return holder.draw(canvas, left, top, alphaPaint);
-            }
-        }
-        return false;
     }
 
 }

@@ -121,6 +121,11 @@ public class DanmakuRenderer extends Renderer {
                 drawItem.measure(disp, false);
             }
 
+            // notify prepare drawing
+            if (!drawItem.isPrepared()) {
+                drawItem.prepare(disp, false);
+            }
+
             // layout
             mDanmakusRetainer.fix(drawItem, disp, mVerifier);
 

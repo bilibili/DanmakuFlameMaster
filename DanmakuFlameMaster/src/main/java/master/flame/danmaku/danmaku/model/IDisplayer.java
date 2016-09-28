@@ -41,6 +41,8 @@ public interface IDisplayer {
 
     int getSlopPixel();
 
+    void prepare(BaseDanmaku danmaku, boolean fromWorkerThread);
+
     void measure(BaseDanmaku danmaku, boolean fromWorkerThread);
 
     float getStrokeWidth();

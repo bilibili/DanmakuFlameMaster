@@ -472,6 +472,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
     }
 
     @Override
+    public void prepare(BaseDanmaku danmaku, boolean fromWorkerThread) {
+        if (sStuffer != null) {
+            sStuffer.prepare(danmaku, fromWorkerThread);
+        }
+    }
+
+    @Override
     public void measure(BaseDanmaku danmaku, boolean fromWorkerThread) {
         TextPaint paint = getPaint(danmaku, fromWorkerThread);
         if (mDisplayConfig.HAS_STROKE) {

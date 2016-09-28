@@ -5,12 +5,12 @@ import android.graphics.Paint;
 import android.text.TextPaint;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.IDrawingCache;
 
 /**
  * Created by ch on 15-7-16.
  */
 public abstract class BaseCacheStuffer {
-
 
     public static abstract class Proxy {
         /**
@@ -27,6 +27,12 @@ public abstract class BaseCacheStuffer {
 
     protected Proxy mProxy;
 
+    public void prepare(BaseDanmaku danmaku, boolean fromWorkerThread) {
+        if (mProxy != null) {
+            mProxy.prepareDrawing(danmaku, fromWorkerThread);
+        }
+    }
+
     /**
      * set paintWidth, paintHeight to danmaku
      * @param danmaku
@@ -41,7 +47,16 @@ public abstract class BaseCacheStuffer {
 
     public abstract void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplayer.DisplayerConfig displayerConfig);
 
-    public abstract boolean drawCache(BaseDanmaku danmaku, Canvas canvas, float left, float top, Paint alphaPaint, TextPaint paint);
+    public boolean drawCache(BaseDanmaku danmaku, Canvas canvas, float left, float top, Paint alphaPaint, TextPaint paint) {
+        IDrawingCache<?> cache = danmaku.getDrawingCache();
+        if (cache != null) {
+            DrawingCacheHolder holder = (DrawingCacheHolder) cache.get();
+            if (holder != null) {
+                return holder.draw(canvas, left, top, alphaPaint);
+            }
+        }
+        return false;
+    }
 
     public void clearCache(BaseDanmaku danmaku) {
 

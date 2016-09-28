@@ -149,9 +149,12 @@ public class DrawTask implements IDrawTask {
     @Override
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure) {
         mContext.getDisplayer().getCacheStuffer().clearCache(item);
+        item.requestFlags |= BaseDanmaku.FLAG_REQUEST_INVALIDATE;
         if (remeasure) {
             item.paintWidth = -1;
             item.paintHeight = -1;
+            item.requestFlags |= BaseDanmaku.FLAG_REQUEST_REMEASURE;
+            item.measureResetFlag++;
         }
     }
 

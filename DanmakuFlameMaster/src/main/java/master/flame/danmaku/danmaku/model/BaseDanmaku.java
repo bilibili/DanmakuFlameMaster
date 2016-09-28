@@ -157,6 +157,11 @@ public abstract class BaseDanmaku {
     public int syncTimeOffsetResetFlag = 0;
 
     /**
+     * 重置位 prepare
+     */
+    public int prepareResetFlag = -1;
+
+    /**
      * 绘制用缓存
      */
     public IDrawingCache<?> cache;
@@ -231,6 +236,15 @@ public abstract class BaseDanmaku {
     public void measure(IDisplayer displayer, boolean fromWorkerThread) {
         displayer.measure(this, fromWorkerThread);
         this.measureResetFlag = flags.MEASURE_RESET_FLAG;
+    }
+
+    public boolean isPrepared() {
+        return this.prepareResetFlag == flags.PREPARE_RESET_FLAG;
+    }
+
+    public void prepare(IDisplayer displayer, boolean fromWorkerThread) {
+        displayer.prepare(this, fromWorkerThread);
+        this.prepareResetFlag = flags.PREPARE_RESET_FLAG;
     }
 
     public IDrawingCache<?> getDrawingCache() {
