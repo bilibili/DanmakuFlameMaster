@@ -237,6 +237,7 @@ public class DrawHandler extends Handler {
                     pausedPosition = position;
                 }
             case RESUME:
+                removeMessages(DrawHandler.PAUSE);
                 quitFlag = false;
                 if (mReady) {
                     mRenderingState.reset();
@@ -288,6 +289,7 @@ public class DrawHandler extends Handler {
                     break;
                 }
             case PAUSE:
+                removeMessages(DrawHandler.RESUME);
                 removeMessages(UPDATE);
                 if (drawTask != null) {
                     drawTask.onPlayStateChanged(IDrawTask.PLAY_STATE_PAUSE);
@@ -579,6 +581,7 @@ public class DrawHandler extends Handler {
     }
 
     public void resume() {
+        removeMessages(DrawHandler.PAUSE);
         sendEmptyMessage(DrawHandler.RESUME);
     }
 
@@ -587,6 +590,7 @@ public class DrawHandler extends Handler {
     }
 
     public void pause() {
+        removeMessages(DrawHandler.RESUME);
         syncTimerIfNeeded();
         sendEmptyMessage(DrawHandler.PAUSE);
     }

@@ -347,8 +347,10 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
 
     @Override
     public void pause() {
-        if (handler != null)
+        if (handler != null) {
+            handler.removeCallbacks(mResumeRunnable);
             handler.pause();
+        }
     }
 
     private int mResumeTryCount = 0;
@@ -372,7 +374,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     public void resume() {
         if (handler != null && handler.isPrepared()) {
             mResumeTryCount = 0;
-            handler.postDelayed(mResumeRunnable, 100);
+            handler.post(mResumeRunnable);
         }  else if (handler == null) {
             restart();
         }
