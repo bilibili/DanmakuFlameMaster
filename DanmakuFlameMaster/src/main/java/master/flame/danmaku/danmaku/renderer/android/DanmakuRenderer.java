@@ -85,7 +85,6 @@ public class DanmakuRenderer extends Renderer {
             drawItem = itr.next();
 
             if (drawItem.isTimeOut()) {
-                itr.remove();
                 disp.recycle(drawItem);
                 continue;
             }
