@@ -127,7 +127,8 @@ public class DanmakuFilters {
                 return false;
             }
 
-            if (danmaku.getActualTime() - mLastSkipped.getActualTime() < (context.mDanmakuFactory.MAX_Duration_Scroll_Danmaku.value * mFilterFactor)) {
+            long gapTime = danmaku.getActualTime() - mLastSkipped.getActualTime();
+            if (gapTime >= 0 && gapTime < (context.mDanmakuFactory.MAX_Duration_Scroll_Danmaku.value * mFilterFactor)) {
                 return true;
             }
 
