@@ -23,7 +23,13 @@ public class DanmakuTouchHelper {
     private final android.view.GestureDetector.OnGestureListener mOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
         @Override
         public boolean onDown(MotionEvent event) {
-            return true;
+            if(danmakuView != null) {
+                IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
+                if (onDanmakuClickListener != null) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
