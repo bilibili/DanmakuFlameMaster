@@ -754,7 +754,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     return 0;
                 }
                 long deltaTime = first.getActualTime() - mTimer.currMillisecond;
-                long sleepTime = 30 + 10 * deltaTime / mContext.mDanmakuFactory.MAX_DANMAKU_DURATION;
+                long sleepTime = (deltaTime < 0 ? 30 : 30 + 10 * deltaTime / mContext.mDanmakuFactory.MAX_DANMAKU_DURATION);
                 sleepTime = Math.min(100, sleepTime);
                 if (repositioned) {
                     sleepTime = 0;
