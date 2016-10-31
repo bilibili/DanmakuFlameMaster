@@ -23,7 +23,7 @@ android {
     buildToolsVersion '19.1.0'
 
     defaultConfig {
-        minSdkVersion 7
+        minSdkVersion 9
         targetSdkVersion 19
         versionName VERSION_NAME
         versionCode Integer.parseInt(VERSION_CODE)
