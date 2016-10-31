@@ -258,7 +258,7 @@ public class Danmakus implements IDanmakus {
     public BaseDanmaku last() {
         if (items != null && !items.isEmpty()) {
             if (mSortType == ST_BY_LIST) {
-                return ((LinkedList<BaseDanmaku>) items).get(items.size() - 1);
+                return ((LinkedList<BaseDanmaku>) items).peekLast();
             }
             return ((SortedSet<BaseDanmaku>) items).last();
         }
