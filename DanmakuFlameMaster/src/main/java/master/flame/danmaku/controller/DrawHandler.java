@@ -25,10 +25,10 @@ import android.util.DisplayMetrics;
 
 import java.util.LinkedList;
 
+import master.flame.danmaku.danmaku.model.AbsDanmakuSync;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.AbsDanmakuSync;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
@@ -705,7 +705,12 @@ public class DrawHandler extends Handler {
         int frames = mDrawTimes.size();
         if(frames <= 0)
             return 0;
-        long dtime = mDrawTimes.peekLast() - mDrawTimes.peekFirst();
+        Long first = mDrawTimes.peekFirst();
+        Long last = mDrawTimes.peekLast();
+        if (first == null || last == null) {
+            return 0;
+        }
+        long dtime = last - first;
         return dtime / frames;
     }
 

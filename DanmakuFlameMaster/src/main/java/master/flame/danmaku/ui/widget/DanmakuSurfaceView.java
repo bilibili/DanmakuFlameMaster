@@ -252,7 +252,11 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
     private float fps() {
         long lastTime = SystemClock.uptimeMillis();
         mDrawTimes.addLast(lastTime);
-        float dtime = lastTime - mDrawTimes.peekFirst();
+        Long first = mDrawTimes.peekFirst();
+        if (first == null) {
+            return 0.0f;
+        }
+        float dtime = lastTime - first;
         int frames = mDrawTimes.size();
         if (frames > MAX_RECORD_SIZE) {
             mDrawTimes.removeFirst();
