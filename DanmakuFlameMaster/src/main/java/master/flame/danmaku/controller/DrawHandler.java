@@ -705,7 +705,7 @@ public class DrawHandler extends Handler {
         int frames = mDrawTimes.size();
         if(frames <= 0)
             return 0;
-        long dtime = mDrawTimes.getLast() - mDrawTimes.getFirst();
+        long dtime = mDrawTimes.peekLast() - mDrawTimes.peekFirst();
         return dtime / frames;
     }
 

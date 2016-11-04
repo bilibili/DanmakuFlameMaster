@@ -238,7 +238,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     private float fps() {
         long lastTime = SystemClock.uptimeMillis();
         mDrawTimes.addLast(lastTime);
-        float dtime = lastTime - mDrawTimes.getFirst();
+        float dtime = lastTime - mDrawTimes.peekFirst();
         int frames = mDrawTimes.size();
         if (frames > MAX_RECORD_SIZE) {
             mDrawTimes.removeFirst();
