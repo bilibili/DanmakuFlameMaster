@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package master.flame.danmaku.danmaku.parser.android;
+package com.sample;
 
 import android.graphics.Color;
 import android.text.TextUtils;
@@ -38,6 +38,7 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
+import master.flame.danmaku.danmaku.parser.android.AndroidFileSource;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class BiliDanmukuParser extends BaseDanmakuParser {
