@@ -80,7 +80,7 @@ public class AcFunDanmakuParser extends BaseDanmakuParser {
                         // TODO : parse advance danmaku json
                         continue;
                     long time = (long) (Float.parseFloat(values[0]) * 1000); // 出现时间
-                    int color = Integer.parseInt(values[1]) | 0xFF000000; // 颜色
+                    int color = (int) ((0x00000000ff000000 | Long.parseLong(values[1])) & 0x00000000ffffffff); // 颜色
                     float textSize = Float.parseFloat(values[3]); // 字体大小
                     BaseDanmaku item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
                     if (item != null) {
