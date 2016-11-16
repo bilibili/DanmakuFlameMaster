@@ -17,13 +17,17 @@
 apply plugin: 'com.android.application'
 
 dependencies {
+    compile project(':ndkbitmap-armv5')
+    compile project(':ndkbitmap-armv7a')
+    compile project(':ndkbitmap-x86')
     compile project(':DanmakuFlameMaster')
+
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 //    compile 'tv.danmaku.ijk.media:ijkplayer-arm64:0.6.2'
 }
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         minSdkVersion 9
