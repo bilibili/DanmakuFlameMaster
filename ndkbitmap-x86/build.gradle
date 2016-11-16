@@ -22,8 +22,9 @@ android {
     }
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.2.1'
+if (rootProject.file('gradle/gradle-mvn-push.gradle').exists()) {
+    apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+}
+if (rootProject.file('gradle/gradle-bintray-upload.gradle').exists()) {
+    apply from: rootProject.file('gradle/gradle-bintray-upload.gradle')
 }
