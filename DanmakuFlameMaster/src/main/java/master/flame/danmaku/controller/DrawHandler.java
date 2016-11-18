@@ -622,18 +622,34 @@ public class DrawHandler extends Handler {
         if (drawTask == null)
             return mRenderingState;
 
-        if(!quitFlag && !mInWaitingState) {
+        if (!mInWaitingState) {
             AbsDanmakuSync danmakuSync = mContext.danmakuSync;
-            if (danmakuSync != null && danmakuSync.getSyncState() == AbsDanmakuSync.SYNC_STATE_PLAYING) {
-                long fromTime = timer.currMillisecond;
-                long toTime = danmakuSync.getUptimeMillis();
-                long offset = toTime - fromTime;
-                if (Math.abs(offset) > danmakuSync.getThresholdTimeMills()) {
-                    drawTask.requestSync(fromTime, toTime, offset);
-                    timer.update(toTime);
-                    mTimeBase = SystemClock.uptimeMillis() - toTime;
-                    mRemainingTime = 0;
-                }
+            if (danmakuSync != null) {
+                do {
+                    boolean isSyncPlayingState = danmakuSync.isSyncPlayingState();
+                    if (!isSyncPlayingState && !quitFlag) {
+                        break;
+                    }
+                    int syncState = danmakuSync.getSyncState();
+                    if (syncState == AbsDanmakuSync.SYNC_STATE_PLAYING) {
+                        long fromTime = timer.currMillisecond;
+                        long toTime = danmakuSync.getUptimeMillis();
+                        long offset = toTime - fromTime;
+                        if (Math.abs(offset) > danmakuSync.getThresholdTimeMills()) {
+                            if (isSyncPlayingState && quitFlag) {
+                                resume();
+                            }
+                            drawTask.requestSync(fromTime, toTime, offset);
+                            timer.update(toTime);
+                            mTimeBase = SystemClock.uptimeMillis() - toTime;
+                            mRemainingTime = 0;
+                        }
+                    } else if (syncState == AbsDanmakuSync.SYNC_STATE_HALT) {
+                        if (isSyncPlayingState && !quitFlag) {
+                            pause();
+                        }
+                    }
+                } while (false);
             }
         }
         mDisp.setExtraData(canvas);

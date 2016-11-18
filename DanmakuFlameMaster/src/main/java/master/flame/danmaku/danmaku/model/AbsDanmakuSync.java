@@ -30,4 +30,12 @@ public abstract class AbsDanmakuSync {
         return 1500L;
     }
 
+    /**
+     * synchronize pause/resume state with outside playback
+     * @return
+     */
+    public boolean isSyncPlayingState() {
+        return false;
+    }
+
 }
