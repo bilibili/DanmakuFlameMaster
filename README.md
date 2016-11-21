@@ -60,12 +60,12 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.ctiao:DanmakuFlameMaster:0.6.0'
-    compile 'com.github.ctiao:ndkbitmap-armv7a:0.6.0'
+    compile 'com.github.ctiao:DanmakuFlameMaster:0.6.1'
+    compile 'com.github.ctiao:ndkbitmap-armv7a:0.6.1'
 
     # Other ABIs: optional
-    compile 'com.github.ctiao:armv5:0.6.0'
-    compile 'com.github.ctiao:ndkbitmap-x86:0.6.0'
+    compile 'com.github.ctiao:armv5:0.6.1'
+    compile 'com.github.ctiao:ndkbitmap-x86:0.6.1'
 }
 ```
 Snapshots of the development version are available in [Sonatype's snapshots repository][2].
