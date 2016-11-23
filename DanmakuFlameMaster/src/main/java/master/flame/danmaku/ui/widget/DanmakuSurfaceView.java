@@ -176,9 +176,9 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
             handler.quit();
             handler = null;
         }
-        if (mHandlerThread != null) {
-            HandlerThread handlerThread = this.mHandlerThread;
-            mHandlerThread = null;
+        HandlerThread handlerThread = this.mHandlerThread;
+        mHandlerThread = null;
+        if (handlerThread != null) {
             try {
                 handlerThread.join();
             } catch (InterruptedException e) {

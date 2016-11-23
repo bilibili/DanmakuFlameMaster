@@ -160,9 +160,9 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         if (handler != null) {
             handler.quit();
         }
-        if (mHandlerThread != null) {
-            HandlerThread handlerThread = this.mHandlerThread;
-            mHandlerThread = null;
+        HandlerThread handlerThread = this.mHandlerThread;
+        mHandlerThread = null;
+        if (handlerThread != null) {
             try {
                 handlerThread.join();
             } catch (InterruptedException e) {
