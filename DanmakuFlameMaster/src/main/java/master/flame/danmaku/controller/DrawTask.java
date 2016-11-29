@@ -258,6 +258,8 @@ public class DrawTask implements IDrawTask {
         mStartRenderTime = mills < 1000 ? 0 : mills;
         mRenderingState.reset();
         mRenderingState.endTime = mStartRenderTime;
+        mLastBeginMills = mLastEndMills = 0;
+
         if (danmakuList != null) {
             BaseDanmaku last = danmakuList.last();
             if (last != null && !last.isTimeOut()) {
