@@ -35,11 +35,7 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 
 ### TODO:
 
-- 继续精确/稳定绘帧周期
-
 - 增加OpenGL ES绘制方式
-
-- 改进缓存策略和效率
 
 
 ### Download
@@ -64,7 +60,7 @@ dependencies {
     compile 'com.github.ctiao:ndkbitmap-armv7a:0.6.2'
 
     # Other ABIs: optional
-    compile 'com.github.ctiao:armv5:0.6.2'
+    compile 'com.github.ctiao:ndkbitmap-armv5:0.6.2'
     compile 'com.github.ctiao:ndkbitmap-x86:0.6.2'
 }
 ```
