@@ -17,7 +17,6 @@
 package master.flame.danmaku.danmaku.model.android;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,22 +25,9 @@ import java.util.TreeSet;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class Danmakus implements IDanmakus {
-
-    public static final int ST_BY_TIME = 0;
-
-    public static final int ST_BY_YPOS = 1;
-
-    public static final int ST_BY_YPOS_DESC = 2;
-
-    /**
-     * this type is used to iterate/remove/insert elements, not support sub/subnew
-     */
-    public static final int ST_BY_LIST = 4;
 
     public Collection<BaseDanmaku> items;
 
@@ -53,8 +39,6 @@ public class Danmakus implements IDanmakus {
 
     private BaseDanmaku startSubItem;
 
-    private DanmakuIterator iterator;
-
     private int mSize = 0;
 
     private int mSortType = ST_BY_TIME;
@@ -62,6 +46,7 @@ public class Danmakus implements IDanmakus {
     private BaseComparator mComparator;
 
     private boolean mDuplicateMergingEnabled;
+    private Object mLockObject = new Object();
 
     public Danmakus() {
         this(ST_BY_TIME, false);
@@ -90,7 +75,6 @@ public class Danmakus implements IDanmakus {
         }
         mSortType = sortType;
         mSize = 0;
-        iterator = new DanmakuIterator(items);
     }
 
     public Danmakus(Collection<BaseDanmaku> items) {
@@ -114,16 +98,6 @@ public class Danmakus implements IDanmakus {
             mSortType = ST_BY_LIST;
         }
         mSize = (items == null ? 0 : items.size());
-        if (iterator == null) {
-            iterator = new DanmakuIterator(items);
-        } else {
-            iterator.setDatas(items);
-        }
-    }
-
-    public IDanmakuIterator iterator() {
-        iterator.reset();
-        return iterator;
     }
 
     @Override
@@ -162,6 +136,7 @@ public class Danmakus implements IDanmakus {
         }
         if (subItems == null) {
             subItems = new Danmakus(mDuplicateMergingEnabled);
+            subItems.mLockObject = this.mLockObject;
         }
         if (startSubItem == null) {
             startSubItem = createItem("start");
@@ -186,16 +161,18 @@ public class Danmakus implements IDanmakus {
     }
 
     @Override
-    public IDanmakus sub(long startTime, long endTime) {
+    public synchronized IDanmakus sub(long startTime, long endTime) {
         if (items == null || items.size() == 0) {
             return null;
         }
         if (subItems == null) {
             if(mSortType == ST_BY_LIST) {
                 subItems = new Danmakus(Danmakus.ST_BY_LIST);
+                subItems.mLockObject = this.mLockObject;
                 subItems.setItems(items);
             } else {
                 subItems = new Danmakus(mDuplicateMergingEnabled);
+                subItems.mLockObject = this.mLockObject;
             }
         }
         if (mSortType == ST_BY_LIST) {
@@ -234,7 +211,6 @@ public class Danmakus implements IDanmakus {
         if (items != null) {
             items.clear();
             mSize = 0;
-            iterator = new DanmakuIterator(items);
         }
         if (subItems != null) {
             subItems = null;
@@ -265,122 +241,6 @@ public class Danmakus implements IDanmakus {
         return null;
     }
 
-    private class DanmakuIterator implements IDanmakuIterator{
-
-        private Collection<BaseDanmaku> mData;
-        private Iterator<BaseDanmaku> it;
-        private boolean mIteratorUsed;
-
-        public DanmakuIterator(Collection<BaseDanmaku> datas){
-            setDatas(datas);
-        }
-
-        public synchronized void reset() {
-            if (!mIteratorUsed && it != null) {
-                return;
-            }
-            if (mData != null && mSize > 0) {
-                it = mData.iterator();
-            } else {
-                it = null;
-            }
-            mIteratorUsed = false;
-        }
-
-        public synchronized void setDatas(Collection<BaseDanmaku> datas){
-            if (mData != datas) {
-                mIteratorUsed = false;
-                it = null;
-            }
-            mData = datas;
-        }
-
-        @Override
-        public synchronized BaseDanmaku next() {
-            mIteratorUsed = true;
-            return it != null ? it.next() : null;
-        }
-
-        @Override
-        public synchronized boolean hasNext() {
-            return it != null && it.hasNext();
-        }
-
-        @Override
-        public synchronized void remove() {
-            mIteratorUsed = true;
-            if (it != null) {
-                it.remove();
-                mSize--;
-            }
-        }
-
-    }
-
-    private class BaseComparator implements Comparator<BaseDanmaku> {
-
-        protected boolean mDuplicateMergingEnable;
-
-        public BaseComparator(boolean duplicateMergingEnabled) {
-            setDuplicateMergingEnabled(duplicateMergingEnabled);
-        }
-
-        public void setDuplicateMergingEnabled(boolean enable) {
-            mDuplicateMergingEnable = enable;
-        }
-
-        @Override
-        public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) {
-                return 0;
-            }
-            return DanmakuUtils.compare(obj1, obj2);
-        }
-
-    }
-
-    private class TimeComparator extends BaseComparator {
-
-        public TimeComparator(boolean duplicateMergingEnabled) {
-            super(duplicateMergingEnabled);
-        }
-
-        @Override
-        public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-            return super.compare(obj1, obj2);
-        }
-    }
-
-    private class YPosComparator extends BaseComparator {
-
-        public YPosComparator(boolean duplicateMergingEnabled) {
-            super(duplicateMergingEnabled);
-        }
-
-        @Override
-        public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) {
-                return 0;
-            }
-            return Float.compare(obj1.getTop(), obj2.getTop());
-        }
-    }
-
-    private class YPosDescComparator extends BaseComparator {
-
-        public YPosDescComparator(boolean duplicateMergingEnabled) {
-            super(duplicateMergingEnabled);
-        }
-
-        @Override
-        public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) {
-                return 0;
-            }
-            return Float.compare(obj2.getTop(), obj1.getTop());
-        }
-    }
-
     @Override
     public boolean contains(BaseDanmaku item) {
         return this.items != null && this.items.contains(item);
@@ -402,8 +262,39 @@ public class Danmakus implements IDanmakus {
         startItem = endItem = null;
         if (subItems == null) {
             subItems = new Danmakus(enable);
+            subItems.mLockObject = this.mLockObject;
         }
         subItems.setDuplicateMergingEnabled(enable);
+    }
+
+    @Override
+    public Collection<BaseDanmaku> getCollection() {
+        return this.items;
+    }
+
+    @Override
+    public void forEach(Consumer<? super BaseDanmaku, ?> consumer) {
+        synchronized (this.mLockObject) {
+            consumer.before();
+            Iterator<BaseDanmaku> it = items.iterator();
+            while (it.hasNext()) {
+                int action = consumer.accept(it.next());
+                if (action == DefaultConsumer.ACTION_BREAK) {
+                    break;
+                } else if (action == DefaultConsumer.ACTION_REMOVE) {
+                    it.remove();
+                } else if (action == DefaultConsumer.ACTION_REMOVE_AND_BREAK) {
+                    it.remove();
+                    break;
+                }
+            }
+            consumer.after();
+        }
+    }
+
+    @Override
+    public Object obtainSynchronizer() {
+        return mLockObject;
     }
 
 }

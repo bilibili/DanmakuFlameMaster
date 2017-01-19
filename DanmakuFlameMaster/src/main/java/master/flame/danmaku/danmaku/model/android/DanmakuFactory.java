@@ -200,25 +200,28 @@ public class DanmakuFactory {
         return sizeChanged;
     }
 
-    private void updateSpecialDanmakusDate(float scaleX, float scaleY) {
+    private void updateSpecialDanmakusDate(final float scaleX, final float scaleY) {
         IDanmakus list = sSpecialDanmakus;
-        IDanmakuIterator it = list.iterator();
-        while (it.hasNext()) {
-            SpecialDanmaku speicalDanmaku = (SpecialDanmaku) it.next();
-            fillTranslationData(speicalDanmaku, speicalDanmaku.beginX, speicalDanmaku.beginY,
-                    speicalDanmaku.endX, speicalDanmaku.endY, speicalDanmaku.translationDuration,
-                    speicalDanmaku.translationStartDelay, scaleX, scaleY);
-            LinePath[] linePaths = speicalDanmaku.linePaths;
-            if (linePaths != null && linePaths.length > 0) {
-                int length = linePaths.length;
-                float[][] points = new float[length + 1][2];
-                for (int j = 0; j < length; j++) {
-                    points[j] = linePaths[j].getBeginPoint();
-                    points[j + 1] = linePaths[j].getEndPoint();
+        list.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+            @Override
+            public int accept(BaseDanmaku danmaku) {
+                SpecialDanmaku speicalDanmaku = (SpecialDanmaku) danmaku;
+                fillTranslationData(speicalDanmaku, speicalDanmaku.beginX, speicalDanmaku.beginY,
+                        speicalDanmaku.endX, speicalDanmaku.endY, speicalDanmaku.translationDuration,
+                        speicalDanmaku.translationStartDelay, scaleX, scaleY);
+                LinePath[] linePaths = speicalDanmaku.linePaths;
+                if (linePaths != null && linePaths.length > 0) {
+                    int length = linePaths.length;
+                    float[][] points = new float[length + 1][2];
+                    for (int j = 0; j < length; j++) {
+                        points[j] = linePaths[j].getBeginPoint();
+                        points[j + 1] = linePaths[j].getEndPoint();
+                    }
+                    fillLinePathData(speicalDanmaku, points, scaleX, scaleY);
                 }
-                fillLinePathData(speicalDanmaku, points, scaleX, scaleY);
+                return ACTION_CONTINUE;
             }
-        }
+        });
     }
 
     public void updateMaxDanmakuDuration() {
