@@ -76,22 +76,24 @@ public class DanmakuTouchHelper {
         return false;
     }
 
-    private IDanmakus touchHitDanmaku(float x, float y) {
-        IDanmakus hitDanmakus = new Danmakus();
+    private IDanmakus touchHitDanmaku(final float x, final float y) {
+        final IDanmakus hitDanmakus = new Danmakus();
         mDanmakuBounds.setEmpty();
 
         IDanmakus danmakus = danmakuView.getCurrentVisibleDanmakus();
         if (null != danmakus && !danmakus.isEmpty()) {
-            IDanmakuIterator iterator = danmakus.iterator();
-            while (iterator.hasNext()) {
-                BaseDanmaku danmaku = iterator.next();
-                if (null != danmaku) {
-                    mDanmakuBounds.set(danmaku.getLeft(), danmaku.getTop(), danmaku.getRight(), danmaku.getBottom());
-                    if (mDanmakuBounds.contains(x, y)) {
-                        hitDanmakus.addItem(danmaku);
+            danmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+                @Override
+                public int accept(BaseDanmaku danmaku) {
+                    if (null != danmaku) {
+                        mDanmakuBounds.set(danmaku.getLeft(), danmaku.getTop(), danmaku.getRight(), danmaku.getBottom());
+                        if (mDanmakuBounds.contains(x, y)) {
+                            hitDanmakus.addItem(danmaku);
+                        }
                     }
+                    return ACTION_CONTINUE;
                 }
-            }
+            });
         }
 
         return hitDanmakus;

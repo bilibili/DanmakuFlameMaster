@@ -14,7 +14,6 @@ import java.util.TreeMap;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -373,24 +372,25 @@ public class DanmakuFilters {
         protected final LinkedHashMap<String, BaseDanmaku> currentDanmakus = new LinkedHashMap<String, BaseDanmaku>();
         private final IDanmakus passedDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
 
-        private final void removeTimeoutDanmakus(final IDanmakus danmakus, long limitTime) {
-            IDanmakuIterator it = danmakus.iterator();
-            long startTime = SystemClock.uptimeMillis();
-            while (it.hasNext()) {
-                try {
-                    BaseDanmaku item = it.next();
-                    if (item.isTimeOut()) {
-                        it.remove();
-                    } else {
-                        break;
+        private final void removeTimeoutDanmakus(final IDanmakus danmakus, final long limitTime) {
+            danmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+                long startTime = SystemClock.uptimeMillis();
+                @Override
+                public int accept(BaseDanmaku item) {
+                    try {
+                        if (SystemClock.uptimeMillis() - startTime > limitTime) {
+                            return ACTION_BREAK;
+                        }
+                        if (item.isTimeOut()) {
+                            return ACTION_REMOVE;
+                        } else {
+                            return ACTION_BREAK;
+                        }
+                    } catch (Exception e) {
+                        return ACTION_BREAK;
                     }
-                } catch (Exception e) {
-                    break;
                 }
-                if (SystemClock.uptimeMillis() - startTime > limitTime) {
-                    break;
-                }
-            }
+            });
         }
 
         private void removeTimeoutDanmakus(LinkedHashMap<String, BaseDanmaku> danmakus,
