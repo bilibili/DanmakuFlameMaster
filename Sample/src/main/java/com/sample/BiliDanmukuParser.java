@@ -47,8 +47,8 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
     }
 
-    private float mDispScaleX;
-    private float mDispScaleY;
+    protected float mDispScaleX;
+    protected float mDispScaleY;
 
     @Override
     public Danmakus parse() {
@@ -76,7 +76,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
 
         private static final String TRUE_STRING = "true";
 
-        public Danmakus result = null;
+        public Danmakus result = new Danmakus();
 
         public BaseDanmaku item = null;
 
@@ -90,7 +90,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
 
         @Override
         public void startDocument() throws SAXException {
-            result = new Danmakus();
+
         }
 
         @Override
@@ -135,12 +135,16 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
 
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
-            if (item != null) {
+            if (item != null && item.text != null) {
                 if (item.duration != null) {
                     String tagName = localName.length() != 0 ? localName : qName;
                     if (tagName.equalsIgnoreCase("d")) {
                         item.setTimer(mTimer);
-                        result.addItem(item);
+                        item.flags = mContext.mGlobalFlagValues;
+                        Object lock = result.obtainSynchronizer();
+                        synchronized (lock) {
+                            result.addItem(item);
+                        }
                     }
                 }
                 item = null;
@@ -148,7 +152,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
         }
 
         @Override
-        public void characters(char[] ch, int start, int length)  {
+        public void characters(char[] ch, int start, int length) {
             if (item != null) {
                 DanmakuUtils.fillText(item, decodeXmlString(new String(ch, start, length)));
                 item.index = index++;
@@ -162,14 +166,14 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     try {
                         JSONArray jsonArray = new JSONArray(text);
                         textArr = new String[jsonArray.length()];
-                        for(int i=0;i<textArr.length;i++){
+                        for (int i = 0; i < textArr.length; i++) {
                             textArr[i] = jsonArray.getString(i);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
-                    if (textArr == null || textArr.length < 5) {
+                    if (textArr == null || textArr.length < 5 || TextUtils.isEmpty(textArr[4])) {
                         item = null;
                         return;
                     }
@@ -195,10 +199,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     if (textArr.length >= 11) {
                         endX = Float.parseFloat(textArr[7]);
                         endY = Float.parseFloat(textArr[8]);
-                        if(!"".equals(textArr[9])){
+                        if (!"".equals(textArr[9])) {
                             translationDuration = Integer.parseInt(textArr[9]);
                         }
-                        if(!"".equals(textArr[10])){
+                        if (!"".equals(textArr[10])) {
                             translationStartDelay = (long) (Float.parseFloat(textArr[10]));
                         }
                     }
