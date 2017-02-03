@@ -161,7 +161,7 @@ public class Danmakus implements IDanmakus {
     }
 
     @Override
-    public synchronized IDanmakus sub(long startTime, long endTime) {
+    public IDanmakus sub(long startTime, long endTime) {
         if (items == null || items.size() == 0) {
             return null;
         }
@@ -169,7 +169,9 @@ public class Danmakus implements IDanmakus {
             if(mSortType == ST_BY_LIST) {
                 subItems = new Danmakus(Danmakus.ST_BY_LIST);
                 subItems.mLockObject = this.mLockObject;
-                subItems.setItems(items);
+                synchronized (this.mLockObject) {
+                    subItems.setItems(items);
+                }
             } else {
                 subItems = new Danmakus(mDuplicateMergingEnabled);
                 subItems.mLockObject = this.mLockObject;
@@ -194,7 +196,9 @@ public class Danmakus implements IDanmakus {
 
         startItem.setTime(startTime);
         endItem.setTime(endTime);
-        subItems.setItems(((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem));
+        synchronized (this.mLockObject) {
+            subItems.setItems(((SortedSet<BaseDanmaku>) items).subSet(startItem, endItem));
+        }
         return subItems;
     }
 
