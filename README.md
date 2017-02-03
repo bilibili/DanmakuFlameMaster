@@ -49,7 +49,7 @@ Download the [latest version][1] or grab via Maven:
 <dependency>
   <groupId>com.github.ctiao</groupId>
   <artifactId>dfm</artifactId>
-  <version>0.6.3</version>
+  <version>0.6.4</version>
 </dependency>
 ```
 
@@ -60,12 +60,12 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.ctiao:DanmakuFlameMaster:0.6.3'
-    compile 'com.github.ctiao:ndkbitmap-armv7a:0.6.3'
+    compile 'com.github.ctiao:DanmakuFlameMaster:0.6.4'
+    compile 'com.github.ctiao:ndkbitmap-armv7a:0.6.4'
 
     # Other ABIs: optional
-    compile 'com.github.ctiao:armv5:0.6.3'
-    compile 'com.github.ctiao:ndkbitmap-x86:0.6.3'
+    compile 'com.github.ctiao:armv5:0.6.4'
+    compile 'com.github.ctiao:ndkbitmap-x86:0.6.4'
 }
 ```
 Snapshots of the development version are available in [Sonatype's snapshots repository][2].
