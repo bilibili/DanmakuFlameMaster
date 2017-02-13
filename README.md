@@ -60,7 +60,7 @@ dependencies {
     compile 'com.github.ctiao:ndkbitmap-armv7a:0.6.4'
 
     # Other ABIs: optional
-    compile 'com.github.ctiao:armv5:0.6.4'
+    compile 'com.github.ctiao:ndkbitmap-armv5:0.6.4'
     compile 'com.github.ctiao:ndkbitmap-x86:0.6.4'
 }
 ```
