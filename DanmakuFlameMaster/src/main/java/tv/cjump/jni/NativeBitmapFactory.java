@@ -72,12 +72,13 @@ public class NativeBitmapFactory {
         Log.e("NativeBitmapFactory", "loaded" + nativeLibLoaded);
     }
 
-    public static void releaseLibs() {
-        if (nativeLibLoaded) {
-            release();
-        }
+    public static synchronized void releaseLibs() {
+        boolean loaded =  nativeLibLoaded;
         nativeIntField = null;
         nativeLibLoaded = false;
+        if (loaded) {
+            release();
+        }
         // Log.e("NativeBitmapFactory", "released");
     }
 
@@ -152,7 +153,7 @@ public class NativeBitmapFactory {
         bitmap.recycle();
     }
 
-    public static Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
+    public static synchronized Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
         if (!nativeLibLoaded || nativeIntField == null) {
             // Log.e("NativeBitmapFactory", "ndk bitmap create failed");
             return Bitmap.createBitmap(width, height, config);
