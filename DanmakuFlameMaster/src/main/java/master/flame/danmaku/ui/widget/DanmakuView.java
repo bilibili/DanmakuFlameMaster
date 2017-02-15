@@ -153,7 +153,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         stopDraw();
     }
 
-    private void stopDraw() {
+    private synchronized void stopDraw() {
         DrawHandler handler = this.handler;
         this.handler = null;
         unlockCanvasAndPost();
@@ -171,13 +171,13 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
             handlerThread.quit();
         }
     }
-    
-    protected Looper getLooper(int type){
+
+    protected synchronized Looper getLooper(int type) {
         if (mHandlerThread != null) {
             mHandlerThread.quit();
             mHandlerThread = null;
         }
-        
+
         int priority;
         switch (type) {
             case THREAD_TYPE_MAIN_THREAD:
@@ -193,7 +193,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
                 priority = android.os.Process.THREAD_PRIORITY_DEFAULT;
                 break;
         }
-        String threadName = "DFM Handler Thread #"+priority;
+        String threadName = "DFM Handler Thread #" + priority;
         mHandlerThread = new HandlerThread(threadName, priority);
         mHandlerThread.start();
         return mHandlerThread.getLooper();

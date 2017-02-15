@@ -171,7 +171,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
         stopDraw();
     }
 
-    private void stopDraw() {
+    private synchronized void stopDraw() {
         if (handler != null) {
             handler.quit();
             handler = null;
@@ -188,7 +188,7 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
         }
     }
     
-    protected Looper getLooper(int type){
+    protected synchronized Looper getLooper(int type){
         if (mHandlerThread != null) {
             mHandlerThread.quit();
             mHandlerThread = null;

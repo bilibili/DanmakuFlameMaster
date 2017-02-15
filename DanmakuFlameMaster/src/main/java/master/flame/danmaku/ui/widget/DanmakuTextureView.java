@@ -45,8 +45,7 @@ import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.SystemClock;
 
 /**
- * DanmakuTextureView需要开启GPU加速才能显示弹幕
- * 很遗憾...经过测试TextureView没有提升绘制速度,也许哪里用的不对
+ * DanmakuTextureView  目前使用lockCanvas, 没有使用opengl硬件加速
  * @author ch
  *
  */
@@ -180,7 +179,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
         stopDraw();
     }
 
-    private void stopDraw() {
+    private synchronized void stopDraw() {
         if (handler != null) {
             handler.quit();
             handler = null;
@@ -197,7 +196,7 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
         }
     }
     
-    protected Looper getLooper(int type){
+    protected synchronized Looper getLooper(int type){
         if (mHandlerThread != null) {
             mHandlerThread.quit();
             mHandlerThread = null;
