@@ -282,7 +282,11 @@ public class Danmakus implements IDanmakus {
             consumer.before();
             Iterator<BaseDanmaku> it = items.iterator();
             while (it.hasNext()) {
-                int action = consumer.accept(it.next());
+                BaseDanmaku next = it.next();
+                if (next == null) {
+                    continue;
+                }
+                int action = consumer.accept(next);
                 if (action == DefaultConsumer.ACTION_BREAK) {
                     break;
                 } else if (action == DefaultConsumer.ACTION_REMOVE) {
