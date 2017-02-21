@@ -397,11 +397,12 @@ public class CacheManagingDrawTask extends DrawTask {
 
         private boolean push(BaseDanmaku item, int itemSize, boolean forcePush) {
             int size = itemSize; //sizeOf(item);
-            while (mRealSize + size > mMaxSize && mCaches.size() > 0) {
-                BaseDanmaku oldValue = mCaches.first();
+            BaseDanmaku oldValue = mCaches.first();
+            while (mRealSize + size > mMaxSize && oldValue != null) {
                 if (oldValue.isTimeOut()) {
                     entryRemoved(false, oldValue, item);
                     mCaches.removeItem(oldValue);
+                    oldValue = mCaches.first();
                 } else {
                     if (forcePush) {
                         break;
