@@ -177,7 +177,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         item = null;
                         return;
                     }
-                    item.text = textArr[4];
+                    DanmakuUtils.fillText(item, textArr[4]);
                     float beginX = Float.parseFloat(textArr[0]);
                     float beginY = Float.parseFloat(textArr[1]);
                     float endX = beginX;
