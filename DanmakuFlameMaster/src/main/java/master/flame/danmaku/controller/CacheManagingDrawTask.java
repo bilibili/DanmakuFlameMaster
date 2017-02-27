@@ -24,7 +24,6 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.ICacheManager;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
@@ -724,7 +723,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 danmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
                     @Override
                     public int accept(BaseDanmaku item) {
-                        if (mPause) {
+                        if (mPause || mCancelFlag) {
                             return ACTION_BREAK;
                         }
                         if (!item.hasPassedFilter()) {

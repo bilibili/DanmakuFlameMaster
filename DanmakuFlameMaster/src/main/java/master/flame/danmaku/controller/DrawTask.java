@@ -182,7 +182,7 @@ public class DrawTask implements IDrawTask {
         if (danmakus == null || danmakus.isEmpty())
             return;
         synchronized (danmakus) {
-            danmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+            danmakus.forEachSync(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
                 @Override
                 public int accept(BaseDanmaku danmaku) {
                     if (danmaku.isLive) {
@@ -198,7 +198,7 @@ public class DrawTask implements IDrawTask {
     protected synchronized void removeUnusedLiveDanmakusIn(final int msec) {
         if (danmakuList == null || danmakuList.isEmpty() || mLiveDanmakus.isEmpty())
             return;
-        mLiveDanmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+        mLiveDanmakus.forEachSync(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
             long startTime = SystemClock.uptimeMillis();
 
             @Override
@@ -226,7 +226,7 @@ public class DrawTask implements IDrawTask {
         IDanmakus subDanmakus = danmakuList.subnew(beginMills, endMills);
         final IDanmakus visibleDanmakus = new Danmakus();
         if (null != subDanmakus && !subDanmakus.isEmpty()) {
-            subDanmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+            subDanmakus.forEachSync(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
                 @Override
                 public int accept(BaseDanmaku danmaku) {
                     if (danmaku.isShown() && !danmaku.isOutside()) {
@@ -417,7 +417,7 @@ public class DrawTask implements IDrawTask {
         IDanmakus runningDanmakus = mRenderingState.obtainRunningDanmakus();
         mRunningDanmakus = runningDanmakus;
         // set offset time for each running-danmakus
-        runningDanmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+        runningDanmakus.forEachSync(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
             @Override
             public int accept(BaseDanmaku danmaku) {
                 if (danmaku.isOutside()) {

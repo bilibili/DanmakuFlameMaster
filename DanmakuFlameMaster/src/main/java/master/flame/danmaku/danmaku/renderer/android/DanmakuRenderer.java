@@ -19,7 +19,6 @@ package master.flame.danmaku.danmaku.renderer.android;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.ICacheManager;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.IDrawingCache;
@@ -167,7 +166,7 @@ public class DanmakuRenderer extends Renderer {
         mConsumer.disp = disp;
         mConsumer.renderingState = renderingState;
         mConsumer.startRenderTime = startRenderTime;
-        danmakus.forEach(mConsumer);
+        danmakus.forEachSync(mConsumer);
     }
 
     public void setCacheManager(ICacheManager cacheManager) {

@@ -373,7 +373,7 @@ public class DanmakuFilters {
         private final IDanmakus passedDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
 
         private final void removeTimeoutDanmakus(final IDanmakus danmakus, final long limitTime) {
-            danmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+            danmakus.forEachSync(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
                 long startTime = SystemClock.uptimeMillis();
                 @Override
                 public int accept(BaseDanmaku item) {

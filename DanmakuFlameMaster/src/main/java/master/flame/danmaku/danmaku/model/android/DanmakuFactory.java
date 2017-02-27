@@ -20,7 +20,6 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.FBDanmaku;
 import master.flame.danmaku.danmaku.model.FTDanmaku;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.L2RDanmaku;
@@ -202,7 +201,7 @@ public class DanmakuFactory {
 
     private void updateSpecialDanmakusDate(final float scaleX, final float scaleY) {
         IDanmakus list = sSpecialDanmakus;
-        list.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+        list.forEachSync(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
             @Override
             public int accept(BaseDanmaku danmaku) {
                 SpecialDanmaku speicalDanmaku = (SpecialDanmaku) danmaku;

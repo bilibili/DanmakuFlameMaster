@@ -277,27 +277,32 @@ public class Danmakus implements IDanmakus {
     }
 
     @Override
-    public void forEach(Consumer<? super BaseDanmaku, ?> consumer) {
+    public void forEachSync(Consumer<? super BaseDanmaku, ?> consumer) {
         synchronized (this.mLockObject) {
-            consumer.before();
-            Iterator<BaseDanmaku> it = items.iterator();
-            while (it.hasNext()) {
-                BaseDanmaku next = it.next();
-                if (next == null) {
-                    continue;
-                }
-                int action = consumer.accept(next);
-                if (action == DefaultConsumer.ACTION_BREAK) {
-                    break;
-                } else if (action == DefaultConsumer.ACTION_REMOVE) {
-                    it.remove();
-                } else if (action == DefaultConsumer.ACTION_REMOVE_AND_BREAK) {
-                    it.remove();
-                    break;
-                }
-            }
-            consumer.after();
+            forEach(consumer);
         }
+    }
+
+    @Override
+    public void forEach(Consumer<? super BaseDanmaku, ?> consumer) {
+        consumer.before();
+        Iterator<BaseDanmaku> it = items.iterator();
+        while (it.hasNext()) {
+            BaseDanmaku next = it.next();
+            if (next == null) {
+                continue;
+            }
+            int action = consumer.accept(next);
+            if (action == DefaultConsumer.ACTION_BREAK) {
+                break;
+            } else if (action == DefaultConsumer.ACTION_REMOVE) {
+                it.remove();
+            } else if (action == DefaultConsumer.ACTION_REMOVE_AND_BREAK) {
+                it.remove();
+                break;
+            }
+        }
+        consumer.after();
     }
 
     @Override

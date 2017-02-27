@@ -206,7 +206,7 @@ public class DanmakusRetainer {
                 boolean overwriteInsert = false;
                 mConsumer.disp = disp;
                 mConsumer.drawItem = drawItem;
-                mVisibleDanmakus.forEach(mConsumer);
+                mVisibleDanmakus.forEachSync(mConsumer);
                 RetainerState retainerState = mConsumer.result();
                 if (retainerState != null) {
                     lines = retainerState.lines;
@@ -388,7 +388,7 @@ public class DanmakusRetainer {
                 mConsumer.topPos = topPos;
                 mConsumer.disp = disp;
                 mConsumer.drawItem = drawItem;
-                mVisibleDanmakus.forEach(mConsumer);
+                mVisibleDanmakus.forEachSync(mConsumer);
                 RetainerState retainerState = mConsumer.result();
                 topPos = mConsumer.topPos;
                 if (retainerState != null) {

@@ -95,6 +95,8 @@ public interface IDanmakus {
 
     Collection<BaseDanmaku> getCollection();
 
+    void forEachSync(Consumer<? super BaseDanmaku, ?> consumer);
+
     void forEach(Consumer<? super BaseDanmaku, ?> consumer);
 
     Object obtainSynchronizer();

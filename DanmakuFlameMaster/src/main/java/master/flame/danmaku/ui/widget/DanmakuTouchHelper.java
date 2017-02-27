@@ -7,7 +7,6 @@ import android.view.View;
 
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDanmakuIterator;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 
@@ -82,7 +81,7 @@ public class DanmakuTouchHelper {
 
         IDanmakus danmakus = danmakuView.getCurrentVisibleDanmakus();
         if (null != danmakus && !danmakus.isEmpty()) {
-            danmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
+            danmakus.forEachSync(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
                 @Override
                 public int accept(BaseDanmaku danmaku) {
                     if (null != danmaku) {
