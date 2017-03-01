@@ -166,7 +166,6 @@ public class DrawHandler extends Handler {
     }
 
     public void quit() {
-        removeCallbacksAndMessages(null);
         sendEmptyMessage(QUIT);
     }
 
@@ -296,6 +295,9 @@ public class DrawHandler extends Handler {
                     drawTask.onPlayStateChanged(IDrawTask.PLAY_STATE_PAUSE);
                 }
             case QUIT:
+                if (what == QUIT) {
+                    removeCallbacksAndMessages(null);
+                }
                 quitFlag = true;
                 syncTimerIfNeeded();
                 pausedPosition = timer.currMillisecond;
