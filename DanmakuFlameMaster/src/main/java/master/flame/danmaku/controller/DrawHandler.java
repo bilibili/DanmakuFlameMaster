@@ -688,6 +688,9 @@ public class DrawHandler extends Handler {
     }
 
     private void waitRendering(long dTime) {
+        if (isStop()) {
+            return;
+        }
         mRenderingState.sysTime = SystemClock.uptimeMillis();
         mInWaitingState = true;
         if (mUpdateInNewThread) {
