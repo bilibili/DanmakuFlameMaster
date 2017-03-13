@@ -310,18 +310,14 @@ public class DrawTask implements IDrawTask {
     }
 
     protected void loadDanmakus(BaseDanmakuParser parser) {
-        danmakuList = parser.setConfig(mContext).setDisplayer(mDisp).setTimer(mTimer).getDanmakus();
-//        if (danmakuList != null && !danmakuList.isEmpty()) {
-//            if (danmakuList.first().flags == null) {
-//                IDanmakuIterator it = danmakuList.iterator();
-//                while (it.hasNext()) {
-//                    BaseDanmaku item = it.next();
-//                    if (item != null) {
-//                        item.flags = mContext.mGlobalFlagValues;
-//                    }
-//                }
-//            }
-//        }
+        danmakuList = parser.setConfig(mContext).setDisplayer(mDisp).setTimer(mTimer).setListener(new BaseDanmakuParser.Listener() {
+            @Override
+            public void onDanmakuAdd(BaseDanmaku danmaku) {
+                if (mTaskListener != null) {
+                    mTaskListener.onDanmakuAdd(danmaku);
+                }
+            }
+        }).getDanmakus();
         mContext.mGlobalFlagValues.resetAll();
         if(danmakuList != null) {
             mLastDanmaku = danmakuList.last();

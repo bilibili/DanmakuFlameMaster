@@ -499,11 +499,11 @@ public class DrawHandler extends Handler {
                             if (danmaku.isTimeOut()) {
                                 return;
                             }
-                            long delay = danmaku.getActualTime() - timer.currMillisecond;
-                            if (delay > 0) {
-                                sendEmptyMessageDelayed(NOTIFY_RENDERING, delay);
-                            } else if (mInWaitingState) {
+                            long delay = danmaku.getActualTime() - getCurrentTime();
+                            if (delay < mContext.mDanmakuFactory.MAX_DANMAKU_DURATION && (mInWaitingState || mRenderingState.nothingRendered)) {
                                 notifyRendering();
+                            } else if (delay > 0 && delay <= mContext.mDanmakuFactory.MAX_DANMAKU_DURATION) {
+                                sendEmptyMessageDelayed(NOTIFY_RENDERING, delay);
                             }
                         }
 
@@ -587,6 +587,7 @@ public class DrawHandler extends Handler {
     }
 
     public void prepare() {
+        mReady = false;
         sendEmptyMessage(DrawHandler.PREPARE);
     }
 
@@ -688,7 +689,7 @@ public class DrawHandler extends Handler {
     }
 
     private void waitRendering(long dTime) {
-        if (isStop()) {
+        if (isStop() || !isPrepared() || mInSeekingAction) {
             return;
         }
         mRenderingState.sysTime = SystemClock.uptimeMillis();

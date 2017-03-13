@@ -16,6 +16,7 @@
 
 package master.flame.danmaku.danmaku.parser;
 
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
@@ -25,6 +26,11 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
  *
  */
 public abstract class BaseDanmakuParser {
+
+    public interface Listener {
+        void onDanmakuAdd(BaseDanmaku danmaku);
+    }
+
     protected IDataSource<?> mDataSource;
 
     protected DanmakuTimer mTimer;
@@ -37,6 +43,7 @@ public abstract class BaseDanmakuParser {
 
     protected IDisplayer mDisp;
     protected DanmakuContext mContext;
+    protected Listener mListener;
 
     public BaseDanmakuParser setDisplayer(IDisplayer disp){
         mDisp = disp;
@@ -48,6 +55,15 @@ public abstract class BaseDanmakuParser {
         mContext.mDanmakuFactory.updateMaxDanmakuDuration();
         return this;
     }
+
+    public IDisplayer getDisplayer(){
+        return mDisp;
+    }
+
+    public BaseDanmakuParser setListener(Listener listener) {
+        mListener = listener;
+        return this;
+    }
     
     /**
      * decide the speed of scroll-danmakus
@@ -55,10 +71,6 @@ public abstract class BaseDanmakuParser {
      */
     protected float getViewportSizeFactor() {
         return 1 / (mDispDensity - 0.6f);
-    }
-
-    public IDisplayer getDisplayer(){
-        return mDisp;
     }
     
     public BaseDanmakuParser load(IDataSource<?> source) {
