@@ -214,7 +214,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         this.endAlpha = endAlpha;
         this.deltaAlpha = endAlpha - beginAlpha;
         this.alphaDuration = alphaDuration;
-        if(deltaAlpha != 0 && beginAlpha != AlphaValue.MAX){
+        if(beginAlpha != AlphaValue.MAX){
             alpha = beginAlpha;
         }
     }

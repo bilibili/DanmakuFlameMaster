@@ -32,7 +32,6 @@ import java.util.Map;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 
 public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
@@ -227,6 +226,10 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
                 }
             }
 
+            if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
+                paint.setAlpha(danmaku.getAlpha());
+            }
+
         }
 
         public void clearTextHeightCache() {
@@ -332,6 +335,8 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
     private int height;
 
+    private float locationZ;
+
     private float density = 1;
 
     private int densityDpi = 160;
@@ -406,12 +411,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
             if (alphaPaint != null && alphaPaint.getAlpha() == AlphaValue.TRANSPARENT) {
                 return IRenderer.NOTHING_RENDERING;
             }
+
             // drawing cache
             boolean cacheDrawn = sStuffer.drawCache(danmaku, canvas, left, top, alphaPaint, mDisplayConfig.PAINT);
             int result = IRenderer.CACHE_RENDERING;
             if (!cacheDrawn) {
                 if (alphaPaint != null) {
                     mDisplayConfig.PAINT.setAlpha(alphaPaint.getAlpha());
+                    mDisplayConfig.PAINT_DUPLICATE.setAlpha(alphaPaint.getAlpha());
                 } else {
                     resetPaintAlpha(mDisplayConfig.PAINT);
                 }
@@ -448,11 +455,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
     private int saveCanvas(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
         camera.save();
+        if (locationZ !=0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            camera.setLocation(0, 0, locationZ);
+        }
         camera.rotateY(-danmaku.rotationY);
         camera.rotateZ(-danmaku.rotationZ);
         camera.getMatrix(matrix);
-        matrix.preTranslate(-left, -top);
-        matrix.postTranslate(left, top);
+//        matrix.preTranslate(-left, -top);
+        matrix.postTranslate(left , top);
         camera.restore();
         int count = canvas.save();
         canvas.concat(matrix);
@@ -542,6 +552,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
+        this.locationZ = (float) (width / 2f / Math.tan((Math.PI / 180) * (55f / 2f)));
     }
 
     @Override
