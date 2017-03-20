@@ -206,16 +206,16 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                             translationStartDelay = (long) (Float.parseFloat(textArr[10]));
                         }
                     }
-                    if (isPercentageNumber(beginX)) {
+                    if (isPercentageNumber(textArr[0])) {
                         beginX *= DanmakuFactory.BILI_PLAYER_WIDTH;
                     }
-                    if (isPercentageNumber(beginY)) {
+                    if (isPercentageNumber(textArr[1])) {
                         beginY *= DanmakuFactory.BILI_PLAYER_HEIGHT;
                     }
-                    if (isPercentageNumber(endX)) {
+                    if (isPercentageNumber(textArr[7])) {
                         endX *= DanmakuFactory.BILI_PLAYER_WIDTH;
                     }
-                    if (isPercentageNumber(endY)) {
+                    if (isPercentageNumber(textArr[8])) {
                         endY *= DanmakuFactory.BILI_PLAYER_HEIGHT;
                     }
                     item.duration = new Duration(alphaDuraion);
@@ -227,7 +227,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
 
                     if (textArr.length >= 12) {
                         // 是否有描边
-                        if (!TextUtils.isEmpty(textArr[11]) && TRUE_STRING.equals(textArr[11])) {
+                        if (!TextUtils.isEmpty(textArr[11]) && TRUE_STRING.equalsIgnoreCase(textArr[11])) {
                             item.textShadowColor = Color.TRANSPARENT;
                         }
                     }
@@ -277,8 +277,9 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
 
     }
 
-    private boolean isPercentageNumber(float number) {
-        return number >= 0f && number <= 1f;
+    private boolean isPercentageNumber(String number) {
+        //return number >= 0f && number <= 1f;
+        return number != null && number.contains(".");
     }
 
     @Override
