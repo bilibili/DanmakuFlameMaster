@@ -102,6 +102,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         private int transparency = AlphaValue.MAX;
         private float scaleTextSize = 1.0f;
         private boolean isTextScaled = false;
+        private int margin = 0;
 
         public DisplayerConfig() {
             PAINT = new TextPaint();
@@ -327,6 +328,16 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
     @Override
     public BaseCacheStuffer getCacheStuffer() {
         return sStuffer;
+    }
+
+    @Override
+    public void setMargin(int m) {
+        mDisplayConfig.margin = m;
+    }
+
+    @Override
+    public int getMargin() {
+        return mDisplayConfig.margin;
     }
 
     public Canvas canvas;

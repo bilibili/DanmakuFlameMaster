@@ -24,7 +24,7 @@ public class DanmakuContext {
     }
 
     public enum DanmakuConfigTag {
-        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU, DUPLICATE_MERGING_ENABLED, MAXIMUN_LINES, OVERLAPPING_ENABLE, ALIGN_BOTTOM;
+        FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU, DUPLICATE_MERGING_ENABLED, MAXIMUN_LINES, OVERLAPPING_ENABLE, ALIGN_BOTTOM, DANMAKU_MARGIN;
 
         public boolean isVisibilityRelatedTag() {
             return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
@@ -45,6 +45,8 @@ public class DanmakuContext {
     public int transparency = AlphaValue.MAX;
 
     public float scaleTextSize = 1.0f;
+
+    public int margin = 0;
 
     /**
      * 弹幕显示隐藏设置
@@ -155,6 +157,17 @@ public class DanmakuContext {
             mGlobalFlagValues.updateMeasureFlag();
             mGlobalFlagValues.updateVisibleFlag();
             notifyConfigureChanged(DanmakuConfigTag.SCALE_TEXTSIZE, p);
+        }
+        return this;
+    }
+
+    public DanmakuContext setDanmakuMargin(int m) {
+        if (margin != m) {
+            margin = m;
+            mDisplayer.setMargin(m);
+            mGlobalFlagValues.updateFilterFlag();
+            mGlobalFlagValues.updateVisibleFlag();
+            notifyConfigureChanged(DanmakuConfigTag.DANMAKU_MARGIN, m);
         }
         return this;
     }
