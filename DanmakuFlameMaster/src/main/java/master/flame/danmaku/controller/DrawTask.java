@@ -450,7 +450,7 @@ public class DrawTask implements IDrawTask {
                 }
                 handled = true;
             }
-        } else if (DanmakuConfigTag.SCALE_TEXTSIZE.equals(tag) || DanmakuConfigTag.SCROLL_SPEED_FACTOR.equals(tag)) {
+        } else if (DanmakuConfigTag.SCALE_TEXTSIZE.equals(tag) || DanmakuConfigTag.SCROLL_SPEED_FACTOR.equals(tag) || DanmakuConfigTag.DANMAKU_MARGIN.equals(tag)) {
             requestClearRetainer();
             handled = false;
         } else if (DanmakuConfigTag.MAXIMUN_LINES.equals(tag) || DanmakuConfigTag.OVERLAPPING_ENABLE.equals(tag)) {

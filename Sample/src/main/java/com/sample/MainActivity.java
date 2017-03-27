@@ -3,6 +3,7 @@ package com.sample;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -222,7 +223,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         .setCacheStuffer(new SpannedCacheStuffer(), mCacheStufferAdapter) // 图文混排使用SpannedCacheStuffer
 //        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
         .setMaximumLines(maxLinesPair)
-        .preventOverlapping(overlappingEnablePair);
+        .preventOverlapping(overlappingEnablePair).setDanmakuMargin(40);
         if (mDanmakuView != null) {
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
@@ -422,4 +423,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return spannableStringBuilder;
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mDanmakuView.getConfig().setDanmakuMargin(20);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mDanmakuView.getConfig().setDanmakuMargin(40);
+        }
+    }
 }

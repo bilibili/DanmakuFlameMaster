@@ -66,4 +66,8 @@ public interface IDisplayer {
 
     void setDanmakuStyle(int style, float[] data);
 
+    void setMargin(int m);
+
+    int getMargin();
+
 }

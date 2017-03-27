@@ -199,6 +199,7 @@ public class DanmakusRetainer {
             boolean willHit = !shown && !mVisibleDanmakus.isEmpty();
             boolean isOutOfVertialEdge = false;
             BaseDanmaku removeItem = null;
+            int margin = disp.getMargin();
             if (!shown) {
                 mCancelFixingFlag = false;
                 // 确定弹幕位置
@@ -221,7 +222,7 @@ public class DanmakusRetainer {
                 boolean checkEdge = true;
                 if (insertItem != null) {
                     if (lastItem != null)
-                        topPos = lastItem.getBottom();
+                        topPos = lastItem.getBottom() + margin;
                     else
                         topPos = insertItem.getTop();
                     if (insertItem != drawItem){
@@ -233,7 +234,7 @@ public class DanmakusRetainer {
                     checkEdge = false;
                     shown = false;
                 } else if (lastItem != null) {
-                    topPos = lastItem.getBottom();
+                    topPos = lastItem.getBottom() + margin;
                     willHit = false;
                 } else if (firstItem != null) {
                     topPos = firstItem.getTop();
@@ -352,7 +353,7 @@ public class DanmakusRetainer {
                     return ACTION_BREAK;
                 }
 
-                topPos = item.getTop() - drawItem.paintHeight;
+                topPos = item.getTop() - disp.getMargin() - drawItem.paintHeight;
                 return ACTION_CONTINUE;
             }
 
