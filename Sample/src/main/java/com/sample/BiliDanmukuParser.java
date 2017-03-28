@@ -117,11 +117,11 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                 // parse p value to danmaku
                 String[] values = pValue.split(",");
                 if (values.length > 0) {
-                    long time = (long) (Float.parseFloat(values[0]) * 1000); // 出现时间
-                    int type = Integer.parseInt(values[1]); // 弹幕类型
-                    float textSize = Float.parseFloat(values[2]); // 字体大小
-                    int color = (int) ((0x00000000ff000000 | Long.parseLong(values[3])) & 0x00000000ffffffff); // 颜色
-                    // int poolType = Integer.parseInt(values[5]); // 弹幕池类型（忽略
+                    long time = (long) (parseFloat(values[0]) * 1000); // 出现时间
+                    int type = parseInteger(values[1]); // 弹幕类型
+                    float textSize = parseFloat(values[2]); // 字体大小
+                    int color = (int) ((0x00000000ff000000 | parseLong(values[3])) & 0x00000000ffffffff); // 颜色
+                    // int poolType = parseInteger(values[5]); // 弹幕池类型（忽略
                     item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
                     if (item != null) {
                         item.setTime(time);
@@ -178,32 +178,32 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         return;
                     }
                     DanmakuUtils.fillText(item, textArr[4]);
-                    float beginX = Float.parseFloat(textArr[0]);
-                    float beginY = Float.parseFloat(textArr[1]);
+                    float beginX = parseFloat(textArr[0]);
+                    float beginY = parseFloat(textArr[1]);
                     float endX = beginX;
                     float endY = beginY;
                     String[] alphaArr = textArr[2].split("-");
-                    int beginAlpha = (int) (AlphaValue.MAX * Float.parseFloat(alphaArr[0]));
+                    int beginAlpha = (int) (AlphaValue.MAX * parseFloat(alphaArr[0]));
                     int endAlpha = beginAlpha;
                     if (alphaArr.length > 1) {
-                        endAlpha = (int) (AlphaValue.MAX * Float.parseFloat(alphaArr[1]));
+                        endAlpha = (int) (AlphaValue.MAX * parseFloat(alphaArr[1]));
                     }
-                    long alphaDuraion = (long) (Float.parseFloat(textArr[3]) * 1000);
+                    long alphaDuraion = (long) (parseFloat(textArr[3]) * 1000);
                     long translationDuration = alphaDuraion;
                     long translationStartDelay = 0;
                     float rotateY = 0, rotateZ = 0;
                     if (textArr.length >= 7) {
-                        rotateZ = Float.parseFloat(textArr[5]);
-                        rotateY = Float.parseFloat(textArr[6]);
+                        rotateZ = parseFloat(textArr[5]);
+                        rotateY = parseFloat(textArr[6]);
                     }
                     if (textArr.length >= 11) {
-                        endX = Float.parseFloat(textArr[7]);
-                        endY = Float.parseFloat(textArr[8]);
+                        endX = parseFloat(textArr[7]);
+                        endY = parseFloat(textArr[8]);
                         if (!"".equals(textArr[9])) {
-                            translationDuration = Integer.parseInt(textArr[9]);
+                            translationDuration = parseInteger(textArr[9]);
                         }
                         if (!"".equals(textArr[10])) {
-                            translationStartDelay = (long) (Float.parseFloat(textArr[10]));
+                            translationStartDelay = (long) (parseFloat(textArr[10]));
                         }
                     }
                     if (isPercentageNumber(textArr[0])) {
@@ -241,16 +241,20 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         // 路径数据
                         if (!"".equals(textArr[14])) {
                             String motionPathString = textArr[14].substring(1);
-                            String[] pointStrArray = motionPathString.split("L");
-                            if (pointStrArray != null && pointStrArray.length > 0) {
-                                float[][] points = new float[pointStrArray.length][2];
-                                for (int i = 0; i < pointStrArray.length; i++) {
-                                    String[] pointArray = pointStrArray[i].split(",");
-                                    points[i][0] = Float.parseFloat(pointArray[0]);
-                                    points[i][1] = Float.parseFloat(pointArray[1]);
+                            if (!TextUtils.isEmpty(motionPathString)) {
+                                String[] pointStrArray = motionPathString.split("L");
+                                if (pointStrArray.length > 0) {
+                                    float[][] points = new float[pointStrArray.length][2];
+                                    for (int i = 0; i < pointStrArray.length; i++) {
+                                        String[] pointArray = pointStrArray[i].split(",");
+                                        if (pointArray.length >= 2) {
+                                            points[i][0] = parseFloat(pointArray[0]);
+                                            points[i][1] = parseFloat(pointArray[1]);
+                                        }
+                                    }
+                                    mContext.mDanmakuFactory.fillLinePathData(item, points, mDispScaleX,
+                                            mDispScaleY);
                                 }
-                                mContext.mDanmakuFactory.fillLinePathData(item, points, mDispScaleX,
-                                        mDispScaleY);
                             }
                         }
                     }
@@ -280,6 +284,30 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
     private boolean isPercentageNumber(String number) {
         //return number >= 0f && number <= 1f;
         return number != null && number.contains(".");
+    }
+
+    private float parseFloat(String floatStr) {
+        try {
+            return Float.parseFloat(floatStr);
+        } catch (NumberFormatException e) {
+            return 0.0f;
+        }
+    }
+
+    private int parseInteger(String intStr) {
+        try {
+            return Integer.parseInt(intStr);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+    
+    private long parseLong(String longStr) {
+        try {
+            return Long.parseLong(longStr);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     @Override
