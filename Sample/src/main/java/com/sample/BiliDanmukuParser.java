@@ -35,6 +35,7 @@ import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.SpecialDanmaku;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
@@ -235,7 +236,8 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                         //TODO 字体 textArr[12]
                     }
                     if (textArr.length >= 14) {
-                        //TODO 是否有动画缓冲(easing)
+                        // Linear.easeIn or Quadratic.easeOut
+                        ((SpecialDanmaku) item).isQuadraticEaseOut = ("0".equals(textArr[13]));
                     }
                     if (textArr.length >= 15) {
                         // 路径数据

@@ -73,6 +73,11 @@ public class SpecialDanmaku extends BaseDanmaku {
 
     public long translationStartDelay;
 
+    /**
+     * Linear.easeIn or Quadratic.easeOut
+     */
+    public boolean isQuadraticEaseOut = false;
+
     public int beginAlpha;
 
     public int endAlpha;
@@ -119,7 +124,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         float currY = beginY;
         long dtime = deltaTime - translationStartDelay;
         if (translationDuration > 0 && dtime >= 0 && dtime <= translationDuration) {
-            float tranalationProgress = dtime / (float) translationDuration;
+            float tranalationProgress = 0f;
             if (linePaths != null) {
                 LinePath currentLinePath = null;
                 for (LinePath line : linePaths) {
@@ -134,8 +139,7 @@ public class SpecialDanmaku extends BaseDanmaku {
                 if (currentLinePath != null) {
                     float deltaX = currentLinePath.delatX;
                     float deltaY = currentLinePath.deltaY;
-                    tranalationProgress = (deltaTime - currentLinePath.beginTime)
-                            / (float) currentLinePath.duration;
+                    tranalationProgress = (deltaTime - currentLinePath.beginTime) / (float) currentLinePath.duration;
                     float beginX = currentLinePath.pBegin.x;
                     float beginY = currentLinePath.pBegin.y;
                     if (deltaX != 0) {
@@ -148,6 +152,7 @@ public class SpecialDanmaku extends BaseDanmaku {
                     }
                 }
             } else {
+                tranalationProgress = isQuadraticEaseOut ? getQuadEaseOutProgress(dtime, translationDuration) : dtime / (float) translationDuration;
                 if (deltaX != 0) {
                     float vectorX = deltaX * tranalationProgress;
                     currX = beginX + vectorX;
@@ -170,6 +175,18 @@ public class SpecialDanmaku extends BaseDanmaku {
         this.setVisibility(!isOutside());
 
         return currStateValues;
+    }
+
+    private final static float getQuadEaseOutProgress(long ctime, long duration) {
+//            Math.easeOutQuad = function (t, b, c, d) {
+//                t /= d;
+//                return -c * t*(t-2) + b;
+//            };
+        float t = ctime;
+//        float b = 0f;
+        float c = 1.0f;
+        float d = duration;
+        return -c * (t /= d) * (t - 2); // + b;
     }
 
     @Override
