@@ -70,4 +70,7 @@ public interface IDisplayer {
 
     int getMargin();
 
+    void setAllMarginTop(int m);
+
+    int getAllMarginTop();
 }
