@@ -662,7 +662,8 @@ public class DrawHandler extends Handler {
 
     private void redrawIfNeeded() {
         if (quitFlag && mDanmakusVisible) {
-            obtainMessage(UPDATE_WHEN_PAUSED).sendToTarget();
+            removeMessages(UPDATE_WHEN_PAUSED);
+            sendEmptyMessageDelayed(UPDATE_WHEN_PAUSED, 100);
         }
     }
 
