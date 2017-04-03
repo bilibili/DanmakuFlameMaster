@@ -172,6 +172,11 @@ public class DanmakuContext {
         return this;
     }
 
+    public DanmakuContext setMarginTop(int m) {
+        mDisplayer.setAllMarginTop(m);
+        return this;
+    }
+
     /**
      * @return 是否显示顶部弹幕
      */
