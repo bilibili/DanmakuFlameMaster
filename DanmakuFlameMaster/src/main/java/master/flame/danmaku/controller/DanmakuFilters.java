@@ -1,6 +1,7 @@
 
 package master.flame.danmaku.controller;
 
+import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.util.SystemClock;
 
 import java.util.ArrayList;
@@ -127,7 +128,8 @@ public class DanmakuFilters {
             }
 
             long gapTime = danmaku.getActualTime() - mLastSkipped.getActualTime();
-            if (gapTime >= 0 && gapTime < (context.mDanmakuFactory.MAX_Duration_Scroll_Danmaku.value * mFilterFactor)) {
+            Duration maximumScrollDuration = context.mDanmakuFactory.MAX_Duration_Scroll_Danmaku;
+            if (gapTime >= 0 && maximumScrollDuration != null && gapTime < (maximumScrollDuration.value * mFilterFactor)) {
                 return true;
             }
 
