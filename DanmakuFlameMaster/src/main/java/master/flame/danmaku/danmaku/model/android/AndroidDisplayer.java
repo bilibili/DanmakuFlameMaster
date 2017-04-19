@@ -483,7 +483,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         camera.rotateY(-danmaku.rotationY);
         camera.rotateZ(-danmaku.rotationZ);
         camera.getMatrix(matrix);
-//        matrix.preTranslate(-left, -top);
+        matrix.preTranslate(-left, -top);
         matrix.postTranslate(left , top);
         camera.restore();
         int count = canvas.save();
