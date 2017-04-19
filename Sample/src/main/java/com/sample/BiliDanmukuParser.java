@@ -213,10 +213,10 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     if (isPercentageNumber(textArr[1])) {
                         beginY *= DanmakuFactory.BILI_PLAYER_HEIGHT;
                     }
-                    if (isPercentageNumber(textArr[7])) {
+                    if (textArr.length >= 8 && isPercentageNumber(textArr[7])) {
                         endX *= DanmakuFactory.BILI_PLAYER_WIDTH;
                     }
-                    if (isPercentageNumber(textArr[8])) {
+                    if (textArr.length >= 9 && isPercentageNumber(textArr[8])) {
                         endY *= DanmakuFactory.BILI_PLAYER_HEIGHT;
                     }
                     item.duration = new Duration(alphaDuraion);
