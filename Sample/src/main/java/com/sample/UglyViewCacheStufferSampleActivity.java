@@ -416,6 +416,11 @@ public class UglyViewCacheStufferSampleActivity extends Activity implements View
                 }
 
                 @Override
+                public boolean onDanmakuLongClick(IDanmakus danmakus) {
+                    return false;
+                }
+
+                @Override
                 public boolean onViewClick(IDanmakuView view) {
                     mMediaController.setVisibility(View.VISIBLE);
                     return false;

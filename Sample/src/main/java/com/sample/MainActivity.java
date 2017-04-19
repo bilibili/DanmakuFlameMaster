@@ -260,6 +260,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
 
                 @Override
+                public boolean onDanmakuLongClick(IDanmakus danmakus) {
+                    return false;
+                }
+
+                @Override
                 public boolean onViewClick(IDanmakuView view) {
                     mMediaController.setVisibility(View.VISIBLE);
                     return false;

@@ -67,6 +67,10 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
 
 	private OnDanmakuClickListener mOnDanmakuClickListener;
 
+    private float mXOff;
+
+    private float mYOff;
+
     private DanmakuTouchHelper mTouchHelper;
 
     private boolean mShowFps;
@@ -427,8 +431,25 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     }
 
     @Override
+    public void setOnDanmakuClickListener(OnDanmakuClickListener listener, float xOff, float yOff) {
+        mOnDanmakuClickListener = listener;
+        mXOff = xOff;
+        mYOff = yOff;
+    }
+
+    @Override
     public OnDanmakuClickListener getOnDanmakuClickListener() {
         return mOnDanmakuClickListener;
+    }
+
+    @Override
+    public float getXOff() {
+        return mXOff;
+    }
+
+    @Override
+    public float getYOff() {
+        return mYOff;
     }
 
     @Override

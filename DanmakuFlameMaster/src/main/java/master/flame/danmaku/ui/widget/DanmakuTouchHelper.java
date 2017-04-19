@@ -1,6 +1,8 @@
 package master.flame.danmaku.ui.widget;
 
 import android.graphics.RectF;
+import android.nfc.Tag;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,17 +16,20 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
  * Created by kmfish on 2015/1/25.
  */
 public class DanmakuTouchHelper {
-
     private final GestureDetector mTouchDelegate;
     private IDanmakuView danmakuView;
     private RectF mDanmakuBounds;
+    private float mXOff;
+    private float mYOff;
 
-    private final android.view.GestureDetector.OnGestureListener mOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
+    private final android.view.GestureDetector.OnGestureListener mOnGestureListener = new GestureDetector.SimpleOnGestureListener() {
         @Override
         public boolean onDown(MotionEvent event) {
-            if(danmakuView != null) {
+            if (danmakuView != null) {
                 IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
                 if (onDanmakuClickListener != null) {
+                    mXOff = danmakuView.getXOff();
+                    mYOff = danmakuView.getYOff();
                     return true;
                 }
             }
@@ -36,19 +41,33 @@ public class DanmakuTouchHelper {
             IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
             boolean isEventConsumed = false;
             if (null != clickDanmakus && !clickDanmakus.isEmpty()) {
-                isEventConsumed = performDanmakuClick(clickDanmakus);
+                isEventConsumed = performDanmakuClick(clickDanmakus, false);
             }
             if (!isEventConsumed) {
                 isEventConsumed = performViewClick();
             }
             return isEventConsumed;
         }
+
+        @Override
+        public void onLongPress(MotionEvent event) {
+            IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
+            if (onDanmakuClickListener == null) {
+                mXOff = danmakuView.getXOff();
+                mYOff = danmakuView.getYOff();
+                return;
+            }
+            IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
+            if (null != clickDanmakus && !clickDanmakus.isEmpty()) {
+                performDanmakuClick(clickDanmakus, true);
+            }
+        }
     };
 
     private DanmakuTouchHelper(IDanmakuView danmakuView) {
         this.danmakuView = danmakuView;
         this.mDanmakuBounds = new RectF();
-        this.mTouchDelegate = new GestureDetector(((View)danmakuView).getContext(), mOnGestureListener);
+        this.mTouchDelegate = new GestureDetector(((View) danmakuView).getContext(), mOnGestureListener);
     }
 
     public static synchronized DanmakuTouchHelper instance(IDanmakuView danmakuView) {
@@ -59,10 +78,14 @@ public class DanmakuTouchHelper {
         return mTouchDelegate.onTouchEvent(event);
     }
 
-    private boolean performDanmakuClick(IDanmakus danmakus) {
+    private boolean performDanmakuClick(IDanmakus danmakus, boolean isLongClick) {
         IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
         if (onDanmakuClickListener != null) {
-            return onDanmakuClickListener.onDanmakuClick(danmakus);
+            if (isLongClick) {
+                return onDanmakuClickListener.onDanmakuLongClick(danmakus);
+            } else {
+                return onDanmakuClickListener.onDanmakuClick(danmakus);
+            }
         }
         return false;
     }
@@ -86,7 +109,7 @@ public class DanmakuTouchHelper {
                 public int accept(BaseDanmaku danmaku) {
                     if (null != danmaku) {
                         mDanmakuBounds.set(danmaku.getLeft(), danmaku.getTop(), danmaku.getRight(), danmaku.getBottom());
-                        if (mDanmakuBounds.contains(x, y)) {
+                        if (mDanmakuBounds.intersect(x - mXOff, y - mYOff, x + mXOff, y + mYOff)) {
                             hitDanmakus.addItem(danmaku);
                         }
                     }
@@ -97,5 +120,4 @@ public class DanmakuTouchHelper {
 
         return hitDanmakus;
     }
-
 }
