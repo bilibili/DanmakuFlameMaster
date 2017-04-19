@@ -105,9 +105,8 @@ public class CacheManagingDrawTask extends DrawTask {
         } else {
             IDrawingCache<?> cache = danmaku.getDrawingCache();
             if (cache != null) {
-                if (cache.hasReferences()) {
-                    cache.decreaseReference();
-                } else {
+                cache.decreaseReference();
+                if (!cache.hasReferences()) {
                     cache.destroy();
                 }
                 danmaku.cache = null;
@@ -369,8 +368,8 @@ public class CacheManagingDrawTask extends DrawTask {
             if (cache == null) {
                 return 0;
             }
+            cache.decreaseReference();
             if (cache.hasReferences()) {
-                cache.decreaseReference();
                 oldValue.cache = null;
                 return 0;
             }
