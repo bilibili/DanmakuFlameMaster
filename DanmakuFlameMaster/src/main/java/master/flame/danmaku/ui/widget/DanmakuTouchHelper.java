@@ -53,10 +53,10 @@ public class DanmakuTouchHelper {
         public void onLongPress(MotionEvent event) {
             IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
             if (onDanmakuClickListener == null) {
-                mXOff = danmakuView.getXOff();
-                mYOff = danmakuView.getYOff();
                 return;
             }
+            mXOff = danmakuView.getXOff();
+            mYOff = danmakuView.getYOff();
             IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
             if (null != clickDanmakus && !clickDanmakus.isEmpty()) {
                 performDanmakuClick(clickDanmakus, true);
