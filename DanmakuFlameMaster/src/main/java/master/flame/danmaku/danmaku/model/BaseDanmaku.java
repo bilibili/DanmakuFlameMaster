@@ -213,8 +213,6 @@ public abstract class BaseDanmaku {
      * 标记是否首次显示，首次显示后将置为FIRST_SHOWN_RESET_FLAG
      */
     public int firstShownFlag = -1;
-    private long realTime;
-    public boolean isOffset;
 
     public long getDuration() {
         return duration.value;
@@ -353,6 +351,7 @@ public abstract class BaseDanmaku {
 
     public long getActualTime() {
         if (flags == null || flags.SYNC_TIME_OFFSET_RESET_FLAG != this.syncTimeOffsetResetFlag) {
+            this.timeOffset = 0;
             return time;
         }
         return time + timeOffset;
@@ -360,8 +359,9 @@ public abstract class BaseDanmaku {
 
     public boolean isOffset() {
         if (flags == null || flags.SYNC_TIME_OFFSET_RESET_FLAG != this.syncTimeOffsetResetFlag) {
+            this.timeOffset = 0;
             return false;
         }
-        return isOffset;
+        return timeOffset != 0;
     }
 }

@@ -629,7 +629,7 @@ public class DrawHandler extends Handler {
             if (danmakuSync != null) {
                 do {
                     boolean isSyncPlayingState = danmakuSync.isSyncPlayingState();
-                    if (!isSyncPlayingState && !quitFlag) {
+                    if (!isSyncPlayingState && quitFlag) {
                         break;
                     }
                     int syncState = danmakuSync.getSyncState();
@@ -643,7 +643,7 @@ public class DrawHandler extends Handler {
                             }
                             drawTask.requestSync(fromTime, toTime, offset);
                             timer.update(toTime);
-                            mTimeBase = SystemClock.uptimeMillis() - toTime;
+                            mTimeBase -= offset;
                             mRemainingTime = 0;
                         }
                     } else if (syncState == AbsDanmakuSync.SYNC_STATE_HALT) {
