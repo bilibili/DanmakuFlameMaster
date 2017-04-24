@@ -420,6 +420,9 @@ public class DrawTask implements IDrawTask {
                     return ACTION_REMOVE;
                 }
                 danmaku.setTimeOffset(offsetMills + danmaku.timeOffset);
+                if (danmaku.timeOffset == 0) {
+                    return ACTION_REMOVE;
+                }
                 return ACTION_CONTINUE;
             }
         });

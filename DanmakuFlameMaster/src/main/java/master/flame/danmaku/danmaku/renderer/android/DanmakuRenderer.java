@@ -40,11 +40,11 @@ public class DanmakuRenderer extends Renderer {
             lastItem = drawItem;
             if (drawItem.isTimeOut()) {
                 disp.recycle(drawItem);
-                return ACTION_CONTINUE;
+                return renderingState.isRunningDanmakus ? ACTION_REMOVE : ACTION_CONTINUE;
             }
 
             if (!renderingState.isRunningDanmakus && drawItem.isOffset()) {
-                return ACTION_REMOVE;
+                return ACTION_CONTINUE;
             }
 
             if (!drawItem.hasPassedFilter()) {
