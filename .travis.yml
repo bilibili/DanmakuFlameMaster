@@ -10,6 +10,7 @@ android:
 
 script:
     - ./gradlew check -i
+    - ./gradlew assemble
 
 after_failure:
   - cat /home/travis/build/Bilibili/DanmakuFlameMaster/DanmakuFlameMaster/build/outputs/lint-results.html
