@@ -230,17 +230,13 @@ public class CacheManagingDrawTask extends DrawTask {
         @Override
         public void addDanmaku(BaseDanmaku danmaku) {
             if (mHandler != null) {
-                if (danmaku.isLive) {
-                    if (danmaku.forceBuildCacheInSameThread) {
-                        if (!danmaku.isTimeOut()) {
-                            mHandler.createCache(danmaku);
-                        }
-                    } else {
-                        mHandler.obtainMessage(CacheHandler.BIND_CACHE, danmaku).sendToTarget();
+                if (danmaku.isLive && danmaku.forceBuildCacheInSameThread) {
+                    if (!danmaku.isTimeOut()) {
+                        mHandler.createCache(danmaku);
                     }
-                } else {
-                    mHandler.obtainMessage(CacheHandler.ADD_DANMAKU, danmaku).sendToTarget();
+                    return;
                 }
+                mHandler.obtainMessage(CacheHandler.ADD_DANMAKU, danmaku).sendToTarget();
             }
         }
 
@@ -519,9 +515,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
             public static final int REBUILD_CACHE = 0x11;
 
-            public static final int BIND_CACHE = 0x12;
-
-            public static final int DISABLE_CANCEL_FLAG = 0x13;
+            public static final int DISABLE_CANCEL_FLAG = 0x12;
 
             private boolean mPause;
 
@@ -571,15 +565,6 @@ public class CacheManagingDrawTask extends DrawTask {
                     case ADD_DANMAKU:
                         BaseDanmaku item = (BaseDanmaku) msg.obj;
                         addDanmakuAndBuildCache(item);
-                        break;
-                    case BIND_CACHE:
-                        BaseDanmaku danmaku = (BaseDanmaku) msg.obj;
-                        if (!danmaku.isTimeOut()) {
-                            createCache(danmaku);
-                            if (danmaku.cache != null) {
-                                push(danmaku, danmaku.cache.size(), true);
-                            }
-                        }
                         break;
                     case REBUILD_CACHE:
                         BaseDanmaku cacheitem = (BaseDanmaku) msg.obj;
