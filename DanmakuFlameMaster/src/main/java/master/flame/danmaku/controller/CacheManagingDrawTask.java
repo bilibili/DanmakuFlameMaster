@@ -239,7 +239,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         mHandler.obtainMessage(CacheHandler.BIND_CACHE, danmaku).sendToTarget();
                     }
                 } else {
-                    mHandler.obtainMessage(CacheHandler.ADD_DANMAKKU, danmaku).sendToTarget();
+                    mHandler.obtainMessage(CacheHandler.ADD_DANMAKU, danmaku).sendToTarget();
                 }
             }
         }
@@ -499,7 +499,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
             private static final int PREPARE = 0x1;
 
-            public static final int ADD_DANMAKKU = 0x2;
+            public static final int ADD_DANMAKU = 0x2;
 
             public static final int BUILD_CACHES = 0x3;
 
@@ -568,7 +568,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
 //                        Log.i(TAG,"BUILD_CACHES:"+mCacheTimer.currMillisecond+":"+mTimer.currMillisecond);
                         break;
-                    case ADD_DANMAKKU:
+                    case ADD_DANMAKU:
                         BaseDanmaku item = (BaseDanmaku) msg.obj;
                         addDanmakuAndBuildCache(item);
                         break;
