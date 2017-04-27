@@ -572,7 +572,7 @@ public class CacheManagingDrawTask extends DrawTask {
                             IDrawingCache<?> cache = cacheitem.getDrawingCache();
                             boolean requestRemeasure = 0 != (cacheitem.requestFlags & BaseDanmaku.FLAG_REQUEST_REMEASURE);
                             if (!requestRemeasure && cache != null && cache.get() !=null && !cache.hasReferences()) {
-                                cache = DanmakuUtils.buildDanmakuDrawingCache(cacheitem, mDisp, (DrawingCache) cacheitem.cache);
+                                cache = DanmakuUtils.buildDanmakuDrawingCache(cacheitem, mDisp, (DrawingCache) cacheitem.cache, mContext.bitsPerPixelOfCache);
                                 cacheitem.cache = cache;
                                 push(cacheitem, 0, true);
                                 return;
@@ -857,7 +857,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 DrawingCache cache = null;
                 try {
                     cache = mCachePool.acquire();
-                    cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache);
+                    cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache, mContext.bitsPerPixelOfCache);
                     item.cache = cache;
                 } catch (OutOfMemoryError e) {
 //Log.e("cache", "break at error: oom");
@@ -907,7 +907,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     if (cache != null) {
                         danmaku.cache = null;
 //Log.e("cache", danmaku.text + "DrawingCache hit!!:" + item.paintWidth + "," + danmaku.paintWidth);
-                        cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache);  //redraw
+                        cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache, mContext.bitsPerPixelOfCache);  //redraw
                         item.cache = cache;
                         mCacheManager.push(item, 0, forceInsert);
                         return RESULT_SUCCESS;
@@ -924,7 +924,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     }
 
                     cache = mCachePool.acquire();
-                    cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache);
+                    cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache, mContext.bitsPerPixelOfCache);
                     item.cache = cache;
                     boolean pushed = mCacheManager.push(item, sizeOf(item), forceInsert);
                     if (!pushed) {

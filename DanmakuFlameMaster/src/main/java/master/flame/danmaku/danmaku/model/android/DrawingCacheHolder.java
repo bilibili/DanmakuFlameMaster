@@ -32,16 +32,7 @@ public class DrawingCacheHolder {
 
     }
 
-    public DrawingCacheHolder(int w, int h) {
-        buildCache(w, h, 0, true);
-    }
-    
-    public DrawingCacheHolder(int w, int h, int density) {
-        mDensity = density;
-        buildCache(w, h, density, true);
-    }
-
-    public void buildCache(int w, int h, int density, boolean checkSizeEquals) {
+    public void buildCache(int w, int h, int density, boolean checkSizeEquals, int bitsPerPixel) {
         boolean reuse = checkSizeEquals ? (w == width && h == height) : (w <= width && h <= height);
         if (reuse && bitmap != null) {
 //            canvas.drawColor(Color.TRANSPARENT);
@@ -56,7 +47,11 @@ public class DrawingCacheHolder {
         }
         width = w;
         height = h;
-        bitmap = NativeBitmapFactory.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Bitmap.Config config = Bitmap.Config.ARGB_4444;
+        if (bitsPerPixel == 32) {
+            config = Bitmap.Config.ARGB_8888;
+        }
+        bitmap = NativeBitmapFactory.createBitmap(w, h, config);
         if (density > 0) {
             mDensity = density;
             bitmap.setDensity(density);

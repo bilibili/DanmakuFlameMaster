@@ -85,11 +85,11 @@ public class DanmakuUtils {
     }
 
     public static DrawingCache buildDanmakuDrawingCache(BaseDanmaku danmaku, IDisplayer disp,
-            DrawingCache cache) {
+            DrawingCache cache, int bitsPerPixel) {
         if (cache == null)
             cache = new DrawingCache();
 
-        cache.build((int) Math.ceil(danmaku.paintWidth), (int) Math.ceil(danmaku.paintHeight), disp.getDensityDpi(), false);
+        cache.build((int) Math.ceil(danmaku.paintWidth), (int) Math.ceil(danmaku.paintHeight), disp.getDensityDpi(), false, bitsPerPixel);
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
             ((AbsDisplayer) disp).drawDanmaku(danmaku, holder.canvas, 0, 0, true);
