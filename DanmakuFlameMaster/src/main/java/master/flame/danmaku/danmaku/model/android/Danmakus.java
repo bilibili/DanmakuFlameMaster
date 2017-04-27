@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Danmaku;
@@ -39,7 +40,7 @@ public class Danmakus implements IDanmakus {
 
     private BaseDanmaku startSubItem;
 
-    private int mSize = 0;
+    private volatile AtomicInteger mSize = new AtomicInteger(0);
 
     private int mSortType = ST_BY_TIME;
 
@@ -74,7 +75,7 @@ public class Danmakus implements IDanmakus {
             mComparator = comparator;
         }
         mSortType = sortType;
-        mSize = 0;
+        mSize.set(0);
     }
 
     public Danmakus(Collection<BaseDanmaku> items) {
@@ -97,7 +98,7 @@ public class Danmakus implements IDanmakus {
         if (items instanceof List) {
             mSortType = ST_BY_LIST;
         }
-        mSize = (items == null ? 0 : items.size());
+        mSize.set(items == null ? 0 : items.size());
     }
 
     @Override
@@ -105,7 +106,7 @@ public class Danmakus implements IDanmakus {
         if (items != null) {
             try {
                 if (items.add(item)) {
-                    mSize++;
+                    mSize.incrementAndGet();
                     return true;
                 }
             } catch (Exception e) {
@@ -124,7 +125,7 @@ public class Danmakus implements IDanmakus {
             item.setVisibility(false);
         }
         if (items.remove(item)) {
-            mSize--;
+            mSize.decrementAndGet();
             return true;
         }
         return false;
@@ -207,14 +208,14 @@ public class Danmakus implements IDanmakus {
     }
 
     public int size() {
-        return mSize;
+        return mSize.get();
     }
 
     @Override
     public void clear() {
         if (items != null) {
             items.clear();
-            mSize = 0;
+            mSize.set(0);
         }
         if (subItems != null) {
             subItems = null;
@@ -297,8 +298,10 @@ public class Danmakus implements IDanmakus {
                 break;
             } else if (action == DefaultConsumer.ACTION_REMOVE) {
                 it.remove();
+                mSize.decrementAndGet();
             } else if (action == DefaultConsumer.ACTION_REMOVE_AND_BREAK) {
                 it.remove();
+                mSize.decrementAndGet();
                 break;
             }
         }
