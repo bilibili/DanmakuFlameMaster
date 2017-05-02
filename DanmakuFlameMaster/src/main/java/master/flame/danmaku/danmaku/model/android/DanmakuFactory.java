@@ -59,7 +59,7 @@ public class DanmakuFactory {
     
     public Duration MAX_Duration_Special_Danmaku;
     
-    public IDanmakus sSpecialDanmakus = new Danmakus();
+    private IDanmakus sSpecialDanmakus = new Danmakus();
 
     public IDisplayer sLastDisp;
     private DanmakuContext sLastConfig;
@@ -199,7 +199,7 @@ public class DanmakuFactory {
         return sizeChanged;
     }
 
-    private void updateSpecialDanmakusDate(final float scaleX, final float scaleY) {
+    private synchronized void updateSpecialDanmakusDate(final float scaleX, final float scaleY) {
         IDanmakus list = sSpecialDanmakus;
         list.forEachSync(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
             @Override
