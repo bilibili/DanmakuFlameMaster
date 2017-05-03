@@ -101,8 +101,8 @@ public class DanmakuUtils {
         return cache;
     }
 
-    public static int getCacheSize(int w, int h) {
-        return (w) * (h) * 4;
+    public static int getCacheSize(int w, int h, int bytesPerPixel) {
+        return (w) * (h) * bytesPerPixel;
     }
     
     public final static boolean isDuplicate(BaseDanmaku obj1, BaseDanmaku obj2) {

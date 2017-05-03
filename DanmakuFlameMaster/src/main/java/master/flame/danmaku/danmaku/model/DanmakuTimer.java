@@ -21,6 +21,14 @@ public class DanmakuTimer {
 
     private long lastInterval;
 
+    public DanmakuTimer() {
+
+    }
+
+    public DanmakuTimer(long curr) {
+        update(curr);
+    }
+
     public long update(long curr) {
         lastInterval = curr - currMillisecond;
         currMillisecond = curr;

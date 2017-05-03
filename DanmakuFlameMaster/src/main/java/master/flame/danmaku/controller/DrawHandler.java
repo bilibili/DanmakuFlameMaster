@@ -34,7 +34,6 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
-import master.flame.danmaku.danmaku.util.AndroidUtils;
 import master.flame.danmaku.danmaku.util.SystemClock;
 import tv.cjump.jni.DeviceUtils;
 
@@ -548,7 +547,7 @@ public class DrawHandler extends Handler {
         mDisp.resetSlopPixel(mContext.scaleTextSize);
         mDisp.setHardwareAccelerated(isHardwareAccelerated);
         IDrawTask task = useDrwaingCache ?
-                new CacheManagingDrawTask(timer, mContext, taskListener, 1024 * 1024 * AndroidUtils.getMemoryClass(context) / 3)
+                new CacheManagingDrawTask(timer, mContext, taskListener)
                 : new DrawTask(timer, mContext, taskListener);
         task.setParser(mParser);
         task.prepare();

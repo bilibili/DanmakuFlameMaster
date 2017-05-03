@@ -86,13 +86,6 @@ public class DanmakuContext {
         NONE, SHADOW, STROKEN
     }
 
-    public final static int BMP_BPP_ARGB_4444 = 16;
-    public final static int BMP_BPP_ARGB_8888 = 32;
-    /**
-     * 缓存bitmap的格式, ARGB_4444 = 16  ARGB_8888 = 32
-     */
-    public int bitsPerPixelOfCache = BMP_BPP_ARGB_8888;
-
     public BorderType shadowType = BorderType.SHADOW;
 
     public AbsDanmakuSync danmakuSync;
@@ -126,6 +119,8 @@ public class DanmakuContext {
     public final DanmakuFilters mDanmakuFilters = new DanmakuFilters();
 
     public final DanmakuFactory mDanmakuFactory = DanmakuFactory.create();
+
+    public CachingPolicy cachingPolicy = CachingPolicy.POLICY_DEFAULT;
 
     public AbsDisplayer getDisplayer() {
         return mDisplayer;
@@ -639,14 +634,8 @@ public class DanmakuContext {
         return this;
     }
 
-    /**
-     * 设置缓存bitmap像素位数,可设置BMP_BPP_ARGB_4444或BMP_BPP_ARGB_8888<br/>
-     * 此选项在KITKAT(4.4)及以上系统无效,ARGB_4444会自动被系统替换成ARGB_8888
-     * @param bitsPerPixel 像素位数,可设置BMP_BPP_ARGB_4444或BMP_BPP_ARGB_8888
-     * @return
-     */
-    public DanmakuContext setBPPOfCache(int bitsPerPixel) {
-        this.bitsPerPixelOfCache = bitsPerPixel;
+    public DanmakuContext setCachingPolicy(CachingPolicy cachingPolicy) {
+        this.cachingPolicy = cachingPolicy;
         return this;
     }
     

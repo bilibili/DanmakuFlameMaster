@@ -221,7 +221,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mContext = DanmakuContext.create();
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setScrollSpeedFactor(1.2f).setScaleTextSize(1.2f)
         .setCacheStuffer(new SpannedCacheStuffer(), mCacheStufferAdapter) // 图文混排使用SpannedCacheStuffer
-        .setBPPOfCache(DanmakuContext.BMP_BPP_ARGB_4444)  // 设置缓存bitmap格式
 //        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
         .setMaximumLines(maxLinesPair)
         .preventOverlapping(overlappingEnablePair).setDanmakuMargin(40);
