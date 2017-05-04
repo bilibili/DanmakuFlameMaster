@@ -16,12 +16,15 @@
 
 package master.flame.danmaku.controller;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.view.Choreographer;
 
 import java.util.LinkedList;
 
@@ -40,6 +43,7 @@ import tv.cjump.jni.DeviceUtils;
 public class DrawHandler extends Handler {
 
     private DanmakuContext mContext;
+    private FrameCallback mFrameCallback;
 
     public interface Callback {
         public void prepared();
@@ -110,7 +114,7 @@ public class DrawHandler extends Handler {
 
     private UpdateThread mThread;
 
-    private final boolean mUpdateInNewThread;
+    private boolean mUpdateInSeparateThread;
 
     private long mCordonTime = 30;
 
@@ -137,7 +141,6 @@ public class DrawHandler extends Handler {
 
     public DrawHandler(Looper looper, IDanmakuViewController view, boolean danmakuVisibile) {
         super(looper);
-        mUpdateInNewThread = (Runtime.getRuntime().availableProcessors() > 3);
         mIdleSleep = !DeviceUtils.isProblemBoxDevice();
         bindView(view);
         if (danmakuVisibile) {
@@ -257,9 +260,11 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case UPDATE:
-                if (mUpdateInNewThread) {
+                if (mContext.updateMethod == 0) {
+                    updateInChoreographer();
+                } else if (mContext.updateMethod == 1) {
                     updateInNewThread();
-                } else {
+                } else if (mContext.updateMethod == 2) {
                     updateInCurrentThread();
                 }
                 break;
@@ -428,6 +433,45 @@ public class DrawHandler extends Handler {
         mThread.start();
     }
 
+    @TargetApi(16)
+    private class FrameCallback implements Choreographer.FrameCallback {
+        @Override
+        public void doFrame(long frameTimeNanos) {
+            sendEmptyMessage(UPDATE);
+        }
+    };
+
+    @TargetApi(16)
+    private void updateInChoreographer() {
+        if (quitFlag) {
+            return;
+        }
+        Choreographer.getInstance().postFrameCallback(mFrameCallback);
+        long startMS = SystemClock.uptimeMillis();
+        long d = syncTimer(startMS);
+        if (d < 0) {
+            removeMessages(UPDATE);
+            return;
+        }
+        d = mDanmakuView.drawDanmakus();
+        removeMessages(UPDATE);
+        if (d > mCordonTime2) {  // this situation may be cuased by ui-thread waiting of DanmakuView, so we sync-timer at once
+            timer.add(d);
+            mDrawTimes.clear();
+        }
+        if (!mDanmakusVisible) {
+            waitRendering(INDEFINITE_TIME);
+            return;
+        } else if (mRenderingState.nothingRendered && mIdleSleep) {
+            long dTime = mRenderingState.endTime - timer.currMillisecond;
+            if (dTime > 500) {
+                waitRendering(dTime - 10);
+                return;
+            }
+        }
+
+    }
+
     private final long syncTimer(long startMS) {
         if (mInSeekingAction || mInSyncAction) {
             return 0;
@@ -587,6 +631,13 @@ public class DrawHandler extends Handler {
 
     public void prepare() {
         mReady = false;
+        if (Build.VERSION.SDK_INT < 16 && mContext.updateMethod == 0) {
+            mContext.updateMethod = 2;
+        }
+        if (mContext.updateMethod == 0) {
+            mFrameCallback = new FrameCallback();
+        }
+        mUpdateInSeparateThread = (mContext.updateMethod == 1);
         sendEmptyMessage(DrawHandler.PREPARE);
     }
 
@@ -673,7 +724,7 @@ public class DrawHandler extends Handler {
         if(drawTask != null) {
             drawTask.requestClear();
         }
-        if (mUpdateInNewThread) {
+        if (mUpdateInSeparateThread) {
             synchronized (this) {
                 mDrawTimes.clear();
             }
@@ -694,7 +745,7 @@ public class DrawHandler extends Handler {
         }
         mRenderingState.sysTime = SystemClock.uptimeMillis();
         mInWaitingState = true;
-        if (mUpdateInNewThread) {
+        if (mUpdateInSeparateThread) {
             if (mThread == null) {
                 return;
             }

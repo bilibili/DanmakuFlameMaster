@@ -127,6 +127,15 @@ public class DanmakuContext {
     }
 
     /**
+     * 0 默认 Choreographer驱动DrawHandler线程刷新 <br />
+     * 1 "DFM Update"单独线程刷新 <br />
+     * 2 DrawHandler线程自驱动刷新
+     *
+     * Note: 在系统{@link android.os.Build.VERSION_CODES#JELLY_BEAN}以下, 0方式会被2方式代替
+     */
+    public byte updateMethod = 0;
+
+    /**
      * set typeface
      * 
      * @param font
