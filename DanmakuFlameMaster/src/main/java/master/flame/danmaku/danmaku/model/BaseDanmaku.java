@@ -16,6 +16,9 @@
 
 package master.flame.danmaku.danmaku.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class BaseDanmaku {
 
     public final static String DANMAKU_BR_CHAR = "/n";
@@ -200,6 +203,11 @@ public abstract class BaseDanmaku {
      * 透明度
      */
     protected int alpha = AlphaValue.MAX;
+
+    /**
+     * 存放各种业务数据
+     */
+    public Map expand = null;
 
     public int mFilterParam = 0;
 
