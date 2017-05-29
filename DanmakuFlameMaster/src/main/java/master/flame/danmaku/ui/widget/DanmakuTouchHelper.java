@@ -1,8 +1,6 @@
 package master.flame.danmaku.ui.widget;
 
 import android.graphics.RectF;
-import android.nfc.Tag;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +16,7 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
 public class DanmakuTouchHelper {
     private final GestureDetector mTouchDelegate;
     private IDanmakuView danmakuView;
+    private IDanmakus clickDanmakus;
     private RectF mDanmakuBounds;
     private float mXOff;
     private float mYOff;
@@ -38,7 +37,6 @@ public class DanmakuTouchHelper {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent event) {
-            IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
             boolean isEventConsumed = false;
             if (null != clickDanmakus && !clickDanmakus.isEmpty()) {
                 isEventConsumed = performDanmakuClick(clickDanmakus, false);
@@ -57,7 +55,6 @@ public class DanmakuTouchHelper {
             }
             mXOff = danmakuView.getXOff();
             mYOff = danmakuView.getYOff();
-            IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
             if (null != clickDanmakus && !clickDanmakus.isEmpty()) {
                 performDanmakuClick(clickDanmakus, true);
             }
@@ -75,6 +72,9 @@ public class DanmakuTouchHelper {
     }
 
     public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
+        }
         return mTouchDelegate.onTouchEvent(event);
     }
 
