@@ -694,4 +694,16 @@ public class DanmakuContext {
         }
     }
 
+    public DanmakuContext registerFilter(DanmakuFilters.BaseDanmakuFilter filter) {
+        mDanmakuFilters.registerFilter(filter);
+        mGlobalFlagValues.updateFilterFlag();
+        return this;
+    }
+
+    public DanmakuContext unregisterFilter(DanmakuFilters.BaseDanmakuFilter filter) {
+        mDanmakuFilters.unregisterFilter(filter);
+        mGlobalFlagValues.updateFilterFlag();
+        return this;
+    }
+
 }

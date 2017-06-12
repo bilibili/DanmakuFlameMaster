@@ -546,6 +546,8 @@ public class DanmakuFilters {
 
     public final static String TAG_OVERLAPPING_FILTER = "1019_Filter";
 
+    public final static String TAG_PRIMARY_CUSTOM_FILTER = "2000_Primary_Custom_Filter";
+
     public final Exception filterException = new Exception("not suuport this filter tag");
 
     public void filter(BaseDanmaku danmaku, int index, int totalsizeInScreen,
@@ -642,6 +644,11 @@ public class DanmakuFilters {
         return filter;
     }
 
+    public void registerFilter(BaseDanmakuFilter filter) {
+        filters.put(TAG_PRIMARY_CUSTOM_FILTER + "_" + filter.hashCode(), filter);
+        mFilterArray = filters.values().toArray(mFilterArray);
+    }
+
     public void unregisterFilter(String tag) {
         unregisterFilter(tag, true);
     }
@@ -656,6 +663,11 @@ public class DanmakuFilters {
                 mFilterArraySecondary = filtersSecondary.values().toArray(mFilterArraySecondary);
             }
         }
+    }
+
+    public void unregisterFilter(BaseDanmakuFilter filter) {
+        filters.remove(TAG_PRIMARY_CUSTOM_FILTER + "_" + filter.hashCode());
+        mFilterArray = filters.values().toArray(mFilterArray);
     }
 
     public void clear() {
