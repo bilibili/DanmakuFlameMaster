@@ -74,4 +74,6 @@ public interface IDrawTask {
 
     public void requestHide();
 
+    void requestRender();
+
 }

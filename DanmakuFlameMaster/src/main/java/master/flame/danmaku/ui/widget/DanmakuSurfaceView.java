@@ -446,6 +446,11 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
     }
 
     @Override
+    public void forceRender() {
+
+    }
+
+    @Override
     public void clear() {
         if (!isViewReady()) {
             return;

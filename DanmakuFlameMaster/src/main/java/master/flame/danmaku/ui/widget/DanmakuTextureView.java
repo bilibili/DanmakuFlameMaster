@@ -453,6 +453,11 @@ public class DanmakuTextureView extends TextureView implements IDanmakuView, IDa
     }
 
     @Override
+    public void forceRender() {
+
+    }
+
+    @Override
     public synchronized void clear() {
         if (!isViewReady()) {
             return;

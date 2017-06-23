@@ -82,6 +82,8 @@ public class DrawHandler extends Handler {
 
     private static final int CLEAR_DANMAKUS_ON_SCREEN = 13;
 
+    private static final int FORCE_RENDER = 14;
+
     private static final long INDEFINITE_TIME = 10000000;
 
     private long pausedPosition = 0;
@@ -334,6 +336,11 @@ public class DrawHandler extends Handler {
             case CLEAR_DANMAKUS_ON_SCREEN:
                 if (drawTask != null) {
                     drawTask.clearDanmakusOnScreen(getCurrentTime());
+                }
+                break;
+            case FORCE_RENDER:
+                if (drawTask != null) {
+                    drawTask.requestRender();
                 }
                 break;
         }
@@ -664,6 +671,11 @@ public class DrawHandler extends Handler {
         removeMessages(HIDE_DANMAKUS);
         obtainMessage(HIDE_DANMAKUS, quitDrawTask).sendToTarget();
         return timer.currMillisecond;
+    }
+
+    public void forceRender() {
+        removeMessages(FORCE_RENDER);
+        obtainMessage(FORCE_RENDER).sendToTarget();
     }
 
     public boolean getVisibility() {

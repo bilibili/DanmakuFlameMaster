@@ -134,4 +134,6 @@ public interface IDanmakuView {
     public float getXOff();
 
     public float getYOff();
+
+    void forceRender();
 }

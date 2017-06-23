@@ -562,4 +562,9 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     public float getYOff() {
         return mYOff;
     }
+
+    public void forceRender() {
+        mRequestRender = true;
+        handler.forceRender();
+    }
 }
