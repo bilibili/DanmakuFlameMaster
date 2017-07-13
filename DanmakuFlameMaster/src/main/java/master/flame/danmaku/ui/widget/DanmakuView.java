@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.AttributeSet;
@@ -50,8 +51,8 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
 
     private HandlerThread mHandlerThread;
 
-    private DrawHandler handler;
-    
+    private volatile DrawHandler handler;
+
     private boolean isSurfaceCreated;
 
     private boolean mEnableDanmakuDrwaingCache = true;
@@ -369,14 +370,15 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     private Runnable mResumeRunnable = new Runnable() {
         @Override
         public void run() {
-            if (handler == null) {
+            DrawHandler drawHandler = handler;
+            if (drawHandler == null) {
                 return;
             }
             mResumeTryCount++;
             if (mResumeTryCount > 4 || DanmakuView.super.isShown()) {
-                handler.resume();
+                drawHandler.resume();
             } else {
-                handler.postDelayed(this, 100 * mResumeTryCount);
+                drawHandler.postDelayed(this, 100 * mResumeTryCount);
             }
         }
     };
