@@ -347,7 +347,7 @@ public abstract class BaseDanmaku {
         if (mTags == null) {
             return null;
         }
-        return mTags.get(key)
+        return mTags.get(key);
     }
 
     public void setTimeOffset(long timeOffset) {
