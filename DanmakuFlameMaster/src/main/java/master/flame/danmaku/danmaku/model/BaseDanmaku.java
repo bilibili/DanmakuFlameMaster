@@ -16,6 +16,8 @@
 
 package master.flame.danmaku.danmaku.model;
 
+import android.util.SparseArray;
+
 public abstract class BaseDanmaku {
 
     public final static String DANMAKU_BR_CHAR = "/n";
@@ -214,6 +216,8 @@ public abstract class BaseDanmaku {
      */
     public int firstShownFlag = -1;
 
+    private SparseArray<Object> mTags = new SparseArray<>();
+
     public long getDuration() {
         return duration.value;
     }
@@ -333,6 +337,17 @@ public abstract class BaseDanmaku {
 
     public void setTag(Object tag) {
         this.tag = tag;
+    }
+
+    public void setTag(int key, Object tag) {
+        this.mTags.put(key, tag);
+    }
+
+    public Object getTag(int key) {
+        if (mTags == null) {
+            return null;
+        }
+        return mTags.get(key)
     }
 
     public void setTimeOffset(long timeOffset) {
