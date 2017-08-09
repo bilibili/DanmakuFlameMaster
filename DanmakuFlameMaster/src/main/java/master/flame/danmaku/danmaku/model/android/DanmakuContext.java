@@ -16,6 +16,7 @@ import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
+import master.flame.danmaku.danmaku.model.IDanmakus;
 
 public class DanmakuContext {
 
@@ -121,6 +122,16 @@ public class DanmakuContext {
     public final DanmakuFactory mDanmakuFactory = DanmakuFactory.create();
 
     public CachingPolicy cachingPolicy = CachingPolicy.POLICY_DEFAULT;
+
+    private IDanmakus.BaseComparator mBaseComparator;
+
+    public IDanmakus.BaseComparator getBaseComparator() {
+        return mBaseComparator;
+    }
+
+    public void setBaseComparator(IDanmakus.BaseComparator baseComparator) {
+        this.mBaseComparator = baseComparator;
+    }
 
     public AbsDisplayer getDisplayer() {
         return mDisplayer;

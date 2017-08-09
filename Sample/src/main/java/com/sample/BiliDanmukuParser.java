@@ -42,6 +42,8 @@ import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
 import master.flame.danmaku.danmaku.parser.android.AndroidFileSource;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
+import static master.flame.danmaku.danmaku.model.IDanmakus.ST_BY_TIME;
+
 public class BiliDanmukuParser extends BaseDanmakuParser {
 
     static {
@@ -77,7 +79,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
 
         private static final String TRUE_STRING = "true";
 
-        public Danmakus result = new Danmakus();
+        public Danmakus result;
 
         public BaseDanmaku item = null;
 
@@ -91,7 +93,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
 
         @Override
         public void startDocument() throws SAXException {
-
+            result = new Danmakus(ST_BY_TIME, false, mContext.getBaseComparator());
         }
 
         @Override

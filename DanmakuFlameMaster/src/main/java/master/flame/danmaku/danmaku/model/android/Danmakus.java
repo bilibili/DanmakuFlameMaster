@@ -58,15 +58,19 @@ public class Danmakus implements IDanmakus {
     }
 
     public Danmakus(int sortType, boolean duplicateMergingEnabled) {
+        this(sortType, duplicateMergingEnabled, null);
+    }
+
+    public Danmakus(int sortType, boolean duplicateMergingEnabled, BaseComparator baseComparator) {
         BaseComparator comparator = null;
         if (sortType == ST_BY_TIME) {
-            comparator = new TimeComparator(duplicateMergingEnabled);
+            comparator = baseComparator == null ? new TimeComparator(duplicateMergingEnabled) : baseComparator;
         } else if (sortType == ST_BY_YPOS) {
             comparator = new YPosComparator(duplicateMergingEnabled);
         } else if (sortType == ST_BY_YPOS_DESC) {
             comparator = new YPosDescComparator(duplicateMergingEnabled);
         }
-        if(sortType == ST_BY_LIST) {
+        if (sortType == ST_BY_LIST) {
             items = new LinkedList<>();
         } else {
             mDuplicateMergingEnabled = duplicateMergingEnabled;
