@@ -536,7 +536,7 @@ public class DrawHandler extends Handler {
     private void prepare(final Runnable runnable) {
         if (drawTask == null) {
             drawTask = createDrawTask(mDanmakuView.isDanmakuDrawingCacheEnabled(), timer,
-                    mDanmakuView.getContext(), mDanmakuView.getWidth(), mDanmakuView.getHeight(),
+                    mDanmakuView.getContext(), mDanmakuView.getViewWidth(), mDanmakuView.getViewHeight(),
                     mDanmakuView.isHardwareAccelerated(), new IDrawTask.TaskListener() {
                         @Override
                         public void ready() {

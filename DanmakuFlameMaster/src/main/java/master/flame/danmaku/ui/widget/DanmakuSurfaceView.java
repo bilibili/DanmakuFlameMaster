@@ -382,6 +382,16 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
     }
 
     @Override
+    public int getViewWidth() {
+        return super.getWidth();
+    }
+
+    @Override
+    public int getViewHeight() {
+        return super.getHeight();
+    }
+
+    @Override
     public View getView() {
         return this;
     }
