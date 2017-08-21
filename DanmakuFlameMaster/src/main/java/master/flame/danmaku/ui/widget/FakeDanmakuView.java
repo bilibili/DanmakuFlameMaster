@@ -133,8 +133,8 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
     @Override
     public void prepare(BaseDanmakuParser parser, DanmakuContext config) {
         config.updateMethod = 1;
-        handler.setIdleSleep(false);
         super.prepare(parser, config);
+        handler.setIdleSleep(false);
     }
 
     public void getFrameAtTime(final long beginMills, final long endMills, final int frameRate, final OnFrameAvailableListener onFrameAvailableListener) {
