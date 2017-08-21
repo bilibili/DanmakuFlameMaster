@@ -18,6 +18,8 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback {
 
+    private DanmakuTimer mTimer;
+
     public interface OnFrameAvailableListener {
         void onFrameAvailable(long timeMills, Bitmap bitmap);
 
@@ -85,8 +87,11 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
                 release();
                 onFrameAvailableListener.onFailed(101, e.getMessage());
             } finally {
-                if (curr > mEndTimeMills) {
+                if (curr >= mEndTimeMills) {
                     release();
+                    if (mTimer != null) {
+                        mTimer.update(mEndTimeMills);
+                    }
                     onFrameAvailableListener.onFramesFinished(curr);
                 }
             }
@@ -142,6 +147,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         try {
             configCopy = (DanmakuContext) config.clone();
             configCopy.setDanmakuSync(null);
+            configCopy.mGlobalFlagValues.updateAll();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
             configCopy = config;
@@ -185,8 +191,10 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
 
     @Override
     public void updateTimer(DanmakuTimer timer) {
-        mOuterTimer.add(mFrameIntervalMills);
+        mTimer = timer;
         timer.update(mOuterTimer.currMillisecond);
+        mOuterTimer.add(mFrameIntervalMills);
+        timer.add(mFrameIntervalMills);
     }
 
     @Override

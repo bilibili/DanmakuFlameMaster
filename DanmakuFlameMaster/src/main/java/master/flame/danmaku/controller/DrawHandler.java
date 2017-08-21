@@ -167,6 +167,10 @@ public class DrawHandler extends Handler {
 
     public void setParser(BaseDanmakuParser parser) {
         mParser = parser;
+        DanmakuTimer timer = parser.getTimer();
+        if (timer != null) {
+            this.timer = timer;
+        }
     }
 
     public void setCallback(Callback cb) {

@@ -651,7 +651,6 @@ public class DanmakuContext implements Cloneable {
 
     public DanmakuContext setDanmakuSync(AbsDanmakuSync danmakuSync) {
         this.danmakuSync = danmakuSync;
-        notifyConfigureChanged(DanmakuConfigTag.DANMAKU_SYNC);
         return this;
     }
 

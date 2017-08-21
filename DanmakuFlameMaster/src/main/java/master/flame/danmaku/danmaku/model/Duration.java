@@ -1,7 +1,7 @@
 
 package master.flame.danmaku.danmaku.model;
 
-public class Duration {
+public class Duration implements Cloneable {
 
     private long mInitialDuration;
 

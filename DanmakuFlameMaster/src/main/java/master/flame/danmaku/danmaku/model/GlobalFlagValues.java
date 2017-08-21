@@ -18,6 +18,15 @@ public class GlobalFlagValues {
         PREPARE_RESET_FLAG = 0;
     }
 
+    public void updateAll() {
+        VISIBLE_RESET_FLAG++;
+        MEASURE_RESET_FLAG++;
+        FILTER_RESET_FLAG++;
+        FIRST_SHOWN_RESET_FLAG++;
+        SYNC_TIME_OFFSET_RESET_FLAG++;
+        PREPARE_RESET_FLAG++;
+    }
+
     public void updateVisibleFlag() {
         VISIBLE_RESET_FLAG++;
     }
