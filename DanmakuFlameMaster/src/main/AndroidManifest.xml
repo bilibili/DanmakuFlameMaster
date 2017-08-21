@@ -17,8 +17,8 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="master.flame.danmaku"
-    android:versionCode="9001"
-    android:versionName="0.9.1" >
+    android:versionCode="9002"
+    android:versionName="0.9.2" >
 
     <uses-sdk
         android:minSdkVersion="9"
