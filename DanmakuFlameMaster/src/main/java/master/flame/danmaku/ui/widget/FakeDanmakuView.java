@@ -53,7 +53,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
     }
 
     public void initBufferCanvas(int width, int height) {
-        mBufferBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+        mBufferBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mBufferCanvas = new Canvas(mBufferBitmap);
     }
 
@@ -72,17 +72,22 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
                 handler.draw(canvas);
             }
         }
-        OnFrameAvailableListener mOnFrameAvailableListener = this.mOnFrameAvailableListener;
-        if (mOnFrameAvailableListener != null) {
+        OnFrameAvailableListener onFrameAvailableListener = this.mOnFrameAvailableListener;
+        if (onFrameAvailableListener != null) {
             long curr = mOuterTimer.currMillisecond;
-            if (curr >= mExpectBeginMills - mFrameIntervalMills) {
-                Bitmap bitmap = Bitmap.createScaledBitmap(mBufferBitmap, (int) (mWidth * mScale), (int) (mHeight * mScale), true);
-                mOnFrameAvailableListener.onFrameAvailable(curr, bitmap);
-                bitmap.recycle();
-            }
-            if (curr > mEndTimeMills) {
-                mOnFrameAvailableListener.onFramesFinished(curr);
-                release();
+            try {
+                if (curr >= mExpectBeginMills - mFrameIntervalMills) {
+                    Bitmap bitmap = Bitmap.createScaledBitmap(mBufferBitmap, (int) (mWidth * mScale), (int) (mHeight * mScale), true);
+                    onFrameAvailableListener.onFrameAvailable(curr, bitmap);
+                    bitmap.recycle();
+                }
+            } catch (Exception e) {
+                onFrameAvailableListener.onFailed(101, e.getMessage());
+            } finally {
+                if (curr > mEndTimeMills) {
+                    release();
+                    onFrameAvailableListener.onFramesFinished(curr);
+                }
             }
         }
         mRequestRender = false;
