@@ -18,7 +18,7 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 
-public class DanmakuContext {
+public class DanmakuContext implements Cloneable {
 
     public static DanmakuContext create() {
         return new DanmakuContext();
@@ -718,4 +718,8 @@ public class DanmakuContext {
         return this;
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

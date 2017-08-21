@@ -82,6 +82,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
                     bitmap.recycle();
                 }
             } catch (Exception e) {
+                release();
                 onFrameAvailableListener.onFailed(101, e.getMessage());
             } finally {
                 if (curr > mEndTimeMills) {
@@ -137,17 +138,25 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
 
     @Override
     public void prepare(BaseDanmakuParser parser, DanmakuContext config) {
-        config.updateMethod = 1;
-        super.prepare(parser, config);
+        DanmakuContext configCopy;
+        try {
+            configCopy = (DanmakuContext) config.clone();
+            configCopy.setDanmakuSync(null);
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            configCopy = config;
+        }
+        configCopy.updateMethod = 1;
+        super.prepare(parser, configCopy);
         handler.setIdleSleep(false);
     }
 
     public void getFrameAtTime(final long beginMills, final long endMills, final int frameRate, final OnFrameAvailableListener onFrameAvailableListener) {
         if (mRetryCount++ > 5) {
+            release();
             if (onFrameAvailableListener != null) {
                 onFrameAvailableListener.onFailed(100, "not prepared");
             }
-            release();
             return;
         }
         if (!isPrepared()) {
