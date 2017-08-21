@@ -157,6 +157,10 @@ public class DrawHandler extends Handler {
         this.mDanmakuView = view;
     }
 
+    public void setIdleSleep(boolean enable) {
+        mIdleSleep = enable;
+    }
+
     public void setConfig(DanmakuContext config) {
         mContext = config;
     }
