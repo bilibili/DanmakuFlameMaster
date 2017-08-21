@@ -18,8 +18,6 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback {
 
-    private int mRetryCount = 0;
-
     public interface OnFrameAvailableListener {
         void onFrameAvailable(long timeMills, Bitmap bitmap);
 
@@ -38,6 +36,9 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
     private long mEndTimeMills;
     private Bitmap mBufferBitmap;
     private Canvas mBufferCanvas;
+
+    private int mRetryCount = 0;
+    private long mExpectBeginMills = 0;
 
     public FakeDanmakuView(Context context) {
         super(context);
@@ -74,9 +75,11 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         OnFrameAvailableListener mOnFrameAvailableListener = this.mOnFrameAvailableListener;
         if (mOnFrameAvailableListener != null) {
             long curr = mOuterTimer.currMillisecond;
-            Bitmap bitmap = Bitmap.createScaledBitmap(mBufferBitmap, (int) (mWidth * mScale), (int) (mHeight * mScale), true);
-            mOnFrameAvailableListener.onFrameAvailable(curr, bitmap);
-            bitmap.recycle();
+            if (curr >= mExpectBeginMills - mFrameIntervalMills) {
+                Bitmap bitmap = Bitmap.createScaledBitmap(mBufferBitmap, (int) (mWidth * mScale), (int) (mHeight * mScale), true);
+                mOnFrameAvailableListener.onFrameAvailable(curr, bitmap);
+                bitmap.recycle();
+            }
             if (curr > mEndTimeMills) {
                 mOnFrameAvailableListener.onFramesFinished(curr);
                 release();
@@ -138,6 +141,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
             if (onFrameAvailableListener != null) {
                 onFrameAvailableListener.onFailed(100, "not prepared");
             }
+            release();
             return;
         }
         if (!isPrepared()) {
@@ -151,6 +155,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         }
         mOnFrameAvailableListener = onFrameAvailableListener;
         mFrameIntervalMills = 1000 / frameRate;
+        mExpectBeginMills = beginMills;
         mBeginTimeMills = Math.max(0, beginMills - getConfig().mDanmakuFactory.MAX_Duration_Scroll_Danmaku.value);
         mEndTimeMills = endMills;
         mOuterTimer = new DanmakuTimer(mBeginTimeMills);
