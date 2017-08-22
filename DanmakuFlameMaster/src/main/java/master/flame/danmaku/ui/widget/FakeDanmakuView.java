@@ -21,6 +21,9 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
     private DanmakuTimer mTimer;
 
     public interface OnFrameAvailableListener {
+
+        void onConfig(DanmakuContext config);
+
         void onFrameAvailable(long timeMills, Bitmap bitmap);
 
         void onFramesFinished(long timeMills);
@@ -147,21 +150,29 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         try {
             configCopy = (DanmakuContext) config.clone();
             configCopy.setDanmakuSync(null);
+            configCopy.unregisterAllConfigChangedCallbacks();
             configCopy.mGlobalFlagValues.updateAll();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
             configCopy = config;
         }
         configCopy.updateMethod = 1;
+        if (mOnFrameAvailableListener != null) {
+            mOnFrameAvailableListener.onConfig(configCopy);
+        }
         super.prepare(parser, configCopy);
         handler.setIdleSleep(false);
     }
 
-    public void getFrameAtTime(final long beginMills, final long endMills, final int frameRate, final OnFrameAvailableListener onFrameAvailableListener) {
+    public void setOnFrameAvailableListener(OnFrameAvailableListener onFrameAvailableListener) {
+        mOnFrameAvailableListener = onFrameAvailableListener;
+    }
+
+    public void getFrameAtTime(final long beginMills, final long endMills, final int frameRate) {
         if (mRetryCount++ > 5) {
             release();
-            if (onFrameAvailableListener != null) {
-                onFrameAvailableListener.onFailed(100, "not prepared");
+            if (mOnFrameAvailableListener != null) {
+                mOnFrameAvailableListener.onFailed(100, "not prepared");
             }
             return;
         }
@@ -169,12 +180,11 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    getFrameAtTime(beginMills, endMills, frameRate, onFrameAvailableListener);
+                    getFrameAtTime(beginMills, endMills, frameRate);
                 }
             }, 1500L);
             return;
         }
-        mOnFrameAvailableListener = onFrameAvailableListener;
         mFrameIntervalMills = 1000 / frameRate;
         mExpectBeginMills = beginMills;
         mBeginTimeMills = Math.max(0, beginMills - getConfig().mDanmakuFactory.MAX_Duration_Scroll_Danmaku.value);
