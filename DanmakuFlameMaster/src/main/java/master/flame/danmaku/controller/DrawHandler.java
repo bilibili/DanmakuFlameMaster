@@ -320,6 +320,11 @@ public class DrawHandler extends Handler {
                     notifyRendering();
                     quitUpdateThread();
                 }
+                if (mFrameCallback != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        Choreographer.getInstance().removeFrameCallback(mFrameCallback);
+                    }
+                }
                 if (what == QUIT){
                     if (this.drawTask != null){
                         this.drawTask.quit();
