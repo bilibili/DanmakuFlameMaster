@@ -180,9 +180,18 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
             long curr = mOuterTimer.currMillisecond;
             try {
                 if (curr >= mExpectBeginMills - mFrameIntervalMills) {
-                    Bitmap bitmap = Bitmap.createScaledBitmap(mBufferBitmap, (int) (mWidth * mScale), (int) (mHeight * mScale), true);
+                    Bitmap bitmap;
+                    boolean recycle = false;
+                    if (mScale == 1f) {
+                        bitmap = mBufferBitmap;
+                    } else {
+                        bitmap = Bitmap.createScaledBitmap(mBufferBitmap, (int) (mWidth * mScale), (int) (mHeight * mScale), true);
+                        recycle = true;
+                    }
                     onFrameAvailableListener.onFrameAvailable(curr, bitmap);
-                    bitmap.recycle();
+                    if (recycle) {
+                        bitmap.recycle();
+                    }
                 }
             } catch (Exception e) {
                 release();
