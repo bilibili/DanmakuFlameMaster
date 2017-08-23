@@ -64,7 +64,7 @@ public class DanmakuFactory {
     public IDisplayer sLastDisp;
     private DanmakuContext sLastConfig;
 
-    static DanmakuFactory create() {
+    public static DanmakuFactory create() {
         return new DanmakuFactory();
     }
 

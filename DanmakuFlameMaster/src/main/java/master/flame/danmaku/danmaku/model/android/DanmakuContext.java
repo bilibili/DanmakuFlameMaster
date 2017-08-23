@@ -74,24 +74,7 @@ public class DanmakuContext implements Cloneable {
      */
     public float scrollSpeedFactor = 1.0f;
 
-
-    /**
-     * 绘制刷新率(毫秒)
-     */
-    public int refreshRateMS = 15;
-
-    /**
-     * 描边/阴影类型
-     */
-    public enum BorderType {
-        NONE, SHADOW, STROKEN
-    }
-
-    public BorderType shadowType = BorderType.SHADOW;
-
     public AbsDanmakuSync danmakuSync;
-
-    public int shadowRadius = 3;
 
     List<Integer> mColorValueWhiteList = new ArrayList<Integer>();
     
@@ -119,7 +102,7 @@ public class DanmakuContext implements Cloneable {
 
     public final DanmakuFilters mDanmakuFilters = new DanmakuFilters();
 
-    public final DanmakuFactory mDanmakuFactory = DanmakuFactory.create();
+    public DanmakuFactory mDanmakuFactory = DanmakuFactory.create();
 
     public CachingPolicy cachingPolicy = CachingPolicy.POLICY_DEFAULT;
 
