@@ -9,14 +9,89 @@ import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHelper;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.Duration;
+import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.SpecialDanmaku;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
+import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 /**
  * Created by ch on 17/8/18.
  */
 
 public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback {
+
+    private class CustomParser extends BaseDanmakuParser {
+
+        private final BaseDanmakuParser mBaseParser;
+        private final long stTime;
+        private final long edTime;
+        private float mDispScaleX, mDispScaleY;
+
+        public CustomParser(BaseDanmakuParser baseParser, long stTime, long edTime) {
+            this.mBaseParser = baseParser;
+            this.stTime = stTime;
+            this.edTime = edTime;
+        }
+
+        @Override
+        protected IDanmakus parse() {
+            final IDanmakus danmakus = new Danmakus();
+            IDanmakus subnew = this.mBaseParser.getDanmakus().subnew(this.stTime, this.edTime);
+            subnew.forEach(new IDanmakus.Consumer<BaseDanmaku, Object>() {
+                @Override
+                public int accept(BaseDanmaku danmaku) {
+                    BaseDanmaku item = mContext.mDanmakuFactory.createDanmaku(danmaku.getType(), mContext);
+                    if (item != null) {
+                        item.setTime(danmaku.getTime());
+                        DanmakuUtils.fillText(item, danmaku.text);
+                        item.textSize = danmaku.textSize;
+                        item.textColor = danmaku.textColor;
+                        item.textShadowColor = danmaku.textShadowColor;
+
+                        if (danmaku instanceof SpecialDanmaku) {
+                            SpecialDanmaku sdanmaku = (SpecialDanmaku) danmaku;
+                            item.index = danmaku.index;
+                            item.duration = new Duration(sdanmaku.getDuration());
+                            item.rotationZ = sdanmaku.rotateZ;
+                            item.rotationY = sdanmaku.rotationY;
+                            ((SpecialDanmaku) item).isQuadraticEaseOut = sdanmaku.isQuadraticEaseOut;
+
+                            mContext.mDanmakuFactory.fillTranslationData(item, sdanmaku.beginX,
+                                    sdanmaku.beginY, sdanmaku.endX, sdanmaku.endY, sdanmaku.translationDuration, sdanmaku.translationStartDelay, mDispScaleX, mDispScaleY);
+                            mContext.mDanmakuFactory.fillAlphaData(item, sdanmaku.beginAlpha, sdanmaku.endAlpha, item.getDuration());
+
+//                            mContext.mDanmakuFactory.fillLinePathData(item, points, mDispScaleX,
+//                                    mDispScaleY);  // FIXME
+                            return 0;  // FIXME skip special danmakus
+                        }
+
+                        item.setTimer(mTimer);
+                        item.flags = mContext.mGlobalFlagValues;
+                        Object lock = danmakus.obtainSynchronizer();
+                        synchronized (lock) {
+                            danmakus.addItem(item);
+                        }
+                    }
+                    return 0;
+                }
+            });
+            return danmakus;
+        }
+
+        @Override
+        public BaseDanmakuParser setDisplayer(IDisplayer disp) {
+            super.setDisplayer(disp);
+            mDispScaleX = mDispWidth / (float) mBaseParser.getDisplayer().getWidth();
+            mDispScaleY = mDispHeight / (float) mBaseParser.getDisplayer().getHeight();
+            return this;
+        }
+
+    }
 
     private DanmakuTimer mTimer;
 
@@ -146,9 +221,13 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
 
     @Override
     public void prepare(BaseDanmakuParser parser, DanmakuContext config) {
+
+        CustomParser newParser = new CustomParser(parser, mBeginTimeMills, mEndTimeMills);
         DanmakuContext configCopy;
         try {
             configCopy = (DanmakuContext) config.clone();
+            configCopy.resetContext();
+            configCopy.setScaleTextSize(config.scaleTextSize * 0.17f);
             configCopy.setDanmakuSync(null);
             configCopy.unregisterAllConfigChangedCallbacks();
             configCopy.mGlobalFlagValues.updateAll();
@@ -160,15 +239,21 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         if (mOnFrameAvailableListener != null) {
             mOnFrameAvailableListener.onConfig(configCopy);
         }
-        super.prepare(parser, configCopy);
+        super.prepare(newParser, configCopy);
         handler.setIdleSleep(false);
+    }
+
+    public void setTimeRange(final long beginMills, final long endMills) {
+        mExpectBeginMills = beginMills;
+        mBeginTimeMills = Math.max(0, beginMills - 30000L); // FIXME: 17/8/23 magic code 30000L
+        mEndTimeMills = endMills;
     }
 
     public void setOnFrameAvailableListener(OnFrameAvailableListener onFrameAvailableListener) {
         mOnFrameAvailableListener = onFrameAvailableListener;
     }
 
-    public void getFrameAtTime(final long beginMills, final long endMills, final int frameRate) {
+    public void getFrameAtTime(final int frameRate) {
         if (mRetryCount++ > 5) {
             release();
             if (mOnFrameAvailableListener != null) {
@@ -177,20 +262,21 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
             return;
         }
         if (!isPrepared()) {
+            DrawHandler handler = this.handler;
+            if (handler == null) {
+                return;
+            }
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    getFrameAtTime(beginMills, endMills, frameRate);
+                    getFrameAtTime(frameRate);
                 }
             }, 1500L);
             return;
         }
         mFrameIntervalMills = 1000 / frameRate;
-        mExpectBeginMills = beginMills;
-        mBeginTimeMills = Math.max(0, beginMills - getConfig().mDanmakuFactory.MAX_Duration_Scroll_Danmaku.value);
-        mEndTimeMills = endMills;
-        mOuterTimer = new DanmakuTimer(mBeginTimeMills);
         setCallback(this);
+        mOuterTimer = new DanmakuTimer(mBeginTimeMills);
         start(mBeginTimeMills);
     }
 
