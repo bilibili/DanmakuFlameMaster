@@ -53,6 +53,12 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
             subnew.forEach(new IDanmakus.Consumer<BaseDanmaku, Object>() {
                 @Override
                 public int accept(BaseDanmaku danmaku) {
+                    long time = danmaku.getTime();
+                    if (time < stTime) {
+                        return IDanmakus.Consumer.ACTION_CONTINUE;
+                    } else if (time > edTime) {
+                        return IDanmakus.Consumer.ACTION_BREAK;
+                    }
                     BaseDanmaku item = mContext.mDanmakuFactory.createDanmaku(danmaku.getType(), mContext);
                     if (item != null) {
                         item.setTime(danmaku.getTime());

@@ -703,7 +703,8 @@ public class DanmakuContext implements Cloneable {
     public DanmakuContext resetContext() {
         mDisplayer = new AndroidDisplayer();
         mGlobalFlagValues = new GlobalFlagValues();
-        mDanmakuFilters = new DanmakuFilters();
+//        mDanmakuFilters = new DanmakuFilters();
+        mDanmakuFilters.clear();
         mDanmakuFactory = DanmakuFactory.create();
         return this;
     }
