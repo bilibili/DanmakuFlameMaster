@@ -85,6 +85,8 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
                         }
 
                         item.setTimer(mTimer);
+                        item.mFilterParam = danmaku.mFilterParam;
+                        item.filterResetFlag = danmaku.filterResetFlag;
                         item.flags = mContext.mGlobalFlagValues;
                         Object lock = danmakus.obtainSynchronizer();
                         synchronized (lock) {
@@ -258,6 +260,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         try {
             configCopy = (DanmakuContext) config.clone();
             configCopy.resetContext();
+            configCopy.mGlobalFlagValues.FILTER_RESET_FLAG = config.mGlobalFlagValues.FILTER_RESET_FLAG;
             configCopy.setDanmakuSync(null);
             configCopy.unregisterAllConfigChangedCallbacks();
             configCopy.mGlobalFlagValues.updateAll();
