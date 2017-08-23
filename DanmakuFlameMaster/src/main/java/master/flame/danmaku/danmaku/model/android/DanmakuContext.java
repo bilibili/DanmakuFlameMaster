@@ -96,11 +96,11 @@ public class DanmakuContext implements Cloneable {
 
     private boolean mIsPreventOverlappingEnabled;
 
-    private final AbsDisplayer mDisplayer = new AndroidDisplayer();
+    public AbsDisplayer mDisplayer = new AndroidDisplayer();
 
-    public final GlobalFlagValues mGlobalFlagValues = new GlobalFlagValues();
+    public GlobalFlagValues mGlobalFlagValues = new GlobalFlagValues();
 
-    public final DanmakuFilters mDanmakuFilters = new DanmakuFilters();
+    public DanmakuFilters mDanmakuFilters = new DanmakuFilters();
 
     public DanmakuFactory mDanmakuFactory = DanmakuFactory.create();
 
@@ -697,6 +697,14 @@ public class DanmakuContext implements Cloneable {
     public DanmakuContext unregisterFilter(DanmakuFilters.BaseDanmakuFilter filter) {
         mDanmakuFilters.unregisterFilter(filter);
         mGlobalFlagValues.updateFilterFlag();
+        return this;
+    }
+
+    public DanmakuContext resetContext() {
+        mDisplayer = new AndroidDisplayer();
+        mGlobalFlagValues = new GlobalFlagValues();
+        mDanmakuFilters = new DanmakuFilters();
+        mDanmakuFactory = DanmakuFactory.create();
         return this;
     }
 
