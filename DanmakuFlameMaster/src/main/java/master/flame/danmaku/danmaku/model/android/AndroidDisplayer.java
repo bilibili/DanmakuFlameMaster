@@ -255,7 +255,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
             HAS_STROKE = CONFIG_HAS_STROKE;
             HAS_SHADOW = CONFIG_HAS_SHADOW;
             HAS_PROJECTION = CONFIG_HAS_PROJECTION;
-            ANTI_ALIAS = fromWorkerThread && CONFIG_ANTI_ALIAS;
+            ANTI_ALIAS = CONFIG_ANTI_ALIAS;
         }
     }
 

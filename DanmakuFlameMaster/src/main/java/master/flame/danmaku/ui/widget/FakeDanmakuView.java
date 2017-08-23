@@ -26,11 +26,11 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback {
 
     private class CustomParser extends BaseDanmakuParser {
-
         private final BaseDanmakuParser mBaseParser;
         private final long stTime;
         private final long edTime;
         private float mDispScaleX, mDispScaleY;
+        private int mViewWidth;
 
         public CustomParser(BaseDanmakuParser baseParser, long stTime, long edTime) {
             this.mBaseParser = baseParser;
@@ -41,7 +41,15 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         @Override
         protected IDanmakus parse() {
             final IDanmakus danmakus = new Danmakus();
-            IDanmakus subnew = this.mBaseParser.getDanmakus().subnew(this.stTime, this.edTime);
+            IDanmakus subnew;
+            try {
+                subnew = this.mBaseParser.getDanmakus().subnew(this.stTime, this.edTime);
+            } catch (Exception e) {
+                subnew = this.mBaseParser.getDanmakus();
+            }
+            if (subnew == null) {
+                return danmakus;
+            }
             subnew.forEach(new IDanmakus.Consumer<BaseDanmaku, Object>() {
                 @Override
                 public int accept(BaseDanmaku danmaku) {
@@ -88,9 +96,18 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
             super.setDisplayer(disp);
             mDispScaleX = mDispWidth / (float) mBaseParser.getDisplayer().getWidth();
             mDispScaleY = mDispHeight / (float) mBaseParser.getDisplayer().getHeight();
+            if (mViewWidth <= 1) {
+                mViewWidth = disp.getWidth();
+            }
             return this;
         }
 
+        @Override
+        protected float getViewportSizeFactor() {
+            float scale = DanmakuFactory.COMMON_DANMAKU_DURATION * mViewWidth / DanmakuFactory.BILI_PLAYER_WIDTH;
+            float factor = 1.1f;
+            return mContext.mDanmakuFactory.MAX_DANMAKU_DURATION * factor / scale;
+        }
     }
 
     private DanmakuTimer mTimer;
@@ -221,13 +238,11 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
 
     @Override
     public void prepare(BaseDanmakuParser parser, DanmakuContext config) {
-
         CustomParser newParser = new CustomParser(parser, mBeginTimeMills, mEndTimeMills);
         DanmakuContext configCopy;
         try {
             configCopy = (DanmakuContext) config.clone();
             configCopy.resetContext();
-            configCopy.setScaleTextSize(config.scaleTextSize * 0.17f);
             configCopy.setDanmakuSync(null);
             configCopy.unregisterAllConfigChangedCallbacks();
             configCopy.mGlobalFlagValues.updateAll();
@@ -271,7 +286,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
                 public void run() {
                     getFrameAtTime(frameRate);
                 }
-            }, 1500L);
+            }, 1000L);
             return;
         }
         mFrameIntervalMills = 1000 / frameRate;
