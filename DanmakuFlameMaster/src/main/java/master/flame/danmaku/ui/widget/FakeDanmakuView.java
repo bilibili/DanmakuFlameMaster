@@ -131,6 +131,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         void onFailed(int errorCode, String msg);
     }
 
+    private boolean mIsRelease;
     private OnFrameAvailableListener mOnFrameAvailableListener;
     private int mWidth = 0;
     private int mHeight = 0;
@@ -164,11 +165,18 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
 
     @Override
     public long drawDanmakus() {
+        if (mIsRelease) {
+            return 0;
+        }
         Canvas canvas = mBufferCanvas;
         if (canvas == null) {
             return 0;
         }
-        mBufferBitmap.eraseColor(Color.TRANSPARENT);
+        Bitmap bufferBitmap = this.mBufferBitmap;
+        if (bufferBitmap == null || bufferBitmap.isRecycled()) {
+            return 0;
+        }
+        bufferBitmap.eraseColor(Color.TRANSPARENT);
         if (mClearFlag) {
             DrawHelper.clearCanvas(canvas);
             mClearFlag = false;
@@ -185,9 +193,9 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
                     Bitmap bitmap;
                     boolean recycle = false;
                     if (mScale == 1f) {
-                        bitmap = mBufferBitmap;
+                        bitmap = bufferBitmap;
                     } else {
-                        bitmap = Bitmap.createScaledBitmap(mBufferBitmap, (int) (mWidth * mScale), (int) (mHeight * mScale), true);
+                        bitmap = Bitmap.createScaledBitmap(bufferBitmap, (int) (mWidth * mScale), (int) (mHeight * mScale), true);
                         recycle = true;
                     }
                     onFrameAvailableListener.onFrameAvailable(curr, bitmap);
@@ -214,15 +222,10 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
 
     @Override
     public void release() {
-        mOnFrameAvailableListener = null;
-        Canvas canvas = mBufferCanvas;
-        mBufferCanvas = null;
-        if (canvas != null) {
-            canvas.setBitmap(null);
-        }
+        mIsRelease = true;
         Bitmap bmp = mBufferBitmap;
-        mBufferCanvas = null;
-        if (bmp != null) {
+        mBufferBitmap = null;
+        if (bmp != null && !bmp.isRecycled()) {
             bmp.recycle();
         }
         super.release();
