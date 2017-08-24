@@ -205,7 +205,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
             if (isTranslucent) {
                 if (stroke) {
-                    paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
+                    paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.FILL_AND_STROKE);
                     paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
                     int alpha = HAS_PROJECTION ? (int) (sProjectionAlpha * ((float) transparency / AlphaValue.MAX))
                             : transparency;
@@ -217,7 +217,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
                 }
             } else {
                 if (stroke) {
-                    paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.STROKE);
+                    paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.FILL_AND_STROKE);
                     paint.setColor(danmaku.textShadowColor & 0x00FFFFFF);
                     int alpha = HAS_PROJECTION ? sProjectionAlpha : AlphaValue.MAX;
                     paint.setAlpha(alpha);
