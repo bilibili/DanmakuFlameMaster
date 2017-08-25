@@ -225,11 +225,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
     public void release() {
         mIsRelease = true;
         super.release();
-        Bitmap bmp = mBufferBitmap;
         mBufferBitmap = null;
-        if (bmp != null && !bmp.isRecycled()) {
-            bmp.recycle();
-        }
     }
 
     @Override
