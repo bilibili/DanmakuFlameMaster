@@ -276,6 +276,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         }
         super.prepare(newParser, configCopy);
         handler.setIdleSleep(false);
+        handler.enableNonBlockMode(true);
     }
 
     public void setTimeRange(final long beginMills, final long endMills) {
@@ -311,7 +312,7 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         }
         mFrameIntervalMills = 1000 / frameRate;
         setCallback(this);
-        long beginMills = Math.max(0, mExpectBeginMills - getConfig().mDanmakuFactory.MAX_DANMAKU_DURATION);
+        long beginMills = Math.max(0, mExpectBeginMills - getConfig().mDanmakuFactory.MAX_DANMAKU_DURATION * 3 / 2);
         mOuterTimer = new DanmakuTimer(beginMills);
         start(beginMills);
     }
