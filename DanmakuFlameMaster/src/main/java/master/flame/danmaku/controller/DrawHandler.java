@@ -141,6 +141,8 @@ public class DrawHandler extends Handler {
 
     private boolean mIdleSleep;
 
+    private boolean mNonBlockModeEnable;
+
     public DrawHandler(Looper looper, IDanmakuViewController view, boolean danmakuVisibile) {
         super(looper);
         mIdleSleep = !DeviceUtils.isProblemBoxDevice();
@@ -159,6 +161,10 @@ public class DrawHandler extends Handler {
 
     public void setIdleSleep(boolean enable) {
         mIdleSleep = enable;
+    }
+
+    public void enableNonBlockMode(boolean enable) {
+        mNonBlockModeEnable = enable;
     }
 
     public void setConfig(DanmakuContext config) {
@@ -381,7 +387,7 @@ public class DrawHandler extends Handler {
         }
         long startMS = SystemClock.uptimeMillis();
         long d = syncTimer(startMS);
-        if (d < 0) {
+        if (d < 0 && !mNonBlockModeEnable) {
             removeMessages(UPDATE);
             sendEmptyMessageDelayed(UPDATE, 60 - d);
             return;
@@ -423,13 +429,13 @@ public class DrawHandler extends Handler {
                     long startMS = SystemClock.uptimeMillis();
                     dTime = SystemClock.uptimeMillis() - lastTime;
                     long diffTime = mFrameUpdateRate - dTime;
-                    if (diffTime > 1) {
+                    if (diffTime > 1 && !mNonBlockModeEnable) {
                         SystemClock.sleep(1);
                         continue;
                     }
                     lastTime = startMS;
                     long d = syncTimer(startMS);
-                    if (d < 0) {
+                    if (d < 0 && !mNonBlockModeEnable) {
                         SystemClock.sleep(60 - d);
                         continue;
                     }
@@ -499,9 +505,17 @@ public class DrawHandler extends Handler {
         mInSyncAction = true;
         long d = 0;
         long time = startMS - mTimeBase;
-        if (!mDanmakusVisible || mRenderingState.nothingRendered || mInWaitingState) {
+        if (mNonBlockModeEnable) {
+            if (mCallback != null) {
+                mCallback.updateTimer(timer);
+                d = timer.lastInterval();
+            }
+        } else if (!mDanmakusVisible || mRenderingState.nothingRendered || mInWaitingState) {
             timer.update(time);
             mRemainingTime = 0;
+            if (mCallback != null) {
+                mCallback.updateTimer(timer);
+            }
         } else {
             long gapTime = time - timer.currMillisecond;
             long averageTime = Math.max(mFrameUpdateRate, getAverageRenderingTime());
@@ -513,7 +527,7 @@ public class DrawHandler extends Handler {
                 d = Math.max(mFrameUpdateRate, d);
                 d = Math.min(mCordonTime, d);
                 long a = d - mLastDeltaTime;
-                if (a > 3 && a < 8  && mLastDeltaTime >= mFrameUpdateRate && mLastDeltaTime <= mCordonTime) {
+                if (a > 3 && a < 8 && mLastDeltaTime >= mFrameUpdateRate && mLastDeltaTime <= mCordonTime) {
                     d = mLastDeltaTime;
                 }
                 gapTime -= d;
@@ -521,11 +535,12 @@ public class DrawHandler extends Handler {
             }
             mRemainingTime = gapTime;
             timer.add(d);
+            if (mCallback != null) {
+                mCallback.updateTimer(timer);
+            }
 //            Log.e("DrawHandler", time+"|d:" + d  + "RemaingTime:" + mRemainingTime + ",gapTime:" + gapTime + ",rtim:" + mRenderingState.consumingTime + ",average:" + averageTime);
         }
-        if (mCallback != null) {
-            mCallback.updateTimer(timer);
-        }
+
         mInSyncAction = false;
         return d;
     }
