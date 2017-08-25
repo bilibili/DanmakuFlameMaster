@@ -7,6 +7,7 @@ import android.graphics.Color;
 
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHelper;
+import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.Duration;
@@ -263,6 +264,8 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         try {
             configCopy = (DanmakuContext) config.clone();
             configCopy.resetContext();
+            configCopy.transparency = AlphaValue.MAX;
+            configCopy.setDanmakuTransparency(config.transparency / (float) AlphaValue.MAX);
             configCopy.mGlobalFlagValues.FILTER_RESET_FLAG = config.mGlobalFlagValues.FILTER_RESET_FLAG;
             configCopy.setDanmakuSync(null);
             configCopy.unregisterAllConfigChangedCallbacks();
@@ -312,8 +315,9 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         }
         mFrameIntervalMills = 1000 / frameRate;
         setCallback(this);
-        mOuterTimer = new DanmakuTimer(mBeginTimeMills);
-        start(mBeginTimeMills);
+        long beginMills = Math.max(0, mExpectBeginMills - getConfig().mDanmakuFactory.MAX_DANMAKU_DURATION);
+        mOuterTimer = new DanmakuTimer(beginMills);
+        start(beginMills);
     }
 
     @Override
