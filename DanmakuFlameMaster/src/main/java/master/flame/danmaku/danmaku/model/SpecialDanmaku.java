@@ -152,6 +152,19 @@ public class SpecialDanmaku extends BaseDanmaku {
             float scaleX = mScaleFactor.scaleX;
             float scaleY = mScaleFactor.scaleY;
             setTranslationData(beginX * scaleX, beginY * scaleY, endX * scaleX, endY * scaleY, translationDuration, translationStartDelay);
+            if (linePaths != null && linePaths.length > 0) {
+                int length = linePaths.length;
+                float[][] points = new float[length + 1][2];
+                for (int j = 0; j < length; j++) {
+                    points[j] = linePaths[j].getBeginPoint();
+                    points[j + 1] = linePaths[j].getEndPoint();
+                }
+                for (int i = 0; i < points.length; i++) {
+                    points[i][0] *= scaleX;
+                    points[i][1] *= scaleY;
+                }
+                setLinePathData(points);
+            }
             this.mScaleFactorChangedFlag = mScaleFactor.flag;
             this.mCurrentWidth = mScaleFactor.width;
             this.mCurrentHeight = mScaleFactor.height;
