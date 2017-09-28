@@ -164,7 +164,9 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void prepare() {
-        assert (mParser != null);
+        if (mParser == null) {
+            return;
+        }
         loadDanmakus(mParser);
         mCacheManager.begin();
     }
