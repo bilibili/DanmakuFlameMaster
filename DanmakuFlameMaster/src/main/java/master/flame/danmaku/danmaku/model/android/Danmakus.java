@@ -128,9 +128,11 @@ public class Danmakus implements IDanmakus {
         if (item.isOutside()) {
             item.setVisibility(false);
         }
-        if (items.remove(item)) {
-            mSize.decrementAndGet();
-            return true;
+        synchronized (this.mLockObject) {
+            if (items.remove(item)) {
+                mSize.decrementAndGet();
+                return true;
+            }
         }
         return false;
     }
