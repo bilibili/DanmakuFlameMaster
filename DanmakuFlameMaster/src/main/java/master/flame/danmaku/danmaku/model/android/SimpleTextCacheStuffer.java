@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDrawingCache;
 
 /**
  * Created by ch on 15-7-16.
@@ -63,6 +62,9 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
     }
 
     protected void drawText(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, TextPaint paint, boolean fromWorkerThread) {
+        if (fromWorkerThread) {
+            paint.setAlpha(255);
+        }
         if (lineText != null) {
             canvas.drawText(lineText, left, top, paint);
         } else {
