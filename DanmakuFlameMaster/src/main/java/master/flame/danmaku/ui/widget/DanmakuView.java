@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.AttributeSet;
@@ -411,13 +412,17 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     }
 
     @Override
-    public void start(long postion) {
+    public void start(long position) {
+        Handler handler = this.handler;
         if (handler == null) {
             prepare();
-        }else{
+            handler = this.handler;
+        } else {
             handler.removeCallbacksAndMessages(null);
         }
-        handler.obtainMessage(DrawHandler.START, postion).sendToTarget();
+        if (handler != null) {
+            handler.obtainMessage(DrawHandler.START, position).sendToTarget();
+        }
     }
 
     @Override
