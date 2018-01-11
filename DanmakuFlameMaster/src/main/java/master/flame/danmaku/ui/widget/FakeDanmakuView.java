@@ -103,6 +103,9 @@ public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback
         @Override
         public BaseDanmakuParser setDisplayer(IDisplayer disp) {
             super.setDisplayer(disp);
+            if (mBaseParser == null || mBaseParser.getDisplayer() == null) {
+                return this;
+            }
             mDispScaleX = mDispWidth / (float) mBaseParser.getDisplayer().getWidth();
             mDispScaleY = mDispHeight / (float) mBaseParser.getDisplayer().getHeight();
             if (mViewWidth <= 1) {
