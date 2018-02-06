@@ -245,6 +245,8 @@ public class CacheManagingDrawTask extends DrawTask {
             if (mHandler != null) {
                 mHandler.requestCancelCaching();
                 mHandler.obtainMessage(CacheHandler.REBUILD_CACHE, danmaku).sendToTarget();
+                mHandler.sendEmptyMessage(CacheHandler.DISABLE_CANCEL_FLAG);
+                requestBuild(0);
             }
         }
 
