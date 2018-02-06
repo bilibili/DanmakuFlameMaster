@@ -19,12 +19,12 @@ apply plugin: 'com.android.library'
 def SourcePath = 'src/main/'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 19
+        targetSdkVersion 27
         versionName VERSION_NAME
         versionCode Integer.parseInt(VERSION_CODE)
     }

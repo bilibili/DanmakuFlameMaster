@@ -26,12 +26,12 @@ dependencies {
 //    compile 'tv.danmaku.ijk.media:ijkplayer-arm64:0.6.2'
 }
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 19
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
