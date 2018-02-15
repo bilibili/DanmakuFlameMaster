@@ -267,6 +267,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 mDrawingNotify.notifyAll();
             }
             if (mHandler != null) {
+                mHandler.removeCallbacksAndMessages(null);
                 mHandler.pause();
                 mHandler = null;
             }
