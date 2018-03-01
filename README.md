@@ -45,7 +45,7 @@ Download the [latest version][1] or grab via Maven:
 <dependency>
   <groupId>com.github.ctiao</groupId>
   <artifactId>dfm</artifactId>
-  <version>0.9.24</version>
+  <version>0.9.25</version>
 </dependency>
 ```
 
@@ -56,7 +56,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.ctiao:DanmakuFlameMaster:0.9.24'
+    compile 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
     compile 'com.github.ctiao:ndkbitmap-armv7a:0.9.21'
 
     # Other ABIs: optional
