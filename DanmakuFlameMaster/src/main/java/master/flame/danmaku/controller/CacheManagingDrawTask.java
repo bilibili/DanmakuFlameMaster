@@ -77,8 +77,8 @@ public class CacheManagingDrawTask extends DrawTask {
 
     @Override
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure) {
+        super.invalidateDanmaku(item, remeasure);
         if (mCacheManager == null) {
-            super.invalidateDanmaku(item, remeasure);
             return;
         }
         mCacheManager.invalidateDanmaku(item, remeasure);
