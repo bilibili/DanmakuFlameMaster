@@ -69,6 +69,7 @@ public class DrawingCacheHolder {
     }
 
     public synchronized void recycle() {
+        canvas = null;
         Bitmap bitmapReserve = bitmap;
         bitmap = null;
         width = height = 0;
