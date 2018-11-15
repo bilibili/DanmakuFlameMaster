@@ -403,16 +403,6 @@ public class CacheManagingDrawTask extends DrawTask {
                             }
                             //else 回收尺寸过大的cache
                         }
-                        if (!mEndFlag) {
-                            synchronized (mDrawingNotify) {
-                                try {
-                                    mDrawingNotify.wait(30);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                    return ACTION_BREAK;
-                                }
-                            }
-                        }
                         entryRemoved(false, val, null);
                         return ACTION_REMOVE;
                     } else {
