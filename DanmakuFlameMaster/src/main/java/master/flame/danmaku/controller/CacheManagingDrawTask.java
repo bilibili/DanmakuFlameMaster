@@ -197,7 +197,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
         public HandlerThread mThread;
 
-        Danmakus mCaches = new Danmakus();
+        final Danmakus mCaches = new Danmakus();
 
         DrawingCachePoolManager mCachePoolManager = new DrawingCachePoolManager();
 
@@ -238,6 +238,18 @@ public class CacheManagingDrawTask extends DrawTask {
                     return;
                 }
                 mHandler.obtainMessage(CacheHandler.ADD_DANMAKU, danmaku).sendToTarget();
+            }
+        }
+
+        @Override
+        public void buildDanmakuCache(final BaseDanmaku danmaku) {
+            if (danmaku == null) {
+                return;
+            }
+            CacheHandler handler = mHandler;
+            if (handler != null) {
+                //直接构建缓存
+                handler.addDanmakuAndBuildCache(danmaku);
             }
         }
 
@@ -381,12 +393,14 @@ public class CacheManagingDrawTask extends DrawTask {
 
         private boolean push(BaseDanmaku item, int itemSize, boolean forcePush) {
             int size = itemSize; //sizeOf(item);
-            if (size > 0) {
-                clearTimeOutAndFilteredCaches(size, forcePush);
-                // may be a risk of OOM if (mRealSize + size) is still larger than mMaxSize
+            synchronized (this.mCaches) {
+                if (size > 0) {
+                    clearTimeOutAndFilteredCaches(size, forcePush);
+                    // may be a risk of OOM if (mRealSize + size) is still larger than mMaxSize
+                }
+                this.mCaches.addItem(item);
+                mRealSize += size;
             }
-            this.mCaches.addItem(item);
-            mRealSize += size;
 //Log.i("DFM CACHE", "realsize:"+mRealSize + ",size" + size);
             return true;
         }
@@ -549,23 +563,25 @@ public class CacheManagingDrawTask extends DrawTask {
                     case REBUILD_CACHE:
                         BaseDanmaku cacheitem = (BaseDanmaku) msg.obj;
                         if (cacheitem != null) {
-                            IDrawingCache<?> cache = cacheitem.getDrawingCache();
-                            boolean requestRemeasure = 0 != (cacheitem.requestFlags & BaseDanmaku.FLAG_REQUEST_REMEASURE);
-                            if (!requestRemeasure && cache != null && cache.get() !=null && !cache.hasReferences()) {
-                                cache = DanmakuUtils.buildDanmakuDrawingCache(cacheitem, mDisp, (DrawingCache) cacheitem.cache, mContext.cachingPolicy.bitsPerPixelOfCache);
-                                cacheitem.cache = cache;
-                                push(cacheitem, 0, true);
-                                return;
-                            }
-                            if (cacheitem.isLive) {
-                                clearCache(cacheitem);
-                                createCache(cacheitem);
-                            } else {
-                                if (cache != null && cache.hasReferences()) {
-                                    cache.destroy();
+                            synchronized (cacheitem) {
+                                IDrawingCache<?> cache = cacheitem.getDrawingCache();
+                                boolean requestRemeasure = 0 != (cacheitem.requestFlags & BaseDanmaku.FLAG_REQUEST_REMEASURE);
+                                if (!requestRemeasure && cache != null && cache.get() != null && !cache.hasReferences()) {
+                                    cache = DanmakuUtils.buildDanmakuDrawingCache(cacheitem, mDisp, (DrawingCache) cacheitem.cache, mContext.cachingPolicy.bitsPerPixelOfCache);
+                                    cacheitem.cache = cache;
+                                    push(cacheitem, 0, true);
+                                    return;
                                 }
-                                entryRemoved(true, cacheitem, null);
-                                addDanmakuAndBuildCache(cacheitem);
+                                if (cacheitem.isLive) {
+                                    clearCache(cacheitem);
+                                    createCache(cacheitem);
+                                } else {
+                                    if (cache != null && cache.hasReferences()) {
+                                        cache.destroy();
+                                    }
+                                    entryRemoved(true, cacheitem, null);
+                                    addDanmakuAndBuildCache(cacheitem);
+                                }
                             }
                         }
                         break;
@@ -806,7 +822,12 @@ public class CacheManagingDrawTask extends DrawTask {
                         }
 
                         // build cache
-                        buildCache(item, false);
+                        synchronized (item) {
+                            cache = item.getDrawingCache();
+                            if (cache == null || cache.get() == null) {
+                                buildCache(item, false);
+                            }
+                        }
                         if (!repositioned) {
                             long consumingTime = SystemClock.uptimeMillis() - startTime;
                             if (consumingTime >= mContext.mDanmakuFactory.COMMON_DANMAKU_DURATION * mScreenSize) {
@@ -828,31 +849,33 @@ public class CacheManagingDrawTask extends DrawTask {
             }
 
             public boolean createCache(BaseDanmaku item) {
-                // measure
-                if (!item.isMeasured()) {
-                    item.measure(mDisp, true);
-                }
-                DrawingCache cache = null;
-                try {
-                    cache = mCachePool.acquire();
-                    cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache, mContext.cachingPolicy.bitsPerPixelOfCache);
-                    item.cache = cache;
-                } catch (OutOfMemoryError e) {
+                synchronized (item) {
+                    // measure
+                    if (!item.isMeasured()) {
+                        item.measure(mDisp, true);
+                    }
+                    DrawingCache cache = null;
+                    try {
+                        cache = mCachePool.acquire();
+                        cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache, mContext.cachingPolicy.bitsPerPixelOfCache);
+                        item.cache = cache;
+                    } catch (OutOfMemoryError e) {
 //Log.e("cache", "break at error: oom");
-                    if (cache != null) {
-                        mCachePool.release(cache);
-                    }
-                    item.cache = null;
-                    return false;
-                } catch (Exception e) {
+                        if (cache != null) {
+                            mCachePool.release(cache);
+                        }
+                        item.cache = null;
+                        return false;
+                    } catch (Exception e) {
 //Log.e("cache", "break at exception:" + e.getMessage());
-                    if (cache != null) {
-                        mCachePool.release(cache);
+                        if (cache != null) {
+                            mCachePool.release(cache);
+                        }
+                        item.cache = null;
+                        return false;
                     }
-                    item.cache = null;
-                    return false;
+                    return true;
                 }
-                return true;
             }
 
             private byte buildCache(BaseDanmaku item, boolean forceInsert) {
@@ -933,7 +956,12 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
                 IDrawingCache<?> cache = danmaku.getDrawingCache();
                 if (cache == null || cache.get() == null) {
-                    buildCache(danmaku, true);
+                    synchronized (danmaku) {
+                        cache = danmaku.getDrawingCache();
+                        if (cache == null || cache.get() == null) {
+                            buildCache(danmaku, true);
+                        }
+                    }
                 }
             }
 
