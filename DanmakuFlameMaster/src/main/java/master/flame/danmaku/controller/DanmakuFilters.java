@@ -367,7 +367,10 @@ public class DanmakuFilters {
         }
 
     }
-
+/*
+ * 过滤重复弹幕
+ *
+ */
     public static class DuplicateMergingFilter extends BaseDanmakuFilter<Void> {
 
         protected final IDanmakus blockedDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
@@ -394,7 +397,10 @@ public class DanmakuFilters {
                 }
             });
         }
-
+/*
+ * 过滤超时弹幕
+ *
+ */
         private void removeTimeoutDanmakus(LinkedHashMap<String, BaseDanmaku> danmakus,
                 int limitTime) {
             Iterator<Entry<String, BaseDanmaku>> it = danmakus.entrySet().iterator();
@@ -469,7 +475,10 @@ public class DanmakuFilters {
         }
 
     }
-
+/*
+ * 按照行数过滤
+ *
+ */
     public static class MaximumLinesFilter extends BaseDanmakuFilter<Map<Integer, Integer>> {
 
         private Map<Integer, Integer> mMaximumLinesPairs;
@@ -497,7 +506,10 @@ public class DanmakuFilters {
             mMaximumLinesPairs = null;
         }
     }
-
+/*
+ * 过滤重叠弹幕
+ *
+ */
     public static class OverlappingFilter extends BaseDanmakuFilter<Map<Integer, Boolean>> {
 
         private Map<Integer, Boolean> mEnabledPairs;
