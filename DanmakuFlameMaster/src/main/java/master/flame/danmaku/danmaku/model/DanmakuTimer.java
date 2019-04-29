@@ -17,12 +17,15 @@
 package master.flame.danmaku.danmaku.model;
 
 public class DanmakuTimer {
-    public long currMillisecond;
-
+    public long currMillisecond = 0L;
     private long lastInterval;
 
-    public DanmakuTimer() {
+    private float videoSpeed = 1.0f;
+    private long lastTimeStamp = 0L;
+    private long lastCurr;
+    private long firstCurr;
 
+    public DanmakuTimer() {
     }
 
     public DanmakuTimer(long curr) {
@@ -30,8 +33,20 @@ public class DanmakuTimer {
     }
 
     public long update(long curr) {
-        lastInterval = curr - currMillisecond;
-        currMillisecond = curr;
+        if(lastTimeStamp == 0) {
+            lastTimeStamp = System.currentTimeMillis();
+            firstCurr = curr;
+        }
+        long t = System.currentTimeMillis();
+        lastInterval = t - lastTimeStamp;
+
+        if((lastInterval - curr + lastCurr) > 2000 || (lastInterval - curr + lastCurr) < -2000)
+            currMillisecond = curr - firstCurr;
+        else
+            currMillisecond += lastInterval * videoSpeed;
+
+        lastCurr = curr;
+        lastTimeStamp = t;
         return lastInterval;
     }
 
@@ -43,4 +58,11 @@ public class DanmakuTimer {
         return lastInterval;
     }
 
+    public void setSpeed(float speed) {
+        videoSpeed = speed;
+    }
+
+    public float getSpeed() {
+        return videoSpeed;
+    }
 }
