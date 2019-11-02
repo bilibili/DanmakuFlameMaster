@@ -38,6 +38,8 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.SystemClock;
+import master.flame.danmaku.gl.AndroidGLDisplayer;
+import master.flame.danmaku.gl.GLDrawTask;
 import tv.cjump.jni.DeviceUtils;
 
 public class DrawHandler extends Handler {
@@ -625,7 +627,8 @@ public class DrawHandler extends Handler {
                 displayMetrics.scaledDensity);
         mDisp.resetSlopPixel(mContext.scaleTextSize);
         mDisp.setHardwareAccelerated(isHardwareAccelerated);
-        IDrawTask task = useDrwaingCache ?
+        mContext.cachingPolicy.mCacheDrawEnabled = useDrwaingCache || mDisp instanceof AndroidGLDisplayer;
+        IDrawTask task = mDisp instanceof AndroidGLDisplayer ? new GLDrawTask(timer, mContext, taskListener) : useDrwaingCache ?
                 new CacheManagingDrawTask(timer, mContext, taskListener)
                 : new DrawTask(timer, mContext, taskListener);
         task.setParser(mParser);

@@ -267,8 +267,10 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
     private BaseCacheStuffer sStuffer = new SimpleTextCacheStuffer();
 
-    public AndroidDisplayer() {
+    private DanmakuContext mDanmakuContext;
 
+    public AndroidDisplayer(DanmakuContext context) {
+        mDanmakuContext = context;
     }
 
     @SuppressLint("NewApi")
@@ -437,7 +439,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
             // drawing cache
             boolean cacheDrawn = sStuffer.drawCache(danmaku, canvas, left, top, alphaPaint, mDisplayConfig.PAINT);
             int result = IRenderer.CACHE_RENDERING;
-            if (!cacheDrawn) {
+            if (!cacheDrawn && !(mDanmakuContext.cachingPolicy.mCacheDrawEnabled && mDanmakuContext.cachingPolicy.mAllowDelayInCacheModel)) {
                 if (alphaPaint != null) {
                     mDisplayConfig.PAINT.setAlpha(alphaPaint.getAlpha());
                     mDisplayConfig.PAINT_DUPLICATE.setAlpha(alphaPaint.getAlpha());

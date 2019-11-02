@@ -76,4 +76,20 @@ public class CachingPolicy {
 
     public int maxTimesOfReusableFinds = 150;
 
+
+    /**
+     * 是否开启了弹幕缓存模式
+     */
+    public boolean mCacheDrawEnabled = false;
+    /**
+     * 是否允许弹幕在使用缓存的状态下延迟显示
+     * 对于使用缓存的弹幕，直接绘制弹幕缓存的速度比绘制弹幕速度快得多
+     * 在某些极端的情况下(弹幕密度大或则预留创建缓存的时间短)，弹幕缓存无法及时提供，所以此标识表明是否允许在没有
+     * 准备好弹幕缓存的情况下延迟弹幕显示，直到弹幕缓存创建好。
+     * 该变量在绘制{@link AndroidDisplayer}和
+     * {@link master.flame.danmaku.controller.CacheManagingDrawTask}中使用到
+     * 默认不延迟。
+     * 该值只有在{@link #mCacheDrawEnabled}状态为true才有效
+     */
+    public boolean mAllowDelayInCacheModel = false;
 }

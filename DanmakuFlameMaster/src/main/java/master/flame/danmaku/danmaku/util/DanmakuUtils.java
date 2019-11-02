@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCacheHolder;
 
@@ -99,6 +100,24 @@ public class DanmakuUtils {
             }
         }
         return cache;
+    }
+
+    public static boolean isCacheOk(BaseDanmaku danmaku) {
+        if (danmaku == null) {
+            return false;
+        }
+        IDrawingCache<?> cache = danmaku.cache;
+        if (cache == null) {
+            return false;
+        }
+        DrawingCacheHolder holder = (DrawingCacheHolder) cache.get();
+        if (holder == null) {
+            return false;
+        }
+        if (holder.bitmap == null || holder.bitmap.isRecycled()) {
+            return false;
+        }
+        return true;
     }
 
     public static int getCacheSize(int w, int h, int bytesPerPixel) {

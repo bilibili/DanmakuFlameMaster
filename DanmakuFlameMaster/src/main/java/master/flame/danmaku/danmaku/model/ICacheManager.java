@@ -21,4 +21,10 @@ package master.flame.danmaku.danmaku.model;
  */
 public interface ICacheManager {
     void addDanmaku(BaseDanmaku danmaku);
+
+    /**
+     * 直接在当前线程构建弹幕缓存
+     * @param danmaku 弹幕
+     */
+    void buildDanmakuCache(BaseDanmaku danmaku);
 }
