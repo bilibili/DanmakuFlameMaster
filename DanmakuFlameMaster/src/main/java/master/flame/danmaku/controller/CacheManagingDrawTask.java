@@ -249,7 +249,7 @@ public class CacheManagingDrawTask extends DrawTask {
             CacheHandler handler = mHandler;
             if (handler != null) {
                 //直接构建缓存
-                handler.addDanmakuAndBuildCache(danmaku);
+                handler.addDanmakuAndBuildCache(danmaku, false);
             }
         }
 
@@ -257,8 +257,6 @@ public class CacheManagingDrawTask extends DrawTask {
             if (mHandler != null) {
                 mHandler.requestCancelCaching();
                 mHandler.obtainMessage(CacheHandler.REBUILD_CACHE, danmaku).sendToTarget();
-                mHandler.sendEmptyMessage(CacheHandler.DISABLE_CANCEL_FLAG);
-                requestBuild(0);
             }
         }
 
@@ -279,7 +277,6 @@ public class CacheManagingDrawTask extends DrawTask {
                 mDrawingNotify.notifyAll();
             }
             if (mHandler != null) {
-                mHandler.removeCallbacksAndMessages(null);
                 mHandler.pause();
                 mHandler = null;
             }
@@ -558,7 +555,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         break;
                     case ADD_DANMAKU:
                         BaseDanmaku item = (BaseDanmaku) msg.obj;
-                        addDanmakuAndBuildCache(item);
+                        addDanmakuAndBuildCache(item, false);
                         break;
                     case REBUILD_CACHE:
                         BaseDanmaku cacheitem = (BaseDanmaku) msg.obj;
@@ -580,7 +577,7 @@ public class CacheManagingDrawTask extends DrawTask {
                                         cache.destroy();
                                     }
                                     entryRemoved(true, cacheitem, null);
-                                    addDanmakuAndBuildCache(cacheitem);
+                                    addDanmakuAndBuildCache(cacheitem, true);
                                 }
                             }
                         }
@@ -825,7 +822,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         synchronized (item) {
                             cache = item.getDrawingCache();
                             if (cache == null || cache.get() == null) {
-                                buildCache(item, false);
+                                buildCache(item, false, false);
                             }
                         }
                         if (!repositioned) {
@@ -878,7 +875,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
             }
 
-            private byte buildCache(BaseDanmaku item, boolean forceInsert) {
+            private byte buildCache(BaseDanmaku item, boolean forceInsert, boolean rebuild) {
 
                 // measure
                 if (!item.isMeasured()) {
@@ -909,6 +906,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         danmaku.cache = null;
 //Log.e("cache", danmaku.text + "DrawingCache hit!!:" + item.paintWidth + "," + danmaku.paintWidth);
                         cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache, mContext.cachingPolicy.bitsPerPixelOfCache);  //redraw
+                        delayDanmakuIfNeed(item, rebuild);
                         item.cache = cache;
                         mCacheManager.push(item, 0, forceInsert);
                         return RESULT_SUCCESS;
@@ -928,6 +926,7 @@ public class CacheManagingDrawTask extends DrawTask {
 
                     cache = mCachePool.acquire();
                     cache = DanmakuUtils.buildDanmakuDrawingCache(item, mDisp, cache, mContext.cachingPolicy.bitsPerPixelOfCache);
+                    delayDanmakuIfNeed(item, rebuild);
                     item.cache = cache;
                     boolean pushed = mCacheManager.push(item, sizeOf(item), forceInsert);
                     if (!pushed) {
@@ -947,7 +946,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 }
             }
 
-            private final void addDanmakuAndBuildCache(BaseDanmaku danmaku) {
+            private final void addDanmakuAndBuildCache(BaseDanmaku danmaku, boolean rebuild) {
                 if (danmaku.isTimeOut() || (danmaku.getActualTime() > mCacheTimer.currMillisecond + mContext.mDanmakuFactory.MAX_DANMAKU_DURATION && !danmaku.isLive)) {
                     return;
                 }
@@ -959,8 +958,26 @@ public class CacheManagingDrawTask extends DrawTask {
                     synchronized (danmaku) {
                         cache = danmaku.getDrawingCache();
                         if (cache == null || cache.get() == null) {
-                            buildCache(danmaku, true);
+                            buildCache(danmaku, true, rebuild);
                         }
+                    }
+                }
+            }
+
+            private void delayDanmakuIfNeed(BaseDanmaku item, boolean rebuild) {
+                if (!rebuild && !item.isOutside() && mContext.cachingPolicy.mAllowDelayInCacheModel) {
+                    //该弹幕已经迟到了,将显示时间延后
+                    /*该处必须比mTimer.currMillisecond小
+                     * 原因参考DanmakuUtils#willHitInDuration方法判断两个弹幕碰撞
+                     * 因为item.isOutside()此时等于false，大概率已经被layout了，并且在某一行的最后面
+                     * 此时如果直接设置mTimer.currMillisecond，后面item.isOutside()会变成true,
+                     * 碰撞结果变成false,后面很多弹幕被别添加到同一行，导致弹幕堆积在某一行，而下方
+                     * 留下大量空白
+                     * */
+                    item.setTime(mTimer.currMillisecond - 1);
+                    //重新计算位置
+                    if (item.isShown()) {
+                        item.layout(mContext.getDisplayer(), item.getLeft(), item.getTop());
                     }
                 }
             }
@@ -1009,7 +1026,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         return IDanmakus.Consumer.ACTION_BREAK;
                     }
                     if (mRealSize + fexpectedFreeSize > mMaxSize) {
-                        if (oldValue.isTimeOut() || oldValue.isFiltered()) {
+                        if (oldValue.isTimeOut() || (oldValue.priority == 0 && oldValue.isFiltered())) {
                             entryRemoved(false, oldValue, null);
                             return IDanmakus.Consumer.ACTION_REMOVE;
                         } else if (forcePush) {

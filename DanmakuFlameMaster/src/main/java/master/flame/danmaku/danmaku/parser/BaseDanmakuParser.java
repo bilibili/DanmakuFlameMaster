@@ -70,7 +70,8 @@ public abstract class BaseDanmakuParser {
      * @return
      */
     protected float getViewportSizeFactor() {
-        return 1 / (mDispDensity - 0.6f);
+//        return 1 / (mDispDensity - 0.6f);
+        return 2.0f;
     }
     
     public BaseDanmakuParser load(IDataSource<?> source) {

@@ -96,7 +96,7 @@ public class DanmakuContext implements Cloneable {
 
     private boolean mIsPreventOverlappingEnabled;
 
-    public AbsDisplayer mDisplayer = new AndroidDisplayer();
+    public AbsDisplayer mDisplayer = new AndroidDisplayer(this);
 
     public GlobalFlagValues mGlobalFlagValues = new GlobalFlagValues();
 
@@ -701,7 +701,7 @@ public class DanmakuContext implements Cloneable {
     }
 
     public DanmakuContext resetContext() {
-        mDisplayer = new AndroidDisplayer();
+        mDisplayer = new AndroidDisplayer(this);
         mGlobalFlagValues = new GlobalFlagValues();
 //        mDanmakuFilters = new DanmakuFilters();
         mDanmakuFilters.clear();
