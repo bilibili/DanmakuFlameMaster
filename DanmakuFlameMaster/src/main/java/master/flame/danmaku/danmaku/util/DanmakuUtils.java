@@ -149,7 +149,7 @@ public class DanmakuUtils {
         if (r != 0)
             return r < 0 ? -1 : 1;
 
-        r = obj1.hashCode() - obj1.hashCode();
+        r = obj1.hashCode() - obj2.hashCode();
         return r;
     }
 
